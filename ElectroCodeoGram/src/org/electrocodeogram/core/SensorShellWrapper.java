@@ -1,7 +1,9 @@
 package org.electrocodeogram.core;
 
+import java.io.File;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.electrocodeogram.module.ModuleRegistry;
 import org.electrocodeogram.module.source.SensorSource;
@@ -21,6 +23,9 @@ public class SensorShellWrapper extends SensorShell
      * @uml.associationEnd multiplicity="(0 1)"
      */
     private SensorSource sensorSource = null;
+    
+    /** The logging instance for SensorShells. */
+    private Logger logger;
 
     /**
      * The constructor takes the same parameters as the HS SensorShell and sipmly passes
@@ -45,6 +50,24 @@ public class SensorShellWrapper extends SensorShell
     }
 
     
+    /**
+     * @param sensorProperties
+     * @param interactive
+     * @param toolName
+     * @param offlineEnabled
+     * @param commandFile
+     */
+    public SensorShellWrapper(SensorProperties sensorProperties, boolean interactive, String toolName, boolean offlineEnabled, File commandFile)
+    {
+        super(sensorProperties, interactive, toolName, offlineEnabled, commandFile);
+        
+        ModuleRegistry.getInstance();
+        
+        sensorSource = new SensorSource();
+        
+    }
+
+
     /** 
      * This method overwrites the Hs doCommand method
      * @see org.hackystat.kernel.shell.SensorShell#doCommand(java.util.Date, java.lang.String, java.util.List)
@@ -93,7 +116,5 @@ public class SensorShellWrapper extends SensorShell
             
         }
      }
-
-    
 
 }

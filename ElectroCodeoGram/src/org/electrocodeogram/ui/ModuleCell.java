@@ -7,16 +7,9 @@
 package org.electrocodeogram.ui;
 
 import java.awt.Color;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
-import java.util.Map;
 
 import javax.swing.BorderFactory;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
 
 import org.electrocodeogram.module.Module;
 import org.jgraph.graph.DefaultGraphCell;

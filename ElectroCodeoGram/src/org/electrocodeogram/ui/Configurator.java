@@ -9,7 +9,6 @@ import java.util.Observable;
 import java.util.Observer;
 
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
@@ -22,10 +21,6 @@ import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-
-
-
-
 
 import org.electrocodeogram.core.EventPacket;
 import org.electrocodeogram.module.Module;

@@ -49,7 +49,6 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.electrocodeogram.core.SensorShellWrapper;
 import org.hackystat.kernel.admin.SensorProperties;
-import org.hackystat.kernel.shell.SensorShell;
 import org.hackystat.stdext.sensor.eclipse.event.EclipseSensorEvent;
 import org.hackystat.stdext.sensor.eclipse.event.IEclipseSensorEventListener;
 import org.hackystat.stdext.sensor.eclipse.junit.EclipseJUnitListener;
@@ -430,7 +429,7 @@ public class EclipseSensor {
     // Adds the current activity.
     String[] args = {"add", activityType, data
     };
-    this.eclipseSensorShell.doCommand("Activity", Arrays.asList(args));
+    this.eclipseSensorShell.doCommand("MicroActivity", Arrays.asList(args));
   }
 
   /** Keep track of the latest state change file to avoid sending out repeated data. */
