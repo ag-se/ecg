@@ -2,28 +2,8 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="E:/Programme/eclipse/plugins/org.eclipse.jface_3.0.0/jface.jar"/>
-	<classpathentry kind="lib" path="E:/Programme/eclipse/plugins/org.eclipse.debug.core_3.0.1/dtcore.jar"/>
-	<classpathentry kind="lib" path="E:/Programme/eclipse/plugins/org.eclipse.ui.editors_3.0.1/editors.jar"/>
-	<classpathentry kind="lib" path="E:/Programme/eclipse/plugins/org.eclipse.ui.ide_3.0.1/ide.jar"/>
-	<classpathentry kind="lib" path="E:/Programme/eclipse/plugins/org.eclipse.jdt.ui_3.0.1/jdt.jar"/>
-	<classpathentry kind="lib" path="E:/Programme/eclipse/plugins/org.eclipse.jdt.core_3.0.1/jdtcore.jar"/>
-	<classpathentry kind="lib" path="E:/Programme/eclipse/plugins/org.eclipse.jface.text_3.0.1/jfacetext.jar"/>
-	<classpathentry kind="lib" path="E:/Programme/eclipse/plugins/org.eclipse.jdt.junit_3.0.1/junitsupport.jar"/>
-	<classpathentry kind="lib" path="E:/Programme/eclipse/plugins/org.eclipse.osgi_3.0.1/osgi.jar"/>
-	<classpathentry kind="lib" path="E:/Programme/eclipse/plugins/org.eclipse.core.resources_3.0.1/resources.jar"/>
-	<classpathentry kind="lib" path="E:/Programme/eclipse/plugins/org.eclipse.core.runtime_3.0.1/runtime.jar"/>
-	<classpathentry kind="lib" path="E:/Programme/eclipse/plugins/org.eclipse.swt.win32_3.0.1/ws/win32/swt.jar"/>
-	<classpathentry kind="lib" path="E:/Programme/eclipse/plugins/org.eclipse.text_3.0.1/text.jar"/>
-	<classpathentry kind="lib" path="E:/Programme/eclipse/plugins/org.eclipse.ui.workbench.texteditor_3.0.1/texteditor.jar"/>
-	<classpathentry kind="lib" path="E:/Programme/eclipse/plugins/org.eclipse.ui_3.0.1/ui.jar"/>
-	<classpathentry kind="lib" path="E:/Programme/eclipse/plugins/org.eclipse.update.ui_3.0.1/updateui.jar"/>
-	<classpathentry kind="lib" path="E:/Programme/eclipse/plugins/org.eclipse.ui.views_3.0.0/views.jar"/>
-	<classpathentry kind="lib" path="E:/Programme/eclipse/plugins/org.eclipse.ui.workbench_3.0.1/workbench.jar"/>
-	<classpathentry kind="lib" path="lib/cdtcore.jar"/>
-	<classpathentry kind="lib" path="lib/cdtparser.jar"/>
+	<classpathentry kind="src" path="/hackyKernel"/>
 	<classpathentry kind="lib" path="lib/jgraph.jar"/>
 	<classpathentry kind="lib" path="lib/jgraphaddons.jar"/>
-	<classpathentry kind="src" path="/hackyKernel"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

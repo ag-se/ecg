@@ -1,11 +1,9 @@
 package org.electrocodeogram.core;
 
-import java.io.File;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.electrocodeogram.module.ModuleRegistry;
 import org.electrocodeogram.module.source.SensorSource;
 import org.hackystat.kernel.admin.SensorProperties;
 import org.hackystat.kernel.shell.SensorShell;
@@ -16,7 +14,9 @@ import org.hackystat.kernel.shell.SensorShell;
 
 public class SensorShellWrapper extends SensorShell
 {
-
+    
+    private static final SensorShellWrapper theInstance = new SensorShellWrapper(new SensorProperties("",""),false,"ECG");
+    
     /**
      * 
      * @uml.property name="sensorSource"
@@ -27,6 +27,13 @@ public class SensorShellWrapper extends SensorShell
     /** The logging instance for SensorShells. */
     private Logger logger;
 
+    
+    public static SensorShellWrapper getInstance()
+    {
+        return theInstance;
+        
+    }
+    
     /**
      * The constructor takes the same parameters as the HS SensorShell and sipmly passes
      * them to it's constructor.
@@ -39,42 +46,21 @@ public class SensorShellWrapper extends SensorShell
      * @param isInteractive 
      * @param toolName The name of the developing tool the sending sensor is working inside
      */
-    public SensorShellWrapper(SensorProperties sensorProperties, boolean isInteractive, String toolName)
+    private SensorShellWrapper(SensorProperties sensorProperties, boolean isInteractive, String toolName)
     {
         super(sensorProperties, isInteractive, toolName);
-		
-        ModuleRegistry.getInstance();
-    
+		       
         sensorSource = new SensorSource();
         
     }
-
-    
-    /**
-     * @param sensorProperties
-     * @param interactive
-     * @param toolName
-     * @param offlineEnabled
-     * @param commandFile
-     */
-    public SensorShellWrapper(SensorProperties sensorProperties, boolean interactive, String toolName, boolean offlineEnabled, File commandFile)
-    {
-        super(sensorProperties, interactive, toolName, offlineEnabled, commandFile);
-        
-        ModuleRegistry.getInstance();
-        
-        sensorSource = new SensorSource();
-        
-    }
-
-
+   
     /** 
      * This method overwrites the Hs doCommand method
      * @see org.hackystat.kernel.shell.SensorShell#doCommand(java.util.Date, java.lang.String, java.util.List)
      * 
      * Instead of forwarding the event into the HS framework it is forwardied into the ECG framework her.
      */
-    public boolean doCommand(Date timeStamp, String commandName, List argList)
+    public synchronized boolean doCommand(Date timeStamp, String commandName, List argList)
     {
         
         boolean result =  super.doCommand(timeStamp, commandName, argList);
@@ -116,5 +102,4 @@ public class SensorShellWrapper extends SensorShell
             
         }
      }
-
 }
