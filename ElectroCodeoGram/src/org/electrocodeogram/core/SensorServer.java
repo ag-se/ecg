@@ -7,8 +7,10 @@
 package org.electrocodeogram.core;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Observable;
 
@@ -39,6 +41,22 @@ public class SensorServer extends Observable
         
     }
     
+    public InetAddress[] getSensorAddresses()
+    {
+        int count = this.getSensorCount();
+        
+        InetAddress[] addresses = new InetAddress[count];
+        
+        Object[] sensorThreads = sensorThreadPool.values().toArray();
+        
+        for(int i=0;i<count;i++)
+        {
+            addresses[i] = ((SensorThread)sensorThreads[i]).getSensorAddress();
+        }
+        
+        return addresses;
+    }
+    
     public int getSensorCount()
     {
         return sensorThreadPool.size();
@@ -47,6 +65,24 @@ public class SensorServer extends Observable
     public void removeSensorThread(int id)
     {
         sensorThreadPool.remove(new Integer(id));
+        
+        setChanged();
+        notifyObservers(this);
+        clearChanged();
+    }
+    
+    public String[] getAddress()
+    {
+        String[] toReturn = null;
+        
+        try {
+            toReturn = new String[] {InetAddress.getLocalHost().toString(),new Integer(SensorServer.PORT).toString()};
+        }
+        catch (UnknownHostException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return toReturn;
     }
     
     public static void main(String[] args)
@@ -59,6 +95,10 @@ public class SensorServer extends Observable
         
         try {
             seso = new ServerSocket(PORT);
+            
+            me.setChanged();
+            me.notifyObservers(me);
+            me.clearChanged();
         }
         catch (IOException e) {
             // TODO Auto-generated catch block

@@ -30,8 +30,12 @@
 			</arguments>
 		</buildCommand>
 		<buildCommand>
-			<name>com.omondo.uml.std.Builder</name>
+			<name>org.eclipse.ui.externaltools.ExternalToolBuilder</name>
 			<arguments>
+				<dictionary>
+					<key>LaunchConfigHandle</key>
+					<value>&lt;project&gt;/.externalToolBuilders/com.omondo.uml.std.Builder.launch</value>
+				</dictionary>
 			</arguments>
 		</buildCommand>
 	</buildSpec>

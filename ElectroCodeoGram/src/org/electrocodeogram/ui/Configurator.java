@@ -1,18 +1,23 @@
 package org.electrocodeogram.ui;
 
 import java.awt.Color;
-import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.HeadlessException;
+import java.net.InetAddress;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
@@ -22,7 +27,6 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-
 import org.electrocodeogram.core.SensorServer;
 import org.electrocodeogram.module.Module;
 import org.electrocodeogram.module.ModuleRegistry;
@@ -31,7 +35,7 @@ import org.jgraph.graph.DefaultEdge;
 import org.jgraph.graph.GraphConstants;
 import org.jgraph.layout.TreeLayoutAlgorithm;
 
-import com.zfqjava.swing.*;
+import com.zfqjava.swing.JStatusBar;
 /**
  * @author 7oas7er *  * TODO To change the template for this generated type comment go to * Window - Preferences - Java - Code Style - Code Templates
  */
@@ -65,6 +69,8 @@ public class Configurator extends JFrame implements Observer
      * @uml.associationEnd multiplicity="(0 1)"
      */
     private ModuleGraph moduleGraph = null;
+    
+    private SensorGraph sensorGraph = null;
 
 
     private JPanel pnlModules;
@@ -78,12 +84,14 @@ public class Configurator extends JFrame implements Observer
     private JStatusBar statusBar;
     
     private boolean shouldScroll = false;
+
+    private JPanel pnlSensors;
     
     public static Configurator getInstance(Module source)
     {
         assert(source != null);
         
-        assert(source.getModuleType() == Module.SOURCE_MODULE);
+        
         
         if(theInstance == null)
         {
@@ -91,7 +99,16 @@ public class Configurator extends JFrame implements Observer
         }
         else
         {
-            theInstance.source = source;
+            try
+            {
+                assert(source.getModuleType() == Module.SOURCE_MODULE);
+                
+                theInstance.source = source;
+            }
+            catch(AssertionError e)
+            {
+                ;
+            }
         }
         return theInstance;
     }
@@ -115,7 +132,7 @@ public class Configurator extends JFrame implements Observer
         
         try {
             
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            UIManager.setLookAndFeel("org.fife.plaf.Office2003.Office2003LookAndFeel");
         }
         catch (ClassNotFoundException e) {
             // TODO Auto-generated catch block
@@ -144,10 +161,15 @@ public class Configurator extends JFrame implements Observer
         
         setBounds(0,0,800,600);
                      
-        getContentPane().setLayout(new GridLayout(4,1));
+        getContentPane().setLayout(new GridBagLayout());
         
-        moduleGraph = new ModuleGraph();
         
+        sensorGraph = new SensorGraph();
+        pnlSensors = new JPanel(new GridLayout(1,1));
+        pnlSensors.setBorder(new TitledBorder(new LineBorder(new Color(0,0,0)),"Active sensors"));
+        pnlSensors.add(sensorGraph);
+        
+        moduleGraph = new ModuleGraph();    
         pnlModules  = new JPanel(new GridLayout(1,1));
         pnlModules.setBorder(new TitledBorder(new LineBorder(new Color(0,0,0)),"Tree of running modules"));
         pnlModules.add(moduleGraph);
@@ -155,7 +177,7 @@ public class Configurator extends JFrame implements Observer
         textArea = new JTextArea();
         textArea.setEditable(false);
         textArea.setLineWrap(true);
-        
+          
         scrollPane = new JScrollPane(textArea);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
@@ -177,25 +199,83 @@ public class Configurator extends JFrame implements Observer
         pnlMessages.setBorder(new TitledBorder(new LineBorder(new Color(0,0,0)),"Event messages in selected module"));
         pnlMessages.add(scrollPane);
         
-        getContentPane().add(pnlModules);
         
-        getContentPane().add(pnlMessages);
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         
-       
+        splitPane.add(getButtonPanel(),0);
         
-        createButtons();
-
-        statusBar = new JStatusBar(JStatusBar.VIEWER);
-                     
-        getContentPane().add(statusBar);
+        JPanel pnlRight = new JPanel(new GridBagLayout());
+        
+        
+        GridBagConstraints c = new GridBagConstraints();
+        c.anchor = GridBagConstraints.NORTH;
+        c.fill = GridBagConstraints.BOTH;
+        c.gridx = 0;
+        c.gridy = 0;
+        c.weighty = 0.2;
+        c.weightx = 1;
+        
+        pnlRight.add(pnlSensors,c);
+        
+        c = new GridBagConstraints();
+        c.anchor = GridBagConstraints.NORTH;
+        c.fill = GridBagConstraints.BOTH;
+        c.gridx = 0;
+        c.gridy = 1;
+        c.weighty = 1;
+        c.weightx = 1;
+        
+        pnlRight.add(pnlModules,c);
+                
+        c = new GridBagConstraints();
+        c.anchor = GridBagConstraints.NORTH;
+        c.fill = GridBagConstraints.BOTH;
+        c.gridx = 0;
+        c.gridy = 2;
+        c.weighty = 1;
+        c.weightx = 1;
+        
+        pnlRight.add(pnlMessages,c);
+        
+        splitPane.add(pnlRight,1);
+        
+        c = new GridBagConstraints();
+        c.anchor = GridBagConstraints.NORTHWEST;
+        c.fill = GridBagConstraints.BOTH;
+        c.gridx = 0;
+        c.gridy = 0;
+        c.weighty = 2;
+        c.weightx = 2;
+        
+        getContentPane().add(splitPane,c);
+    
+        statusBar = new JStatusBar(JStatusBar.EXPLORER);
+                           
+        GridBagConstraints c2 = new GridBagConstraints();
+        c2.anchor = GridBagConstraints.SOUTHWEST;
+        c2.fill = GridBagConstraints.HORIZONTAL;
+        c2.gridx = 0;
+        c2.gridy = 2;
+        c2.weighty = 0;
+        c2.weightx = 2;
+        
+        getContentPane().add(statusBar,c2);
         
         setVisible(true);
     }
   
-    private void createButtons()
+    private JPanel getButtonPanel()
     {
-        JPanel pnlButtons = new JPanel(new FlowLayout());
+        JPanel pnlButtons = null;
+        
+        pnlButtons = new JPanel();
                         
+        pnlButtons.setLayout(new BoxLayout(pnlButtons,BoxLayout.Y_AXIS));
+        
+        pnlButtons.setBackground(Color.WHITE);
+        
+        pnlButtons.setBorder(new TitledBorder("Installed modules"));
+        
         ModuleRegistry moduleRegistry = ModuleRegistry.getInstance();
         
         Object[] moduleNameObjects = moduleRegistry.getInstalledModulesNames();
@@ -216,7 +296,7 @@ public class Configurator extends JFrame implements Observer
             
         }
         
-        getContentPane().add(pnlButtons);
+        return pnlButtons;
     }
     
     /**
@@ -226,8 +306,11 @@ public class Configurator extends JFrame implements Observer
     {
               
         this();
-        this.source = source;
-        traverseConnectedModules(null,source);
+        if (source.getModuleType() == Module.SOURCE_MODULE)
+        {
+            this.source = source;
+            traverseConnectedModules(null,source);
+        }
     }
 
     /**
@@ -275,11 +358,11 @@ public class Configurator extends JFrame implements Observer
             
             TreeLayoutAlgorithm tla = new TreeLayoutAlgorithm();
             
-            tla.setOrientation(SwingConstants.NORTH);
+            tla.setOrientation(SwingConstants.WEST);
                    
             tla.setAlignment(SwingConstants.CENTER);
             
-            tla.setCenterRoot(false);
+            tla.setCenterRoot(true);
                  
             tla.run(moduleGraph,moduleGraph.getRoots());
             
@@ -326,21 +409,53 @@ public class Configurator extends JFrame implements Observer
         {
             SensorServer seso = (SensorServer) arg;
             
-            statusBar.setText("Active Sensors: " + seso.getSensorCount());
+            int activeSensors = seso.getSensorCount();
             
-//            SensorCell sl = new SensorCell(this,"Eclipse Sensor");
-//            
-//            moduleGraph.addSensorCell(sl);
-//            
-//            TreeLayoutAlgorithm tla = new TreeLayoutAlgorithm();
-//            
-//            tla.setOrientation(SwingConstants.NORTH);
-//                   
-//            tla.setAlignment(SwingConstants.CENTER);
-//            
-//            tla.setCenterRoot(false);
-//                 
-//            tla.run(moduleGraph,moduleGraph.getRoots());
+            String text = "Active Sensors: " + activeSensors;
+            
+            JLabel lbl = (JLabel) statusBar.getComponent(4);
+            
+            lbl.setText(text);
+            
+            String[] address;
+            
+            if((address = seso.getAddress()) != null)
+            {
+                text = "Listening on: " + address[0] + ":" + address[1];
+                
+                lbl = (JLabel) statusBar.getComponent(0);
+                
+                lbl.setText(text);
+            }
+            
+            if(activeSensors > 0)
+            {
+                pnlSensors.remove(sensorGraph);
+                
+                sensorGraph = new SensorGraph();
+                
+                pnlSensors.add(sensorGraph);
+                
+                InetAddress[] addresses = seso.getSensorAddresses();
+                
+                for (int i=0;i<activeSensors;i++)
+                {
+	                SensorCell sc = new SensorCell(this,"Unknown Sensor at" + addresses[i].toString());
+		  
+	                sensorGraph.addSensorCell(sc);
+	            }
+              
+            }
+            else if(activeSensors == 0)
+            {
+                pnlSensors.remove(sensorGraph);
+                
+                sensorGraph = new SensorGraph();
+                                             
+                pnlSensors.add(sensorGraph);
+            }
+            
+            pnlSensors.repaint();
         }
     }
 

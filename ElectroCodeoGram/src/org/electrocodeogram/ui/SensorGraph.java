@@ -15,6 +15,7 @@ import org.jgraph.event.GraphSelectionEvent;
 import org.jgraph.event.GraphSelectionListener;
 import org.jgraph.graph.DefaultEdge;
 import org.jgraph.graph.DefaultGraphModel;
+import org.jgraph.graph.GraphConstants;
 
 /**
  * @author 7oas7er
@@ -22,18 +23,17 @@ import org.jgraph.graph.DefaultGraphModel;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public class ModuleGraph extends JGraph
+public class SensorGraph extends JGraph
 {
 
     private int selectedModuleCellId = -1;
     
-    private ModuleCell rootCell = null;
-
-    public ModuleGraph(){
+    public SensorGraph(){
         
         super(new DefaultGraphModel());
       
-   
+        //DefaultGraphCell[] cells = new DefaultGraphCell[2];
+
         addGraphSelectionListener(new GraphSelectionListener() {
 
             public void valueChanged(GraphSelectionEvent arg0)
@@ -50,7 +50,7 @@ public class ModuleGraph extends JGraph
                 }
                 
             }});
-           
+       
         this.setBorder(new LineBorder(Color.GRAY));
 		
     }
@@ -59,29 +59,19 @@ public class ModuleGraph extends JGraph
      * 
      * @uml.property name="selectedModuleCellId"
      */
-    public int getSelectedModuleCellId() {
+    public int getSelectedSensorCellId() {
         return selectedModuleCellId;
     }
 
-          
-    public void addModuleCell(ModuleCell cell)
-    {
-        if (rootCell == null)
-        {
-            rootCell = cell;
-        }
-        this.getGraphLayoutCache().insert(cell);
-    }
-
-    /**
-     * @param edge
-     */
-    public void addEdge(DefaultEdge edge)
-    {
-        this.getGraphLayoutCache().insert(edge);
-        
-    }
     
+    public void addSensorCell(SensorCell cell)
+    {
+        this.getGraphLayoutCache().insert(cell);
+
+    }
+   
+   
+ 
 
     
 }

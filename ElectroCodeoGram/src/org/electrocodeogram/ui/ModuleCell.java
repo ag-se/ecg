@@ -52,6 +52,10 @@ public class ModuleCell extends DefaultGraphCell
         GraphConstants.setBounds(this.getAttributes(), new Rectangle2D.Double(root.getWidth() / 2, 20, 100, 25));
         
         GraphConstants.setAutoSize(this.getAttributes(),true);
+        
+        GraphConstants.setMoveable(this.getAttributes(),false);
+        
+        GraphConstants.setEditable(this.getAttributes(),false);
                
         switch (moduleType)
         {
@@ -73,6 +77,8 @@ public class ModuleCell extends DefaultGraphCell
         DefaultPort port = new DefaultPort();
         this.add(port);
         port.setParent(this);
+        
+        
         
 
     }

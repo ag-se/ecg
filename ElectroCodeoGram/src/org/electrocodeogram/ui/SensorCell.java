@@ -11,7 +11,6 @@ import java.awt.geom.Rectangle2D;
 
 import javax.swing.BorderFactory;
 
-import org.electrocodeogram.module.Module;
 import org.jgraph.graph.DefaultGraphCell;
 import org.jgraph.graph.DefaultPort;
 import org.jgraph.graph.GraphConstants;

@@ -8,6 +8,7 @@ package org.electrocodeogram.core;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
 
@@ -34,6 +35,18 @@ public class SensorThread extends Thread
     
     private SensorServer seso = null;
    
+    public InetAddress getSensorAddress()
+    {
+        if (socketToSensor != null)
+        {
+            return socketToSensor.getInetAddress();
+        }
+        else
+        {
+            return null;
+        }
+    }
+    
     public SensorThread(SensorServer seso, Socket socketToSensor)
     {
         super();

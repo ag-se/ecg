@@ -3,10 +3,11 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="src" path="/hackyKernel"/>
+	<classpathentry kind="src" path="/ECG_ClientTools"/>
+	<classpathentry kind="lib" path="lib/componentset.jar"/>
 	<classpathentry kind="lib" path="lib/jgraph.jar"/>
 	<classpathentry kind="lib" path="lib/jgraphaddons.jar"/>
-	<classpathentry kind="src" path="/ECG_ClientTools"/>
-	<classpathentry kind="lib" path="componentset.jar"/>
-	<classpathentry kind="lib" path="sensorshell.jar"/>
+	<classpathentry kind="lib" path="lib/OfficeLnFs.jar"/>
+	<classpathentry kind="lib" path="lib/sensorshell.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
