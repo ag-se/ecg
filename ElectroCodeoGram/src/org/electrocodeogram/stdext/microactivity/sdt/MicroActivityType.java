@@ -36,6 +36,8 @@ public class MicroActivityType {
   public static final MicroActivityType UNKNOWN = new MicroActivityType("Unknown");
   /** The active buffer has changed state in a sensor. */
   public static final MicroActivityType STATE_CHANGE = new MicroActivityType("State Change");
+  
+  public static final MicroActivityType WINDOW_ACTIVATED = new MicroActivityType("Window Activated");
 
   /** Holds the string identifying this ActivityType instance. */
   private String activityString;
