@@ -5,18 +5,15 @@
  * Window - Preferences - Java - Code Style - Code Templates
  */
 package org.electrocodeogram.sensorwrapper;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.net.InetAddress;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import java.net.InetAddress;
-import java.net.Socket;
-import java.io.ObjectOutputStream;	
-
-import org.hackystat.kernel.admin.SensorProperties;
-
-import java.net.UnknownHostException;
-import java.io.IOException;
+import org.electrocodeogram.sensorwrapper.SensorProperties;
 /**
  * @author 7oas7er
  *
@@ -33,9 +30,9 @@ public class SensorShell
     
     private Socket socketToServer = null;
     
-    public static InetAddress HOST = null;
+    private InetAddress host = null;
     
-    public static final int PORT = 22222;
+    private int port;
     /**
      * @param string
      * @param b
@@ -47,12 +44,11 @@ public class SensorShell
 
         try
         {
-            HOST = InetAddress.getLocalHost();
+            host = properties.getECGServerAddress();
+            
+            port = properties.getECGServerPort();
             
             connectToServer();
-        }
-        catch(UnknownHostException e)
-        {          
         }
         catch(IOException e)
         {
@@ -65,7 +61,7 @@ public class SensorShell
      */
     private void connectToServer() throws IOException
     {
-        socketToServer = new Socket(HOST,PORT);
+        socketToServer = new Socket(host,port);
         
         connectedFlag = true;
         
