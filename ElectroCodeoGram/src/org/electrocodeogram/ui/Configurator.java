@@ -23,6 +23,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 
+import org.electrocodeogram.core.SensorServer;
 import org.electrocodeogram.module.Module;
 import org.electrocodeogram.module.ModuleRegistry;
 import org.electrocodeogram.sensorwrapper.EventPacket;
@@ -30,6 +31,7 @@ import org.jgraph.graph.DefaultEdge;
 import org.jgraph.graph.GraphConstants;
 import org.jgraph.layout.TreeLayoutAlgorithm;
 
+import com.zfqjava.swing.*;
 /**
  * @author 7oas7er *  * TODO To change the template for this generated type comment go to * Window - Preferences - Java - Code Style - Code Templates
  */
@@ -73,6 +75,8 @@ public class Configurator extends JFrame implements Observer
     
     private JScrollPane scrollPane;
     
+    private JStatusBar statusBar;
+    
     private boolean shouldScroll = false;
     
     public static Configurator getInstance(Module source)
@@ -85,15 +89,28 @@ public class Configurator extends JFrame implements Observer
         {
             theInstance = new Configurator(source);
         }
+        else
+        {
+            theInstance.source = source;
+        }
         return theInstance;
     }
     
     /**
-     * @throws java.awt.HeadlessException
+     * @return
      */
-    private Configurator(Module source) throws HeadlessException
+    public static Observer getInstance()
     {
-              
+        if(theInstance == null)
+        {
+            theInstance = new Configurator();
+        }
+        return theInstance;
+    }
+ 
+    
+    private Configurator()
+    {
         super();
         
         try {
@@ -117,7 +134,7 @@ public class Configurator extends JFrame implements Observer
             e.printStackTrace();
         }
           
-        this.source = source;
+        
         
         setTitle("ElectroCodeoGram Configurator");
     
@@ -127,7 +144,7 @@ public class Configurator extends JFrame implements Observer
         
         setBounds(0,0,800,600);
                      
-        getContentPane().setLayout(new GridLayout(3,1));
+        getContentPane().setLayout(new GridLayout(4,1));
         
         moduleGraph = new ModuleGraph();
         
@@ -164,10 +181,14 @@ public class Configurator extends JFrame implements Observer
         
         getContentPane().add(pnlMessages);
         
-        traverseConnectedModules(null,source);
+       
         
         createButtons();
-                
+
+        statusBar = new JStatusBar(JStatusBar.VIEWER);
+                     
+        getContentPane().add(statusBar);
+        
         setVisible(true);
     }
   
@@ -196,6 +217,17 @@ public class Configurator extends JFrame implements Observer
         }
         
         getContentPane().add(pnlButtons);
+    }
+    
+    /**
+     * @throws java.awt.HeadlessException
+     */
+    private Configurator(Module source) throws HeadlessException
+    {
+              
+        this();
+        this.source = source;
+        traverseConnectedModules(null,source);
     }
 
     /**
@@ -290,7 +322,26 @@ public class Configurator extends JFrame implements Observer
                 
             }
         }
-  
+        else if(arg instanceof SensorServer)
+        {
+            SensorServer seso = (SensorServer) arg;
+            
+            statusBar.setText("Active Sensors: " + seso.getSensorCount());
+            
+//            SensorCell sl = new SensorCell(this,"Eclipse Sensor");
+//            
+//            moduleGraph.addSensorCell(sl);
+//            
+//            TreeLayoutAlgorithm tla = new TreeLayoutAlgorithm();
+//            
+//            tla.setOrientation(SwingConstants.NORTH);
+//                   
+//            tla.setAlignment(SwingConstants.CENTER);
+//            
+//            tla.setCenterRoot(false);
+//                 
+//            tla.run(moduleGraph,moduleGraph.getRoots());
+        }
     }
 
 
@@ -306,7 +357,7 @@ public class Configurator extends JFrame implements Observer
         
         ModuleCell ml = new ModuleCell(this,m.getModuleType(),m.getId(),m.getName());
         
-        moduleGraph.addCell(ml);
+        moduleGraph.addModuleCell(ml);
         
         if(parent != null)
         {
@@ -319,10 +370,8 @@ public class Configurator extends JFrame implements Observer
     		edge.setSource(parent.getChildAt(0));
     		
     		edge.setTarget(ml.getChildAt(0));
-    		
-    		
-    		
-    		moduleGraph.addCell(edge);
+    		   		   		
+    		moduleGraph.addEdge(edge);
         }
         if(m.countConnectedModules() > 0)
         {
@@ -338,6 +387,7 @@ public class Configurator extends JFrame implements Observer
 
         
     }
- 
+
+    
 
 }

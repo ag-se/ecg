@@ -7,5 +7,6 @@
 	<classpathentry kind="lib" path="lib/jgraphaddons.jar"/>
 	<classpathentry kind="src" path="/ECG_ClientTools"/>
 	<classpathentry kind="lib" path="sensorshell.jar"/>
+	<classpathentry kind="lib" path="componentset.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

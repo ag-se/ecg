@@ -9,6 +9,7 @@ package org.electrocodeogram.core;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.Socket;
+import java.net.SocketException;
 
 import org.electrocodeogram.sensorwrapper.EventPacket;
 
@@ -21,15 +22,25 @@ import org.electrocodeogram.sensorwrapper.EventPacket;
 public class SensorThread extends Thread
 {
 
+    private static int count = 0;
+    
+    private int id = -1;
+    
     private Socket socketToSensor = null;
     
     private boolean runningFlag = true;
     
     private ObjectInputStream ois = null;
+    
+    private SensorServer seso = null;
    
-    public SensorThread(Socket socketToSensor)
+    public SensorThread(SensorServer seso, Socket socketToSensor)
     {
         super();
+                
+        id = ++count;
+        
+        this.seso = seso;
         
         this.socketToSensor = socketToSensor;
         
@@ -42,6 +53,17 @@ public class SensorThread extends Thread
         }
     }
     
+    public int getId()
+    {
+        return id;
+    }
+    
+    
+    public void stopSensorThread()
+    {
+        runningFlag = false;
+    }
+    
     public void run()
     {
         while(runningFlag)
@@ -50,6 +72,10 @@ public class SensorThread extends Thread
                 EventPacket e = (EventPacket) ois.readObject();
                 
                 SensorShellWrapper.getInstance().doCommand(e.getTimeStamp(),e.getCommandName(),e.getArglist());
+            }
+            catch(SocketException e)
+            {
+                runningFlag = false;
             }
             catch (IOException e) {
                 // TODO Auto-generated catch block
@@ -60,6 +86,9 @@ public class SensorThread extends Thread
                 e.printStackTrace();
             }
         }
+        
+        seso.removeSensorThread(id);
+        
     }
 
 

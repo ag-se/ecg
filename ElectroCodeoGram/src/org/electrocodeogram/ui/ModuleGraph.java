@@ -9,8 +9,10 @@ package org.electrocodeogram.ui;
 import org.jgraph.JGraph;
 import org.jgraph.event.GraphSelectionEvent;
 import org.jgraph.event.GraphSelectionListener;
+import org.jgraph.graph.DefaultEdge;
 import org.jgraph.graph.DefaultGraphCell;
 import org.jgraph.graph.DefaultGraphModel;
+import org.jgraph.graph.GraphConstants;
 
 /**
  * @author 7oas7er
@@ -22,6 +24,8 @@ public class ModuleGraph extends JGraph
 {
 
     private int selectedModuleCellId = -1;
+    
+    private ModuleCell rootCell = null;
 
     public ModuleGraph(){
         
@@ -72,9 +76,39 @@ public class ModuleGraph extends JGraph
     }
 
     
-    public void addCell(DefaultGraphCell cell)
+    public void addSensorCell(SensorCell cell)
     {
         this.getGraphLayoutCache().insert(cell);
+        
+        DefaultEdge edge = new DefaultEdge();
+        
+        GraphConstants.setLineEnd(edge.getAttributes(),GraphConstants.ARROW_CLASSIC);
+        
+        GraphConstants.setDisconnectable(edge.getAttributes(),false);
+        
+		edge.setSource(cell.getChildAt(0));
+		
+		edge.setTarget(rootCell.getChildAt(0));
+		
+		addEdge(edge);
+    }
+    
+    public void addModuleCell(ModuleCell cell)
+    {
+        if (rootCell == null)
+        {
+            rootCell = cell;
+        }
+        this.getGraphLayoutCache().insert(cell);
+    }
+
+    /**
+     * @param edge
+     */
+    public void addEdge(DefaultEdge edge)
+    {
+        this.getGraphLayoutCache().insert(edge);
+        
     }
     
 //    private DefaultGraphCell createVertex(String name, double x,

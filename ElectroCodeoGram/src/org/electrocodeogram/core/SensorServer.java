@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
+import java.util.Observable;
 
 import org.electrocodeogram.module.ModuleRegistry;
 import org.electrocodeogram.ui.Configurator;
@@ -20,7 +21,7 @@ import org.electrocodeogram.ui.Configurator;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public class SensorServer
+public class SensorServer extends Observable
 {
     public static final int PORT = 22222;
     
@@ -38,9 +39,21 @@ public class SensorServer
         
     }
     
+    public int getSensorCount()
+    {
+        return sensorThreadPool.size();
+    }
+    
+    public void removeSensorThread(int id)
+    {
+        sensorThreadPool.remove(new Integer(id));
+    }
+    
     public static void main(String[] args)
     {
         SensorServer me = new SensorServer();
+        
+        me.addObserver(Configurator.getInstance());
                    
         ServerSocket seso = null;
         
@@ -56,7 +69,15 @@ public class SensorServer
         {
             try {
                 Socket socketToSensor = seso.accept();
-                SensorThread st = new SensorThread(socketToSensor);
+                
+                SensorThread st = new SensorThread(me,socketToSensor);
+                
+                me.sensorThreadPool.put(new Integer(st.getId()),st);
+                
+                me.setChanged();
+                me.notifyObservers(me);
+                me.clearChanged();
+                
                 st.start();
                 
             }
