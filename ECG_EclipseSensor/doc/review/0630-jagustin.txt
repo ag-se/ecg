@@ -1,0 +1,43 @@
+Code Review of Eclipse Sensor by Joy Agustin
+
+1. [EclipseSensor.java:73,75] I think use of the <code> tags are useful to
+   emphasize the method names, but I think you might have fogotten the </code>
+   closing tags.  Also, I'm not sure what value is added to the JavaDoc by
+   adding descriptions of the methods at the class level this way.  Right now
+   it looks like the comments should be placed at the method level.
+   (Agreed, get rid of method docs at class level.)
+   <fixed - deleted all method descriptions>
+   
+2. [EclipseSensor.java:285, 304, 318, 342, 394] Inconsistent use of
+   this.shell.doCommand(), doCommand(), and this.doCommand().
+   (OK)
+   <fixed>
+   
+3. [EclipseSensor.java:416] Not sure why you would need a
+   removeEclipseSensorEventListener method?
+   (OK)
+   <done>
+   
+4. [Ramblings of a confused person] Can't remember if anyone ever mentioned this
+   before, but I was looking though my Hackystat data and I noticed that
+   sometimes I have 3 or 4 "Browser activated" data in a row within a short
+   period of time:
+   
+Mon Jun 30 13:26:24 HST 2003 Eclipse State Change C:/cvs/hackyEclipse/doc/review/0630-jagustin.txt
+Mon Jun 30 13:27:16 HST 2003 Eclipse Unknown Browser activated
+Mon Jun 30 13:28:12 HST 2003 Eclipse Unknown Browser activated
+Mon Jun 30 13:28:29 HST 2003 Eclipse Unknown Browser activated
+Mon Jun 30 13:28:39 HST 2003 Eclipse Open File C:/cvs/hackyEclipse/src/org/hackystat/stdext/sensor/eclipse/event/IEclipseSensorEventListener.java
+   
+   For example, above my browser was activated 3 times in little over a minute.
+   Would it be possible to gather data to tell me what file is active just
+   before my browser was not active and then tell me what file is active when my
+   my browser is reactivated (like a before and after)?  Perhaps with this data
+   Hackystat can figure out what people's programming habits are?  (From the
+   above example, we can all guess that I was doing this code review.)  But
+   perhaps this wouldn't work because it would also require knowing what a
+   person did while they were "away" from the browser.  Or perhaps I'm just
+   trying to find something that isn't there.
+   (Get rid of recording these browser events, there is no useful information provided.)
+   <removed the "browser activated" and the "browser closing" messages>
+   

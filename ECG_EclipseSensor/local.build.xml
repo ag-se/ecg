@@ -1,0 +1,267 @@
+<project name="hackyEclipse" default="default" basedir=".">
+  <description>
+  Local build file for the hackyEclipse module.
+  CVS: $Id: local.build.xml,v 1.12 2004/07/29 02:33:39 takuyay Exp $
+  </description>
+  
+  <property name="src.dir" location="${basedir}/src"/>
+  <property name="lib.dir" location="${basedir}/lib"/>
+  <property name="lib.jar.dir" location="${lib.dir}/jar"/>
+  <property name="classes.2x.dir" location="${basedir}/build/classes/2x"/>
+  <property name="classes.3x.dir" location="${basedir}/build/classes/3x"/>
+  
+  <property name="eclipse.jar.2x.dir" location="${lib.dir}/jar/2x"/>
+  <property name="eclipse.jar.3x.dir" location="${lib.dir}/jar/3x"/>
+   
+  <!-- *********************************************************************** -->
+  <!--
+  <target name="updateWebInfLib"
+    description="Updates hackyBuild WEB-INF/lib with jars needed for server-side.">
+    <fail message="Undefined install.war.web-inf.lib.dir" unless="install.war.web-inf.lib.dir"/>
+    <copy todir="${install.war.web-inf.lib.dir}" preservelastmodified="true">
+      <fileset dir="${lib.jar.dir}">
+        <include name="*.jar"/>
+      </fileset>
+     </copy>
+  </target>
+  -->
+  <target name="clean"
+          description="clean build directory.">
+    <delete dir="${basedir}/build"/>
+  </target>
+
+  <!-- *********************************************************************** -->
+  <!--<target name="setClassPath" depends="updateWebInfLib"-->
+  <target name="setClassPath"
+    description="Defines the classpath for compiling and javadoc-ing this module.">
+    <fail message="Undefined install.war.web-inf.lib.dir" unless="install.war.web-inf.lib.dir"/>
+    <fail message="Undefined tomcat.servlet.jar" unless="tomcat.servlet.jar"/>
+
+    <path id="compile.classpath.2x">
+      <pathelement location="${install.war.web-inf.classes.dir}"/>
+      <!--
+      <pathelement location="${tomcat.servlet.jar}"/>
+      <fileset dir="${install.war.web-inf.lib.dir}">
+        <include name="*.jar"/>
+      </fileset>
+      -->
+      <!-- Eclipse (client-side) sensor libraries -->
+      <fileset dir="${eclipse.jar.2x.dir}">
+        <include name="**/*.jar"/>
+      </fileset>
+    </path>
+    
+    <path id="compile.classpath.3x">
+      <pathelement location="${install.war.web-inf.classes.dir}"/>
+      <!--
+      <pathelement location="${tomcat.servlet.jar}"/>
+      -->
+      <!--
+      <fileset dir="${install.war.web-inf.lib.dir}">
+        <include name="*.jar"/>
+      </fileset>
+      -->
+      
+      <!-- Eclipse (client-side) sensor libraries -->
+      <fileset dir="${eclipse.jar.3x.dir}">
+        <include name="**/*.jar"/>
+      </fileset>
+    </path>
+    
+    <path id="compile.classpath">
+      <path refid="compile.classpath.3x"/>
+    </path>
+  </target>    
+
+  <!-- *********************************************************************** -->
+  <!--<target name="compile" depends="updateWebInfLib, setClassPath"-->
+  <!--
+  <target name="compile" depends="setClassPath"
+    description="Compiles changed classes to WEB-INF/classes directory.">
+    <echo message="  (${ant.project.name}) Invoking compile."/>
+    <fail message="Undefined install.war.web-inf.classes.dir" unless="install.war.web-inf.classes.dir"/>
+    <javac srcdir="${src.dir}" 
+           destdir="${install.war.web-inf.classes.dir}" 
+           debug="on"
+           deprecation="on">
+       <classpath refid="compile.classpath"/>           
+    </javac>
+  </target>
+  -->
+  
+  <!-- *********************************************************************** -->
+  <target name="compile"
+    description="Compiles changed classes to local classes2x and classes3x directory.">
+    <antcall target="compile2x"/>
+    <antcall target="compile3x"/>
+  </target>
+  
+  <!-- *********************************************************************** -->
+  <!--<target name="compile" depends="updateWebInfLib, setClassPath"-->
+  <target name="compile2x" depends="setClassPath"
+    description="Compiles changed classes to local classes3x directory.">
+    <echo message="  (${ant.project.name}) Invoking compile."/>
+    <!--
+    <fail message="Undefined install.war.web-inf.classes.dir" unless="install.war.web-inf.classes.dir"/>
+    -->
+    <mkdir dir="${classes.2x.dir}"/>
+    <javac srcdir="${src.dir}" 
+           destdir="${classes.2x.dir}" 
+           debug="on"
+           fork="on"
+           deprecation="on">
+       <classpath refid="compile.classpath.2x"/>           
+    </javac>
+    <copy todir="${classes.2x.dir}">
+      <fileset dir="${src.dir}" includes="**/*.properties"/>      
+    </copy>
+  </target>
+  
+    <!-- *********************************************************************** -->
+  <!--<target name="compile" depends="updateWebInfLib, setClassPath"-->
+  <target name="compile3x" depends="setClassPath"
+    description="Compiles changed classes to local classes3x directory.">
+    <echo message="  (${ant.project.name}) Invoking compile."/>
+    <!--
+    <fail message="Undefined install.war.web-inf.classes.dir" unless="install.war.web-inf.classes.dir"/>
+    -->
+    <mkdir dir="${classes.3x.dir}"/>
+    <javac srcdir="${src.dir}" 
+           destdir="${classes.3x.dir}" 
+           debug="on"
+           fork="on"
+           deprecation="on"
+           excludes="org/hackystat/stdext/sensor/eclipse/helper2x/**/*">
+       <classpath refid="compile.classpath.3x"/>           
+    </javac>
+    <copy todir="${classes.3x.dir}">
+      <fileset dir="${src.dir}" includes="**/*.properties"/>      
+    </copy>
+  </target>
+
+  <!-- *********************************************************************** -->
+  <target name="war" depends="compile"
+    description="Brings the install.war.dir directory up to date.">
+    <echo message="  (${ant.project.name}) Invoking war."/>
+    <fail message="Undefined install.war.dir" unless="install.war.dir"/>
+    <property name="module.src.dir" location="${src.dir}"/>    
+    <ant dir="../hackyBuild" antfile="build.utils.xml" target="updateWebAppContent"/>
+  </target>
+
+  <!-- *********************************************************************** -->
+  <target name="javadoc" depends="compile3x"
+    description="Generates Javadoc documentation.">
+    <property name="module.src.dir" value="${src.dir}"/>    
+    <property name="module.name" value="${ant.project.name}"/>   
+    <property name="module.version" value="${version}"/> 
+    <property name="module.classpath" refid="compile.classpath.3x"/>   
+    <property name="module.excludepackagenames" value="org/hackystat/stdext/sensor/eclipse/helper2x/**/*"/> 
+    <ant dir="../hackyBuild" antfile="build.utils.xml" target="javadoc"/>
+  </target>
+
+  <!-- *********************************************************************** -->
+  <target name="install" depends="compile, war, installEclipseSensor"
+    description="Required target. Does nothing other than compile and war.">
+  </target>
+  
+  <!-- *********************************************************************** -->
+  <target name="cvsCommit"   
+    description="Does a CVS commit on the current module.">
+    <fail message="user.cvsroot property not defined." unless="user.cvsroot"/>
+    <fail message="cvs.message property not defined." unless="cvs.message"/>
+    <cvs cvsRoot="${user.cvsroot}"
+         command="commit -m ${cvs.message}"/>
+  </target>
+
+  <!-- *********************************************************************** -->
+  <!--<target name="bcml" depends="setClassPath, updateWebInfLib"-->
+  <target name="bcml" depends="setClassPath"
+    description="Compiles module, then runs BCML over generated class files.">
+    <echo message="  (${ant.project.name}) Invoking bcml."/>
+    <property name="module.classes.dir" location="${basedir}/bcml-compile"/>
+    <property name="module.name" value="${ant.project.name}"/>
+    <delete dir="${module.classes.dir}" quiet="yes"/>
+    <mkdir dir="${module.classes.dir}"/>
+    <javac srcdir="${src.dir}" 
+           destdir="${module.classes.dir}" 
+           debug="on"
+           excludes="org/hackystat/stdext/sensor/eclipse/helper2x/**/*">
+       <classpath refid="compile.classpath.3x"/>           
+    </javac>
+    <ant dir="../hackyBuild" inheritRefs="true" antfile="build.utils.xml" target="bcml"/>
+    <delete dir="${module.classes.dir}" quiet="yes"/>
+  </target>
+  
+  <!-- *********************************************************************** -->
+  <target name="default" depends="install"
+    description="Default target is install.">
+  </target>
+  
+  <!-- *********************************************************************** -->
+  <target name="sensorsUptodate"
+    description="Defines sensors.uptodate if all sensor executables are newer than their sources.">
+    <fail message="Undefined install.war.download.dir" unless="install.sensorshell.dir"/>
+    <condition property="sensors.uptodate">
+      <and>
+        <!--
+        <uptodate targetfile="${install.war.download.dir}/sensor.cccc.jar">
+          <srcfiles dir="${install.war.web-inf.classes.dir}"
+                    includes="org/hackystat/stdext/sensor/ant/cccc/**"/>
+        </uptodate>
+        <uptodate targetfile="${install.war.download.dir}/sensor.jblanket.jar">
+          <srcfiles dir="${install.war.web-inf.classes.dir}"
+                    includes="org/hackystat/stdext/sensor/ant/jblanket/**"/>
+        </uptodate>
+        <uptodate targetfile="${install.war.download.dir}/sensor.junit.jar">
+          <srcfiles dir="${install.war.web-inf.classes.dir}"
+                    includes="org/hackystat/stdext/sensor/ant/junit/**"/>
+        </uptodate>
+        <uptodate targetfile="${install.war.download.dir}/sensor.bcml.jar">
+          <srcfiles dir="${install.war.web-inf.classes.dir}"
+                    includes="org/hackystat/stdext/sensor/ant/bcml/**"/>
+        </uptodate>
+        -->
+       <uptodate targetfile="${install.war.download.dir}/sensor.eclipse.3x.jar">
+          <srcfiles dir="${classes.3x.dir}"
+                    includes="org/hackystat/stdext/sensor/eclipse/**"/>
+       </uptodate>
+       <uptodate targetfile="${install.war.download.dir}/sensor.eclipse.2x.jar">
+          <srcfiles dir="${classes.2x.dir}"
+                    includes="org/hackystat/stdext/sensor/eclipse/**"/>
+       </uptodate>
+
+      </and>
+    </condition>
+  </target>
+  
+  <!-- *********************************************************************** -->
+  <!--   Eclipse installation targets                                         -->
+  <!-- *********************************************************************** -->
+
+   <target name="installEclipseSensor" depends="sensorsUptodate" unless="sensors.uptodate"
+    description="Packages the Eclipse sensor and puts to installation dirs.">
+    <echo message="  (${ant.project.name}) Installing eclipse sensor."/>
+    <property name="eclipse.sensor.dir" location="${src.dir}/org/hackystat/stdext/sensor/eclipse"/>
+    <copy todir="${install.war.eclipse.dir}" preservelastmodified="true">
+      <fileset dir="${eclipse.sensor.dir}/update"/>
+    </copy>
+
+    <!-- Copy junit plugin distribution file to kernel/lib/ext/download/eclipse directory tree. -->
+    <copy todir="${install.war.eclipse.dir}" preservelastmodified="true">
+      <fileset dir="${lib.dir}/jar/2x" includes="*.zip"/>
+    </copy>
+
+    <!-- Make sensor.eclipse.jar. Do this here to keep all Eclipse stuff together. -->
+    <jar jarfile="${install.war.download.dir}/sensor.eclipse.2x.jar"
+         basedir="${classes.2x.dir}"
+         includes="**/eclipse/**/*.class,**/*.properties"
+         manifest="${install.manifest}" />
+         
+    <jar jarfile="${install.war.download.dir}/sensor.eclipse.3x.jar"
+         basedir="${classes.3x.dir}"
+         includes="**/eclipse/**/*.class,**/*.properties"
+         manifest="${install.manifest}" />
+    
+  </target>
+  
+</project>

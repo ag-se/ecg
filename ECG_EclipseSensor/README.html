@@ -1,0 +1,161 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+  <head>
+    <title>HackyStat Eclipse README</title>
+  
+<link href="lib/stylesheet.css" rel="stylesheet" type="text/css">
+        </head>
+<body>
+<h1 align="center"><font size="3">Hacky Eclipse Developer Documentation</font><br>
+  README</h1>
+<p align="center"><a href="http://csdl.ics.hawaii.edu/%7Etakuyay/">Takuya Yamashita</a><br>
+  <a href="http://csdl.ics.hawaii.edu/">Collaborative Software Development Laboratory</a><br>
+  <a href="http://www.hawaii.edu/">University of Hawaii&nbsp;</a></p>
+<p align="center">$Id: README.html,v 1.3 2004/07/02 11:32:24 takuyay Exp $</p>
+<p align="left">These instructions explain the structure of the Hacky Eclipse 
+  distribution, the steps required to build an installation with a chosen set 
+  of extensions, and how to develop the Hacky Eclipse Sensor inside Eclipse IDE.</p>
+<h2 align="left">A. Contents of this package</h2>
+<table border="1" width="100%" height="308">
+  <tr> 
+    <td width="20%" align="center" height="18"><b>Directory/File</b></td>
+    <td width="80%" height="18"> <p align="center"><b>Contents</b></td>
+  </tr>
+  <tr> 
+    <td width="20%" align="center" height="95"><b>.</b></td>
+    <td width="80%" height="95">Top-level files include: 
+      <ul>
+        <li><a href="README.html">README.html</a> (this file)</li>
+        <li><a href="local.build.xml">local.build.xml</a> (the Ant build configuration file, called by hackyBuild module)</li>
+        <li><a href="plugin.xml">plugin.xml</a> (the eclipse PDE file to simulate Hackystat Eclipse seonsor within Eclipse) </li>
+    </ul></td>
+  </tr>
+  <tr> 
+    <td width="20%" align="center" height="96"><b>./lib</b></td>
+    <td width="80%" height="96">Contains data files and components used to build 
+      Hackystat Sensor for Eclipse
+      <ul><li><b>eclipse/</b>: Contains .jar files for compiling Hacky Eclipse</li>
+      </ul>
+    <p>&nbsp;</p></td>
+  </tr>
+  <tr> 
+    <td width="20%" align="center" height="59"><b>./doc</b></td>
+    <td width="80%" height="59">Contains developer documentation including: 
+      <ul>
+        <li><a href="doc/eclipse_sensor_size.xls">eclipse_sensor_size.xls</a> 
+          shows the locc results between before-refactoring and after-refactoring.</li>
+    </ul></td>
+  </tr>
+  <tr> 
+    <td width="20%" align="center" height="18"><strong>./src</strong></td>
+    <td width="80%" height="18">Contains the source files</td>
+  </tr>
+</table>
+<h2 align="left">B. Build the Hackystat Sensor for Eclipse </h2>
+<p align="left"><b>1. Checkout or download hackyBuild and hackyKernel module as well. </b></p>
+<p align="left">If you have not had the hackyBuild and hackyKernel module in your local environment, you need to checkout these from cvs (consult <a href="mailto:johnson@hawaii.edu">Philip Johnson</a> for cvs availability), or download the stable version from <a href="http://hackydev.ics.hawaii.edu">http://hackydev.ics.hawaii.edu</a></p>
+<p align="left"><b>2. Read README.html in hackyBuild module for general environment setting and build. </b></p>
+<p align="left">There is a detail information on how to set your local environment for hackystat development. Please try to read at least Section A (1: 
+
+
+ Build Tools installation, 2: 
+
+
+ Hackystat system configuration, and 3: 
+
+
+ Hackystat system deployment).</p>
+<p align="left"><b>3. Add hackyEclipse.available statment in the hackystat.properties file.</b></p>
+<p align="left">In section 
+
+ 
+2.3. Configure the hackystat.properties file, you need to add the following statement:</p>
+<pre>
+hackyEclipse.available=true
+</pre>
+This enables hackyBuild to know hackyEclipse module is available so that eclipse sensor can be build as well in build process.
+<p align="left"><b>4. Build Hacky Eclipse Sensor.</b></p>
+<p align="left">To build Hacky Eclipse Sensor, you can type the following in the hackyBuild directory. Note that hackyBuild is the central build module of all hacky related modules so that all ant command would be executed in hackyBuild.</p>
+<table border="1" width="100%">
+  <tr> 
+    <td width="12%">All platforms</td>
+    <td width="54%">% ant</td>
+  </tr>
+</table>
+<p align="left">After executing the &quot;ant&quot; command, the Hacky Eclipse 
+  Sensor would be build inside the hackybuild\build\war\download\eclipse\</p>
+<h2 align="left">C. Hacky Eclipse Sensor Development</h2>
+<p align="left">You can develop the Hacky Eclipse Sensor easily without deploying 
+  modified eclipse sensor in the Eclipse IDE. Before starting the following process, 
+  YOU MUST INSTALL ECLIPSE IDE. see the A. Installation.</p>
+<ol>
+  <li><strong>Import Hacky Eclipse (this module) into Eclipse IDE.</strong> <br>
+    To import the Hacky Eclipse, You can go to &quot;FIle | Import | Existing 
+    Project Into Workspace | Browse your package contents&quot;. Check if there 
+    is error task (red cross mark icon on the top of project called Hacky Eclipse). 
+    If there is, you fix the error or consult me.</li>
+  <li><strong>Prepare runtime workbench execution for the Hacky Eclipse.</strong> 
+    <br>
+    Even though you have had old (current) eclipse sensor in your Eclipse IDE, 
+    you would not be worried about the current eclipse sensor to be run at runtime. 
+    you can run the editing (imported) eclipse sensor (the Hacky Eclipse package 
+    you opened in Eclipse IDE) from Eclipse IDE. You can go to &quot;Window | 
+    Preferences | Plug-In Development | Target Platform&quot;, click &quot;Not 
+    In Workspace&quot; button to see if only org.hackystat.stdext.sensor is unchecked. 
+    This setting gives you not to run current installed eclipse sensor for next 
+    eclipse runtime plugin environment so that you can only run your editing (imported) 
+    Hacky Eclipse. Don't forget to click &quot;OK&quot; on the right bottom after 
+    this change.</li>
+  <li><strong>Add System.out.println() to see if you can debug a source code.</strong> 
+    <br>
+    To see how it works, Try to add System.out.println(&quot;Part was activated!&quot;); 
+    into the partActivated() method of the org.hackystat.stdext.sensor.EclipseSensor.PartListenerAdapter 
+    class. You can add the statement in the first line after the partActivated 
+    method declaration, and save the file.</li>
+  <li><strong>Run runtime workbench for the Hacky Eclipse.</strong> <br>
+    To run the new modified Hacky Eclipse sensor, You can go to &quot;Run | Run 
+    As...| Run-time Workbench&quot; to open up new Eclipse. After that, Try to 
+    click text editor tags on the Eclipse IDE. You can see the &quot;Part was 
+    activated!&quot; output in the source Eclipse IDE Console window.</li>
+  <li><strong>Use debug mode too.</strong> <br>
+    To use debug functionality, you can double- click the area in the left most 
+    tiny bar (before the line number if any, or before the source line begins) 
+    in order to set a break point. The light-blue round mark icon would appear 
+    at the same source code you added the 3. Add System.out.println().... If you 
+    can see the icon, Try to execute run-time workbench with debug mode. Go to 
+    &quot;Run | Debug As..| Run-time workbench&quot;. You can see that the program 
+    stops at the break point in the source Eclipse IDE when you click any text 
+    editor tags in the the debug mode in a new opened-up Eclipse IDE.</li>
+</ol>
+<h2>D. User documentation</h2>
+<p>User documentation for Hacky Eclipse Sensor is not available.</p>
+<h2>E. Developer documentation</h2>
+<p>Developer documentation for the Hacky Eclipse Sensor system is available as 
+  java documentation in the hackyBuild\build\reports\javadoc\hackyEclipse . To build javadoc for the Hackystat Eclipse 
+  Sensor, type the following in the hackyBuild directory. </p>
+<table width="100%" border="1">
+  <tr> 
+    <td width="12%">Build javadoc</td>
+    <td width="54%">% ant javadocAll</td>
+  </tr>
+</table>
+<p>&nbsp;</p>
+<h2>F. Contact information</h2>
+<table border="0" width="100%">
+  <tr> 
+    <td width="23%"><b>Developer contact:</b></td>
+    <td width="77%">Takuya Yamashita (<a href="mailto:takuyay@hawaii.edu">takuyay@hawaii.edu</a>)</td>
+  </tr>
+  <tr> 
+    <td width="23%"><b>CVS repository:</b></td>
+    <td width="77%">Available. Contact Philip Johnson (<a href="mailto:johnson@hawaii.edu">johnson@hawaii.edu</a>) 
+      for server and password.</td>
+  </tr>
+  <tr> 
+    <td width="23%"><b>Mailing lists:</b></td>
+    <td width="77%">Currently Not Available.</td>
+  </tr>
+</table>
+
+</body>
+</html>

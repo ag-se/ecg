@@ -1,0 +1,61 @@
+Code review of hackyEclipse sensor by Philip Johnson on 6/30/2003
+
+0. [general] Wow!  Way improved over last week!  Great job!
+
+1. [EclipseSensor.java (and elsewhere?)] Two newlines between code segments. 
+As indicated in last review, please change to 1 newline. 
+(OK)
+<fixed>
+
+2. [EclipseSensor.initializeListeners()] This seems to initialize a window
+listener only for the first window displayed. Right now I am typing into
+a second window I created (so that one window displays the code, and the
+other window displays this review comment editor buffer.  It appears to me 
+that you don't capture new Window events, and thus anything I do in a second
+or third window that I create during an editor session is not being recorded. 
+I used the System.out.println("Part activated" idea you talked about to test
+this, and the message is not printed out when I click on things in a second
+window.
+(OK)
+<see hongbing's message>
+
+3. [EclipseSensor.java:254] Should be "return this.timerStateChangeInterval".
+More generally, check all instance var references to use "this." if appropriate.
+(OK, and make this variable an instance variable, not a class variable.)
+<done>
+
+4. [EclipseSensorPlugin.java:32] Use "EclipseSensorPlugin.plugin = this" to 
+better indicate that a class instance variable is being set.
+(OK)
+<done>
+
+5. [EclipseSensorPlugin.java:85-98] Eliminate blank lines.
+(OK)
+<done>
+
+6. [EclipseSensorPlugin.java:394,354,342,318,304, etc.] Sometimes you 
+invoke doCommand (the private method of EclipseSensor) and sometimes you 
+invoke this.shell.doCommand (the public method of SensorShell). This is
+confusing. I suggest that you *always* invoke this.doCommand from the processCommand
+methods, and then invoke this.shell.doCommand only from within the this.doCommand
+method. This has the additional benefit of enabling the "monitor" capability 
+below.
+<finished>
+
+7. [General] To help ensure that this sensor is behaving correctly, please
+implement the following feature. In sensor.properties, people can add a new
+setting:
+ENABLE_ECLIPSE_SENSOR_MONITOR = true
+
+Then, edit the this.doCommand method to check the value of this sensorproperties
+variable and if it is true, print out a summary of each invocation of doCommand.
+That way, users can see in real time when the sensor is working and notice when 
+it isn't behaving as expected.
+
+8. [README.html] Need to explain how to revert back to built-in sensor mode after debugging
+session is concluded!
+(Add a comment to readme that you don't need to unset these settings.)
+
+
+
+

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry excluding="org/hackystat/stdext/sensor/eclipse/helper2x/" kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="lib/jar/3x/org.eclipse.core.resources_3.0.0/resources.jar"/>
+	<classpathentry kind="lib" path="lib/jar/3x/org.eclipse.core.runtime_3.0.0/runtime.jar"/>
+	<classpathentry kind="lib" path="lib/jar/3x/org.eclipse.debug.core_3.0.0/dtcore.jar"/>
+	<classpathentry kind="lib" path="lib/jar/3x/org.eclipse.jdt.core_3.0.0/jdtcore.jar"/>
+	<classpathentry kind="lib" path="lib/jar/3x/org.eclipse.jdt.junit_3.0.0/junitsupport.jar"/>
+	<classpathentry kind="lib" path="lib/jar/3x/org.eclipse.jdt.ui_3.0.0/jdt.jar"/>
+	<classpathentry kind="lib" path="lib/jar/3x/org.eclipse.jface_3.0.0/jface.jar"/>
+	<classpathentry kind="lib" path="lib/jar/3x/org.eclipse.jface.text_3.0.0/jfacetext.jar"/>
+	<classpathentry kind="lib" path="lib/jar/3x/org.eclipse.osgi_3.0.0/osgi.jar"/>
+	<classpathentry kind="lib" path="lib/jar/3x/org.eclipse.swt.win32_3.0.0/swt.jar"/>
+	<classpathentry kind="lib" path="lib/jar/3x/org.eclipse.text_3.0.0/text.jar"/>
+	<classpathentry kind="lib" path="lib/jar/3x/org.eclipse.ui_3.0.0/ui.jar"/>
+	<classpathentry kind="lib" path="lib/jar/3x/org.eclipse.ui.editors_3.0.0/editors.jar"/>
+	<classpathentry kind="lib" path="lib/jar/3x/org.eclipse.ui.ide_3.0.0/ide.jar"/>
+	<classpathentry kind="lib" path="lib/jar/3x/org.eclipse.ui.views_3.0.0/views.jar"/>
+	<classpathentry kind="lib" path="lib/jar/3x/org.eclipse.ui.workbench_3.0.0/workbench.jar"/>
+	<classpathentry kind="lib" path="lib/jar/3x/org.eclipse.ui.workbench.texteditor_3.0.0/texteditor.jar"/>
+	<classpathentry kind="lib" path="lib/jar/3x/org.eclipse.update.ui_3.0.0/updateui.jar"/>
+	<classpathentry kind="lib" path="lib/jar/2x/org.eclipse.cdt.core_2.0.0/cdtcore.jar"/>
+	<classpathentry kind="lib" path="lib/jar/2x/org.eclipse.cdt.core_2.0.0/cdtparser.jar"/>
+	<classpathentry kind="src" path="/hackyKernel"/>
+	<classpathentry kind="src" path="/ECG_ClientTools"/>
+	<classpathentry kind="output" path="build/classes"/>
+</classpath>

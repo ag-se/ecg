@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="org.hackystat.stdext.sensor"
+      label="%featureName"
+      version="@VERSION@.3x"
+      provider-name="%providerName"
+      image="hackystat.gif">
+
+   <description url="http://hackystat.ics.hawaii.edu/hackystat/">
+      In order for data to be sent to a Hackystat server, you must install
+sensors. Sensors are small programs that are attached to the software
+engineering tools you use (such as programming editors, source code
+control systems, testing tools, and so forth). The sensors monitor your
+usage of the tool and automatically send data to the server. Sensors can
+be easily disabled.
+   </description>
+
+   <license url="http://hackystat.ics.hawaii.edu/hackystat/">
+      %license
+   </license>
+
+   <url>
+      <update label="%updateSiteName" url="http://hackystat.ics.hawaii.edu/hackystat/download/eclipse/"/>
+   </url>
+
+   <requires>
+      <import plugin="org.eclipse.ui.ide"/>
+      <import plugin="org.eclipse.ui.views"/>
+      <import plugin="org.eclipse.jface.text"/>
+      <import plugin="org.eclipse.ui.workbench.texteditor"/>
+      <import plugin="org.eclipse.ui.editors"/>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.core.resources"/>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.core.boot"/>
+      <import plugin="org.eclipse.jdt.core"/>
+      <import plugin="org.eclipse.jdt.junit"/>
+   </requires>
+
+   <plugin
+         id="org.hackystat.stdext.sensor"
+         download-size="2324"
+         install-size="0"
+         version="@VERSION@.3x">
+   </plugin>
+
+</feature>
