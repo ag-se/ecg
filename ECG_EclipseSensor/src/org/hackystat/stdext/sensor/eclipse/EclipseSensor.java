@@ -21,9 +21,11 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.IBreakpointListener;
 import org.eclipse.debug.core.IBreakpointManager;
+import org.eclipse.debug.core.IDebugEventSetListener;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.ILineBreakpoint;
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -325,6 +327,17 @@ public class EclipseSensor {
 
     IBreakpointManager bpManager = DebugPlugin.getDefault().getBreakpointManager();
     bpManager.addBreakpointListener(new HackystatBreakPointerListener());
+    
+    DebugPlugin dp = DebugPlugin.getDefault();
+    dp.addDebugEventListener(new IDebugEventSetListener(){
+
+        public void handleDebugEvents(DebugEvent[] arg0)
+        {
+            processActivity("Run or Debug","");
+            
+        }});
+    
+    
   }
 
   /**
@@ -408,7 +421,7 @@ public class EclipseSensor {
     // Adds the current activity.
     String[] args = {"add", activityType, data
     };
-    this.eclipseSensorShell.doCommand("Activity", Arrays.asList(args));
+    this.eclipseSensorShell.doCommand("MicroActivity", Arrays.asList(args));
   }
 
   /** Keep track of the latest state change file to avoid sending out repeated data. */
@@ -661,6 +674,9 @@ public class EclipseSensor {
      * @param window An IWorkbenchWindow instance to be triggered when a window is activated.
      */
     public void windowActivated(IWorkbenchWindow window) {
+        
+        processActivity("Window Activated","");
+        
       IEditorPart activeEditorPart = window.getActivePage().getActiveEditor();
       if (activeEditorPart instanceof ITextEditor) {
         EclipseSensor.this.activeTextEditor = (ITextEditor) activeEditorPart;
@@ -685,6 +701,9 @@ public class EclipseSensor {
      * @param window An IWorkbenchWindow instance to be triggered when a window is closed.
      */
     public void windowClosed(IWorkbenchWindow window) {
+        
+        processActivity("Window Closed","");
+        
       EclipseSensor.this.processFileMetric();
       EclipseSensor.this.eclipseSensorShell.send();
     }
@@ -697,6 +716,9 @@ public class EclipseSensor {
      * @param window An IWorkbenchWindow instance to be triggered when a window is deactivated.
      */
     public void windowDeactivated(IWorkbenchWindow window) {
+        
+        processActivity("Window Deactivated","");
+        
       EclipseSensor.this.isActivatedWindow = false;
       IEditorPart activeEditorPart = window.getActivePage().getActiveEditor();
       if (activeEditorPart instanceof ITextEditor) {
@@ -722,6 +744,9 @@ public class EclipseSensor {
      * @param window An IWorkbenchWindow instance to be triggered when a window is opened.
      */
     public void windowOpened(IWorkbenchWindow window) {
+        
+        processActivity("Window Opened","");
+        
       EclipseSensor.this.initializeListeners();
     }
   }
@@ -751,10 +776,14 @@ public class EclipseSensor {
     public void partActivated(IWorkbenchPart part) {
 
       if (part instanceof ITextEditor) {
+          
         //System.out.println("Sensor : " + part);
         EclipseSensor.this.isActivatedWindow = true;
         EclipseSensor.this.activeTextEditor = (ITextEditor) part;
         ITextEditor editor = EclipseSensor.this.activeTextEditor;
+        
+        processActivity("Editor activated",editor.getTitle());
+        
         IDocumentProvider provider = editor.getDocumentProvider();
         IDocument document = provider.getDocument(editor.getEditorInput());
         document.addDocumentListener(new DocumentListenerAdapter());
@@ -763,6 +792,10 @@ public class EclipseSensor {
         // BuffTrans: Copy the new active file size to the threshold buffer size .
         EclipseSensor.this.thresholdBufferSize = activeBufferSize;
         EclipseSensor.this.activeBufferSize = activeBufferSize;
+      }
+      else
+      {
+          processActivity("Part activated",part.getTitle());
       }
     }
 
@@ -788,14 +821,22 @@ public class EclipseSensor {
      */
     public void partClosed(IWorkbenchPart part) {
       if (part instanceof ITextEditor) {
+          
         String fileName = EclipseSensor.this.getFileName((ITextEditor) part);
-        if (fileName.endsWith(".java")) {
+        
+        processActivity("Editor closed",fileName);
+        
+        //if (fileName.endsWith(".java")) {
           EclipseSensor.this.processActivity("Close File", fileName);
-        }
+        //}
         IEditorPart activeEditorPart = part.getSite().getPage().getActiveEditor();
         if (activeEditorPart == null) {
           EclipseSensor.this.activeTextEditor = null;
         }
+      }
+      else
+      {
+          processActivity("Part closed",part.getTitle());
       }
     }
 
@@ -809,6 +850,9 @@ public class EclipseSensor {
     public void partDeactivated(IWorkbenchPart part) {
       if (part instanceof ITextEditor && (part != EclipseSensor.this.deactivatedTextEditor)) {
         EclipseSensor.this.deactivatedTextEditor = (ITextEditor) part;
+        
+        processActivity("Editor deactivated",part.getTitle());
+        
         if (EclipseSensor.this.isActivatedWindow) {
           IEditorPart activeEditorPart = part.getSite().getPage().getActiveEditor();
 
@@ -842,6 +886,10 @@ public class EclipseSensor {
           EclipseSensor.this.isActivatedWindow = true;
         }
       }
+      else
+      {
+          processActivity("Part deactivated",part.getTitle());
+      }
     }
 
     /**
@@ -855,9 +903,16 @@ public class EclipseSensor {
      */
     public void partOpened(IWorkbenchPart part) {
       if (part instanceof ITextEditor && (part != EclipseSensor.this.activeTextEditor)) {
+          
+          processActivity("Editor opened",part.getTitle());
+          
         EclipseSensor.this.activeTextEditor = (ITextEditor) part;
         String fileName = EclipseSensor.this.getFileName((ITextEditor) part);
         EclipseSensor.this.processActivity("Open File", fileName);
+      }
+      else
+      {
+          processActivity("Part opened",part.getTitle());
       }
     }
   }
@@ -1011,7 +1066,7 @@ public class EclipseSensor {
    * @author Takuya Yamashita
    * @version $Id: EclipseSensor.java,v 1.38 2004/11/06 00:00:00 hongbing Exp $
    */
-  private class ResourceChangeAdapter implements IResourceChangeListener, IResourceDeltaVisitor {
+  private class ResourceChangeAdapter implements IResourceChangeListener {
     /**
      * Proivdes manipulation of IResourceChangeEvent instance due to implement
      * <code>IResourceChangeListener</code>. This method must not be called by client because it
@@ -1019,80 +1074,117 @@ public class EclipseSensor {
      * 
      * @param event A resource change event to describe changes to resources.
      */
-    public void resourceChanged(IResourceChangeEvent event) {
-      IResource resource = event.getResource();
-      if (((event.getType() & IResourceChangeEvent.POST_CHANGE) != 0)) {
-        //          ||
-        //          ((event.getType() & IResourceChangeEvent.POST_AUTO_BUILD) != 0)) {
-        try {
-          IResourceDelta rootDelta = event.getDelta();
+      public void resourceChanged(IResourceChangeEvent event) {
 
-          // Accepts the class instance to let the instance be able to visit resource delta.
-          rootDelta.accept(this);
-        }
-        catch (CoreException e) {
-          e.printStackTrace();
-        }
-      }
-    }
+			if (event.getType() != IResourceChangeEvent.POST_CHANGE) return;
+			
+			//debuglog("a resource has been changed");
 
-    /**
-     * Provides visitor pattern due to implement <code>IResourceDeltaVisitor</code>. This method
-     * must not be called by client because it is called by EclipseSensorPlugin instance. Note that
-     * <code>true</code> is returned if the parameter of IResourceDelta instance has children.
-     * <code>false</code> is returned when either Project is opened, closed, or file is saved
-     * because no more traverse of children of the IResourceDelta instance is needed.
-     * 
-     * @param delta IResourceDelta instance to contains delta resource.
-     * @return true if the resource delta's children should be visited; false if they should be
-     *         skipped.
-     * @throws CoreException if the visit fails for some reason.
-     */
-    public boolean visit(IResourceDelta delta) throws CoreException {
-      IResource resource = delta.getResource();
-      int flag = delta.getFlags();
-      int kind = delta.getKind();
+			IResourceDelta delta = event.getDelta();
 
-      // If there is compilation problem with the current java file then send out the activity data.
-      if ((flag & IResourceDelta.MARKERS) != 0) {
-        IMarkerDelta[] markers = delta.getMarkerDeltas();
-        if (markers != null && markers.length > 0) {
-          detectBuildProblem();
-        }
-      }
+			IResourceDeltaVisitor visitor = new IResourceDeltaVisitor() {
 
-      // :RESOLVED: 26 May 2003
-      // Note that the 147456 enumeration type is not listed in the IResourceDelta static filed.
-      // However, its number is generated when Project is either opened or closed so that
-      // it is checked in the logical condition.
-      if (resource instanceof IProject && ((flag == IResourceDelta.OPEN) || (flag == 147456))) {
-        if (((IProject) resource).isOpen()) {
-          EclipseSensor.this.processActivity("Open Project", resource.getProject().getFile(
-              ".project").getLocation().toString());
-          EclipseSensor.this.notifyAll(new EclipseSensorEvent(resource,
-              EclipseSensorEvent.PROJECT_OPEN));
-        }
-        else {
-          EclipseSensor.this.processActivity("Close Project", resource.getProject().getFile(
-              ".project").getLocation().toString());
-          EclipseSensor.this.notifyAll(new EclipseSensorEvent(resource,
-              EclipseSensorEvent.PROJECT_CLOSE));
-        }
-        return false;
-      }
-      if ((kind == IResourceDelta.CHANGED) && (flag == IResourceDelta.CONTENT)
-          && resource instanceof IFile) {
-        if (resource.getLocation().toString().endsWith(".java")) {
-          EclipseSensor.this.processActivity("Save File", resource.getLocation().toString());
-          EclipseSensorEvent event = new EclipseSensorEvent(resource, EclipseSensorEvent.FILE_SAVE);
-          EclipseSensor.this.notifyAll(event);
-        }
+				public boolean visit(IResourceDelta delta) throws CoreException {
+					
+					int kind = delta.getKind();
+					int flags = delta.getFlags();
 
-        // Visit the children because it is not necessary for the saving file to be only one file.
-        return true;
-      }
-      return true; // visit the children
-    }
+					switch (kind) {
+					case IResourceDelta.ADDED:
+						
+					    processActivity("Resource added ",delta.getResource().getName());
+						
+						if (flags == IResourceDelta.MOVED_FROM
+								|| flags == IResourceDelta.MOVED_TO) {
+							//eventlog("it has been moved");
+						}
+
+						break;
+
+					case IResourceDelta.REMOVED:
+					
+					    processActivity("Resource removed ",delta.getResource().getName());
+					
+						if (flags == IResourceDelta.MOVED_FROM
+								|| flags == IResourceDelta.MOVED_TO) {
+							//eventlog("it has been moved");
+						}
+						break;
+
+					case IResourceDelta.CHANGED:
+						
+						String name = delta.getResource().getName();
+					
+						if(name != null)
+						
+						    processActivity("Resource changed ",delta.getResource().getName());
+						
+
+						switch (flags) {
+						case IResourceDelta.OPEN:
+						    
+						    processActivity("Resource opened or closed ",delta.getResource().getName());
+						
+							
+							break;
+
+						case IResourceDelta.CONTENT:
+						    
+						    
+																				
+							break;
+
+						case IResourceDelta.DESCRIPTION:
+						    
+						    
+						
+							break;
+					
+
+						case IResourceDelta.MARKERS:
+						    
+						    
+						
+							break;
+
+						case IResourceDelta.TYPE:
+							
+							break;
+
+						case IResourceDelta.SYNC:
+							
+							break;
+
+						case IResourceDelta.REPLACED:
+							
+						    processActivity("Resource replaced",delta.getResource().getName());
+						
+						    
+							break;
+						
+						default:
+							//debuglog("a child resource must have been changed");
+						}
+
+						break;
+
+					}
+					
+					return true;
+				}
+				
+			};
+			
+			
+			try
+			{
+				delta.accept(visitor);
+			} catch (CoreException e)
+			{
+				
+			}
+
+		}
   }
 
   /**

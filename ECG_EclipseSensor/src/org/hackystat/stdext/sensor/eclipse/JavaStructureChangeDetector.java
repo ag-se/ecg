@@ -10,6 +10,8 @@ import org.eclipse.jdt.core.IElementChangedListener;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaElementDelta;
 
+import org.eclipse.jdt.core.dom.AST;
+
 /**
  * Listens to the java element change events to get incremental work on java objects and collect 
  * refactoring informaiton for test-driven development analysis purpose. It's declared as package
@@ -45,6 +47,7 @@ class JavaStructureChangeDetector implements IElementChangedListener {
     }
 
   }
+ 
   
   /**
    * Process the editng on java element changes.
