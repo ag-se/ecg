@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<editmodel:SequenceDiagramEditModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:editmodel="editmodel.xmi" xmlns:options="options.xmi" name="doCommand" id="org.electrocodeogram.core/SensorShellWrapper#doCommand(Ljava.util.Date;Ljava.lang.String;Ljava.util.List;)" metadata="uml2-1.0" initialized="true" tag="1000" key="323030343130323620456C656374726F436F64656F4772616D2F376F6173376572">
+  <diagramOptions xsi:type="options:SequenceDiagramOptions" level="0"/>
+  <boardSetting snapToGeometry="true" gridEnabled="true" gridSpacing="10,10" gridOrigin="0,0" rulerUnit="pixel">
+    <leftRuler/>
+    <topRuler/>
+  </boardSetting>
+</editmodel:SequenceDiagramEditModel>

@@ -1,0 +1,16 @@
+<sensordatatypes>
+  <sensordatatype name="MicroActivity"
+                  enabled="true"
+                  wrapper="org.electrocodeogram.stdext.microactivity.sdt.MicroActivity"
+                  shellcommand="org.electrocodeogram.stdext.microactivity.sdt.MicroActivityShellCommand"
+                  docstring=""
+                  docfile="doc.sdt.microactivity.html"
+                  version="1.0.0"
+                  contact="">
+    <entryattribute name="type"
+                    type="org.electrocodeogram.stdext.microactivity.sdt.MicroActivityType"
+                    converter="org.electrocodeogram.stdext.microactivity.sdt.MicroActivityType.getInstance"/>
+    <entryattribute name="data" />
+  </sensordatatype>
+</sensordatatypes>
+
