@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<editmodel:ClassDiagramEditModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:editmodel="editmodel.xmi" xmlns:options="options.xmi" size="600,530" id="org.electrocodeogram.core" metadata="uml2-1.0" initialized="true" tag="1000" key="323030343130323620456C656374726F436F64656F4772616D2F376F6173376572">
+  <children xsi:type="editmodel:ClassEditModel" name="EventPacket" location="402,50" size="150,139" id="org.electrocodeogram.core/EventPacket">
+    <children xsi:type="editmodel:CompartmentEditModel" size="127,54">
+      <children xsi:type="editmodel:AttributeEditModel" name="commandName" id="org.electrocodeogram.core/EventPacket#commandName"/>
+      <children xsi:type="editmodel:AttributeEditModel" name="eventSourceId" id="org.electrocodeogram.core/EventPacket#eventSourceId"/>
+      <children xsi:type="editmodel:AttributeEditModel" name="timeStamp" id="org.electrocodeogram.core/EventPacket#timeStamp"/>
+    </children>
+    <children xsi:type="editmodel:CompartmentEditModel" size="90,36">
+      <children xsi:type="editmodel:MethodEditModel" name="EventPacket" id="org.electrocodeogram.core/EventPacket#EventPacket(ILjava.util.Date;Ljava.lang.String;Ljava.util.List;)"/>
+      <children xsi:type="editmodel:MethodEditModel" name="getArglist" id="org.electrocodeogram.core/EventPacket#getArglist()"/>
+    </children>
+    <children xsi:type="editmodel:CompartmentEditModel"/>
+    <classifierPreferences xsi:type="editmodel:UMLClassDiagramClassifierPreference" showStereotype="true" attributeSorter="Natural" methodSorter="Natural" innerClassSorter="Natural" showPublicAttributes="true" showPackageAttributes="true" showStaticAttributes="true" showPublicMethods="true" showPackageMethods="true" showStaticMethods="true" showPublicInnerClasses="true" showPackageInnerClasses="true" showStaticInnerClasses="true" showAttributeProperty="true"/>
+  </children>
+  <children xsi:type="editmodel:ClassEditModel" name="SensorShellWrapper" location="113,365" size="175,85" id="org.electrocodeogram.core/SensorShellWrapper">
+    <children xsi:type="editmodel:CompartmentEditModel"/>
+    <children xsi:type="editmodel:CompartmentEditModel" size="131,36">
+      <children xsi:type="editmodel:MethodEditModel" name="SensorShellWrapper" id="org.electrocodeogram.core/SensorShellWrapper#SensorShellWrapper(Lorg.hackystat.kernel.admin.SensorProperties;ZLjava.lang.String;)"/>
+      <children xsi:type="editmodel:MethodEditModel" name="doCommand" id="org.electrocodeogram.core/SensorShellWrapper#doCommand(Ljava.util.Date;Ljava.lang.String;Ljava.util.List;)"/>
+    </children>
+    <children xsi:type="editmodel:CompartmentEditModel"/>
+    <sourceConnections xsi:type="editmodel:GeneralizationEditModel" id="org.hackystat.kernel.shell/SensorShell&lt;-org.electrocodeogram.core/SensorShellWrapper" source="//@children.1" target="//@children.2" targetEnd="//@children.1/@sourceConnections.0/@children.1" sourceEnd="//@children.1/@sourceConnections.0/@children.0" connectionRouterKind="Manual" autoLocated="true">
+      <children xsi:type="editmodel:AssociationEndEditModel" location="87,0" attachSource="true"/>
+      <children xsi:type="editmodel:AssociationEndEditModel" location="150,265"/>
+    </sourceConnections>
+    <classifierPreferences xsi:type="editmodel:UMLClassDiagramClassifierPreference" showStereotype="true" attributeSorter="Natural" methodSorter="Natural" innerClassSorter="Natural" showPublicAttributes="true" showPackageAttributes="true" showStaticAttributes="true" showPublicMethods="true" showPackageMethods="true" showStaticMethods="true" showPublicInnerClasses="true" showPackageInnerClasses="true" showStaticInnerClasses="true" showAttributeProperty="true"/>
+  </children>
+  <children xsi:type="editmodel:ClassEditModel" targetConnections="//@children.1/@sourceConnections.0" name="SensorShell" location="50,50" size="302,265" id="org.hackystat.kernel.shell/SensorShell">
+    <children xsi:type="editmodel:CompartmentEditModel"/>
+    <children xsi:type="editmodel:CompartmentEditModel" size="130,216">
+      <children xsi:type="editmodel:MethodEditModel" name="SensorShell" id="org.hackystat.kernel.shell/SensorShell#SensorShell(Lorg.hackystat.kernel.admin.SensorProperties;Z)"/>
+      <children xsi:type="editmodel:MethodEditModel" name="SensorShell" id="org.hackystat.kernel.shell/SensorShell#SensorShell(Lorg.hackystat.kernel.admin.SensorProperties;ZLjava.lang.String;)"/>
+      <children xsi:type="editmodel:MethodEditModel" name="SensorShell" id="org.hackystat.kernel.shell/SensorShell#SensorShell(Lorg.hackystat.kernel.admin.SensorProperties;ZLjava.lang.String;Z)"/>
+      <children xsi:type="editmodel:MethodEditModel" name="SensorShell" id="org.hackystat.kernel.shell/SensorShell#SensorShell(Lorg.hackystat.kernel.admin.SensorProperties;ZLjava.lang.String;ZLjava.io.File;)"/>
+      <children xsi:type="editmodel:MethodEditModel" name="doCommand" id="org.hackystat.kernel.shell/SensorShell#doCommand(Ljava.util.Date;Ljava.lang.String;Ljava.util.List;)"/>
+      <children xsi:type="editmodel:MethodEditModel" name="getResultMessage" id="org.hackystat.kernel.shell/SensorShell#getResultMessage()"/>
+      <children xsi:type="editmodel:MethodEditModel" name="getSensorProperties" id="org.hackystat.kernel.shell/SensorShell#getSensorProperties()"/>
+      <children xsi:type="editmodel:MethodEditModel" name="isServerPingable" id="org.hackystat.kernel.shell/SensorShell#isServerPingable(I)"/>
+      <children xsi:type="editmodel:MethodEditModel" name="isServerPingable" id="org.hackystat.kernel.shell/SensorShell#isServerPingable()"/>
+      <children xsi:type="editmodel:MethodEditModel" name="main" id="org.hackystat.kernel.shell/SensorShell#main([Ljava.lang.String;)"/>
+      <children xsi:type="editmodel:MethodEditModel" name="println" id="org.hackystat.kernel.shell/SensorShell#println(Ljava.lang.String;)"/>
+      <children xsi:type="editmodel:MethodEditModel" name="send" id="org.hackystat.kernel.shell/SensorShell#send()"/>
+    </children>
+    <children xsi:type="editmodel:CompartmentEditModel"/>
+    <classifierPreferences xsi:type="editmodel:UMLClassDiagramClassifierPreference" showStereotype="true" attributeSorter="Natural" methodSorter="Natural" innerClassSorter="Natural" showPublicAttributes="true" showPackageAttributes="true" showStaticAttributes="true" showPublicMethods="true" showPackageMethods="true" showStaticMethods="true" showPublicInnerClasses="true" showPackageInnerClasses="true" showStaticInnerClasses="true" showAttributeProperty="true"/>
+  </children>
+  <diagramOptions xsi:type="options:ClassDiagramOptions" properties="wireOptions=1" autoName="false"/>
+  <boardSetting snapToGeometry="true" gridEnabled="true" gridSpacing="10,10" gridOrigin="0,0" rulerUnit="pixel">
+    <leftRuler/>
+    <topRuler/>
+  </boardSetting>
+  <classDiagramPreferences xsi:type="editmodel:UMLClassDiagramPreference" attributeSorter="Natural" methodSorter="Natural" showClassStereotype="true" showPackageStereotype="true" innerClassSorter="Natural" showPublicAttributes="true" showPackageAttributes="true" showStaticAttributes="true" showPublicMethods="true" showPackageMethods="true" showStaticMethods="true" showPublicInnerClasses="true" showPackageInnerClasses="true" showStaticInnerClasses="true" showInterfaceStereotype="true" showAttributeProperty="true"/>
+</editmodel:ClassDiagramEditModel>

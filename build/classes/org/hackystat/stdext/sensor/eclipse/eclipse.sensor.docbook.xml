@@ -1,0 +1,400 @@
+<section id="sec:sensor.eclipse">
+<title>The Eclipse sensor</title>
+
+<section>
+<title>Overview</title>
+<para>
+
+The Eclipse sensor collects data regarding developer activities using the
+Eclipse editor.  The Eclipse sensor represents this data using a variety of
+sensor data types. The Activity SDT (documented in <xref
+linkend="sec:sdt.activity"/>) represents editing actions and the "state
+change" event used to generate the Active Time abstraction. The UnitTest
+SDT (documented in <xref linkend="sec:sdt.unittest"/>) represents
+invocations of JUnit using the JUnit plug-in for Eclipse.  The BuffTrans
+SDT (documented in <xref linkend="sec:sdt.bufftrans"/>) represents the
+sequence of files visited by the developer during editing.
+</para>
+
+<para>
+&Eclipse; is "a kind of universal tool platform - an open extensible IDE for 
+anything and nothing in particular." 
+</para>
+</section>
+
+
+<section>
+<title>Installation</title>
+
+<section>
+<title>Prerequisites</title>
+<para>
+The Eclipse sensor requires &EclipseVersion; and &JavaVersion;.  
+</para>
+</section>
+
+<section>
+<title>Setup sensor.properties</title>
+<para>
+Download and setup your sensor.properties file, as
+described in  <xref linkend="sec:sensorinstallation:sensor.properties"/>
+</para>
+</section>
+
+<section>
+<title>Configure sensor.properties for Eclipse</title>
+<para>
+Edit your sensor.properties file to include the following Eclipse sensor-specific settings
+as illustrated in <xref linkend="example:sensor:eclipse.sensor.properties"/>.
+
+<example id="example:sensor:eclipse.sensor.properties">
+<title>Eclipse-specific settings for sensor.properties</title>
+<programlisting>
+# Global flag for Eclipse sensor. 
+ENABLE_ECLIPSE_SENSOR=true <co id="co:eclipse.enable" />
+
+# Enable status line monitoring of sensor activity.
+ENABLE_ECLIPSE_MONITOR_SENSOR=true <co id="co:eclipse.monitor" />
+
+# Enable automatic checking for new versions on startup.
+ENABLE_ECLIPSE_UPDATE_SENSOR=true <co id="co:eclipse.update" />
+
+# The url for the eclipse update manager to be used if update sensor is true.
+ECLIPSE_UPDATE_URL=http://hackystat.ics.hawaii.edu/hackystat/download/eclipse/site.xml <co id="co:eclipse.url" />
+
+# Enable buffer transition sensor.
+ENABLE_ECLIPSE_BUFFTRANS_SENSOR=true <co id="co:eclipse.bufftrans" />
+
+# The interval in seconds between buffer transition checks.
+HACKYSTAT_BUFFTRANS_INTERVAL=2 <co id="co:eclipse.bufftrans.interval" />
+
+# Enable Eclipse build sensor. Warning! This is a high overhead sensor!
+ENABLE_ECLIPSE_BUILD_SENSOR=false <co id="co:eclipse.build" />
+</programlisting>
+</example>
+</para>
+
+<para>  
+Please note the following regarding <xref linkend="example:sensor:eclipse.sensor.properties"/>:
+<calloutlist>
+<callout arearefs="co:eclipse.enable">
+<para>
+If ENABLE_ECLIPSE_SENSOR is true, then basic sensing is enabled and the remaining settings are
+used to configure additional sensor behaviors.   However,
+if this property is commented out or set to false, then <emphasis>all</emphasis> Eclipse settings are disabled. It thus
+acts as a "master switch" for disabling the Eclipse sensor. 
+</para>
+</callout>
+
+<callout arearefs="co:eclipse.monitor">
+<para>
+If ENABLE_ECLIPSE_MONITOR_SENSOR is true, then the Eclipse sensor will print out a brief message to the status line 
+each time data is collected. This is very useful for helping assess installation and we recommend you 
+enable this property. 
+</para>
+</callout>
+
+<callout arearefs="co:eclipse.update">
+<para>
+If ENABLE_ECLIPSE_UPDATE_SENSOR is true, then each time Eclipse starts up, the Hackystat server will be contacted to see 
+if a new release of the Eclipse sensor is available.  If so, a dialog box will appear asking the user if
+they wish to download the new release. 
+</para>
+</callout>
+
+<callout arearefs="co:eclipse.url">
+<para>
+If ENABLE_ECLIPSE_UPDATE_SENSOR is true, then this property (ECLIPSE_UPDATE_URL) must be available and point to the file that 
+should be checked for updates. 
+</para>
+</callout>
+
+<callout arearefs="co:eclipse.bufftrans">
+<para>
+If ENABLE_ECLIPSE_BUFFTRANS_SENSOR is true, then buffer transitions sensing is enabled in Eclipse. Buffer Transition 
+sensing is documented in  <xref linkend="sec:sdt.bufftrans"/>. 
+</para>
+</callout>
+
+<callout arearefs="co:eclipse.bufftrans.interval">
+<para>
+If ENABLE_ECLIPSE_BUFFTRANS_SENSOR is true, then this property (HACKYSTAT_BUFFTRANS_INTERVAL) specifies how frequently 
+to check whether the file associated with the active buffer has changed. 
+</para>
+</callout>
+
+<callout arearefs="co:eclipse.build">
+<para>
+If ENABLE_ECLIPSE_BUILD_SENSOR is true, then activity data regarding each build event in Eclipse is collected. This is a
+potentially high overhead sensor and so we recommend that you set it to false initially.
+</para>
+</callout>
+</calloutlist>
+</para>
+</section>
+
+
+<section>
+<title>Configure Eclipse Update Manager for Hackystat Sensor</title>
+<para>
+Open Help | Software Updates | Find and Install, check the "Search for new features to install" radio button, the click
+"Next". 
+</para>
+
+<para>
+Click on "New Remote Site" which generates the "New Update Site" dialog box.  Type in "Hackystat Sensor" for the Name field,
+and "http://HOSTNAME/hackystat/download/eclipse" for the URL field.  Make sure to replace HOSTNAME by your actual 
+hackystat host. Click OK to exit this dialog box.
+</para>
+
+<para>
+A new item called "Hackystat Sensor" should now appear in the window with an associated checkbox. Check the "Hackystat Sensor" checkbox, then click "Next".
+</para>
+
+<para>
+If a "Select the features to install" window appears, select the version of the Hackystat sensor appropriate to your installed version of Eclipse (typically the "3x" version). 
+</para>
+
+<para>
+Accept the terms of the license agreement if you find them to be acceptable and click "Next".  
+</para>
+
+<para>
+Click "Finish" to finish the installation.  The plugin is currently unsigned, so you would click "Install" when the 
+Jar Verification dialog box appears. 
+</para>
+
+<para>
+Once the plugin has been downloaded, Eclipse will ask you if it can restart the workbench. This is required to finish
+the installation. 
+</para>
+</section>
+</section>
+
+<section>
+<title>Installation verification</title>
+
+
+<section>
+<title>Check for status line messages</title>
+<para>
+The first step in verifying your Hackystat sensor installation is to make sure that ENABLE_ECLIPSE_MONITOR_SENSOR
+is set to true in your sensor.properties file, then begin editing a file in Eclipse. Within a minute, you
+should see at least one message from the Hackystat sensor appear in the status line at the bottom of the Eclipse
+window.  <xref linkend="figure:sensors:eclipse.statusline"/> illustrates this status line message.
+
+<pasteFigure id="sensors:eclipse.statusline" src="eclipse.statusline.docbook.png">
+Status line message from the Hackystat sensor for Eclipse
+</pasteFigure>
+</para>
+</section>
+
+<section>
+<title>List Sensor Data</title>
+<para>
+If you see messages appearing in the status line, then the next step is to exit Eclipse
+(which will trigger a send of the data to the server).  Then login to your account on
+the Hackystat server, and use the "List Sensor Data" command on the Extras
+page to verify that Activity data for today's date was received by
+the server for the "Eclipse" tool, as illustrated in <xref
+linkend="figure:sensors:eclipse.listsensordata"/>.
+
+<pasteFigure id="sensors:eclipse.listsensordata" src="eclipse.listsensordata.docbook.png">
+List Sensor Data with Eclipse data
+</pasteFigure>
+</para>
+</section>
+
+<section>
+<title>Daily Diary</title>
+<para>
+If the List Sensor Data command verifies that you are receiving data at the server, then the
+final check is to use the Daily Diary command to verify that state change events are being 
+sent and abstracted into the Most Active File, as illustrated in 
+<xref linkend="figure:sensors:eclipse.dailydiary"/>.
+
+<pasteFigure id="sensors:eclipse.dailydiary" src="eclipse.dailydiary.docbook.png">
+Daily Diary with Eclipse data
+</pasteFigure>
+</para>
+
+<para>
+Once you have successfully edited a file, verified that it was sent to the server, and found it listed
+as the Most Active File in the Daily Diary, you can feel confident that the Eclipse sensor is installed 
+correctly and that basic data is being sent to the server. 
+</para>
+</section>
+</section>
+
+
+<section>
+<title>Installation troubleshooting</title>
+
+<section>
+<title>Troubleshooting general client-server problems</title>
+<para>
+The first step in troubleshooting your sensor installation is to verify your 
+sensor.properties settings and server connectivity by following the
+instructions in <xref linkend="sec:sensorinstallation:sensor.properties.troubleshooting"/>
+</para>
+</section>
+
+<section>
+<title>Using an incorrect version of Eclipse or Java</title>
+<para>
+A common installation problem is attempting to install the sensor with an unsupported version of
+Eclipse or Java.  Make sure you are using &EclipseVersion; and &JavaVersion;.
+</para>
+</section>
+
+<section>
+<title>Using mixed versions of Hackystat sensors for Eclipse</title>
+<para>
+If you have installed multiple Hackystat sensors for Eclipse (such as this sensor as well as the 
+one for the Jupiter code review plugin), then you must always update all of the sensors at the 
+same time.  If you only upgrade one sensor and not all, Eclipse may generate "Error" dialog boxes
+for Outline mode or produce other anomalous behaviors
+</para>
+</section>
+
+<section>
+<title>Checking client-side logging</title>
+<para>
+The Eclipse sensor writes out a file called eclipse.0.log to the .hackystat/logs directory that can be 
+useful in debugging your installation.  Under normal conditions, this file should look similar to
+<xref linkend="example:eclipse.sensor.logfile"/>.
+
+<example id="example:eclipse.sensor.logfile">
+<title>eclipse.0.log file</title>
+<programlisting>
+Hackystat Version: 6.3.1124 (November 24 2004 12:05:38)
+SensorShell started at: 12/07/2004 11:05:13
+Type 'help' for a list of commands.
+Host: http://hackystat.ics.hawaii.edu/ is available and key is valid.
+Defined shell command: Dependency
+Defined shell command: Issue
+Defined shell command: Perf
+Defined shell command: FileMetric
+Defined shell command: ReviewIssue
+Defined shell command: Activity
+Defined shell command: Cli
+Defined shell command: ReviewActivity
+Defined shell command: Coverage
+Defined shell command: UnitTest
+Defined shell command: BuffTrans
+Defined shell command: Commit
+Defined shell command: Build
+#> AutoSend [10]
+AutoSend OK (set to 10 minutes)
+AutoSend enabled every 10 minutes.
+Checking for offline data to recover.
+No offline data found.
+#> Activity [setTool, Eclipse]
+setTool OK
+#> Activity [add, Open File, C:/cvs413/stack/build.xml]
+Activity add OK (1 total)
+#> Activity [statechange, C:/cvs413/stack/build.xml, 15382]
+Activity statechange OK (initial file name and buffer size)
+#> send
+Sending sensor data (12/07 11:15:14)
+  Ping: Ping OK (contacted server http://hackystat.ics.hawaii.edu/ with valid key.)
+  Dependency: Send OK (No entries to send.)
+  AutoSend: AutoSend OK ('send' command ignored)
+  Issue: Send OK (No entries to send.)
+  Perf: Send OK (No entries to send.)
+  FileMetric: Send OK (No entries to send.)
+  ReviewIssue: Send OK (No entries to send.)
+  Activity: Send OK (1 entries)
+  Cli: Send OK (No entries to send.)
+  ReviewActivity: Send OK (No entries to send.)
+  Coverage: Send OK (No entries to send.)
+  Commit: Send OK (No entries to send.)
+  UnitTest: Send OK (No entries to send.)
+  BuffTrans: Send OK (No entries to send.)
+  Build: Send OK (No entries to send.)
+</programlisting>
+</example>
+</para>
+</section>
+
+<section>
+<title>Checking Eclipse startup logging</title>
+<para>
+If you do not have messages in the status line, and if you do not find an eclipse.0.log file in the 
+.hackystat/logs directory, then the most likely reason is that the plugin was not installed successfully. 
+To troubleshoot this situation, change directories to the eclipse installation directory and invoke 
+Eclipse manually with the -debug option as follows:
+<programlisting>
+c:\eclipse> eclipse -debug
+</programlisting>
+This will start up Eclipse and also print out some debugging information. Under normal circumstances, the
+information should look as follows:
+<programlisting>
+Install location:
+    file:/c:/eclipse/
+Configuration file:
+    file:/c:/eclipse/configuration/config.ini loaded
+Configuration location:
+    file:/c:/eclipse/configuration/
+Configuration file:
+    file:/c:/eclipse/configuration/config.ini loaded
+Framework located:
+    file:/c:/eclipse/plugins/org.eclipse.osgi_3.0.0/
+Loading framework classpath from:
+    file:/c:/eclipse/plugins/org.eclipse.osgi_3.0.0/eclipse.properties
+Framework classpath:
+    file:/c:/eclipse/plugins/org.eclipse.osgi_3.0.0/core.jar
+    file:/c:/eclipse/plugins/org.eclipse.osgi_3.0.0/console.jar
+    file:/c:/eclipse/plugins/org.eclipse.osgi_3.0.0/osgi.jar
+    file:/c:/eclipse/plugins/org.eclipse.osgi_3.0.0/resolver.jar
+    file:/c:/eclipse/plugins/org.eclipse.osgi_3.0.0/defaultAdaptor.jar
+    file:/c:/eclipse/plugins/org.eclipse.osgi_3.0.0/eclipseAdaptor.jar
+Splash location:
+    c:\eclipse\plugins\org.eclipse.platform_3.0.0\splash.bmp
+Debug options:
+    file:/C:/eclipse/.options not found
+Time to load bundles: 15
+Starting application: 547
+</programlisting>
+Check to see if errors are reported in this output.
+</para>
+</section>
+
+<section>
+<title>Submit a trouble report</title>
+<para>
+If none of the above troubleshooting activities solves your problem, then you should send
+an email to your Hackystat Administrator to request help.  Please include in your email the following 
+information:
+<itemizedlist>
+<listitem><para>The output from 'java -version'.</para></listitem>
+<listitem><para>The output from 'eclipse -version'.</para></listitem>
+<listitem><para>The output from 'java -jar sensorshell.jar -verify'.</para></listitem>
+<listitem><para>The contents of your sensor.properties file.</para></listitem>
+<listitem><para>The contents of the eclipse.0.log file.</para></listitem>
+<listitem><para>The output from invoking eclipse from the command line with the '-debug' option.</para></listitem>
+<listitem><para>A description of the problem you are having.</para></listitem>
+</itemizedlist>
+</para>
+</section>
+</section>
+
+
+
+<section>
+<title>Uninstallation</title>
+<para>
+If you simply wish to turn off Eclipse Hackystat data collection
+temporarily, then the easiest way is to edit the sensor.properties file and
+change the value of ENABLE_ECLIPSE_SENSOR to false.  If you wish to
+permanently uninstall Hackystat Eclipse data collection, then use the Eclipse Update Manager 
+to uninstall the Eclipse sensor. 
+</para>
+</section>
+
+
+</section>
+
+
+
+

@@ -1,0 +1,14 @@
+<body>
+Provides the public interface implementation of the Eclipse sensor event. A client of the Eclipse sensor
+can get the necessary information of the IResource instance or event inforamtion (flag) such as "Open Project"
+in the <code>org.hackystat.stdext.sensor.eclipse.event.EclipseSensorEvent</code> when Hackystat Eclipse sensor
+collects data.
+
+<p>To get the event-driven-collected data from the Hackystat Eclipse sensor, a client must:
+
+<ol>
+<li>Implement <code>org.hackystat.stdext.sensor.eclipse.event.IEclipseSensorEventListener</code>
+interface in such a way that the implementing method called <code>notify</code> is overriden.
+<li>Added the implementing class to the <code>org.hackystat.stdext.sensor.eclipse.EclipseSensor</code>.
+</ol>
+</body>
