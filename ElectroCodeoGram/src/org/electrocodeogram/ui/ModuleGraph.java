@@ -7,6 +7,8 @@
 package org.electrocodeogram.ui;
 
 import java.awt.Color;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import javax.swing.border.LineBorder;
 
@@ -28,12 +30,29 @@ public class ModuleGraph extends JGraph
     private int selectedModuleCellId = -1;
     
     private ModuleCell rootCell = null;
-
-    public ModuleGraph(){
+    
+    
+    
+    private ModuleGraph me = null;
+    
+    private Configurator root = null;
+    
+    public Configurator getRoot()
+    {
+        return root;
+    }
+    
+    public ModuleGraph(Configurator root){
         
         super(new DefaultGraphModel());
       
+        this.root = root;
+        
+        me = this;
    
+        
+        
+        
         addGraphSelectionListener(new GraphSelectionListener() {
 
             public void valueChanged(GraphSelectionEvent arg0)
@@ -52,6 +71,27 @@ public class ModuleGraph extends JGraph
             }});
            
         this.setBorder(new LineBorder(Color.GRAY));
+        
+        addMouseListener(new MouseAdapter(){
+
+            public void mouseClicked(MouseEvent e)
+            {
+                if(e.getButton() == MouseEvent.BUTTON3)
+                {
+	                Object o = getFirstCellForLocation(e.getPoint().x,e.getPoint().y);
+	                if(o != null)
+	                {
+	                    ModuleCell mc = (ModuleCell) o;
+	                    
+	                    selectedModuleCellId = mc.getId();
+	                    
+	                    MenuManager.getInstance().showModuleMenu(me,e.getPoint().x,e.getPoint().y);
+	                    
+	                }
+                }
+            }
+
+            });
 		
     }
 

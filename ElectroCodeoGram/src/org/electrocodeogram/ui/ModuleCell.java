@@ -7,14 +7,20 @@
 package org.electrocodeogram.ui;
 
 import java.awt.Color;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.geom.Rectangle2D;
 
 import javax.swing.BorderFactory;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 
 import org.electrocodeogram.module.Module;
 import org.jgraph.graph.DefaultGraphCell;
 import org.jgraph.graph.DefaultPort;
 import org.jgraph.graph.GraphConstants;
+import org.jgraph.plaf.basic.BasicGraphUI;
 
 /**
  * @author 7oas7er *  * TODO To change the template for this generated type comment go to * Window - Preferences - Java - Code Style - Code Templates
@@ -29,9 +35,10 @@ public class ModuleCell extends DefaultGraphCell
      * @uml.associationEnd multiplicity="(0 1)"
      */
     private Configurator root = null;
-
-
+    
     private int id = -1;
+    
+    private String name;
 
     /**
      * 
@@ -45,6 +52,8 @@ public class ModuleCell extends DefaultGraphCell
     {
         super(name);
 
+        this.name = name;
+        
         this.root = root;
 
         this.id = id;
@@ -77,12 +86,14 @@ public class ModuleCell extends DefaultGraphCell
         DefaultPort port = new DefaultPort();
         this.add(port);
         port.setParent(this);
-        
-        
-        
 
     }
 
+    public String getName()
+    {
+        return name;
+    }
+    
     public Configurator getUIRoot()
     {
         return root;

@@ -14,6 +14,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
@@ -116,7 +117,7 @@ public class Configurator extends JFrame implements Observer
     /**
      * @return
      */
-    public static Observer getInstance()
+    public static Configurator getInstance()
     {
         if(theInstance == null)
         {
@@ -169,7 +170,7 @@ public class Configurator extends JFrame implements Observer
         pnlSensors.setBorder(new TitledBorder(new LineBorder(new Color(0,0,0)),"Active sensors"));
         pnlSensors.add(sensorGraph);
         
-        moduleGraph = new ModuleGraph();    
+        moduleGraph = new ModuleGraph(this);    
         pnlModules  = new JPanel(new GridLayout(1,1));
         pnlModules.setBorder(new TitledBorder(new LineBorder(new Color(0,0,0)),"Tree of running modules"));
         pnlModules.add(moduleGraph);
@@ -350,7 +351,7 @@ public class Configurator extends JFrame implements Observer
         {
             pnlModules.remove(moduleGraph);
             
-            moduleGraph = new ModuleGraph();
+            moduleGraph = new ModuleGraph(this);
             
             pnlModules.add(moduleGraph);
             
@@ -503,6 +504,24 @@ public class Configurator extends JFrame implements Observer
         
     }
 
-    
+    /**
+     * 
+     */
+    public void showModuleDetails()
+    {
+       
+        int id = moduleGraph.getSelectedModuleCellId();
+        
+        if(id != -1)
+        {
+       
+	        Module m = ModuleRegistry.getInstance().getModuleInstance(id);
+	        
+	        String text = "Name: \t" + m.getName() + "\nID: \t " + m.getId() + "\nTyp: \t" + m.getModuleType();
+	        
+	        JOptionPane.showMessageDialog(this,text);
+        }
+        
+    }
 
 }
