@@ -8,9 +8,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.List;
-
 
 import org.electrocodeogram.module.writer.EventWriter;
 import org.electrocodeogram.sensorwrapper.EventPacket;
