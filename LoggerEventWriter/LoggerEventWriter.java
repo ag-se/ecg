@@ -10,8 +10,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
+import org.electrocodeogram.EventPacket;
 import org.electrocodeogram.module.writer.EventWriter;
-import org.electrocodeogram.sensorwrapper.EventPacket;
 
 
 /**
