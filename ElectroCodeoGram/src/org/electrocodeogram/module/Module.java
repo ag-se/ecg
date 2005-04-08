@@ -14,7 +14,7 @@ import java.util.Observer;
 import java.util.logging.*;
 import java.util.logging.Level;
 
-import org.electrocodeogram.sensorwrapper.EventPacket;
+import org.electrocodeogram.EventPacket;
 import org.electrocodeogram.ui.Configurator;
 
 /**

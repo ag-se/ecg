@@ -12,7 +12,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
 
-import org.electrocodeogram.sensorwrapper.EventPacket;
+import org.electrocodeogram.EventPacket;
 
 /**
  * @author 7oas7er

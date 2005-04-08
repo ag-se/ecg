@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import org.electrocodeogram.module.source.SensorSource;
-import org.electrocodeogram.sensorwrapper.EventPacket;
+import org.electrocodeogram.EventPacket;
 import org.hackystat.kernel.admin.SensorProperties;
 import org.hackystat.kernel.shell.SensorShell;
 

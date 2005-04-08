@@ -1,7 +1,7 @@
 package org.electrocodeogram.module.source;
 
 import org.electrocodeogram.module.Module;
-import org.electrocodeogram.sensorwrapper.EventPacket;
+import org.electrocodeogram.EventPacket;
     /**
      * @author Frank Schlesinger
      * 

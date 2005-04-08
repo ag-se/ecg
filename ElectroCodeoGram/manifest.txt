@@ -1,3 +1,3 @@
 Manifest-Version: 1.0
 Main-Class: org.electrocodeogram.core.SensorServer
-Class-Path: lib/sensorshell.jar lib/OfficeLnFs.jar lib/jgraphaddons.jar lib/jgraph.jar lib/componentset.jar lib/ECG_ClientTools.jar
+Class-Path: lib/sensorshell.jar lib/componentset.jar lib/sensorshellwrapper.jar lib/jgraph.jar lib/jgraphaddons.jar lib/OfficeLnFs.jar

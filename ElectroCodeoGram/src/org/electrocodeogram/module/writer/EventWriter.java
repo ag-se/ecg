@@ -10,7 +10,7 @@ import java.util.Observable;
 
 
 import org.electrocodeogram.module.Module;
-import org.electrocodeogram.sensorwrapper.EventPacket;
+import org.electrocodeogram.EventPacket;
 
 
 /**
