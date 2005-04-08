@@ -38,4 +38,13 @@ public class LineNumberAnnotator extends EventAnnotator
         return new EventPacket(this.getId(),new Date(),new Integer(++lineCounter).toString(),null);
     }
 
+    /* (non-Javadoc)
+     * @see org.electrocodeogram.module.Module#setProperty(java.lang.String, java.lang.Object)
+     */
+    public void setProperty(String currentPropertyName, Object propertyValue)
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
 }
