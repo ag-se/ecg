@@ -28,7 +28,7 @@ public class LoggerEventWriter extends EventWriter
     public LoggerEventWriter()
     {
         super("LoggerEventWriter");
-        // TODO Auto-generated constructor stub
+
     }
 
 
@@ -60,6 +60,16 @@ public class LoggerEventWriter extends EventWriter
         eventString += "\n";
         
         logger.log(Level.INFO, eventString);
+    }
+
+
+    /* (non-Javadoc)
+     * @see org.electrocodeogram.module.Module#setProperty(java.lang.String, java.lang.Object)
+     */
+    public void setProperty(String currentPropertyName, Object propertyValue)
+    {
+        // TODO Auto-generated method stub
+        
     }
 
 }
