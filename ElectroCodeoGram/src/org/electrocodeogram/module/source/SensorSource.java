@@ -30,6 +30,15 @@ import org.electrocodeogram.sensorwrapper.EventPacket;
             // TODO : make own processing mechanism
         }
 
+        /* (non-Javadoc)
+         * @see org.electrocodeogram.module.Module#setProperty(java.lang.String, java.lang.Object)
+         */
+        public void setProperty(String currentPropertyName, Object propertyValue)
+        {
+            // TODO Auto-generated method stub
+            
+        }
+
        
 
         

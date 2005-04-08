@@ -11,7 +11,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Observable;
 import java.util.Observer;
-
+import java.util.logging.*;
+import java.util.logging.Level;
 
 import org.electrocodeogram.sensorwrapper.EventPacket;
 import org.electrocodeogram.ui.Configurator;
@@ -20,9 +21,11 @@ import org.electrocodeogram.ui.Configurator;
  * @author 7oas7er *  * TODO To change the template for this generated type comment go to * Window - Preferences - Java - Code Style - Code Templates
  */
 
-public class Module extends Observable implements Observer
+public abstract class Module extends Observable implements Observer
 {
 
+    protected Logger logger = null;
+    
     public final static int SOURCE_MODULE = 0;
 
     public final static int INTERMEDIATE_MODULE = 1;
@@ -56,6 +59,7 @@ public class Module extends Observable implements Observer
      */
     protected EventBuffer eventBuffer = null;
 
+    protected boolean runningFlag = false;
     
     public Module(int moduleType, String name)
     {
@@ -64,6 +68,8 @@ public class Module extends Observable implements Observer
       this.moduleType = moduleType;
       
       this.name = name;
+      
+      this.logger = Logger.getLogger(this.name);
       
       eventBuffer = new EventBuffer();
       
@@ -78,6 +84,25 @@ public class Module extends Observable implements Observer
       addObserver(Configurator.getInstance(this));
       
 
+    }
+    
+    public boolean isRunning()
+    {
+        return runningFlag;
+    }
+    
+    public void stop()
+    {
+        this.runningFlag = false;
+        
+        notifyModuleChanged(this);
+    }
+    
+    public void start()
+    {
+        this.runningFlag = true;
+        
+        notifyModuleChanged(this);
     }
     
     /* (non-Javadoc)
@@ -118,9 +143,36 @@ public class Module extends Observable implements Observer
      */
     protected void processEventPacket(EventPacket eventPacket)
     {
-        setChanged();
-        notifyObservers(new EventPacket(this.getId(),eventPacket.getTimeStamp(),eventPacket.getCommandName(),eventPacket.getArglist()));
-        clearChanged();
+        if(runningFlag && (eventPacket != null))
+        {
+	        setChanged();
+	        notifyObservers(new EventPacket(this.getId(),eventPacket.getTimeStamp(),eventPacket.getCommandName(),eventPacket.getArglist()));
+	        clearChanged();
+	    }
+    }
+
+    /**
+     * @param e
+     * @param string
+     * @param string2
+     * @return
+     */
+    protected boolean isPacketMatching(EventPacket e, String commmandName, String activityType)
+    {
+        assert(e != null);
+        
+        logger.log(Level.INFO,"isPacketMatching?");
+        
+        if(e.getCommandName().equals(commmandName) && e.getArglist().get(1).equals(activityType))
+        {
+            logger.log(Level.INFO,"Yes");
+            return true;
+        }
+        else
+        {
+            logger.log(Level.INFO,"No");
+            return false;
+        }
     }
     
     public int countConnectedModules()
@@ -130,13 +182,27 @@ public class Module extends Observable implements Observer
     
     public int connectModule(Module module)
     {
-        addObserver(module);
-        connectedModuleMap.put(new Integer(module.id),module);
-       // moduleRegistry.add(module);
+        if (moduleType != Module.TARGET_MODULE)
+        {
+	        addObserver(module);
+	        connectedModuleMap.put(new Integer(module.id),module);
+	        notifyModuleChanged(module);
+	        return module.id;
+	    }
+        else
+        {
+            throw new ModuleConnectionException("An diese Modul können Sie keine weiteren Module anhängen");
+        }
+    }
+
+    /**
+     * @param module
+     */
+    private void notifyModuleChanged(Module module)
+    {
         setChanged();
         notifyObservers(module);
         clearChanged();
-        return module.id;
     }
 
     /**
@@ -174,11 +240,7 @@ public class Module extends Observable implements Observer
 		        
 		        connectedModuleMap.remove(idObj);
 		       
-		        setChanged();
-		       
-		        notifyObservers(module);
-		        
-		        clearChanged();
+		        notifyModuleChanged(module);
 	        }
         }
     }
@@ -205,5 +267,34 @@ public class Module extends Observable implements Observer
             
             bufferList.add(eventPacket);
         }
+        
+        public EventPacket getFirst()
+        {
+            return (EventPacket) bufferList.getFirst();
+        }
+        
+        public EventPacket getLast()
+        {
+            return (EventPacket) bufferList.getLast();
+        }
+        
     }
+
+    /**
+     * @param currentPropertyName
+     * @param propertyValue
+     */
+    public abstract void setProperty(String currentPropertyName, Object propertyValue);
+
+    /**
+     * @return
+     */
+    public String getDetails()
+    {
+        String text = "Name: \t" + getName() + "\nID: \t " + getId() + "\nTyp: \t" + getModuleType();
+       
+        return text;
+    
+    }
+    
 }

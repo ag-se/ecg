@@ -11,8 +11,8 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JOptionPane;
 
-import org.electrocodeogram.module.Module;
 import org.electrocodeogram.module.ModuleConnectionException;
+import org.electrocodeogram.module.ModuleRegistry;
 
 /**
  * @author 7oas7er *  * TODO To change the template for this generated type comment go to * Window - Preferences - Java - Code Style - Code Templates
@@ -20,13 +20,6 @@ import org.electrocodeogram.module.ModuleConnectionException;
 
 public class ActionAdapter implements ActionListener
 {
-
-    /**
-     * 
-     * @uml.property name="root"
-     * @uml.associationEnd multiplicity="(0 1)"
-     */
-    private Configurator root = null;
 
     
     private Class moduleClass = null;
@@ -38,34 +31,25 @@ public class ActionAdapter implements ActionListener
     public ActionAdapter(Configurator configurator, Class moduleClass)
     {
         
-        this.root = configurator;
-     
         this.moduleClass = moduleClass;
     }
 
     public void actionPerformed(ActionEvent e)
     {
 
-      int selectedModuleCellId = root.getModuleGraph().getSelectedModuleCellId();
+      int selectedModuleCellId = Configurator.getInstance().getModuleGraph().getSelectedModuleCellId();
         
       if(selectedModuleCellId != -1)
       {
           try
           {
-              root.getModule(selectedModuleCellId).connectModule((Module) moduleClass.newInstance());
+              ModuleRegistry.getInstance().connectNewModuleInstance(selectedModuleCellId,moduleClass);
           }
           catch(ModuleConnectionException er)
           {
-              JOptionPane.showMessageDialog(root,er.getMessage(),"Error",JOptionPane.ERROR_MESSAGE);  
+              JOptionPane.showMessageDialog(Configurator.getInstance(),er.getMessage(),"Error",JOptionPane.ERROR_MESSAGE);  
           }
-        catch (InstantiationException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        }
-        catch (IllegalAccessException e2) {
-            // TODO Auto-generated catch block
-            e2.printStackTrace();
-        }
+       
       }
         
     }

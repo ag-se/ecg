@@ -13,9 +13,7 @@ import javax.swing.border.LineBorder;
 import org.jgraph.JGraph;
 import org.jgraph.event.GraphSelectionEvent;
 import org.jgraph.event.GraphSelectionListener;
-import org.jgraph.graph.DefaultEdge;
 import org.jgraph.graph.DefaultGraphModel;
-import org.jgraph.graph.GraphConstants;
 
 /**
  * @author 7oas7er

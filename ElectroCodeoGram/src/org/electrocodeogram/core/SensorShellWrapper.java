@@ -53,6 +53,8 @@ public class SensorShellWrapper extends SensorShell
 		       
         sensorSource = new SensorSource();
         
+        sensorSource.start();
+        
     }
    
     /** 

@@ -7,20 +7,14 @@
 package org.electrocodeogram.ui;
 
 import java.awt.Color;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.geom.Rectangle2D;
 
 import javax.swing.BorderFactory;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
 
 import org.electrocodeogram.module.Module;
 import org.jgraph.graph.DefaultGraphCell;
 import org.jgraph.graph.DefaultPort;
 import org.jgraph.graph.GraphConstants;
-import org.jgraph.plaf.basic.BasicGraphUI;
 
 /**
  * @author 7oas7er *  * TODO To change the template for this generated type comment go to * Window - Preferences - Java - Code Style - Code Templates
@@ -39,6 +33,8 @@ public class ModuleCell extends DefaultGraphCell
     private int id = -1;
     
     private String name;
+    
+    private boolean isRunning;
 
     /**
      * 
@@ -48,7 +44,7 @@ public class ModuleCell extends DefaultGraphCell
         return id;
     }
 
-    public ModuleCell(Configurator root, int moduleType, int id, String name)
+    public ModuleCell(Configurator root, int moduleType, int id, String name, boolean b)
     {
         super(name);
 
@@ -57,6 +53,8 @@ public class ModuleCell extends DefaultGraphCell
         this.root = root;
 
         this.id = id;
+        
+        this.isRunning = b;
         
         GraphConstants.setBounds(this.getAttributes(), new Rectangle2D.Double(root.getWidth() / 2, 20, 100, 25));
         
@@ -79,7 +77,9 @@ public class ModuleCell extends DefaultGraphCell
         	break;
         }
         
-        GraphConstants.setOpaque(this.getAttributes(), true);
+        
+        
+        GraphConstants.setOpaque(this.getAttributes(), isRunning);
 
         GraphConstants.setBorder(this.getAttributes(), BorderFactory.createRaisedBevelBorder());
 

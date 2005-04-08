@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Properties;
 import java.util.logging.*;
@@ -14,6 +15,7 @@ import java.util.logging.*;
 
 public class ModuleRegistry
 {
+    // TODO : Register Sensor Source
     
     private Logger logger = Logger.getLogger("ModuleRegistry");
 
@@ -158,8 +160,7 @@ public class ModuleRegistry
 
         private HashMap availableModules = new HashMap();
         
-        private Properties properties = new Properties();
-
+        
         private InstalledModules()
         {
             this(new File(System.getProperty("user.home") + "/electrocodeogram/modules/"));
@@ -190,10 +191,10 @@ public class ModuleRegistry
                     }
                     else {
                         
+                        Properties properties = new Properties();
+                                                
                         try {
-                            
-                            assert(properties != null);
-                            
+                             
                             properties.load(new FileInputStream(modulePropertyFile));
                         }
                         catch (FileNotFoundException e1) {
@@ -202,12 +203,14 @@ public class ModuleRegistry
                         }
                         catch (IOException e1) {
                             
-                            logger.log(Level.SEVERE,"Error ehile reading: " + modulePropertyFile.getName());
+                            logger.log(Level.SEVERE,"Error while reading: " + modulePropertyFile.getName());
                         }
                         
                         if (properties.size() > 0) {
                             
                             String moduleName = properties.getProperty("MODULE_NAME");
+                            
+                            // TODO : set module names from file
 
                             assert(moduleName != null);
                             
@@ -227,12 +230,16 @@ public class ModuleRegistry
                                 
                                 assert(availableModules != null);
                                 
-                                availableModules.put(moduleName, moduleClass);
+                                ModuleDescriptor moduleDescriptor = new ModuleDescriptor(moduleName,moduleClass,properties);
+                                                                
+                                availableModules.put(moduleName, moduleDescriptor);
                             }
                             catch (ClassNotFoundException e) {
                                 
                                logger.log(Level.SEVERE,"Unable to load the module " + moduleName);
                             }
+                            
+                            
 
                         }
                     }
@@ -265,8 +272,22 @@ public class ModuleRegistry
             
             assert(availableModules.containsKey(name));
             
-            return (Class) availableModules.get(name);
+            ModuleDescriptor moduleDescriptor = (ModuleDescriptor) availableModules.get(name);
+            
+            return moduleDescriptor.getClazz();
         }
+        
+        public Properties getModulePropertiesForName(String name)
+        {
+            assert(name != null);
+            
+            assert(availableModules.containsKey(name));
+            
+            ModuleDescriptor moduleDescriptor = (ModuleDescriptor) availableModules.get(name);
+            
+            return moduleDescriptor.getProperties();
+        }
+       
 
     }
 
@@ -304,17 +325,115 @@ public class ModuleRegistry
         return installedModules.getModuleClassForName(moduleName);
     }
 
+    
+    public Properties getModulePropertiesForName(String moduleName)
+    {
+        assert(moduleName != null);
+        
+        assert(installedModules != null);
+        
+        return installedModules.getModulePropertiesForName(moduleName);
+    }
+    
+    public Properties getModulePropertiesForId(int id)
+    {
+        assert(id != -1);
+        
+        if(id == 1)
+        {
+            return null;
+        }
+        
+        Module module = getModuleInstance(id);
+        
+        assert(module != null);
+        
+        assert(installedModules != null);
+        
+        return installedModules.getModulePropertiesForName(module.getName());
+    }
     /**
      * @param id
      * @return
      */
     public Module getModuleInstance(int id)
     {
+        // TODO : make this private
+        
        assert(id > 0);
        
        assert(runningModules != null);
        
        return runningModules.getModule(id);
+    }
+
+
+    /**
+     * @param selectedModuleCellId
+     * @param moduleClass
+     * @throws IllegalAccessException
+     * @throws InstantiationException
+     */
+    public void connectNewModuleInstance(int selectedModuleCellId, Class moduleClass) throws ModuleConnectionException
+    {
+        try {
+            getModuleInstance(selectedModuleCellId).connectModule((Module) moduleClass.newInstance());
+        }
+        catch (InstantiationException e) {
+            throw new ModuleConnectionException(e.getMessage());
+        }
+        catch (IllegalAccessException e) {
+            throw new ModuleConnectionException(e.getMessage());
+        }
+        
+    }
+
+
+    /**
+     * @param currentModuleId
+     * @param currentPropertyName
+     * @param propertyValue
+     */
+    public void setModuleProperty(int currentModuleId, String currentPropertyName, Object propertyValue)
+    {
+        
+        assert(currentModuleId != 1);
+        
+        Module module = getModuleInstance(currentModuleId);
+        
+        assert(module != null);
+        
+        Properties moduleProperties = getModulePropertiesForId(currentModuleId);
+        
+        assert(moduleProperties != null);
+        
+        module.setProperty(currentPropertyName,propertyValue);
+        
+    }
+
+
+    /**
+     * @param modulId
+     */
+    public void stopModule(int moduleId)
+    {
+        Module module = getModuleInstance(moduleId);
+        
+        module.stop();
+        
+    }
+
+
+    /**
+     * @param moduleId
+     */
+    public void startModule(int moduleId)
+    {
+        Module module = getModuleInstance(moduleId);
+        
+        module.start();
+        
+        
     }
     
 }

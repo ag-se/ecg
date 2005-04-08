@@ -7,6 +7,7 @@
 package org.electrocodeogram.module.annotator;
 
 import java.util.Observable;
+import java.util.logging.Level;
 
 
 import org.electrocodeogram.module.Module;
@@ -67,7 +68,8 @@ public abstract class EventAnnotator extends Module
      */
     private EventPacket getAnnotation(EventPacket eventPacket)
     {
-    
+        logger.log(Level.INFO,"getAnnotation");
+        
         return annotate(eventPacket);
         
     }

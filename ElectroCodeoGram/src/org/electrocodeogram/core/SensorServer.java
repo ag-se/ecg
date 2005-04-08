@@ -66,11 +66,19 @@ public class SensorServer extends Observable
     {
         sensorThreadPool.remove(new Integer(id));
         
+        doNotifyObservers();
+    }
+    
+    /**
+     * 
+     */
+    public void doNotifyObservers()
+    {
         setChanged();
         notifyObservers(this);
         clearChanged();
     }
-    
+
     public String[] getAddress()
     {
         String[] toReturn = null;
@@ -96,9 +104,7 @@ public class SensorServer extends Observable
         try {
             seso = new ServerSocket(PORT);
             
-            me.setChanged();
-            me.notifyObservers(me);
-            me.clearChanged();
+            me.doNotifyObservers();
         }
         catch (IOException e) {
             // TODO Auto-generated catch block
@@ -126,5 +132,24 @@ public class SensorServer extends Observable
                 e1.printStackTrace();
             }
         }
+    }
+
+    /**
+     * @return
+     */
+    public String[] getSensorNames()
+    {
+        int count = this.getSensorCount();
+        
+        String[] names = new String[count];
+        
+        Object[] sensorThreads = sensorThreadPool.values().toArray();
+        
+        for(int i=0;i<count;i++)
+        {
+            names[i] = ((SensorThread)sensorThreads[i]).getSensorName();
+        }
+        
+        return names;
     }
 }

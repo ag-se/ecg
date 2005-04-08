@@ -5,6 +5,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.HeadlessException;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.net.InetAddress;
 import java.util.List;
 import java.util.Observable;
@@ -14,6 +16,9 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
@@ -87,6 +92,10 @@ public class Configurator extends JFrame implements Observer
     private boolean shouldScroll = false;
 
     private JPanel pnlSensors;
+    
+    private JMenuBar menuBar = null;
+    
+    private JMenu menu2;
     
     public static Configurator getInstance(Module source)
     {
@@ -163,6 +172,49 @@ public class Configurator extends JFrame implements Observer
         setBounds(0,0,800,600);
                      
         getContentPane().setLayout(new GridBagLayout());
+        
+        menuBar = new JMenuBar();
+        
+        JMenu menu1 = new JMenu("Datei");
+        JMenuItem menuItem11 = new JMenuItem("Beenden");
+        menuItem11.addActionListener(new ActionListener(){
+
+            public void actionPerformed(ActionEvent e)
+            {
+               Configurator.getInstance().dispose();
+               System.exit(0);
+                
+            }});
+        menu1.add(menuItem11);
+        
+        JMenu menu2 = new JMenu("Aufzeichnung");
+        JMenuItem menuitem21 = new JMenuItem("Anhalten");
+        menuitem21.addActionListener(new ActionListener(){
+
+            public void actionPerformed(ActionEvent e)
+            {
+                
+                ModuleRegistry.getInstance().getModuleInstance(1).stop();
+                
+            }});
+        
+        JMenuItem menuitem22 = new JMenuItem("Fortsetzen");
+        menuitem22.addActionListener(new ActionListener(){
+
+            public void actionPerformed(ActionEvent e)
+            {
+
+                ModuleRegistry.getInstance().getModuleInstance(1).start();
+                
+            }});
+        menu2.add(menuitem21);
+        menu2.add(menuitem22);
+        
+        menuBar.add(menu1);
+        menuBar.add(menu2);
+        
+        this.setJMenuBar(menuBar);
+        
         
         
         sensorGraph = new SensorGraph();
@@ -439,9 +491,20 @@ public class Configurator extends JFrame implements Observer
                 
                 InetAddress[] addresses = seso.getSensorAddresses();
                 
+                String[] sensorNames = seso.getSensorNames();
+                
                 for (int i=0;i<activeSensors;i++)
                 {
-	                SensorCell sc = new SensorCell(this,"Unknown Sensor at" + addresses[i].toString());
+                    SensorCell sc;
+                    
+                    if(sensorNames[i] == null)
+                    {
+                        sc = new SensorCell(this,"Unknown Sensor at" + addresses[i].toString());
+                    }
+                    else
+                    {
+                        sc = new SensorCell(this,sensorNames[i] + "-Sensor \nat: " + addresses[i].toString());
+                    }
 		  
 	                sensorGraph.addSensorCell(sc);
 	            }
@@ -471,7 +534,7 @@ public class Configurator extends JFrame implements Observer
         
         Module m = (Module) module;
         
-        ModuleCell ml = new ModuleCell(this,m.getModuleType(),m.getId(),m.getName());
+        ModuleCell ml = new ModuleCell(this,m.getModuleType(),m.getId(),m.getName(),m.isRunning());
         
         moduleGraph.addModuleCell(ml);
         
@@ -517,7 +580,9 @@ public class Configurator extends JFrame implements Observer
        
 	        Module m = ModuleRegistry.getInstance().getModuleInstance(id);
 	        
-	        String text = "Name: \t" + m.getName() + "\nID: \t " + m.getId() + "\nTyp: \t" + m.getModuleType();
+	        
+	        
+	        String text = m.getDetails();
 	        
 	        JOptionPane.showMessageDialog(this,text);
         }

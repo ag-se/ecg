@@ -34,7 +34,14 @@ public class SensorThread extends Thread
     private ObjectInputStream ois = null;
     
     private SensorServer seso = null;
+
+    private String sensorName = null;
    
+    public String getSensorName()
+    {
+        return sensorName;
+    }
+    
     public InetAddress getSensorAddress()
     {
         if (socketToSensor != null)
@@ -84,7 +91,20 @@ public class SensorThread extends Thread
             try {
                 EventPacket e = (EventPacket) ois.readObject();
                 
-                SensorShellWrapper.getInstance().doCommand(e.getTimeStamp(),e.getCommandName(),e.getArglist());
+                if (SensorShellWrapper.getInstance().doCommand(e.getTimeStamp(),e.getCommandName(),e.getArglist()))
+                {
+                    if(e.getCommandName().equals(new String("Activity")) && e.getArglist().get(0).equals(new String("setTool")))
+                    {
+                        String sensorName;
+                        
+                        if((sensorName = (String)e.getArglist().get(1)) != null)
+                        {
+                            this.sensorName = sensorName;
+                            
+                            seso.doNotifyObservers();
+                        }
+                    }
+                }
             }
             catch(SocketException e)
             {

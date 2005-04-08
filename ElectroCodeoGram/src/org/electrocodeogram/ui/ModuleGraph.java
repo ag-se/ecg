@@ -35,23 +35,12 @@ public class ModuleGraph extends JGraph
     
     private ModuleGraph me = null;
     
-    private Configurator root = null;
-    
-    public Configurator getRoot()
-    {
-        return root;
-    }
     
     public ModuleGraph(Configurator root){
         
         super(new DefaultGraphModel());
       
-        this.root = root;
-        
         me = this;
-   
-        
-        
         
         addGraphSelectionListener(new GraphSelectionListener() {
 
@@ -61,6 +50,7 @@ public class ModuleGraph extends JGraph
                 {   
                     
                     selectedModuleCellId  = ((ModuleCell)(arg0.getCell())).getId();
+               
                     
                 }
                 else
@@ -81,12 +71,14 @@ public class ModuleGraph extends JGraph
 	                Object o = getFirstCellForLocation(e.getPoint().x,e.getPoint().y);
 	                if(o != null)
 	                {
-	                    ModuleCell mc = (ModuleCell) o;
-	                    
-	                    selectedModuleCellId = mc.getId();
-	                    
-	                    MenuManager.getInstance().showModuleMenu(me,e.getPoint().x,e.getPoint().y);
-	                    
+	                    if (o instanceof ModuleCell)
+	                    {
+		                    ModuleCell mc = (ModuleCell) o;
+		                    
+		                    selectedModuleCellId = mc.getId();
+		                    
+		                    MenuManager.getInstance().showModuleMenu(selectedModuleCellId,me,e.getPoint().x,e.getPoint().y);
+		                }
 	                }
                 }
             }
