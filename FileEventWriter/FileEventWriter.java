@@ -8,6 +8,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.List;
 
 
@@ -36,7 +37,9 @@ public class FileEventWriter extends EventWriter
 
     private static int count = 0;
     
-    File file = null;
+    private File file = null;
+
+    private String prefix;
     
     public FileEventWriter()
     {
@@ -50,6 +53,8 @@ public class FileEventWriter extends EventWriter
             file = new File(HOME + File.separator + DIR + File.separator + count + FILENAME + EXTENSION);
             
         }
+        
+        
     }
     
     /* (non-Javadoc)
@@ -57,39 +62,103 @@ public class FileEventWriter extends EventWriter
      */
     public void write(EventPacket eventPacket)
     {
-        try {
-            bw = new BufferedWriter(new FileWriter(file,true));
-            
-            bw.write(eventPacket.getTimeStamp().toString() + " : ");
-            
-            bw.write(eventPacket.getCommandName());
-            
-            List argList = eventPacket.getArglist();
-            
-            if (argList != null)
-            {
-            
-	            Object[] args = argList.toArray();
+        if(runningFlag)
+        {
+	        try {
+	            bw = new BufferedWriter(new FileWriter(file,true));
 	            
-	            for (int i=0;i<args.length;i++)
+	            bw.write(eventPacket.getTimeStamp().toString() + " : ");
+	            
+	            bw.write(eventPacket.getCommandName());
+	            
+	            List argList = eventPacket.getArglist();
+	            
+	            if (argList != null)
 	            {
-	                String str = (String) args[i];
-	                
-	                bw.write(" " + str);
-	            }
-            }    
-            
-            bw.newLine();
-            
-            bw.close();
-        
-            
+	            
+		            Object[] args = argList.toArray();
+		            
+		            for (int i=0;i<args.length;i++)
+		            {
+		                String str = (String) args[i];
+		                
+		                bw.write(" " + str);
+		            }
+	            }    
+	            
+	            bw.newLine();
+	            
+	            bw.close();
+	        
+	            
+	        }
+	        catch (IOException e) {
+	            // TODO Auto-generated catch block
+	            e.printStackTrace();
+	        }
         }
-        catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        
+    }
+
+    /* (non-Javadoc)
+     * @see org.electrocodeogram.module.Module#setProperty(java.lang.String, java.lang.Object)
+     */
+    public void setProperty(String propertyName, Object propertyValue)
+    {
+        
+        if (propertyName.equals("OutputFile"))
+        {
+            if(propertyValue instanceof String)
+            {
+                String filename = (String) propertyValue;
+                
+                File outputFile = new File(filename);
+                
+                setOutputFile(outputFile);
+            }
+        }
+        else if(propertyName.equals("Prefix"))
+        {
+            if(propertyValue instanceof String)
+            {
+                String prefix = (String) propertyValue;
+                
+                setPrefix(prefix);
+            }
         }
         
+    }
+
+    /**
+     * @param prefix
+     */
+    private void setPrefix(String prefix)
+    {
+        
+        this.prefix = prefix;
+        
+    }
+
+    /**
+     * @param outputFile
+     */
+    private void setOutputFile(File outputFile)
+    {
+       stop();
+       
+       file = outputFile;
+       
+       start();
+              
+    }
+    
+    public String getDetails()
+    {
+        String text = super.getDetails();
+        
+        text += "\nAusgabedatei: " + file.getAbsolutePath();
+        
+        return text;
     }
 
 }
