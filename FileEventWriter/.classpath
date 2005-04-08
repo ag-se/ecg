@@ -3,6 +3,6 @@
 	<classpathentry kind="src" path=""/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="src" path="/ElectroCodeoGram"/>
-	<classpathentry kind="src" path="/ECG_ClientTools"/>
+	<classpathentry kind="lib" path="/ECG_Jars/sensorshellwrapper.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>

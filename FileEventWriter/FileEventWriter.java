@@ -10,8 +10,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
+import org.electrocodeogram.EventPacket;
 import org.electrocodeogram.module.writer.EventWriter;
-import org.electrocodeogram.sensorwrapper.EventPacket;
 
 
 /**
