@@ -6,7 +6,6 @@
  */
 package org.electrocodeogram.module;
 
-import java.io.File;
 import java.util.Properties;
 
 /**

@@ -9,7 +9,6 @@ package org.electrocodeogram.ui;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.util.Properties;
 
 import javax.swing.JFileChooser;
@@ -17,7 +16,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 
-import org.electrocodeogram.module.Module;
 import org.electrocodeogram.module.ModuleRegistry;
 
 /**
