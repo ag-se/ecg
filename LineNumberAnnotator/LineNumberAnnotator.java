@@ -1,8 +1,8 @@
 import java.util.Date;
 
 
+import org.electrocodeogram.EventPacket;
 import org.electrocodeogram.module.annotator.EventAnnotator;
-import org.electrocodeogram.sensorwrapper.EventPacket;
 
 
 /*
