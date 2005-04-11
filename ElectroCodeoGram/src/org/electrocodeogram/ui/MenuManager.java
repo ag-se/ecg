@@ -12,11 +12,15 @@ import java.awt.event.ActionListener;
 import java.util.Properties;
 
 import javax.swing.JFileChooser;
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 
 import org.electrocodeogram.module.ModuleRegistry;
+import org.electrocodeogram.module.Module;
+import org.electrocodeogram.module.annotator.EventProcessor;
+
 
 /**
  * @author 7oas7er
@@ -31,14 +35,67 @@ public class MenuManager
  
     private ModulePopupMenu popupMenu = null;
     
+    private JMenuItem mniModuleDetails = new JMenuItem("Eigenschaften");
     
+    private JMenuItem mniModuleStop = new JMenuItem("Stop");
     
-    /**
-     * 
-     */
+    private JMenuItem mniModuleStart = new JMenuItem("Start");
+    
+    private JMenuItem mniMsgWindowShow = new JMenuItem("Ereignisfenster");
+    
+    private JMenuItem mniMakeAnnotator = new JMenuItem("Annotation");
+    
+    private JMenuItem mniMakeFilter = new JMenuItem("Filterung");
+    
     private MenuManager()
     {
+        mniModuleDetails.addActionListener(new ActionListener(){
+
+            public void actionPerformed(ActionEvent e)
+            {
+                Configurator.getInstance().showModuleDetails();                
+            }});
+      
+        mniModuleStop.addActionListener(new ActionListener(){
+
+            public void actionPerformed(ActionEvent e)
+            {
+               ModuleRegistry.getInstance().stopModule(Configurator.getInstance().getSelectedModuleCellId());
+                
+            }});
         
+        mniModuleStart.addActionListener(new ActionListener(){
+
+            public void actionPerformed(ActionEvent e)
+            {
+               ModuleRegistry.getInstance().startModule(Configurator.getInstance().getSelectedModuleCellId());
+                
+            }});
+        
+        mniMsgWindowShow.addActionListener(new ActionListener(){
+
+            public void actionPerformed(ActionEvent e)
+            {
+                Configurator.getInstance().showMessagesWindow();
+                
+            }});
+        
+        mniMakeAnnotator.addActionListener(new ActionListener(){
+
+            public void actionPerformed(ActionEvent e)
+            {
+                ModuleRegistry.getInstance().setProcessorMode(EventProcessor.ANNOTATOR,Configurator.getInstance().getSelectedModuleCellId());
+                
+            }});
+    
+        mniMakeFilter.addActionListener(new ActionListener(){
+
+            public void actionPerformed(ActionEvent e)
+            {
+                ModuleRegistry.getInstance().setProcessorMode(EventProcessor.FILTER,Configurator.getInstance().getSelectedModuleCellId());
+                
+            }});
+
     }
 
     public static MenuManager getInstance()
@@ -48,7 +105,24 @@ public class MenuManager
     
     public void showModuleMenu(int id, Component c, int x, int y)
     {
-        popupMenu = new ModulePopupMenu(id);
+        popupMenu = new ModulePopupMenu();
+        
+        popupMenu.add(mniModuleStart);
+        
+        popupMenu.add(mniModuleStop);
+        
+        popupMenu.addSeparator();
+        
+        popupMenu.add(mniMsgWindowShow);
+        
+        if(ModuleRegistry.getInstance().isModuleType(Module.INTERMEDIATE_MODULE,id))
+        {
+            popupMenu.addSeparator();
+            
+            popupMenu.add(mniMakeAnnotator);
+            
+            popupMenu.add(mniMakeFilter);
+        }
         
         Properties moduleProperties = ModuleRegistry.getInstance().getModulePropertiesForId(id);
         
@@ -88,6 +162,11 @@ public class MenuManager
 	            }
 	        }
         }
+        
+        popupMenu.addSeparator();
+        
+        popupMenu.add(mniModuleDetails);
+        
         popupMenu.show(c,x,y);
     }
     
@@ -157,51 +236,68 @@ public class MenuManager
 
     private class ModulePopupMenu extends JPopupMenu
     {
-        
-        private int moduleId = -1;
-        
-        public ModulePopupMenu(int moduleId)
+        public ModulePopupMenu()
         {
             super();
-            
-            this.moduleId = moduleId;
-            
-            JMenuItem mniModuleDetails = new JMenuItem("Details");
-            mniModuleDetails.addActionListener(new ActionListener(){
-
-                public void actionPerformed(ActionEvent e)
-                {
-                    Configurator.getInstance().showModuleDetails();                
-                }});
-            
-            this.add(mniModuleDetails);
-            
-            JMenuItem mniModuleStop = new JMenuItem("Stop");
-            mniModuleStop.addActionListener(new ActionListener(){
-
-                public void actionPerformed(ActionEvent e)
-                {
-                   ModuleRegistry.getInstance().stopModule(getModuleId());
-                    
-                }});
-            this.add(mniModuleStop);           
-            
-            JMenuItem mniModuleStart = new JMenuItem("Start");
-            mniModuleStart.addActionListener(new ActionListener(){
-
-                public void actionPerformed(ActionEvent e)
-                {
-                   ModuleRegistry.getInstance().startModule(getModuleId());
-                    
-                }});
-            this.add(mniModuleStart);
-            
+         
         }
         
-        public int getModuleId()
+       
+    }
+    
+    
+    /**
+     * @param menu3
+     * @param id
+     */
+    public void populateModuleMenu(JMenu menu, int id)
+    {
+        if(id == -1) return;
+        
+        menu.removeAll();
+        
+        menu.add(mniModuleStart);
+        
+        menu.add(mniModuleStop);
+        
+        Properties moduleProperties = ModuleRegistry.getInstance().getModulePropertiesForId(id);
+        
+        if(moduleProperties != null)
         {
-            return moduleId;
+        
+	        boolean propertiesDeclared = Boolean.valueOf(moduleProperties.getProperty("PROPERTIES_DECLARED")).booleanValue();
+	        
+	        if (propertiesDeclared)
+	        {
+	            int count = Integer.parseInt(moduleProperties.getProperty("PROPERTIES_COUNT"));
+	            
+	            for (int i=1;i<=count;i++)
+	            {
+	                String propertyDisplayName = moduleProperties.getProperty("MODULE_PROPERTY_DISPLAYNAME_" + i);
+	                
+	                String propetyType = moduleProperties.getProperty("MODULE_PROPERTY_TYPE_" + i);
+	            
+	                String propertyName = moduleProperties.getProperty("MODULE_PROPERTY_NAME_" + i);
+	                
+	                try {
+	                    Class clazz = Class.forName(propetyType);
+	                    
+	                    JMenuItem menuItem = new JMenuItem(propertyDisplayName);
+	                  
+	                    menuItem.addActionListener(new PropertyActionAdapter(id,clazz,propertyName));                    
+	                    
+	                    menu.add(menuItem);
+	                }
+	                catch (ClassNotFoundException e) {
+	                    // TODO Auto-generated catch block
+	                    e.printStackTrace();
+	                }
+	             
+	            }
+	        }
         }
         
+        menu.add(mniModuleDetails);
+     
     }
 }

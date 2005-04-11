@@ -25,11 +25,6 @@ public class ModuleClassLoader extends java.lang.ClassLoader
         super(cl);
     }
     
-//    public Class loadClass(String name) throws ClassNotFoundException
-//    {
-//        return loadClass(name,true);
-//    }
-    
     protected Class findClass(String name) throws ClassNotFoundException
     {
         File classFile = new File(name);

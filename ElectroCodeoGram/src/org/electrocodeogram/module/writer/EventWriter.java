@@ -28,23 +28,31 @@ public abstract class EventWriter extends Module
     public EventWriter(String name)
     {
         super(Module.TARGET_MODULE,name);
-        // TODO Auto-generated constructor stub
     }
     
-    public void update(Observable o, Object arg)
-    {
-        if (arg instanceof EventPacket)
-        {
-            EventPacket eventPacket = (EventPacket) arg;
-            
-            setChanged();
-            notifyObservers(new EventPacket(this.getId(),eventPacket.getTimeStamp(),eventPacket.getCommandName(),eventPacket.getArglist()));
-            clearChanged();
-            
-            write(eventPacket); 
-        }
-    }
+//    public void update(Observable o, Object arg)
+//    {
+//        if (arg instanceof EventPacket)
+//        {
+//            EventPacket eventPacket = (EventPacket) arg;
+//            
+//            setChanged();
+//            notifyObservers(new EventPacket(this.getId(),eventPacket.getTimeStamp(),eventPacket.getCommandName(),eventPacket.getArglist()));
+//            clearChanged();
+//            
+//            write(eventPacket); 
+//        }
+//    }
 
+    public void receiveEventPacket(EventPacket eventPacket)
+    {
+        setChanged();
+        notifyObservers(new EventPacket(this.getId(),eventPacket.getTimeStamp(),eventPacket.getCommandName(),eventPacket.getArglist()));
+        clearChanged();
+        
+        write(eventPacket); 
+    }
+    
     /**
      * @param arg
      */

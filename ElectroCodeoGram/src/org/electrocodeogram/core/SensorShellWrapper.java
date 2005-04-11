@@ -18,11 +18,6 @@ public class SensorShellWrapper extends SensorShell
     
     private static final SensorShellWrapper theInstance = new SensorShellWrapper(new SensorProperties("",""),false,"ECG");
     
-    /**
-     * 
-     * @uml.property name="sensorSource"
-     * @uml.associationEnd multiplicity="(0 1)"
-     */
     private SensorSource sensorSource = null;
     
     /** The logging instance for SensorShells. */

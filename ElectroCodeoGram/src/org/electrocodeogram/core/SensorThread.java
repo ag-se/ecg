@@ -17,8 +17,6 @@ import org.electrocodeogram.EventPacket;
 /**
  * @author 7oas7er
  *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
  */
 public class SensorThread extends Thread
 {

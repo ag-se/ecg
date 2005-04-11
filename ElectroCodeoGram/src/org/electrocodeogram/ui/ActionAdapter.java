@@ -1,8 +1,6 @@
 /*
  * Created on 11.03.2005
  *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
  */
 package org.electrocodeogram.ui;
 
@@ -37,7 +35,7 @@ public class ActionAdapter implements ActionListener
     public void actionPerformed(ActionEvent e)
     {
 
-      int selectedModuleCellId = Configurator.getInstance().getModuleGraph().getSelectedModuleCellId();
+      int selectedModuleCellId = Configurator.getInstance().getSelectedModuleCellId();
         
       if(selectedModuleCellId != -1)
       {

@@ -23,6 +23,8 @@ public class ModuleDescriptor
     
     private Properties properties = null;
     
+    // TODO : make the prop file XML
+    
     public ModuleDescriptor(String name, Class clazz, Properties properties)
     {
         this.properties = properties;

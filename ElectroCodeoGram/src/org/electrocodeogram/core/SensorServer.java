@@ -20,8 +20,6 @@ import org.electrocodeogram.ui.Configurator;
 /**
  * @author 7oas7er
  *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
  */
 public class SensorServer extends Observable
 {
@@ -115,6 +113,8 @@ public class SensorServer extends Observable
         {
             try {
                 Socket socketToSensor = seso.accept();
+                
+                // TODO : make different sensor sources for different sensors
                 
                 SensorThread st = new SensorThread(me,socketToSensor);
                 

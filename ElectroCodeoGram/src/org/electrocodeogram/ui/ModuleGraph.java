@@ -9,6 +9,7 @@ package org.electrocodeogram.ui;
 import java.awt.Color;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Observable;
 
 import javax.swing.border.LineBorder;
 
@@ -27,20 +28,25 @@ import org.jgraph.graph.DefaultGraphModel;
 public class ModuleGraph extends JGraph
 {
 
+    private Configurator configurator = null;
+    
     private int selectedModuleCellId = -1;
     
     private ModuleCell rootCell = null;
     
-    
+    private ModuleGraphObserverDummy observerDummy = null;
     
     private ModuleGraph me = null;
     
-    
-    public ModuleGraph(Configurator root){
+    public ModuleGraph(Configurator configurator){
         
         super(new DefaultGraphModel());
       
         me = this;
+        
+        this.configurator = configurator;
+         
+        observerDummy = new ModuleGraphObserverDummy(configurator,this);
         
         addGraphSelectionListener(new GraphSelectionListener() {
 
@@ -50,12 +56,14 @@ public class ModuleGraph extends JGraph
                 {   
                     
                     selectedModuleCellId  = ((ModuleCell)(arg0.getCell())).getId();
-               
                     
+                    observerDummy.notifyUI();
                 }
                 else
                 {
                     selectedModuleCellId = -1;
+                    
+                    observerDummy.notifyUI();
                 }
                 
             }});
@@ -114,6 +122,26 @@ public class ModuleGraph extends JGraph
         
     }
     
-
+    private class ModuleGraphObserverDummy extends Observable
+    {
+        private ModuleGraph parent = null;
+        
+        public ModuleGraphObserverDummy(Configurator configurator, ModuleGraph parent)
+        {
+            super();
+            
+            this.parent = parent;
+            
+            this.addObserver(configurator);
+            
+        }
+        
+        public void notifyUI()
+        {
+            setChanged();
+            notifyObservers(parent);
+            clearChanged();
+        }
+    }
     
 }

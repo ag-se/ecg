@@ -7,8 +7,9 @@ import java.awt.GridLayout;
 import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.net.InetAddress;
-import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -21,22 +22,16 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollBar;
-import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
-import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import org.electrocodeogram.core.SensorServer;
 import org.electrocodeogram.module.Module;
 import org.electrocodeogram.module.ModuleRegistry;
-import org.electrocodeogram.EventPacket;
 import org.jgraph.graph.DefaultEdge;
 import org.jgraph.graph.GraphConstants;
 import org.jgraph.layout.TreeLayoutAlgorithm;
@@ -59,6 +54,8 @@ public class Configurator extends JFrame implements Observer
      * @uml.associationEnd multiplicity="(0 1)"
      */
     private static Configurator theInstance = null;
+    
+    private MessagesFrame frmMessages = null;
 
     /**
      * 
@@ -83,21 +80,17 @@ public class Configurator extends JFrame implements Observer
 
     private JPanel pnlModules;
 
-    private JPanel pnlMessages;
-
-    private JTextArea textArea;
-
-    private JScrollPane scrollPane;
-
     private JStatusBar statusBar;
-
-    private boolean shouldScroll = false;
 
     private JPanel pnlSensors;
 
     private JMenuBar menuBar = null;
 
     private JMenu menu2;
+    
+    private JMenu menu3;
+
+    private int selectedModuleCellId = -1;
 
     public static Configurator getInstance(Module source)
     {
@@ -148,8 +141,21 @@ public class Configurator extends JFrame implements Observer
             e.printStackTrace();
         }
         catch (UnsupportedLookAndFeelException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        	try {
+				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			} catch (ClassNotFoundException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (InstantiationException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (IllegalAccessException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (UnsupportedLookAndFeelException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
         }
 
         setTitle("ElectroCodeoGram Configurator");
@@ -184,7 +190,7 @@ public class Configurator extends JFrame implements Observer
             public void actionPerformed(ActionEvent e)
             {
 
-                ModuleRegistry.getInstance().getModuleInstance(1).stop();
+                ModuleRegistry.getInstance().stopModule(1);
 
             }
         });
@@ -195,16 +201,41 @@ public class Configurator extends JFrame implements Observer
             public void actionPerformed(ActionEvent e)
             {
 
-                ModuleRegistry.getInstance().getModuleInstance(1).start();
+                ModuleRegistry.getInstance().startModule(1);
 
             }
         });
+        
         menu2.add(menuitem21);
         menu2.add(menuitem22);
 
+        
+        menu3 = new JMenu("Modul");
+        menu3.addMouseListener(new MouseAdapter(){
+
+            public void mouseEntered(MouseEvent e)
+            {
+                MenuManager.getInstance().populateModuleMenu(menu3,moduleGraph.getSelectedModuleCellId());
+            }
+        });
+        
+        JMenu menu4 = new JMenu("Fenster");
+        JMenuItem menuitem41 = new JMenuItem("Ereignisfenster");
+        menuitem41.addActionListener(new ActionListener(){
+
+            public void actionPerformed(ActionEvent e)
+            {
+                
+                showMessagesWindow();
+                
+            }});
+        menu4.add(menuitem41);
+        
         menuBar.add(menu1);
         menuBar.add(menu2);
-
+        menuBar.add(menu3);
+        menuBar.add(menu4);
+        
         this.setJMenuBar(menuBar);
 
         sensorGraph = new SensorGraph();
@@ -219,30 +250,10 @@ public class Configurator extends JFrame implements Observer
                 new LineBorder(new Color(0, 0, 0)), "Tree of running modules"));
         pnlModules.add(moduleGraph);
 
-        textArea = new JTextArea();
-        textArea.setEditable(false);
-        textArea.setLineWrap(true);
+        
 
-        scrollPane = new JScrollPane(textArea);
-        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.getVerticalScrollBar().getModel().addChangeListener(new ChangeListener() {
-
-            public void stateChanged(ChangeEvent e)
-            {
-                if (shouldScroll) {
-                    JScrollBar vertBar = scrollPane.getVerticalScrollBar();
-                    vertBar.setValue(vertBar.getMaximum());
-                    shouldScroll = false;
-                }
-
-            }
-        });
-
-        pnlMessages = new JPanel(new GridLayout(1, 1));
-        pnlMessages.setBorder(new TitledBorder(new LineBorder(
-                new Color(0, 0, 0)), "Event messages in selected module"));
-        pnlMessages.add(scrollPane);
+       
+        
 
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 
@@ -278,7 +289,7 @@ public class Configurator extends JFrame implements Observer
         c.weighty = 1;
         c.weightx = 1;
 
-        pnlRight.add(pnlMessages, c);
+        //pnlRight.add(pnlMessages, c);
 
         splitPane.add(pnlRight, 1);
 
@@ -304,6 +315,8 @@ public class Configurator extends JFrame implements Observer
 
         getContentPane().add(statusBar, c2);
 
+        frmMessages = new MessagesFrame();
+        
         setVisible(true);
     }
 
@@ -323,24 +336,30 @@ public class Configurator extends JFrame implements Observer
 
         Object[] moduleNameObjects = moduleRegistry.getInstalledModulesNames();
 
-        assert (moduleNameObjects != null);
+        if (moduleNameObjects != null)
+        {
 
-        for (int i = 0; i < moduleNameObjects.length; i++) {
-            String moduleName = (String) moduleNameObjects[i];
-
-            Class moduleClass = moduleRegistry.getModuleClassForName(moduleName);
-
-            JButton btnModule = new JButton("Add a " + moduleName);
-
-            btnModule.addActionListener(new ActionAdapter(this, moduleClass));
-
-            pnlButtons.add(btnModule);
-
+	        for (int i = 0; i < moduleNameObjects.length; i++) {
+	            String moduleName = (String) moduleNameObjects[i];
+	
+	            Class moduleClass = moduleRegistry.getModuleClassForName(moduleName);
+	
+	            JButton btnModule = new JButton("Add a " + moduleName);
+	
+	            btnModule.addActionListener(new ActionAdapter(this, moduleClass));
+	
+	            pnlButtons.add(btnModule);
+	
+	        }
         }
-
         return pnlButtons;
     }
 
+    public void showMessagesWindow()
+    {
+        this.frmMessages.show();
+    }
+    
     /**
      * @throws java.awt.HeadlessException
      */
@@ -356,15 +375,6 @@ public class Configurator extends JFrame implements Observer
 
     /**
      * 
-     * @uml.property name="moduleGraph"
-     */
-    public ModuleGraph getModuleGraph()
-    {
-        return moduleGraph;
-    }
-
-    /**
-     * 
      * @uml.property name="source"
      */
     public Module getSource()
@@ -372,14 +382,14 @@ public class Configurator extends JFrame implements Observer
         return source;
     }
 
-    public Module getModule(int id)
-    {
-
-        assert (id > 0);
-
-        return ModuleRegistry.getInstance().getModuleInstance(id);
-
-    }
+//    public Module getModule(int id)
+//    {
+//
+//        assert (id > 0);
+//
+//        return ModuleRegistry.getInstance().getModuleInstance(id);
+//
+//    }
 
     /* (non-Javadoc)
      * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
@@ -407,36 +417,6 @@ public class Configurator extends JFrame implements Observer
 
             tla.run(moduleGraph, moduleGraph.getRoots());
 
-        }
-        else if (arg instanceof EventPacket) {
-            // TODO : Writer erben
-
-            EventPacket eventPacket = (EventPacket) arg;
-
-            if (eventPacket.getEventSourceId() == moduleGraph.getSelectedModuleCellId()) {
-                textArea.append(eventPacket.getTimeStamp().toString() + " : " + eventPacket.getCommandName());
-
-                List argList = eventPacket.getArglist();
-
-                if (argList != null) {
-
-                    Object[] args = eventPacket.getArglist().toArray();
-
-                    for (int i = 0; i < args.length; i++) {
-                        String str = (String) args[i];
-
-                        textArea.append(" " + str);
-                    }
-
-                }
-                textArea.append("\n");
-
-                JScrollBar vertBar = scrollPane.getVerticalScrollBar();
-                if (vertBar.getValue() == vertBar.getMaximum() - vertBar.getVisibleAmount()) {
-                    shouldScroll = true;
-                }
-
-            }
         }
         else if (arg instanceof SensorServer) {
             SensorServer seso = (SensorServer) arg;
@@ -495,7 +475,20 @@ public class Configurator extends JFrame implements Observer
                 pnlSensors.add(sensorGraph);
             }
 
-            pnlSensors.repaint();
+        }
+        else if(arg instanceof ModuleGraph)
+        {
+            this.selectedModuleCellId = moduleGraph.getSelectedModuleCellId();
+            
+            if(selectedModuleCellId == -1)
+            {
+                menu3.setEnabled(false);
+            }
+            else
+            {
+                menu3.setEnabled(true);
+            }
+            frmMessages.setSelectedModul(selectedModuleCellId);
         }
     }
 
@@ -538,6 +531,12 @@ public class Configurator extends JFrame implements Observer
 
     }
 
+    public int getSelectedModuleCellId()
+    {
+        return selectedModuleCellId ;
+        
+    }
+    
     /**
      * 
      */
@@ -548,11 +547,9 @@ public class Configurator extends JFrame implements Observer
 
         if (id != -1) {
 
-            Module m = ModuleRegistry.getInstance().getModuleInstance(id);
+            String text = ModuleRegistry.getInstance().getModuleDetails(id);
 
-            String text = m.getDetails();
-
-            JOptionPane.showMessageDialog(this, text);
+            JOptionPane.showMessageDialog(this, text,"Moduleigenschaften",JOptionPane.INFORMATION_MESSAGE);
         }
 
     }

@@ -25,15 +25,21 @@ import org.electrocodeogram.EventPacket;
             
             eventBuffer.append(eventPacket);
                        
-            processEventPacket(eventPacket);
-            
-            // TODO : make own processing mechanism
+            sendEventPacket(eventPacket);
         }
 
         /* (non-Javadoc)
          * @see org.electrocodeogram.module.Module#setProperty(java.lang.String, java.lang.Object)
          */
         public void setProperty(String currentPropertyName, Object propertyValue)
+        {
+            
+        }
+
+        /* (non-Javadoc)
+         * @see org.electrocodeogram.module.Module#receiveEventPacket(org.electrocodeogram.EventPacket)
+         */
+        public void receiveEventPacket(EventPacket eventPacket)
         {
             // TODO Auto-generated method stub
             

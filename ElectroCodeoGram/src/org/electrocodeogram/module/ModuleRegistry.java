@@ -9,42 +9,24 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.electrocodeogram.module.annotator.EventProcessor;
+
 /**
  * @author Frank Schlesinger *  * The singleton class ModuleRegistry finds installed ECG modules and makes their module-descriptions * available to the framework. It also keeps track of all currently running modules.
  */
 
 public class ModuleRegistry
 {
-    // TODO : Register Sensor Source
     
     private Logger logger = Logger.getLogger("ModuleRegistry");
 
-    /**
-     * 
-     * @uml.property name="theInstance"
-     * @uml.associationEnd multiplicity="(0 1)"
-     */
     private final static ModuleRegistry theInstance = new ModuleRegistry();
 
-    /**
-     * 
-     * @uml.property name="runningModules"
-     * @uml.associationEnd multiplicity="(0 1)"
-     */
     private RunningModules runningModules = null;
 
-    /**
-     * 
-     * @uml.property name="installedModules"
-     * @uml.associationEnd multiplicity="(0 1)"
-     */
     private InstalledModules installedModules = null;
 
-    /**
-     * 
-     * @uml.property name="moduleClassLoader"
-     * @uml.associationEnd multiplicity="(0 1)"
-     */
+    
     private ModuleClassLoader moduleClassLoader = null;
 
     
@@ -87,9 +69,7 @@ public class ModuleRegistry
      */
     private ModuleClassLoader getModuleClassLoader()
         throws ClassNotFoundException {
-
-        //Class clazz = Class.forName("net.datenfabrik.microstat.core.Module");
-
+        
         Class clazz = this.getClass();
 
         ClassLoader currentClassLoader = clazz.getClassLoader();
@@ -163,7 +143,7 @@ public class ModuleRegistry
         
         private InstalledModules()
         {
-            this(new File(System.getProperty("user.home") + "/electrocodeogram/modules/"));
+            this(new File("modules/"));
         }
 
         private InstalledModules(File moduleDirectory)
@@ -356,10 +336,8 @@ public class ModuleRegistry
      * @param id
      * @return
      */
-    public Module getModuleInstance(int id)
+    private Module getModuleInstance(int id)
     {
-        // TODO : make this private
-        
        assert(id > 0);
        
        assert(runningModules != null);
@@ -434,6 +412,68 @@ public class ModuleRegistry
         module.start();
         
         
+    }
+
+
+    /**
+     * @param id
+     * @return
+     */
+    public String getModuleDetails(int moduleId)
+    {
+        Module module = getModuleInstance(moduleId);
+        
+        return module.getDetails();
+    }
+
+
+    /**
+     * @param intermediate_module
+     * @param moduleId
+     * @return
+     */
+    public boolean isModuleType(int moduleType, int moduleId)
+    {
+        Module module = getModuleInstance(moduleId);
+        
+        if(module.getModuleType() == moduleType)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+
+    /**
+     * @param annotator
+     * @param moduleId
+     */
+    public void setProcessorMode(int mode, int moduleId)
+    {
+        Module module = getModuleInstance(moduleId);
+        
+        if(module instanceof EventProcessor)
+        {
+            EventProcessor eventProcessor = (EventProcessor) module;
+            
+            eventProcessor.setProcessorMode(mode);
+        }
+    
+    }
+
+
+    /**
+     * @param moduleId
+     * @return
+     */
+    public String getModulNameForId(int moduleId)
+    {
+        Module module = getModuleInstance(moduleId);
+        
+        return module.getName();
     }
     
 }

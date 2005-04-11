@@ -15,11 +15,12 @@ import java.util.logging.*;
 import java.util.logging.Level;
 
 import org.electrocodeogram.EventPacket;
+import org.electrocodeogram.module.annotator.EventProcessor;
 import org.electrocodeogram.ui.Configurator;
+import org.electrocodeogram.ui.GuiEventWriter;
 
 /**
- * @author 7oas7er *  * TODO To change the template for this generated type comment go to * Window - Preferences - Java - Code Style - Code Templates
- */
+ * @author 7oas7er *  */
 
 public abstract class Module extends Observable implements Observer
 {
@@ -30,13 +31,7 @@ public abstract class Module extends Observable implements Observer
 
     public final static int INTERMEDIATE_MODULE = 1;
 
-    /**
-     * 
-     * @uml.property name="moduleRegistry"
-     * @uml.associationEnd multiplicity="(0 1)"
-     */
     private static ModuleRegistry moduleRegistry = ModuleRegistry.getInstance();
-
 
     public final static int TARGET_MODULE = 2;
     
@@ -52,14 +47,11 @@ public abstract class Module extends Observable implements Observer
      
     private Collection connectedModules = null;
 
-    /**
-     * 
-     * @uml.property name="eventBuffer"
-     * @uml.associationEnd multiplicity="(0 1)"
-     */
     protected EventBuffer eventBuffer = null;
 
     protected boolean runningFlag = false;
+    
+    // TODO : a module may have to know who it is connected to
     
     public Module(int moduleType, String name)
     {
@@ -81,7 +73,12 @@ public abstract class Module extends Observable implements Observer
       
       moduleRegistry.addModuleInstance(this);
       
-      addObserver(Configurator.getInstance(this));
+      if (!(this instanceof GuiEventWriter))
+      {
+          addObserver(Configurator.getInstance(this));
+          
+          addObserver(GuiEventWriter.getInstance());
+      }
       
 
     }
@@ -108,40 +105,37 @@ public abstract class Module extends Observable implements Observer
     /* (non-Javadoc)
      * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
      */
-    public void update(Observable o, Object arg)
+    public final void update(Observable o, Object arg)
     {
-        
+        analyseNotification(o,arg);
     }
 
-    /**
-     * 
-     * @uml.property name="id"
-     */
+    private void analyseNotification(Observable o, Object arg)
+    {
+        if(arg instanceof EventPacket)
+        {
+            EventPacket eventPacket = (EventPacket) arg;
+            
+            receiveEventPacket(eventPacket);
+        }
+    }
+    
+    public abstract void receiveEventPacket(EventPacket eventPacket);
+    
     public int getId() {
         return id;
     }
 
-    /**
-     * 
-     * @uml.property name="moduleType"
-     */
     public int getModuleType() {
         return moduleType;
     }
 
-    /**
-     * 
-     * @uml.property name="name"
-     */
-    public String getName() {
+   public String getName() {
         return name;
     }
 
     
-    /**
-     * @param eventPacket
-     */
-    protected void processEventPacket(EventPacket eventPacket)
+    protected void sendEventPacket(EventPacket eventPacket)
     {
         if(runningFlag && (eventPacket != null))
         {
@@ -205,10 +199,6 @@ public abstract class Module extends Observable implements Observer
         clearChanged();
     }
 
-    /**
-     * 
-     * @uml.property name="connectedModules"
-     */
     public Object[] getConnectedModules() {
         return connectedModules.toArray();
     }
@@ -228,7 +218,6 @@ public abstract class Module extends Observable implements Observer
 	        if(!connectedModuleMap.containsKey(idObj))
 	        {
 	            throw new UnknownModuleIDException("The given module id " + id + " is unknown.");
-	            //throw new UnknownModuleIDException();
 	        }
 	        else
 	        {
@@ -291,7 +280,45 @@ public abstract class Module extends Observable implements Observer
      */
     public String getDetails()
     {
-        String text = "Name: \t" + getName() + "\nID: \t " + getId() + "\nTyp: \t" + getModuleType();
+        String text = "Name: \t" + getName() + "\nID: \t " + getId() + "\nTyp: \t";
+        
+        int type = getModuleType();
+        switch(type)
+        {
+            case Module.SOURCE_MODULE:
+                text += "Quellmodul";
+            break;
+            
+            case Module.INTERMEDIATE_MODULE:
+                text += "Zwischenmodul";
+            break;
+            
+            case Module.TARGET_MODULE:
+                text += "Zielmodul";
+            break;
+        }
+        
+        if(this instanceof EventProcessor)
+        {
+            EventProcessor eventProcessor = (EventProcessor) this;
+            
+            int mode = eventProcessor.getProcessorMode();
+            
+            text += "\nModus: \t";
+            
+            switch(mode)
+            {
+            	case EventProcessor.ANNOTATOR:
+            	    text += "Annotation";
+            	break;
+            	
+            	case EventProcessor.FILTER:
+            	    text += "Filterung";
+            	break;
+            	    
+            }
+        }
+        
        
         return text;
     
