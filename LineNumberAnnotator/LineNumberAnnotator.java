@@ -2,7 +2,7 @@ import java.util.Date;
 
 
 import org.electrocodeogram.EventPacket;
-import org.electrocodeogram.module.annotator.EventAnnotator;
+import org.electrocodeogram.module.annotator.EventProcessor;
 
 
 /*
@@ -17,7 +17,7 @@ import org.electrocodeogram.module.annotator.EventAnnotator;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public class LineNumberAnnotator extends EventAnnotator
+public class LineNumberAnnotator extends EventProcessor
 {
     private int lineCounter = 0;
 
@@ -26,7 +26,7 @@ public class LineNumberAnnotator extends EventAnnotator
      */
     public LineNumberAnnotator()
     {
-        super(EventAnnotator.PRE_ANNOTATION,":\n","LineNumberAnnotator");
+        super(EventProcessor.PRE_ANNOTATION,":\n","LineNumberAnnotator");
         //this.addObserver(new LoggerEventWriter("LoggereventWriter"));
     }
 
@@ -43,7 +43,6 @@ public class LineNumberAnnotator extends EventAnnotator
      */
     public void setProperty(String currentPropertyName, Object propertyValue)
     {
-        // TODO Auto-generated method stub
         
     }
 
