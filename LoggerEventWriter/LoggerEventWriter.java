@@ -68,8 +68,7 @@ public class LoggerEventWriter extends EventWriter
      */
     public void setProperty(String currentPropertyName, Object propertyValue)
     {
-        // TODO Auto-generated method stub
-        
+
     }
 
 }
