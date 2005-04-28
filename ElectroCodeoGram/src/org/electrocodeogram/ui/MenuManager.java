@@ -37,6 +37,8 @@ public class MenuManager
     
     private JMenuItem mniModuleDetails = new JMenuItem("Eigenschaften");
     
+    private JMenuItem mniModuleRemove = new JMenuItem("Entfernen");
+    
     private JMenuItem mniModuleStop = new JMenuItem("Stop");
     
     private JMenuItem mniModuleStart = new JMenuItem("Start");
@@ -49,6 +51,14 @@ public class MenuManager
     
     private MenuManager()
     {
+        mniModuleRemove.addActionListener(new ActionListener(){
+
+            public void actionPerformed(ActionEvent e)
+            {
+                ModuleRegistry.getInstance().removeModule(Configurator.getInstance().getSelectedModuleCellId());
+                
+            }});
+        
         mniModuleDetails.addActionListener(new ActionListener(){
 
             public void actionPerformed(ActionEvent e)
@@ -110,6 +120,10 @@ public class MenuManager
         popupMenu.add(mniModuleStart);
         
         popupMenu.add(mniModuleStop);
+        
+        popupMenu.addSeparator();
+        
+        popupMenu.add(mniModuleRemove);
         
         popupMenu.addSeparator();
         
@@ -260,6 +274,10 @@ public class MenuManager
         
         menu.add(mniModuleStop);
         
+        menu.addSeparator();
+        
+        menu.add(mniModuleRemove);
+                
         Properties moduleProperties = ModuleRegistry.getInstance().getModulePropertiesForId(id);
         
         if(moduleProperties != null)

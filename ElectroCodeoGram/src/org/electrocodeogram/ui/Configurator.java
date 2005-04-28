@@ -519,8 +519,8 @@ public class Configurator extends JFrame implements Observer
 
             moduleGraph.addEdge(edge);
         }
-        if (m.countConnectedModules() > 0) {
-            Object[] modules = m.getConnectedModules();
+        if (m.countChildModules() > 0) {
+            Object[] modules = m.getChildModules();
 
             assert (modules != null);
 
