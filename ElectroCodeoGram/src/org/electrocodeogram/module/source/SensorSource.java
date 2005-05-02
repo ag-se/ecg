@@ -16,7 +16,9 @@ import org.electrocodeogram.EventPacket;
         
         public SensorSource()
         {
-            super(Module.SOURCE_MODULE, "Sensor Data Source");
+            super(Module.SOURCE_MODULE);
+            
+            this.setName("Socket Sensor Source");
         }
         
         public void append(EventPacket eventPacket)

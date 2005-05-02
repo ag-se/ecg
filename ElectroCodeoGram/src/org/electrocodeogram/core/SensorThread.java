@@ -89,9 +89,9 @@ public class SensorThread extends Thread
             try {
                 EventPacket e = (EventPacket) ois.readObject();
                 
-                if (SensorShellWrapper.getInstance().doCommand(e.getTimeStamp(),e.getCommandName(),e.getArglist()))
+                if (SensorShellWrapper.getInstance().doCommand(e.getTimeStamp(),e.getHsCommandName(),e.getArglist()))
                 {
-                    if(e.getCommandName().equals(new String("Activity")) && e.getArglist().get(0).equals(new String("setTool")))
+                    if(e.getHsCommandName().equals(new String("Activity")) && e.getArglist().get(0).equals(new String("setTool")))
                     {
                         String sensorName;
                         

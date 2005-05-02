@@ -216,7 +216,7 @@ public class ModuleRegistry
                             }
                             catch (ClassNotFoundException e) {
                                 
-                               logger.log(Level.SEVERE,"Unable to load the module " + moduleName);
+                               logger.log(Level.SEVERE,"Unable to load the module " + moduleName + " because the class " + fQmoduleClassString + " is not found.\nProceeding with next module if any.");
                             }
                             
                             
@@ -348,14 +348,21 @@ public class ModuleRegistry
 
     /**
      * @param selectedModuleCellId
-     * @param moduleClass
+     * @param moduleName
      * @throws IllegalAccessException
      * @throws InstantiationException
      */
-    public void connectNewModuleInstance(int selectedModuleCellId, Class moduleClass) throws ModuleConnectionException
+    public void connectNewModuleInstance(int selectedModuleCellId, String moduleName) throws ModuleConnectionException
     {
         try {
-            getModuleInstance(selectedModuleCellId).connectModule((Module) moduleClass.newInstance());
+            
+            Class moduleClass = getModuleClassForName(moduleName);
+            
+            Module module = (Module) moduleClass.newInstance();
+            
+            module.setName(moduleName);
+            
+            getModuleInstance(selectedModuleCellId).connectChildModule(module);
         }
         catch (InstantiationException e) {
             throw new ModuleConnectionException(e.getMessage());
@@ -474,6 +481,18 @@ public class ModuleRegistry
         Module module = getModuleInstance(moduleId);
         
         return module.getName();
+    }
+
+
+    /**
+     * @param selectedModuleCellId
+     */
+    public void removeModule(int moduleId)
+    {
+        Module module = getModuleInstance(moduleId);
+        
+        module.remove();
+        
     }
     
 }

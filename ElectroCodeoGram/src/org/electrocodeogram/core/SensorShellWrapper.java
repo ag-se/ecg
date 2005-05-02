@@ -1,5 +1,7 @@
 package org.electrocodeogram.core;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
@@ -64,7 +66,29 @@ public class SensorShellWrapper extends SensorShell
         boolean result =  super.doCommand(timeStamp, commandName, argList);
         if(result)
         {
-            appendToEventSource(timeStamp, commandName, argList);
+            List newArgList = argList;
+            
+            if(commandName.equals("Activity"))
+            {
+                newArgList = new ArrayList(argList.size());
+                
+                Object[] entries = argList.toArray();
+                
+                for(int i=0;i<entries.length;i++)
+                {
+                    if (i == 0)
+                    {
+                        String activityType = (String) entries[i];
+                        
+                        activityType = "HS_ACTIVITY_TYPE:" + activityType;
+                        
+                        entries[i] = activityType;
+                    }
+                    newArgList.add(entries[i]);
+                }
+                
+            }
+            appendToEventSource(timeStamp, "HS_COMMAND:" + commandName, newArgList);
             
             return true;
         }

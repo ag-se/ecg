@@ -342,11 +342,11 @@ public class Configurator extends JFrame implements Observer
 	        for (int i = 0; i < moduleNameObjects.length; i++) {
 	            String moduleName = (String) moduleNameObjects[i];
 	
-	            Class moduleClass = moduleRegistry.getModuleClassForName(moduleName);
+	            //Class moduleClass = moduleRegistry.getModuleClassForName(moduleName);
 	
-	            JButton btnModule = new JButton("Add a " + moduleName);
+	            JButton btnModule = new JButton(moduleName);
 	
-	            btnModule.addActionListener(new ActionAdapter(this, moduleClass));
+	            btnModule.addActionListener(new ActionAdapter(this, moduleName));
 	
 	            pnlButtons.add(btnModule);
 	

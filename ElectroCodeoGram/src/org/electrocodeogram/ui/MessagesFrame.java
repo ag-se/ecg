@@ -30,6 +30,8 @@ import org.electrocodeogram.module.ModuleRegistry;
 public class MessagesFrame extends JFrame implements MessagesTarget
 {
 
+    // TODO : filter message types
+    
     private JPanel pnlMessages;
 
     private JScrollPane scrollPane;

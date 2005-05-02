@@ -20,16 +20,16 @@ public class ActionAdapter implements ActionListener
 {
 
     
-    private Class moduleClass = null;
+    private String moduleName = null;
     /**
      * @param configurator
      * @param selectedModuleCellId
-     * @param moduleClass
+     * @param moduleName
      */
-    public ActionAdapter(Configurator configurator, Class moduleClass)
+    public ActionAdapter(Configurator configurator, String moduleName)
     {
         
-        this.moduleClass = moduleClass;
+        this.moduleName = moduleName;
     }
 
     public void actionPerformed(ActionEvent e)
@@ -41,7 +41,7 @@ public class ActionAdapter implements ActionListener
       {
           try
           {
-              ModuleRegistry.getInstance().connectNewModuleInstance(selectedModuleCellId,moduleClass);
+              ModuleRegistry.getInstance().connectNewModuleInstance(selectedModuleCellId,moduleName);
           }
           catch(ModuleConnectionException er)
           {

@@ -24,7 +24,7 @@ public abstract class EventWriter extends Module
      */
     public EventWriter(String name)
     {
-        super(Module.TARGET_MODULE,name);
+        super(Module.TARGET_MODULE);
     }
     
 //    public void update(Observable o, Object arg)
@@ -44,7 +44,7 @@ public abstract class EventWriter extends Module
     public void receiveEventPacket(EventPacket eventPacket)
     {
         setChanged();
-        notifyObservers(new EventPacket(this.getId(),eventPacket.getTimeStamp(),eventPacket.getCommandName(),eventPacket.getArglist()));
+        notifyObservers(new EventPacket(this.getId(),eventPacket.getTimeStamp(),eventPacket.getHsCommandName(),eventPacket.getArglist()));
         clearChanged();
         
         write(eventPacket); 

@@ -78,7 +78,7 @@ public class GuiEventWriter extends EventWriter
         {
         if (eventPacket.getEventSourceId() == Configurator.getInstance().getSelectedModuleCellId())
         {
-          target.append(eventPacket.getTimeStamp().toString() + " : " + eventPacket.getCommandName());
+          target.append(eventPacket.getTimeStamp().toString() + "," + eventPacket.getHsCommandName());
 
           List argList = eventPacket.getArglist();
 
@@ -89,7 +89,7 @@ public class GuiEventWriter extends EventWriter
               for (int i = 0; i < args.length; i++) {
                   String str = (String) args[i];
 
-                  target.append(" " + str);
+                  target.append("," + str);
               }
 
           }

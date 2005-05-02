@@ -43,31 +43,37 @@ public abstract class Module extends Observable implements Observer
     
     private String name = null;
     
-    private HashMap connectedModuleMap = null;
+    private HashMap childModuleMap = null;
      
-    private Collection connectedModules = null;
+    private Collection childModules = null;
+    
+    private HashMap parentModuleMap = null;
+    
+   private Collection parentModules = null;
 
     protected EventBuffer eventBuffer = null;
 
     protected boolean runningFlag = false;
-    
-    // TODO : a module may have to know who it is connected to
-    
-    public Module(int moduleType, String name)
+   
+    public Module(int moduleType)
     {
       id = ++count;
       
-      this.moduleType = moduleType;
+      this.name = this.getClass().getName();
       
-      this.name = name;
+      this.moduleType = moduleType;
       
       this.logger = Logger.getLogger(this.name);
       
       eventBuffer = new EventBuffer();
       
-      connectedModuleMap = new HashMap();
+      childModuleMap = new HashMap();
       
-      connectedModules = connectedModuleMap.values();
+      childModules = childModuleMap.values();
+      
+      parentModuleMap = new HashMap();
+      
+      parentModules = childModuleMap.values();
 
       assert(moduleRegistry != null);
       
@@ -140,7 +146,7 @@ public abstract class Module extends Observable implements Observer
         if(runningFlag && (eventPacket != null))
         {
 	        setChanged();
-	        notifyObservers(new EventPacket(this.getId(),eventPacket.getTimeStamp(),eventPacket.getCommandName(),eventPacket.getArglist()));
+	        notifyObservers(new EventPacket(this.getId(),eventPacket.getTimeStamp(),eventPacket.getHsCommandName(),eventPacket.getArglist()));
 	        clearChanged();
 	    }
     }
@@ -151,13 +157,13 @@ public abstract class Module extends Observable implements Observer
      * @param string2
      * @return
      */
-    protected boolean isPacketMatching(EventPacket e, String commmandName, String activityType)
+    protected boolean isPacketMatching(EventPacket e, String hsCommmandName, String ecgCommandName)
     {
         assert(e != null);
         
         logger.log(Level.INFO,"isPacketMatching?");
         
-        if(e.getCommandName().equals(commmandName) && e.getArglist().get(1).equals(activityType))
+        if(e.getHsCommandName().equals(hsCommmandName) && e.getEcgCommandName().equals(ecgCommandName))
         {
             logger.log(Level.INFO,"Yes");
             return true;
@@ -169,24 +175,37 @@ public abstract class Module extends Observable implements Observer
         }
     }
     
-    public int countConnectedModules()
+    public int countChildModules()
     {
-        return connectedModules.size();
+        return childModules.size();
     }
     
-    public int connectModule(Module module)
+    public int connectChildModule(Module module)
     {
         if (moduleType != Module.TARGET_MODULE)
         {
 	        addObserver(module);
-	        connectedModuleMap.put(new Integer(module.id),module);
+	        
+	        childModuleMap.put(new Integer(module.id),module);
+	        
+	        module.addParentModule(this);
+	        
 	        notifyModuleChanged(module);
+	        
 	        return module.id;
 	    }
         else
         {
             throw new ModuleConnectionException("An diese Modul können Sie keine weiteren Module anhängen");
         }
+    }
+
+    /**
+     * @param module
+     */
+    private void addParentModule(Module module)
+    {
+        this.parentModuleMap.put(new Integer(module.getId()),module);
     }
 
     /**
@@ -199,40 +218,38 @@ public abstract class Module extends Observable implements Observer
         clearChanged();
     }
 
-    public Object[] getConnectedModules() {
-        return connectedModules.toArray();
+    public Object[] getChildModules() {
+        
+        childModules = childModuleMap.values();
+        
+        return childModules.toArray();
     }
 
+    private Object[] getParentModules() {
+        
+        parentModules = parentModuleMap.values();
+        
+        return parentModules.toArray();
+    }
     
-    public void disconnectModule(int id) throws UnknownModuleIDException
+    public void disconnectModule(Module module) throws UnknownModuleIDException
     {
-
-        if (! (id > 0))
-        {
-            throw new IllegalModuleIDException("A module id must be a positive integer.");
-        }
-        else
-        {
-	        Integer idObj = new Integer(id);
-	        
-	        if(!connectedModuleMap.containsKey(idObj))
+        	if(!childModuleMap.containsKey(new Integer(module.getId())))
 	        {
 	            throw new UnknownModuleIDException("The given module id " + id + " is unknown.");
 	        }
 	        else
 	        {
-		        Module module = (Module)connectedModuleMap.get(idObj);
-		        
 		        assert(module != null);
 		        
 		        deleteObserver(module);
 		        
-		        connectedModuleMap.remove(idObj);
+		        childModuleMap.remove(new Integer(module.getId()));
 		       
 		        notifyModuleChanged(module);
 	        }
         }
-    }
+    
 
 
     public String toString()
@@ -323,5 +340,34 @@ public abstract class Module extends Observable implements Observer
         return text;
     
     }
+
+    /**
+     * 
+     */
+    public void remove()
+    {
+        
+        assert(parentModuleMap.size() != 0);
+        
+        Object[] parentModules = getParentModules();
+        
+        for(int i=0;i<parentModules.length;i++)
+        {
+            Module module = (Module) parentModules[i];
+            
+            module.disconnectModule(this);
+        }
+    }
+
+    /**
+     * @param moduleName
+     */
+    public void setName(String moduleName)
+    {
+        this.name = moduleName;
+        
+    }
+
+   
     
 }
