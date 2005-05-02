@@ -4,6 +4,7 @@
  * TODO To change the template for this generated file go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
+package org.electrocodeogram.modules.writer;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -20,7 +21,7 @@ import org.electrocodeogram.module.writer.EventWriter;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public class FileEventWriter extends EventWriter
+public class PlainTextFileWriter extends EventWriter
 {
 
     private final String HOME = System.getProperty("user.home");
@@ -39,7 +40,7 @@ public class FileEventWriter extends EventWriter
 
     private String prefix;
     
-    public FileEventWriter()
+    public PlainTextFileWriter()
     {
         super("FileEventWriter");
         file = new File(HOME + File.separator + DIR);
