@@ -1,3 +1,4 @@
+package org.electrocodeogram.modules;
 import java.util.Date;
 
 
@@ -17,16 +18,16 @@ import org.electrocodeogram.module.annotator.EventProcessor;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public class LineNumberAnnotator extends EventProcessor
+public class LineNumberer extends EventProcessor
 {
     private int lineCounter = 0;
 
     /**
      * @param name
      */
-    public LineNumberAnnotator()
+    public LineNumberer()
     {
-        super(EventProcessor.PRE_ANNOTATION,":\n","LineNumberAnnotator");
+        super(EventProcessor.PRE_ANNOTATION);
         //this.addObserver(new LoggerEventWriter("LoggereventWriter"));
     }
 
