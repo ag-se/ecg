@@ -68,7 +68,7 @@ public class PlainTextFileWriter extends EventWriter
 	            
 	            bw.write(eventPacket.getTimeStamp().toString() + " : ");
 	            
-	            bw.write(eventPacket.getCommandName());
+	            bw.write(eventPacket.getHsCommandName());
 	            
 	            List argList = eventPacket.getArglist();
 	            
