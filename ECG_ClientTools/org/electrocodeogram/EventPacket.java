@@ -17,6 +17,10 @@ import java.util.List;
 public class EventPacket implements Serializable
 {
 
+    public static final String HS_COMMAND_PREFIX = "HS_COMMAND:";
+    
+    public static final String HS_TYPE_PREFIX = "HS_ACTIVITY_TYPE:";
+    
     public static final String ECG_TYPE_PREFIX = "ECG_TYPE:";
     
     public static final String ECG_TYPE_WINDOW_DEACTIVATED = "Window deactivated";
