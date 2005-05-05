@@ -114,8 +114,7 @@ public class SensorServer extends Observable
             try {
                 Socket socketToSensor = seso.accept();
                 
-                // TODO : make different sensor sources for different sensors
-                
+              
                 SensorThread st = new SensorThread(me,socketToSensor);
                 
                 me.sensorThreadPool.put(new Integer(st.getId()),st);
