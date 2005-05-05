@@ -85,10 +85,15 @@ public class GuiEventWriter extends EventWriter
 
               Object[] args = eventPacket.getArglist().toArray();
 
-              for (int i = 0; i < args.length; i++) {
+              int count = args.length;
+              
+              for (int i = 0; i < count; i++) {
                   String str = (String) args[i];
-
-                  target.append("," + str);
+                  
+                  if(i != count - 1)
+                  {
+                      target.append("," + str);
+                  }
               }
 
           }
