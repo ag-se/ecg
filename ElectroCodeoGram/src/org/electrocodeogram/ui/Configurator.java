@@ -32,6 +32,7 @@ import javax.swing.border.TitledBorder;
 
 import org.electrocodeogram.core.SensorServer;
 import org.electrocodeogram.module.Module;
+import org.electrocodeogram.module.ModuleDescriptor;
 import org.electrocodeogram.module.ModuleRegistry;
 import org.jgraph.graph.DefaultEdge;
 import org.jgraph.graph.GraphConstants;
@@ -42,8 +43,8 @@ import com.zfqjava.swing.JStatusBar;
 /**
  * @author 7oas7er
  * 
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
+ * TODO To change the template for this generated type comment go to Window -
+ * Preferences - Java - Code Style - Code Templates
  */
 
 public class Configurator extends JFrame implements Observer
@@ -55,7 +56,7 @@ public class Configurator extends JFrame implements Observer
      * @uml.associationEnd multiplicity="(0 1)"
      */
     private static Configurator theInstance = null;
-    
+
     private MessagesFrame frmMessages = null;
 
     /**
@@ -85,13 +86,21 @@ public class Configurator extends JFrame implements Observer
 
     private JPanel pnlSensors;
 
+    private JPanel pnlButtons = null;
+
     private JMenuBar menuBar = null;
+    
+    private JSplitPane splitPane = null;
 
     private JMenu menu2;
-    
+
     private JMenu menu3;
 
     private int selectedModuleCellId = -1;
+
+    private boolean moduleConnectionMode;
+
+    private int sourceModuleId;
 
     public static Configurator getInstance(Module source)
     {
@@ -142,21 +151,25 @@ public class Configurator extends JFrame implements Observer
             e.printStackTrace();
         }
         catch (UnsupportedLookAndFeelException e) {
-        	try {
-				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-			} catch (ClassNotFoundException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			} catch (InstantiationException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			} catch (IllegalAccessException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			} catch (UnsupportedLookAndFeelException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
+            try {
+                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            }
+            catch (ClassNotFoundException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+            catch (InstantiationException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+            catch (IllegalAccessException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+            catch (UnsupportedLookAndFeelException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
         }
 
         setTitle("ElectroCodeoGram Configurator");
@@ -206,37 +219,37 @@ public class Configurator extends JFrame implements Observer
 
             }
         });
-        
+
         menu2.add(menuitem21);
         menu2.add(menuitem22);
 
-        
         menu3 = new JMenu("Modul");
-        menu3.addMouseListener(new MouseAdapter(){
+        menu3.addMouseListener(new MouseAdapter() {
 
             public void mouseEntered(MouseEvent e)
             {
-                MenuManager.getInstance().populateModuleMenu(menu3,moduleGraph.getSelectedModuleCellId());
+                MenuManager.getInstance().populateModuleMenu(menu3, moduleGraph.getSelectedModuleCellId());
             }
         });
-        
+
         JMenu menu4 = new JMenu("Fenster");
         JMenuItem menuitem41 = new JMenuItem("Ereignisfenster");
-        menuitem41.addActionListener(new ActionListener(){
+        menuitem41.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e)
             {
-                
+
                 showMessagesWindow();
-                
-            }});
+
+            }
+        });
         menu4.add(menuitem41);
-        
+
         menuBar.add(menu1);
         menuBar.add(menu2);
         menuBar.add(menu3);
         menuBar.add(menu4);
-        
+
         this.setJMenuBar(menuBar);
 
         sensorGraph = new SensorGraph();
@@ -251,14 +264,17 @@ public class Configurator extends JFrame implements Observer
                 new LineBorder(new Color(0, 0, 0)), "Tree of running modules"));
         pnlModules.add(moduleGraph);
 
-        
+        pnlButtons = new JPanel();
 
-       
-        
+        pnlButtons.setLayout(new BoxLayout(pnlButtons, BoxLayout.Y_AXIS));
 
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+        pnlButtons.setBackground(Color.WHITE);
 
-        splitPane.add(getButtonPanel(), 0);
+        pnlButtons.setBorder(new TitledBorder("Installed modules"));
+
+        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+
+        splitPane.add(pnlButtons, 0);
 
         JPanel pnlRight = new JPanel(new GridBagLayout());
 
@@ -316,51 +332,23 @@ public class Configurator extends JFrame implements Observer
 
         getContentPane().add(statusBar, c2);
 
-        frmMessages = new MessagesFrame();
-        
+        //frmMessages = new MessagesFrame();
+
         setVisible(true);
-    }
-
-    private JPanel getButtonPanel()
-    {
-        JPanel pnlButtons = null;
-
-        pnlButtons = new JPanel();
-
-        pnlButtons.setLayout(new BoxLayout(pnlButtons, BoxLayout.Y_AXIS));
-
-        pnlButtons.setBackground(Color.WHITE);
-
-        pnlButtons.setBorder(new TitledBorder("Installed modules"));
-
-        ModuleRegistry moduleRegistry = ModuleRegistry.getInstance();
-
-        Object[] moduleNameObjects = moduleRegistry.getInstalledModulesNames();
-
-        if (moduleNameObjects != null)
-        {
-
-	        for (int i = 0; i < moduleNameObjects.length; i++) {
-	            String moduleName = (String) moduleNameObjects[i];
-	
-	            //Class moduleClass = moduleRegistry.getModuleClassForName(moduleName);
-	
-	            JButton btnModule = new JButton(moduleName);
-	
-	            btnModule.addActionListener(new ActionAdapter(this, moduleName));
-	
-	            pnlButtons.add(btnModule);
-	
-	        }
-        }
-        return pnlButtons;
     }
 
     public void showMessagesWindow()
     {
+        if(frmMessages == null)
+        {
+            frmMessages = new MessagesFrame();
+            
+            frmMessages.setSelectedModul(moduleGraph.getSelectedModuleCellId());
+        }
+        
         this.frmMessages.show();
     }
-    
+
     /**
      * @throws java.awt.HeadlessException
      */
@@ -368,9 +356,9 @@ public class Configurator extends JFrame implements Observer
     {
         this();
         if (source.getModuleType() == Module.SOURCE_MODULE) {
-           
+
             this.sourceModules.add(source);
-            traverseConnectedModules(null, this.sourceModules.get(0));
+            //traverseConnectedModules(null, this.sourceModules.get(0));
         }
     }
 
@@ -378,173 +366,207 @@ public class Configurator extends JFrame implements Observer
      * 
      * @uml.property name="source"
      */
-//    public Module getSource()
-//    {
-//        return source;
-//    }
-
-//    public Module getModule(int id)
-//    {
-//
-//        assert (id > 0);
-//
-//        return ModuleRegistry.getInstance().getModuleInstance(id);
-//
-//    }
-
-    /* (non-Javadoc)
+    //    public Module getSource()
+    //    {
+    //        return source;
+    //    }
+    //    public Module getModule(int id)
+    //    {
+    //
+    //        assert (id > 0);
+    //
+    //        return ModuleRegistry.getInstance().getModuleInstance(id);
+    //
+    //    }
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
      */
     public void update(Observable o, Object arg)
     {
         assert (arg != null);
 
-        if (arg instanceof Module) {
-            
-            Module module = (Module) arg;
-            
-            pnlModules.remove(moduleGraph);
+        /* if the ModuleRegistry is sending the event, a module-instance has been added or removed
+         * or a module class has been installed
+         */
+        if (o instanceof ModuleRegistry) {
 
-            moduleGraph = new ModuleGraph(this);
+            // a module has been added or removed
+            if (arg instanceof Module && (!(arg instanceof GuiEventWriter))) {
 
-            pnlModules.add(moduleGraph);
+                Module module = (Module) arg;
 
-            traverseConnectedModules(null, this.sourceModules.get(0));
-            
-            
+                if(moduleGraph.containsModuleCell(module.getId()))
+                {
+                    moduleGraph.removeModuleCell(module.getId());
+                }
+                else
+                {
+                    ModuleCell ml = new ModuleCell(module.getModuleType(),
+                        module.getId(), module.getName(), module.isRunning());
 
-            TreeLayoutAlgorithm tla = new TreeLayoutAlgorithm();
+                    moduleGraph.addModuleCell(ml);
+                }
+               
+            }
+            // a module class has been intalled
+            else if (arg instanceof ModuleDescriptor) {
+                ModuleDescriptor moduleDescriptor = (ModuleDescriptor) arg;
 
-            tla.setOrientation(SwingConstants.WEST);
+                String moduleName = moduleDescriptor.getName();
 
-            tla.setAlignment(SwingConstants.CENTER);
+                JButton btnModule = new JButton(moduleName);
 
-            tla.setCenterRoot(true);
+                btnModule.addActionListener(new ActionAdapter(this, moduleName));
 
-            //tla.run(moduleGraph, moduleGraph.getRoots());
+                pnlButtons.add(btnModule);
 
+                splitPane.remove(pnlButtons);
+                
+                splitPane.add(pnlButtons);
+            }
         }
-        else if (arg instanceof SensorServer) {
-            SensorServer seso = (SensorServer) arg;
+        else if(o instanceof Module)
+        {
+            if(arg instanceof Module)
+            {
+                Module module = (Module) arg;
+                
+                int id = module.getId();
+                
+                if(moduleGraph.containsModuleCell(id))
+                {
+                    moduleGraph.updateModuleCell(id,module);
+                }
+            }
+        }
+        else {
+            if (arg instanceof SensorServer) {
+                SensorServer seso = (SensorServer) arg;
 
-            int activeSensors = seso.getSensorCount();
+                int activeSensors = seso.getSensorCount();
 
-            String text = "Active Sensors: " + activeSensors;
+                String text = "Active Sensors: " + activeSensors;
 
-            JLabel lbl = (JLabel) statusBar.getComponent(4);
-
-            lbl.setText(text);
-
-            String[] address;
-
-            if ((address = seso.getAddress()) != null) {
-                text = "Listening on: " + address[0] + ":" + address[1];
-
-                lbl = (JLabel) statusBar.getComponent(0);
+                JLabel lbl = (JLabel) statusBar.getComponent(4);
 
                 lbl.setText(text);
-            }
 
-            if (activeSensors > 0) {
-                pnlSensors.remove(sensorGraph);
+                String[] address;
 
-                sensorGraph = new SensorGraph();
+                if ((address = seso.getAddress()) != null) {
+                    text = "Listening on: " + address[0] + ":" + address[1];
 
-                pnlSensors.add(sensorGraph);
+                    lbl = (JLabel) statusBar.getComponent(0);
 
-                InetAddress[] addresses = seso.getSensorAddresses();
+                    lbl.setText(text);
+                }
 
-                String[] sensorNames = seso.getSensorNames();
+                if (activeSensors > 0) {
+                    pnlSensors.remove(sensorGraph);
 
-                for (int i = 0; i < activeSensors; i++) {
-                    SensorCell sc;
+                    sensorGraph = new SensorGraph();
 
-                    if (sensorNames[i] == null) {
-                        sc = new SensorCell(this,
-                                "Unknown Sensor at" + addresses[i].toString());
+                    pnlSensors.add(sensorGraph);
+
+                    InetAddress[] addresses = seso.getSensorAddresses();
+
+                    String[] sensorNames = seso.getSensorNames();
+
+                    for (int i = 0; i < activeSensors; i++) {
+                        SensorCell sc;
+
+                        if (sensorNames[i] == null) {
+                            sc = new SensorCell(
+                                    this,
+                                    "Unknown Sensor at" + addresses[i].toString());
+                        }
+                        else {
+                            sc = new SensorCell(
+                                    this,
+                                    sensorNames[i] + "-Sensor \nat: " + addresses[i].toString());
+                        }
+
+                        sensorGraph.addSensorCell(sc);
                     }
-                    else {
-                        sc = new SensorCell(
-                                this,
-                                sensorNames[i] + "-Sensor \nat: " + addresses[i].toString());
-                    }
 
-                    sensorGraph.addSensorCell(sc);
+                }
+                else if (activeSensors == 0) {
+                    pnlSensors.remove(sensorGraph);
+
+                    sensorGraph = new SensorGraph();
+
+                    pnlSensors.add(sensorGraph);
                 }
 
             }
-            else if (activeSensors == 0) {
-                pnlSensors.remove(sensorGraph);
+            else if (arg instanceof ModuleGraph) {
+                this.selectedModuleCellId = moduleGraph.getSelectedModuleCellId();
 
-                sensorGraph = new SensorGraph();
-
-                pnlSensors.add(sensorGraph);
+                if (selectedModuleCellId == -1) {
+                    menu3.setEnabled(false);
+                }
+                else {
+                    menu3.setEnabled(true);
+                }
+                if (frmMessages != null) {
+                    frmMessages.setSelectedModul(selectedModuleCellId);
+                }
             }
-
-        }
-        else if(arg instanceof ModuleGraph)
-        {
-            this.selectedModuleCellId = moduleGraph.getSelectedModuleCellId();
             
-            if(selectedModuleCellId == -1)
-            {
-                menu3.setEnabled(false);
-            }
-            else
-            {
-                menu3.setEnabled(true);
-            }
-            frmMessages.setSelectedModul(selectedModuleCellId);
         }
+      
     }
 
     /**
-     * 
+     *  
      */
-    private void traverseConnectedModules(ModuleCell parent, Object module)
-    {
-        assert (module != null);
-
-        Module m = (Module) module;
-
-        ModuleCell ml = new ModuleCell(this, m.getModuleType(), m.getId(),
-                m.getName(), m.isRunning());
-
-        moduleGraph.addModuleCell(ml);
-
-        if (parent != null) {
-            DefaultEdge edge = new DefaultEdge();
-
-            GraphConstants.setLineEnd(edge.getAttributes(), GraphConstants.ARROW_CLASSIC);
-
-            GraphConstants.setDisconnectable(edge.getAttributes(), false);
-
-            edge.setSource(parent.getChildAt(0));
-
-            edge.setTarget(ml.getChildAt(0));
-
-            moduleGraph.addEdge(edge);
-        }
-        if (m.countChildModules() > 0) {
-            Object[] modules = m.getChildModules();
-
-            assert (modules != null);
-
-            for (int i = 0; i < modules.length; i++) {
-                traverseConnectedModules(ml, modules[i]);
-            }
-        }
-
-    }
-
+    //    private void traverseConnectedModules(ModuleCell parent, Object module)
+    //    {
+    //        assert (module != null);
+    //
+    //        Module m = (Module) module;
+    //
+    //        ModuleCell ml = new ModuleCell(this, m.getModuleType(), m.getId(),
+    //                m.getName(), m.isRunning());
+    //
+    //        moduleGraph.addModuleCell(ml);
+    //
+    //        if (parent != null) {
+    //            DefaultEdge edge = new DefaultEdge();
+    //
+    //            GraphConstants.setLineEnd(edge.getAttributes(),
+    // GraphConstants.ARROW_CLASSIC);
+    //
+    //            GraphConstants.setDisconnectable(edge.getAttributes(), false);
+    //
+    //            edge.setSource(parent.getChildAt(0));
+    //
+    //            edge.setTarget(ml.getChildAt(0));
+    //
+    //            moduleGraph.addEdge(edge);
+    //        }
+    //        if (m.countChildModules() > 0) {
+    //            Object[] modules = m.getChildModules();
+    //
+    //            assert (modules != null);
+    //
+    //            for (int i = 0; i < modules.length; i++) {
+    //                traverseConnectedModules(ml, modules[i]);
+    //            }
+    //        }
+    //
+    //    }
+    //
     public int getSelectedModuleCellId()
     {
-        return selectedModuleCellId ;
-        
+        return selectedModuleCellId;
+
     }
-    
+
     /**
-     * 
+     *  
      */
     public void showModuleDetails()
     {
@@ -555,9 +577,50 @@ public class Configurator extends JFrame implements Observer
 
             String text = ModuleRegistry.getInstance().getModuleDetails(id);
 
-            JOptionPane.showMessageDialog(this, text,"Moduleigenschaften",JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, text, "Moduleigenschaften", JOptionPane.INFORMATION_MESSAGE);
         }
 
+    }
+
+    /**
+     * @param selectedModuleCellId2
+     */
+    public void enterModuleConnectionMode(int selectedModuleCellId)
+   	{
+        
+        moduleConnectionMode = true;
+        
+        sourceModuleId = selectedModuleCellId;
+        
+    }
+
+    /**
+     * @return
+     */
+    public boolean getModuleConnectionMode()
+    {
+        
+        return moduleConnectionMode;
+    }
+
+    /**
+     * @return
+     */
+    public int getSourceModule()
+    {
+        
+        return sourceModuleId;
+    }
+
+    /**
+     * 
+     */
+    public void exitModuleConnectionMode()
+    {
+        moduleConnectionMode = false;
+        
+        sourceModuleId = -1;
+        
     }
 
 }

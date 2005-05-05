@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JOptionPane;
 
 import org.electrocodeogram.module.ModuleConnectionException;
+import org.electrocodeogram.module.ModuleInstantiationException;
 import org.electrocodeogram.module.ModuleRegistry;
 
 /**
@@ -35,20 +36,28 @@ public class ActionAdapter implements ActionListener
     public void actionPerformed(ActionEvent e)
     {
 
-      int selectedModuleCellId = Configurator.getInstance().getSelectedModuleCellId();
+//      int selectedModuleCellId = Configurator.getInstance().getSelectedModuleCellId();
+//        
+//      if(selectedModuleCellId != -1)
+//      {
+//          try
+//          {
+//              ModuleRegistry.getInstance().connectNewModuleInstance(selectedModuleCellId,moduleName);
+//          }
+//          catch(ModuleConnectionException er)
+//          {
+//              JOptionPane.showMessageDialog(Configurator.getInstance(),er.getMessage(),"Error",JOptionPane.ERROR_MESSAGE);  
+//          }
+//       
+//      }
         
-      if(selectedModuleCellId != -1)
-      {
-          try
-          {
-              ModuleRegistry.getInstance().connectNewModuleInstance(selectedModuleCellId,moduleName);
-          }
-          catch(ModuleConnectionException er)
-          {
-              JOptionPane.showMessageDialog(Configurator.getInstance(),er.getMessage(),"Error",JOptionPane.ERROR_MESSAGE);  
-          }
-       
-      }
+        try {
+            ModuleRegistry.getInstance().createModuleInstance(moduleName);
+        }
+        catch (ModuleInstantiationException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
         
     }
 

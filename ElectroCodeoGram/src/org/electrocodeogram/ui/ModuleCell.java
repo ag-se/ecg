@@ -7,13 +7,17 @@
 package org.electrocodeogram.ui;
 
 import java.awt.Color;
+import java.awt.Point;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
 
 import org.electrocodeogram.module.Module;
+import org.jgraph.graph.DefaultEdge;
 import org.jgraph.graph.DefaultGraphCell;
 import org.jgraph.graph.DefaultPort;
+import org.jgraph.graph.Edge;
 import org.jgraph.graph.GraphConstants;
 
 /**
@@ -35,8 +39,8 @@ public class ModuleCell extends DefaultGraphCell
     private String name;
     
     private boolean isRunning;
-
-    /**
+    
+     /**
      * 
      * @uml.property name="id"
      */
@@ -44,19 +48,18 @@ public class ModuleCell extends DefaultGraphCell
         return id;
     }
 
-    public ModuleCell(Configurator root, int moduleType, int id, String name, boolean b)
+    public ModuleCell(int moduleType, int id, String name, boolean b)
     {
         super(name);
 
         this.name = name;
         
-        this.root = root;
-
         this.id = id;
         
         this.isRunning = b;
         
-        GraphConstants.setBounds(this.getAttributes(), new Rectangle2D.Double(root.getWidth() / 2, 20, 100, 25));
+        
+        GraphConstants.setBounds(this.getAttributes(), new Rectangle2D.Double(0, 0, 100, 25));
         
         GraphConstants.setAutoSize(this.getAttributes(),true);
         
@@ -76,9 +79,7 @@ public class ModuleCell extends DefaultGraphCell
         	    GraphConstants.setGradientColor(this.getAttributes(), Color.BLUE);
         	break;
         }
-        
-        
-        
+       
         GraphConstants.setOpaque(this.getAttributes(), isRunning);
 
         GraphConstants.setBorder(this.getAttributes(), BorderFactory.createRaisedBevelBorder());
@@ -86,7 +87,7 @@ public class ModuleCell extends DefaultGraphCell
         DefaultPort port = new DefaultPort();
         this.add(port);
         port.setParent(this);
-
+       
     }
 
     public String getName()
@@ -98,4 +99,28 @@ public class ModuleCell extends DefaultGraphCell
     {
         return root;
     }
-}
+
+    /**
+     * @return
+     */
+    public Point getLocation()
+    {
+        Rectangle2D rect = GraphConstants.getBounds(this.getAttributes());
+        
+        Point point = new Point((int)rect.getX(),(int)rect.getY());
+        
+        return point;
+    }
+
+    /**
+     * @param location
+     */
+    public void setLocation(Point location)
+    {
+        
+        GraphConstants.setBounds(this.getAttributes(),new Rectangle2D.Double(location.x,location.y,100,25));
+        
+    }
+
+   
+   }

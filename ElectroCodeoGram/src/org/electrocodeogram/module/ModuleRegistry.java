@@ -5,17 +5,19 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Observable;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.electrocodeogram.module.annotator.EventProcessor;
+import org.electrocodeogram.ui.Configurator;
 
 /**
  * @author Frank Schlesinger *  * The singleton class ModuleRegistry finds installed ECG modules and makes their module-descriptions * available to the framework. It also keeps track of all currently running modules.
  */
 
-public class ModuleRegistry
+public class ModuleRegistry extends Observable
 {
     
     private Logger logger = Logger.getLogger("ModuleRegistry");
@@ -41,6 +43,8 @@ public class ModuleRegistry
             
             e2.printStackTrace();
         }
+        
+        addObserver(Configurator.getInstance());
         
         runningModules = new RunningModules();
         
@@ -83,10 +87,10 @@ public class ModuleRegistry
      *
      * This nested class keeps track of all running modules.
      */
-    private class RunningModules extends HashMap
+    private class RunningModules
     {
 
-       
+        private HashMap runningModules = new HashMap();
         
         /**
          * This method is used to add a module instance to the registry.
@@ -96,7 +100,13 @@ public class ModuleRegistry
         {
             assert (module != null);
             
-            put(new Integer(module.getId()),module);
+            runningModules.put(new Integer(module.getId()),module);
+            
+            setChanged();
+            
+            notifyObservers(module);
+            
+            clearChanged();
             
         }
 
@@ -108,7 +118,14 @@ public class ModuleRegistry
         {
             assert (module != null);
             
-            remove(new Integer(module.getId()));
+            runningModules.remove(new Integer(module.getId()));
+            
+            setChanged();
+            
+            notifyObservers(module);
+            
+            clearChanged();
+
             
         }
 
@@ -120,9 +137,9 @@ public class ModuleRegistry
         {
             assert(id > 0);
             
-            assert(containsKey(new Integer(id)));
+            assert(runningModules.containsKey(new Integer(id)));
             
-            return (Module) get(new Integer(id));
+            return (Module) runningModules.get(new Integer(id));
             
         }
 
@@ -211,6 +228,12 @@ public class ModuleRegistry
                                 ModuleDescriptor moduleDescriptor = new ModuleDescriptor(moduleName,moduleClass,properties);
                                                                 
                                 availableModules.put(moduleName, moduleDescriptor);
+                                
+                                setChanged();
+                                
+                                notifyObservers(moduleDescriptor);
+                                
+                                clearChanged();
                             }
                             catch (ClassNotFoundException e) {
                                 
@@ -358,7 +381,7 @@ public class ModuleRegistry
      * @throws IllegalAccessException
      * @throws InstantiationException
      */
-    public void connectNewModuleInstance(int selectedModuleCellId, String moduleName) throws ModuleConnectionException
+    public void createModuleInstance(String moduleName) throws ModuleInstantiationException
     {
         try {
             
@@ -368,13 +391,14 @@ public class ModuleRegistry
             
             module.setName(moduleName);
             
-            getModuleInstance(selectedModuleCellId).connectChildModule(module);
+            runningModules.add(module);
+  
         }
         catch (InstantiationException e) {
-            throw new ModuleConnectionException(e.getMessage());
+            throw new ModuleInstantiationException(e.getMessage());
         }
         catch (IllegalAccessException e) {
-            throw new ModuleConnectionException(e.getMessage());
+            throw new ModuleInstantiationException(e.getMessage());
         }
         
     }
@@ -499,6 +523,8 @@ public class ModuleRegistry
         
         module.remove();
         
+        runningModules.delete(module);
+        
     }
 
 
@@ -520,6 +546,22 @@ public class ModuleRegistry
         {
             return null;
         }
+        
+    }
+
+
+    /**
+     * @param sourceModule
+     * @param selectedModuleCellId
+     */
+    public void connectModule(int sourceModuleId, int targetModuleId) throws ModuleConnectionException
+    {
+
+        Module sourceModule = getModuleInstance(sourceModuleId);
+        
+        Module targetModule = getModuleInstance(targetModuleId);
+        
+        sourceModule.connectChildModule(targetModule);
         
     }
     

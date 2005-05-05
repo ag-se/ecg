@@ -77,7 +77,7 @@ public abstract class Module extends Observable implements Observer
 
       assert(moduleRegistry != null);
       
-      moduleRegistry.addModuleInstance(this);
+      //moduleRegistry.addModuleInstance(this);
       
       if (!(this instanceof GuiEventWriter))
       {
@@ -97,6 +97,8 @@ public abstract class Module extends Observable implements Observer
     
     public void stop()
     {
+        if(runningFlag == false) return;
+        
         this.runningFlag = false;
         
         notifyModuleChanged(this);
@@ -104,6 +106,8 @@ public abstract class Module extends Observable implements Observer
     
     public void start()
     {
+        if(runningFlag == true) return;
+        
         this.runningFlag = true;
         
         notifyModuleChanged(this);
@@ -166,6 +170,7 @@ public abstract class Module extends Observable implements Observer
         
         if(e.getHsCommandName().equals(hsCommmandName) && e.getEcgCommandName().equals(ecgCommandName))
         {
+            // TODO : handle NullPointerException by no ECGCommand
             logger.log(Level.INFO,"Yes");
             return true;
         }
@@ -181,13 +186,15 @@ public abstract class Module extends Observable implements Observer
         return childModules.size();
     }
     
-    public int connectChildModule(Module module)
+    public int connectChildModule(Module module) throws ModuleConnectionException
     {
+        
         if (moduleType == Module.TARGET_MODULE)
         {
             throw new ModuleConnectionException("An diese Modul können Sie keine weiteren Module anhängen");
         }
-        
+        else
+        {
 	        
         	addObserver(module);
 	        
@@ -195,10 +202,13 @@ public abstract class Module extends Observable implements Observer
 	        
 	        module.addParentModule(this);
 	        
-	        notifyModuleChanged(module);
+	        notifyModuleChanged(this);
 	        
 	        return module.id;
-	    
+	        
+        }
+        
+        
     }
 
     /**
@@ -357,7 +367,8 @@ public abstract class Module extends Observable implements Observer
     public void remove()
     {
         
-        assert(parentModuleMap.size() != 0);
+        if(parentModuleMap.size() != 0)
+        {
         
         Object[] parentModules = getParentModules();
         
@@ -366,6 +377,7 @@ public abstract class Module extends Observable implements Observer
             Module module = (Module) parentModules[i];
             
             module.disconnectModule(this);
+        }
         }
     }
 

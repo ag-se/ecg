@@ -39,8 +39,10 @@ public class MenuManager
     
     private JMenuItem mniModuleRemove = new JMenuItem("Entfernen");
     
-    private JMenuItem mniModuleStop = new JMenuItem("Stop");
+    private JMenuItem mniModuleConnectTo = new JMenuItem("Verbinden mit...");
     
+    private JMenuItem mniModuleStop = new JMenuItem("Stop");
+        
     private JMenuItem mniModuleStart = new JMenuItem("Start");
     
     private JMenuItem mniMsgWindowShow = new JMenuItem("Ereignisfenster");
@@ -98,6 +100,14 @@ public class MenuManager
                 
             }});
     
+        mniModuleConnectTo.addActionListener(new ActionListener(){
+
+            public void actionPerformed(ActionEvent e)
+            {
+                Configurator.getInstance().enterModuleConnectionMode(Configurator.getInstance().getSelectedModuleCellId());
+                
+            }});
+        
         mniMakeFilter.addActionListener(new ActionListener(){
 
             public void actionPerformed(ActionEvent e)
@@ -123,11 +133,18 @@ public class MenuManager
         
         popupMenu.addSeparator();
         
+        if(!ModuleRegistry.getInstance().isModuleType(Module.TARGET_MODULE,id))
+        {
+            popupMenu.add(mniModuleConnectTo);
+        }
+                
         popupMenu.add(mniModuleRemove);
         
         popupMenu.addSeparator();
         
         popupMenu.add(mniMsgWindowShow);
+        
+        
         
         if(ModuleRegistry.getInstance().isModuleType(Module.INTERMEDIATE_MODULE,id))
         {
@@ -275,6 +292,8 @@ public class MenuManager
         menu.add(mniModuleStop);
         
         menu.addSeparator();
+        
+        menu.add(mniModuleConnectTo);
         
         menu.add(mniModuleRemove);
                 

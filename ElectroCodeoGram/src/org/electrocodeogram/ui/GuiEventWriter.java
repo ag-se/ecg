@@ -51,10 +51,9 @@ public class GuiEventWriter extends EventWriter
         }
         else
         {
-            if(target == null)
+            if(theInstance.target == null)
             {
                 theInstance.target = target;
-                theInstance.start();
             }
         }
         return theInstance;

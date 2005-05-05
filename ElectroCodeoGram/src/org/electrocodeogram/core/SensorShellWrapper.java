@@ -6,6 +6,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.electrocodeogram.module.Module;
+import org.electrocodeogram.module.ModuleRegistry;
 import org.electrocodeogram.module.source.Source;
 import org.electrocodeogram.EventPacket;
 import org.hackystat.kernel.admin.SensorProperties;
@@ -47,11 +49,13 @@ public class SensorShellWrapper extends SensorShell
     private SensorShellWrapper(SensorProperties sensorProperties, boolean isInteractive, String toolName)
     {
         super(sensorProperties, isInteractive, toolName);
-		       
+
         sensorSource = new Source();
         
-        sensorSource.start();
+        sensorSource.setName("Sensor Source");
         
+        ModuleRegistry.getInstance().addModuleInstance(sensorSource);
+     
     }
    
     /** 
