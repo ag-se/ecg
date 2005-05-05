@@ -190,8 +190,6 @@ public class ModuleRegistry
                             
                             String moduleName = properties.getProperty("MODULE_NAME");
                             
-                            // TODO : set module names from file
-
                             assert(moduleName != null);
                             
                             String moduleClassString =  properties.getProperty("MODULE_CLASS");
@@ -261,11 +259,19 @@ public class ModuleRegistry
         {
             assert(name != null);
             
-            assert(availableModules.containsKey(name));
+            //assert(availableModules.containsKey(name));
             
-            ModuleDescriptor moduleDescriptor = (ModuleDescriptor) availableModules.get(name);
+            if(availableModules.containsKey(name))
+            {
             
-            return moduleDescriptor.getProperties();
+                ModuleDescriptor moduleDescriptor = (ModuleDescriptor) availableModules.get(name);
+            
+                return moduleDescriptor.getProperties();
+            }
+            else
+            {
+                return null;
+            }
         }
        
 
@@ -492,6 +498,28 @@ public class ModuleRegistry
         Module module = getModuleInstance(moduleId);
         
         module.remove();
+        
+    }
+
+
+    /**
+     * @param name
+     */
+    public String getModuleDescription(String name)
+    {
+       
+        Properties properties = getModulePropertiesForName(name);
+        
+        if(properties != null)
+        {
+            String moduleDescription = properties.getProperty("MODULE_DESCRIPTION");
+        
+            return moduleDescription;
+        }
+        else
+        {
+            return null;
+        }
         
     }
     

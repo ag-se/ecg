@@ -6,7 +6,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.electrocodeogram.module.source.SensorSource;
+import org.electrocodeogram.module.source.Source;
 import org.electrocodeogram.EventPacket;
 import org.hackystat.kernel.admin.SensorProperties;
 import org.hackystat.kernel.shell.SensorShell;
@@ -20,7 +20,7 @@ public class SensorShellWrapper extends SensorShell
     
     private static final SensorShellWrapper theInstance = new SensorShellWrapper(new SensorProperties("",""),false,"ECG");
     
-    private SensorSource sensorSource = null;
+    private Source sensorSource = null;
     
     /** The logging instance for SensorShells. */
     private Logger logger;
@@ -48,7 +48,7 @@ public class SensorShellWrapper extends SensorShell
     {
         super(sensorProperties, isInteractive, toolName);
 		       
-        sensorSource = new SensorSource();
+        sensorSource = new Source();
         
         sensorSource.start();
         

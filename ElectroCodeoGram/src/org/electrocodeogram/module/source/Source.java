@@ -10,15 +10,13 @@ import org.electrocodeogram.EventPacket;
      * the module tree of the ECG framework.
      *
      */
-    public class SensorSource extends Module
+    public class Source extends Module
     {
         
         
-        public SensorSource()
+        public Source()
         {
             super(Module.SOURCE_MODULE);
-            
-            this.setName("Socket Sensor Source");
         }
         
         public void append(EventPacket eventPacket)

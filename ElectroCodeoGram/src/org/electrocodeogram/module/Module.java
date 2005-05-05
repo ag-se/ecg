@@ -86,6 +86,7 @@ public abstract class Module extends Observable implements Observer
           addObserver(GuiEventWriter.getInstance());
       }
       
+      start();
 
     }
     
@@ -182,9 +183,13 @@ public abstract class Module extends Observable implements Observer
     
     public int connectChildModule(Module module)
     {
-        if (moduleType != Module.TARGET_MODULE)
+        if (moduleType == Module.TARGET_MODULE)
         {
-	        addObserver(module);
+            throw new ModuleConnectionException("An diese Modul können Sie keine weiteren Module anhängen");
+        }
+        
+	        
+        	addObserver(module);
 	        
 	        childModuleMap.put(new Integer(module.id),module);
 	        
@@ -193,11 +198,7 @@ public abstract class Module extends Observable implements Observer
 	        notifyModuleChanged(module);
 	        
 	        return module.id;
-	    }
-        else
-        {
-            throw new ModuleConnectionException("An diese Modul können Sie keine weiteren Module anhängen");
-        }
+	    
     }
 
     /**
@@ -336,7 +337,16 @@ public abstract class Module extends Observable implements Observer
             }
         }
         
-       
+        String moduleDescription = ModuleRegistry.getInstance().getModuleDescription(this.getName());
+        
+        if(moduleDescription != null)
+        {
+            text += "\nBeschreibung: \t";
+            
+            text += moduleDescription;
+            
+        }
+        
         return text;
     
     }

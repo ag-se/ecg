@@ -60,7 +60,7 @@ public class ModuleCell extends DefaultGraphCell
         
         GraphConstants.setAutoSize(this.getAttributes(),true);
         
-        GraphConstants.setMoveable(this.getAttributes(),false);
+        GraphConstants.setMoveable(this.getAttributes(),true);
         
         GraphConstants.setEditable(this.getAttributes(),false);
                

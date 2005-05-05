@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.net.InetAddress;
+import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -63,7 +64,7 @@ public class Configurator extends JFrame implements Observer
      * @uml.associationEnd multiplicity="(0 1)"
      */
     //private Configurator me = null;
-    private Module source = null;
+    private ArrayList sourceModules = new ArrayList();
 
     private int FileWriterID = -1;
 
@@ -102,7 +103,7 @@ public class Configurator extends JFrame implements Observer
         else {
 
             if (source.getModuleType() == Module.SOURCE_MODULE) {
-                theInstance.source = source;
+                theInstance.sourceModules.add(source);
             }
 
         }
@@ -365,11 +366,11 @@ public class Configurator extends JFrame implements Observer
      */
     private Configurator(Module source) throws HeadlessException
     {
-
         this();
         if (source.getModuleType() == Module.SOURCE_MODULE) {
-            this.source = source;
-            traverseConnectedModules(null, source);
+           
+            this.sourceModules.add(source);
+            traverseConnectedModules(null, this.sourceModules.get(0));
         }
     }
 
@@ -377,10 +378,10 @@ public class Configurator extends JFrame implements Observer
      * 
      * @uml.property name="source"
      */
-    public Module getSource()
-    {
-        return source;
-    }
+//    public Module getSource()
+//    {
+//        return source;
+//    }
 
 //    public Module getModule(int id)
 //    {
@@ -399,13 +400,18 @@ public class Configurator extends JFrame implements Observer
         assert (arg != null);
 
         if (arg instanceof Module) {
+            
+            Module module = (Module) arg;
+            
             pnlModules.remove(moduleGraph);
 
             moduleGraph = new ModuleGraph(this);
 
             pnlModules.add(moduleGraph);
 
-            traverseConnectedModules(null, source);
+            traverseConnectedModules(null, this.sourceModules.get(0));
+            
+            
 
             TreeLayoutAlgorithm tla = new TreeLayoutAlgorithm();
 
@@ -415,7 +421,7 @@ public class Configurator extends JFrame implements Observer
 
             tla.setCenterRoot(true);
 
-            tla.run(moduleGraph, moduleGraph.getRoots());
+            //tla.run(moduleGraph, moduleGraph.getRoots());
 
         }
         else if (arg instanceof SensorServer) {
