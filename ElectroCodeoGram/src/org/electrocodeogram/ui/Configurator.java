@@ -24,6 +24,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
+import javax.swing.JToolTip;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -591,6 +592,7 @@ public class Configurator extends JFrame implements Observer
         moduleConnectionMode = true;
         
         sourceModuleId = selectedModuleCellId;
+        
         
     }
 

@@ -40,7 +40,9 @@ public class ModuleCell extends DefaultGraphCell
     
     private boolean isRunning;
     
-     /**
+    private ArrayList childEdges = null;
+    
+      /**
      * 
      * @uml.property name="id"
      */
@@ -58,6 +60,7 @@ public class ModuleCell extends DefaultGraphCell
         
         this.isRunning = b;
         
+        childEdges = new ArrayList();
         
         GraphConstants.setBounds(this.getAttributes(), new Rectangle2D.Double(0, 0, 100, 25));
         
@@ -90,6 +93,16 @@ public class ModuleCell extends DefaultGraphCell
        
     }
 
+    public void addChildEdge(DefaultEdge edge)
+    {
+        childEdges.add(edge);
+    }
+    
+    public Object[] getChildEdges()
+    {
+        return childEdges.toArray();
+    }
+    
     public String getName()
     {
         return name;
@@ -99,7 +112,7 @@ public class ModuleCell extends DefaultGraphCell
     {
         return root;
     }
-
+    
     /**
      * @return
      */

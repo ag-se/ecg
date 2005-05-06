@@ -516,14 +516,17 @@ public class ModuleRegistry extends Observable
 
     /**
      * @param selectedModuleCellId
+     * @throws UnknownModuleIDException
      */
-    public void removeModule(int moduleId)
+    public void removeModule(int moduleId) throws UnknownModuleIDException
     {
         Module module = getModuleInstance(moduleId);
         
         module.remove();
         
         runningModules.delete(module);
+        
+        
         
     }
 
@@ -562,6 +565,28 @@ public class ModuleRegistry extends Observable
         Module targetModule = getModuleInstance(targetModuleId);
         
         sourceModule.connectChildModule(targetModule);
+        
+    }
+
+
+    /**
+     * @param parentId
+     * @param childId
+     * @throws UnknownModuleIDException
+     */
+    public void disconnectModule(int parentId, int childId) throws UnknownModuleIDException
+    {
+        assert(parentId != -1 && childId != -1);
+        
+        Module parentModule = getModuleInstance(parentId);
+        
+        assert(parentModule != null);
+        
+        Module childModule = getModuleInstance(childId);
+        
+        assert(childModule != null);
+        
+        parentModule.disconnectChildModule(childModule);
         
     }
     

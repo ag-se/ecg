@@ -12,7 +12,7 @@ package org.electrocodeogram.module;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public class UnknownModuleIDException extends RuntimeException
+public class UnknownModuleIDException extends Exception
 {
 
     /**

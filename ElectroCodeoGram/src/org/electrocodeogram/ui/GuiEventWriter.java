@@ -90,10 +90,13 @@ public class GuiEventWriter extends EventWriter
               for (int i = 0; i < count; i++) {
                   String str = (String) args[i];
                   
-                  if(i != count - 1)
+                  if(str.equals(new String("")))
                   {
-                      target.append("," + str);
+                      continue;
                   }
+                  target.append("," + str);
+                  
+                  
               }
 
           }

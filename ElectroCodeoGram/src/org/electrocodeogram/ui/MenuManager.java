@@ -19,6 +19,7 @@ import javax.swing.JPopupMenu;
 
 import org.electrocodeogram.module.ModuleRegistry;
 import org.electrocodeogram.module.Module;
+import org.electrocodeogram.module.UnknownModuleIDException;
 import org.electrocodeogram.module.annotator.EventProcessor;
 
 
@@ -33,11 +34,15 @@ public class MenuManager
 
     private static MenuManager theInstance = new MenuManager();
  
-    private ModulePopupMenu popupMenu = null;
+    private ModulePopupMenu modulePopupMenu = null;
+    
+    private EdgePopupMenu edgePopupMenu = null;
     
     private JMenuItem mniModuleDetails = new JMenuItem("Eigenschaften");
     
     private JMenuItem mniModuleRemove = new JMenuItem("Entfernen");
+    
+    private JMenuItem mniEdgeRemove = new JMenuItem("Entfernen");
     
     private JMenuItem mniModuleConnectTo = new JMenuItem("Verbinden mit...");
     
@@ -57,7 +62,13 @@ public class MenuManager
 
             public void actionPerformed(ActionEvent e)
             {
-                ModuleRegistry.getInstance().removeModule(Configurator.getInstance().getSelectedModuleCellId());
+                try {
+                    ModuleRegistry.getInstance().removeModule(Configurator.getInstance().getSelectedModuleCellId());
+                }
+                catch (UnknownModuleIDException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
                 
             }});
         
@@ -115,7 +126,7 @@ public class MenuManager
                 ModuleRegistry.getInstance().setProcessorMode(EventProcessor.FILTER,Configurator.getInstance().getSelectedModuleCellId());
                 
             }});
-
+        
     }
 
     public static MenuManager getInstance()
@@ -125,34 +136,34 @@ public class MenuManager
     
     public void showModuleMenu(int id, Component c, int x, int y)
     {
-        popupMenu = new ModulePopupMenu();
+        modulePopupMenu = new ModulePopupMenu();
         
-        popupMenu.add(mniModuleStart);
+        modulePopupMenu.add(mniModuleStart);
         
-        popupMenu.add(mniModuleStop);
+        modulePopupMenu.add(mniModuleStop);
         
-        popupMenu.addSeparator();
+        modulePopupMenu.addSeparator();
         
         if(!ModuleRegistry.getInstance().isModuleType(Module.TARGET_MODULE,id))
         {
-            popupMenu.add(mniModuleConnectTo);
+            modulePopupMenu.add(mniModuleConnectTo);
         }
                 
-        popupMenu.add(mniModuleRemove);
+        modulePopupMenu.add(mniModuleRemove);
         
-        popupMenu.addSeparator();
+        modulePopupMenu.addSeparator();
         
-        popupMenu.add(mniMsgWindowShow);
+        modulePopupMenu.add(mniMsgWindowShow);
         
         
         
         if(ModuleRegistry.getInstance().isModuleType(Module.INTERMEDIATE_MODULE,id))
         {
-            popupMenu.addSeparator();
+            modulePopupMenu.addSeparator();
             
-            popupMenu.add(mniMakeAnnotator);
+            modulePopupMenu.add(mniMakeAnnotator);
             
-            popupMenu.add(mniMakeFilter);
+            modulePopupMenu.add(mniMakeFilter);
         }
         
         Properties moduleProperties = ModuleRegistry.getInstance().getModulePropertiesForId(id);
@@ -183,7 +194,7 @@ public class MenuManager
 	                  
 	                    menuItem.addActionListener(new PropertyActionAdapter(id,clazz,propertyName));                    
 	                    
-	                    popupMenu.add(menuItem);
+	                    modulePopupMenu.add(menuItem);
 	                }
 	                catch (ClassNotFoundException e) {
 	                    // TODO Auto-generated catch block
@@ -194,11 +205,59 @@ public class MenuManager
 	        }
         }
         
-        popupMenu.addSeparator();
+        modulePopupMenu.addSeparator();
         
-        popupMenu.add(mniModuleDetails);
+        modulePopupMenu.add(mniModuleDetails);
         
-        popupMenu.show(c,x,y);
+        modulePopupMenu.show(c,x,y);
+    }
+    
+    public void showEdgeMenu(int parentId, int childId, Component c, int x, int y)
+    {
+        edgePopupMenu = new EdgePopupMenu();
+        
+        mniEdgeRemove.addActionListener(new EdgeRemoveAdapter(parentId,childId));
+        
+        edgePopupMenu.add(mniEdgeRemove);
+        
+        edgePopupMenu.show(c,x,y);
+        
+    }
+    
+    private class EdgeRemoveAdapter implements ActionListener
+    {
+
+        private int parentId;
+        
+        private int childId;
+
+        /**
+         * @param parentId
+         * @param childId
+         */
+        public EdgeRemoveAdapter(int parentId, int childId)
+        {
+            
+            this.parentId = parentId;
+            
+            this.childId = childId;
+        }
+
+        /* (non-Javadoc)
+         * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+         */
+        public void actionPerformed(ActionEvent e)
+        {
+            try {
+                ModuleRegistry.getInstance().disconnectModule(parentId,childId);
+            }
+            catch (UnknownModuleIDException e1) {
+              
+                // only occurs because this event is fired twice internaly
+            }
+            
+        }
+        
     }
     
     private class PropertyActionAdapter implements ActionListener
@@ -276,6 +335,13 @@ public class MenuManager
        
     }
     
+    private class EdgePopupMenu extends JPopupMenu
+    {
+        public EdgePopupMenu()
+        {
+            super();
+        }
+    }
     
     /**
      * @param menu3
@@ -337,4 +403,10 @@ public class MenuManager
         menu.add(mniModuleDetails);
      
     }
+
+    /**
+     * @param parentId
+     * @param childId
+     */
+
 }

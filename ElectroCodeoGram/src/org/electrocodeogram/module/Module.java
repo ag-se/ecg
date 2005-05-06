@@ -243,7 +243,7 @@ public abstract class Module extends Observable implements Observer
         return parentModules.toArray();
     }
     
-    public void disconnectModule(Module module) throws UnknownModuleIDException
+    public void disconnectChildModule(Module module) throws UnknownModuleIDException
     {
         	if(!childModuleMap.containsKey(new Integer(module.getId())))
 	        {
@@ -257,7 +257,7 @@ public abstract class Module extends Observable implements Observer
 		        
 		        childModuleMap.remove(new Integer(module.getId()));
 		       
-		        notifyModuleChanged(module);
+		        notifyModuleChanged(this);
 	        }
         }
     
@@ -362,9 +362,10 @@ public abstract class Module extends Observable implements Observer
     }
 
     /**
+     * @throws UnknownModuleIDException
      * 
      */
-    public void remove()
+    public void remove() throws UnknownModuleIDException
     {
         
         if(parentModuleMap.size() != 0)
@@ -376,7 +377,7 @@ public abstract class Module extends Observable implements Observer
         {
             Module module = (Module) parentModules[i];
             
-            module.disconnectModule(this);
+            module.disconnectChildModule(this);
         }
         }
     }

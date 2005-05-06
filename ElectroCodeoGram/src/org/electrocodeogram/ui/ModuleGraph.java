@@ -7,7 +7,6 @@
 package org.electrocodeogram.ui;
 
 import java.awt.Color;
-import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.HashMap;
@@ -22,9 +21,9 @@ import org.electrocodeogram.module.ModuleRegistry;
 import org.jgraph.JGraph;
 import org.jgraph.event.GraphSelectionEvent;
 import org.jgraph.event.GraphSelectionListener;
-import org.jgraph.graph.DefaultEdge;
+
 import org.jgraph.graph.DefaultGraphModel;
-import org.jgraph.graph.Edge;
+
 import org.jgraph.graph.GraphConstants;
 
 /**
@@ -117,6 +116,7 @@ public class ModuleGraph extends JGraph
                                     }
 			                    }
 			                }
+		                    
 		                }
                     }
                     else if(e.getButton() == MouseEvent.BUTTON3)
@@ -141,6 +141,13 @@ public class ModuleGraph extends JGraph
 			                    
 			                    MenuManager.getInstance().showModuleMenu(selectedModuleCellId,me,e.getPoint().x,e.getPoint().y);
 			                }
+		                    else if (o instanceof ModuleEdge)
+		                    {
+		                        ModuleEdge edge = (ModuleEdge) o;
+		                        
+		                        MenuManager.getInstance().showEdgeMenu(edge.getParentId(),edge.getChildId(),me,e.getPoint().x,e.getPoint().y);
+		                    }
+		                    
 		                }
 	                }
                 }
@@ -180,36 +187,15 @@ public class ModuleGraph extends JGraph
             GraphConstants.setOpaque(moduleCell.getAttributes(),module.isRunning());
             
             this.getGraphLayoutCache().insert(moduleCell);
-//        
-//            Point location = moduleCell.getLocation();
-//            
-//            Object[] parentEdges = moduleCell.getParentEdges();
-//            
-//            Object[] childEdges = moduleCell.getChildEdges();
-//                                    
-//            removeModuleCell(id);
-//    
-//            ModuleCell ml = new ModuleCell(module.getModuleType(),module.getId(), module.getName(), module.isRunning());
-//            
-//            ml.setLocation(location);
-//            
-//            for(int i=0;i<parentEdges.length;i++)
-//            {
-//                Edge edge = (Edge) parentEdges[i];
-//                
-//                edge.setTarget(ml.getChildAt(0));
-//            }
-//            
-//            for(int i=0;i<childEdges.length;i++)
-//            {
-//                Edge edge = (Edge) childEdges[i];
-//                
-//                edge.setSource(ml.getChildAt(0));
-//            }
-//            
-//            addModuleCell(ml);
-//            
+
             Object[] modules = module.getChildModules();
+            
+            Object[] edges = moduleCell.getChildEdges();
+            
+            if(edges.length > 0)
+            {
+                getGraphLayoutCache().remove(edges);
+            }
             
             if(modules != null)
             {
@@ -219,19 +205,13 @@ public class ModuleGraph extends JGraph
                     
                     ModuleCell childModuleCell = (ModuleCell) moduleCells.get(new Integer(childModule.getId()));
                     
-                    DefaultEdge edge = new DefaultEdge();
-                    
-                    GraphConstants.setLineEnd(edge.getAttributes(),
-
-                    GraphConstants.ARROW_CLASSIC);
-                            
-                    GraphConstants.setDisconnectable(edge.getAttributes(), false);
+                    ModuleEdge edge = new ModuleEdge(moduleCell.getId(),childModuleCell.getId());
                             
                     edge.setSource(moduleCell.getChildAt(0));
                             
                     edge.setTarget(childModuleCell.getChildAt(0));
                             
-                    addEdge(edge);
+                    addChildEdge(moduleCell,edge);
                             
                 }
             }
@@ -255,19 +235,28 @@ public class ModuleGraph extends JGraph
             
             Object[] o = new Object[]{cell};
             
-            getGraphLayoutCache().removeCells(o);
+            Object[] edges = cell.getChildEdges();
+            
+            if(edges.length > 0)
+            {
+                getGraphLayoutCache().remove(edges);
+            }
+            
+            getGraphLayoutCache().remove(o);
             
             moduleCells.remove(new Integer(id));
         }
     }
     /**
+     * @param moduleCell
      * @param edge
      * @param childModuleCell
      * @param parentModuleCell
      */
-    public void addEdge(DefaultEdge edge)
+    public void addChildEdge(ModuleCell moduleCell, ModuleEdge edge)
     {
        
+        moduleCell.addChildEdge(edge);
         
         this.getGraphLayoutCache().insert(edge);
         
