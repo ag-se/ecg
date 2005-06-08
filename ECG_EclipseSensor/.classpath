@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry excluding="org/hackystat/stdext/sensor/eclipse/helper2x/" kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry kind="lib" path="lib/cdtcore.jar"/>
+	<classpathentry kind="lib" path="lib/cdtparser.jar"/>
+	<classpathentry kind="src" path="/ECG_ClientTools"/>
+	<classpathentry kind="output" path="build/classes"/>
+</classpath>
