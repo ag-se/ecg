@@ -220,7 +220,7 @@ public class VersionCheck {
       }
       WizardDialog dialog = (WizardDialog) wizardDialogObject;
       dialog.create();
-      dialog.getShell().setText(UpdateUI.getString("InstallWizardAction.title")); //$NON-NLS-1$
+      //dialog.getShell().setText(UpdateUI.getString("InstallWizardAction.title")); //$NON-NLS-1$
       dialog.getShell().setSize(600, 500);
       dialog.open();
       
