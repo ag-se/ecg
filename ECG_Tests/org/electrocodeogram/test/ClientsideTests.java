@@ -5,7 +5,6 @@ import junit.framework.TestCase;
 import org.electrocodeogram.EventPacket;
 import org.electrocodeogram.SendingThreadTest;
 import org.electrocodeogram.sensor.TestSensor;
-import org.electrocodeogram.SendingThread;
 
 /**
  * This class collects all testcases for testing the client side of the ECG framework for
