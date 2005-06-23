@@ -16,6 +16,7 @@ import java.util.Observable;
 
 import org.electrocodeogram.module.ModuleRegistry;
 import org.electrocodeogram.ui.Configurator;
+import org.hackystat.kernel.admin.SensorProperties;
 
 /**
  * @author 7oas7er
@@ -23,20 +24,34 @@ import org.electrocodeogram.ui.Configurator;
  */
 public class SensorServer extends Observable
 {
+    public static SensorServer theInstance = null;
+    
     public static final int PORT = 22222;
     
     private boolean runningFlag = true;
     
     private HashMap sensorThreadPool = null;
 
+    private SensorShellWrapper shellWrapper = null;
+    
+    public static SensorServer getInstance()
+    {
+        return theInstance;
+    }
+    
     public SensorServer()
     {
         sensorThreadPool = new HashMap();
-        
+                
         ModuleRegistry.getInstance();
         
-        SensorShellWrapper.getInstance();
+        shellWrapper = new SensorShellWrapper(new SensorProperties("",""),false,"ECG");
         
+    }
+    
+    public SensorShellWrapper getSensorShellWrapper()
+    {
+        return shellWrapper;
     }
     
     public InetAddress[] getSensorAddresses()
@@ -93,35 +108,35 @@ public class SensorServer extends Observable
     
     public static void main(String[] args)
     {
-        SensorServer me = new SensorServer();
+        SensorServer.theInstance = new SensorServer();
         
-        me.addObserver(Configurator.getInstance());
+        theInstance.addObserver(Configurator.getInstance());
                    
         ServerSocket seso = null;
         
         try {
             seso = new ServerSocket(PORT);
             
-            me.doNotifyObservers();
+            theInstance.doNotifyObservers();
         }
         catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
         
-        while(me.runningFlag)
+        while(theInstance.runningFlag)
         {
             try {
                 Socket socketToSensor = seso.accept();
                 
               
-                SensorThread st = new SensorThread(me,socketToSensor);
+                SensorThread st = new SensorThread(theInstance,socketToSensor);
                 
-                me.sensorThreadPool.put(new Integer(st.getId()),st);
+                theInstance.sensorThreadPool.put(new Integer(st.getSensorThreadId()),st);
                 
-                me.setChanged();
-                me.notifyObservers(me);
-                me.clearChanged();
+                theInstance.setChanged();
+                theInstance.notifyObservers(theInstance);
+                theInstance.clearChanged();
                 
                 st.start();
                 

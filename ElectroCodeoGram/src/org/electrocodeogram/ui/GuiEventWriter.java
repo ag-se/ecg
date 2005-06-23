@@ -75,7 +75,7 @@ public class GuiEventWriter extends EventWriter
     {
         if(target != null)
         {
-        if (eventPacket.getEventSourceId() == Configurator.getInstance().getSelectedModuleCellId())
+        if (eventPacket.getSourceId() == Configurator.getInstance().getSelectedModuleCellId())
         {
           target.append(eventPacket.getTimeStamp().toString() + "," + eventPacket.getHsCommandName());
 

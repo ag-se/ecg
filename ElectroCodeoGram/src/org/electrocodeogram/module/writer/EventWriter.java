@@ -7,6 +7,7 @@
 package org.electrocodeogram.module.writer;
 
 import org.electrocodeogram.EventPacket;
+import org.electrocodeogram.IllegalEventParameterException;
 import org.electrocodeogram.module.Module;
 
 
@@ -44,7 +45,13 @@ public abstract class EventWriter extends Module
     public void receiveEventPacket(EventPacket eventPacket)
     {
         setChanged();
-        notifyObservers(new EventPacket(this.getId(),eventPacket.getTimeStamp(),eventPacket.getHsCommandName(),eventPacket.getArglist()));
+        try {
+            notifyObservers(new EventPacket(this.getId(),eventPacket.getTimeStamp(),eventPacket.getHsCommandName(),eventPacket.getArglist()));
+        }
+        catch (IllegalEventParameterException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         clearChanged();
         
         write(eventPacket); 

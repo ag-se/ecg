@@ -71,7 +71,7 @@ public class SensorThread extends Thread
         }
     }
     
-    public int getId()
+    public int getSensorThreadId()
     {
         return id;
     }
@@ -89,7 +89,7 @@ public class SensorThread extends Thread
             try {
                 EventPacket e = (EventPacket) ois.readObject();
                 
-                if (SensorShellWrapper.getInstance().doCommand(e.getTimeStamp(),e.getHsCommandName(),e.getArglist()))
+                if (seso.getSensorShellWrapper().doCommand(e.getTimeStamp(),e.getHsCommandName(),e.getArglist()))
                 {
                     if(e.getHsCommandName().equals(new String("Activity")) && e.getArglist().get(0).equals(new String("setTool")))
                     {

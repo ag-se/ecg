@@ -9,6 +9,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Observable;
@@ -422,7 +424,7 @@ public class Configurator extends JFrame implements Observer
                 btnModule.addActionListener(new ActionAdapter(this, moduleName));
 
                 pnlButtons.add(btnModule);
-
+                
                 splitPane.remove(pnlButtons);
                 
                 splitPane.add(pnlButtons);

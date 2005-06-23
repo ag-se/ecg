@@ -12,9 +12,9 @@ import java.util.LinkedList;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.logging.*;
-import java.util.logging.Level;
 
 import org.electrocodeogram.EventPacket;
+import org.electrocodeogram.IllegalEventParameterException;
 import org.electrocodeogram.module.annotator.EventProcessor;
 import org.electrocodeogram.ui.Configurator;
 import org.electrocodeogram.ui.GuiEventWriter;
@@ -74,10 +74,6 @@ public abstract class Module extends Observable implements Observer
       parentModuleMap = new HashMap();
       
       parentModules = childModuleMap.values();
-
-      assert(moduleRegistry != null);
-      
-      //moduleRegistry.addModuleInstance(this);
       
       if (!(this instanceof GuiEventWriter))
       {
@@ -151,7 +147,13 @@ public abstract class Module extends Observable implements Observer
         if(runningFlag && (eventPacket != null))
         {
 	        setChanged();
-	        notifyObservers(new EventPacket(this.getId(),eventPacket.getTimeStamp(),eventPacket.getHsCommandName(),eventPacket.getArglist()));
+	        try {
+                notifyObservers(new EventPacket(this.getId(),eventPacket.getTimeStamp(),eventPacket.getHsCommandName(),eventPacket.getArglist()));
+            }
+            catch (IllegalEventParameterException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
 	        clearChanged();
 	    }
     }
@@ -192,6 +194,10 @@ public abstract class Module extends Observable implements Observer
         if (moduleType == Module.TARGET_MODULE)
         {
             throw new ModuleConnectionException("An diese Modul können Sie keine weiteren Module anhängen");
+        }
+        else if(childModuleMap.containsKey(new Integer(module.getId())))
+        {
+            throw new ModuleConnectionException("Diese Module sind bereits verbunden.");
         }
         else
         {

@@ -1,38 +1,25 @@
 package org.electrocodeogram.core;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Logger;
 
-import org.electrocodeogram.module.Module;
+import org.electrocodeogram.EventPacket;
+import org.electrocodeogram.IllegalEventParameterException;
 import org.electrocodeogram.module.ModuleRegistry;
 import org.electrocodeogram.module.source.Source;
-import org.electrocodeogram.EventPacket;
 import org.hackystat.kernel.admin.SensorProperties;
 import org.hackystat.kernel.shell.SensorShell;
 
 /**
  * @author Frank Schlesinger *  * This class is the is the project's main- and base-class as it is the entry point * of the ElectroCodeoGram (ECG) extension into the "HackyStat" (HS) framework. *  * It's function is to colllect all the event data that is captured by running sensors * and to process it into the ECG framework for analysis and storing. It is therefore * the source of event data in the ECG module modell.  *  * It extends the HS class SensorShell, so it conforms to the "SensorDataType" * (SDT) concept of HS. That means every konventionell HS sensor is able to communicate * with the ECG's SensorShellWrapper.
  */
-
 public class SensorShellWrapper extends SensorShell
 {
     
-    private static final SensorShellWrapper theInstance = new SensorShellWrapper(new SensorProperties("",""),false,"ECG");
-    
     private Source sensorSource = null;
-    
-    /** The logging instance for SensorShells. */
-    private Logger logger;
-
-    
-    public static SensorShellWrapper getInstance()
-    {
-        return theInstance;
-        
-    }
+     
+    private int eventPacketCount = 0;
     
     /**
      * The constructor takes the same parameters as the HS SensorShell and sipmly passes
@@ -46,7 +33,7 @@ public class SensorShellWrapper extends SensorShell
      * @param isInteractive 
      * @param toolName The name of the developing tool the sending sensor is working inside
      */
-    private SensorShellWrapper(SensorProperties sensorProperties, boolean isInteractive, String toolName)
+    public SensorShellWrapper(SensorProperties sensorProperties, boolean isInteractive, String toolName)
     {
         super(sensorProperties, isInteractive, toolName);
 
@@ -58,6 +45,11 @@ public class SensorShellWrapper extends SensorShell
      
     }
    
+    public int getEventPacketCount()
+    {
+        return eventPacketCount;
+    }
+    
     /** 
      * This method overwrites the Hs doCommand method
      * @see org.hackystat.kernel.shell.SensorShell#doCommand(java.util.Date, java.lang.String, java.util.List)
@@ -68,8 +60,11 @@ public class SensorShellWrapper extends SensorShell
     {
         
         boolean result =  super.doCommand(timeStamp, commandName, argList);
+        
         if(result)
         {
+            eventPacketCount++;
+            
             List newArgList = argList;
             
             if(commandName.equals("Activity"))
@@ -92,6 +87,7 @@ public class SensorShellWrapper extends SensorShell
                 }
                 
             }
+            
             appendToEventSource(timeStamp, "HS_COMMAND:" + commandName, newArgList);
             
             return true;
@@ -100,11 +96,6 @@ public class SensorShellWrapper extends SensorShell
         {
             return false;
         }
-        
-        // TODO : Make a HS writer here
-        
-        
-        
         
     }
 
@@ -117,15 +108,19 @@ public class SensorShellWrapper extends SensorShell
      */
     private void appendToEventSource(Date timeStamp, String commandName, List argList)
     {
-       	
         if (sensorSource != null)
         {
-	        assert(timeStamp != null);
-	        
-	        EventPacket toAppend = new EventPacket(0,timeStamp,commandName,argList);
-	
-            sensorSource.append(toAppend);
-            
-        }
+	        EventPacket toAppend;
+            try {
+                
+                toAppend = new EventPacket(0,timeStamp,commandName,argList);
+                
+                sensorSource.append(toAppend);
+            }
+            catch (IllegalEventParameterException e) {
+                
+                e.printStackTrace();
+            }
+	    }
      }
 }
