@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Properties;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 /**
  * Provides access to the hackystat properties file for each sensor, and provides reasonable default
@@ -39,6 +41,7 @@ public class SensorProperties {
   /** Indicates whether this sensor is active or not. */
   private boolean sensorEnabled = false;
 
+  private Logger logger = null;
 
   /**
    * Initializes access to the Hackystat Sensor settings stored in the user's sensor.properties
@@ -73,16 +76,22 @@ public class SensorProperties {
    * @param sensorFile  The sensor file to read.
    */
   public SensorProperties(String sensorType, File sensorFile) {
+    logger = Logger.getLogger(this.getClass().getName());
     this.sensorFile = sensorFile;
     this.sensorType = sensorType.toUpperCase();
     try {
-      if (sensorFile.exists()) {
+      if (sensorFile.exists())
+      {
         sensorProps.load(new FileInputStream(sensorFile));
         if (sensorProps.size() > 0) {
           this.fileAvailable = true;
           String enableKey = "ENABLE_" + this.sensorType + "_SENSOR";
           this.sensorEnabled = sensorProps.getProperty(enableKey, "false").trim().equals("true");
         }
+      }
+      else
+      {
+          logger.log(Level.WARNING,"No \"sensor.properties\" file found!");
       }
     }
     catch (Exception e) {

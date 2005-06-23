@@ -3,20 +3,17 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-/*
- * Created on 12.03.2005
- *
- */
 
 /**
- * @author 7oas7er
- *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
+ * An EventPacket is a representation for a MicroProcessEvent (MPE).
+ * It contains the events data and is conforming to the syntactical
+ * rules for MPE.
  */
 public class EventPacket implements Serializable
 {
-
+    private static final long serialVersionUID = 2353171166739768704L;
+    
+    // begin: this will go into the MPE managment soon
     public static final String HS_COMMAND_PREFIX = "HS_COMMAND:";
     
     public static final String HS_TYPE_PREFIX = "HS_ACTIVITY_TYPE:";
@@ -56,9 +53,10 @@ public class EventPacket implements Serializable
     public static final String ECG_TYPE_RUN = "Run";
     
     public static final String ECG_TYPE_DEBUG = "Debug";
+    // end
 
-        
-    private int eventSourceId = -1;
+    
+    private int sourceId = -1;
 
     private Date timeStamp = null;
     
@@ -67,48 +65,68 @@ public class EventPacket implements Serializable
     private List argList = null;
     
     
-    /**
-     * @param i
-     * @param timeStamp
-     * @param commandName
-     * @param argList
-     */
-    public EventPacket(int id, Date timeStamp, String hsCommandName, List argList)
+   /**
+    * This creates a new EventPacket object
+    * @param id The module source ID identifies where the EventPacket comes from
+    * @param timeStamp The timeStamp tells when the event was recorded
+    * @param hsCommandName The HackyStat comandName param the event is embedded in
+    * @param argList The argList of parameters containing all the relevant event data
+    * @throws IllegalEventParameterException If the given parameters are not conforming to the syntactical MPE rules
+    */
+    public EventPacket(int id, Date timeStamp, String hsCommandName, List argList) throws IllegalEventParameterException
     {
+        if(!isSyntacticallyCorrect(timeStamp,hsCommandName,argList))
+        {
+            throw new IllegalEventParameterException();
+        }
         
-        this.eventSourceId = id;
+        if(id < 0)
+        {
+            throw new IllegalEventParameterException();
+        }
+        
+        this.sourceId = id;
         
         this.timeStamp = timeStamp;
         
         this.hsCommandName = hsCommandName;
         
-        this.argList = argList;    
+        this.argList = argList;
+        
+        assert(isSyntacticallyCorrect(this.timeStamp,this.hsCommandName,this.argList));
+        
+        assert(this.sourceId > 0);
+        
+    }
+
+   /**
+    * This methis returns th ID that identifies the source module of this EventPacket object.
+    * @return The ID of the source module
+    */
+    public int getSourceId() {
+        return sourceId;
     }
 
     /**
-     * 
-     * @uml.property name="eventSourceId"
-     */
-    public int getEventSourceId() {
-        return eventSourceId;
-    }
-
-    /**
-     * 
-     * @uml.property name="timeStamp"
+     * This method returns the timestamp of the EventPacket.
+     * @return The timestamp as a Date object
      */
     public Date getTimeStamp() {
         return timeStamp;
     }
 
     /**
-     * 
-     * @uml.property name="commandName"
+     * This method returns the HackyStat commandName the event data is carried in
+     * @return The HackyStat commandName
      */
     public String getHsCommandName() {
         return hsCommandName;
     }
 
+    /**
+     * This method returns the ECG commandName wich is contained in the argList of this EventObject.
+     * @return The ECG commandName
+     */
     public String getEcgCommandName()
     {
         for(int i=0;i<argList.size();i++)
@@ -124,9 +142,33 @@ public class EventPacket implements Serializable
         return null;
     }
     
+    /**
+     * This method returns the argList of the EventPacket
+     * @return The argList as a List
+     */
     public List getArglist()
     {
         return argList;
     }
+    
+    /**
+     * This Classmethod proof the syntactcally corectness of an EventPacket.
+     * @param timeStamp The timeStamp tells when the event was recorded
+     * @param hsCommandName The HackyStat comandName param the event is embedded in
+     * @param argList The argList of parameters containing all the relevant event data
+     * @return "true" if the eventPacket is syntactically correct nad "false" if not
+     */
+    public static boolean isSyntacticallyCorrect(Date timeStamp, String commandName, List argList)
+    {
+        if(timeStamp == null || commandName == null || argList == null || argList.isEmpty() || !(argList.get(0) instanceof String))
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
+
 }
 
