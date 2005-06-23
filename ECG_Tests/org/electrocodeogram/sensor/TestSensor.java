@@ -6,7 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
-import org.electrocodeogram.EventPacket;
+import org.electrocodeogram.TestEventPacket;
 import org.hackystat.kernel.admin.SensorProperties;
 import org.hackystat.kernel.shell.SensorShell;
 
@@ -88,9 +88,10 @@ public class TestSensor
      *            The size of each list element
      * @return An EventPacket of the desired kind
      */
-    public EventPacket createEventPacket(boolean syntValidDate, boolean syntValidCommandName, boolean argListNotNull, boolean argListOfString, int argListLength, int argListEntrySize)
+    public TestEventPacket createEventPacket(boolean syntValidDate, boolean syntValidCommandName, boolean argListNotNull, boolean argListOfString, int argListLength, int argListEntrySize)
     {
-        EventPacket eventPacket = new EventPacket(
+        TestEventPacket eventPacket = null;
+        eventPacket = new TestEventPacket(
                 0,
                 createDate(syntValidDate),
                 createCommandName(syntValidCommandName),
@@ -108,7 +109,7 @@ public class TestSensor
      *         EventPacket is syntactically valid and accepted. "false" means
      *         the eventPacket is syntactically invalid and not acccepted.
      */
-    public boolean sendEvent(EventPacket eventPacket)
+    public boolean sendEvent(TestEventPacket eventPacket)
     {
         return shell.doCommand(eventPacket.getTimeStamp(), eventPacket.getHsCommandName(), eventPacket.getArglist());
     }

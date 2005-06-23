@@ -1,9 +1,10 @@
 package org.electrocodeogram.test;
-import org.electrocodeogram.EventPacket;
-import org.electrocodeogram.SendingThreadTest;
-import org.electrocodeogram.sensor.TestSensor;
-
 import junit.framework.TestCase;
+
+import org.electrocodeogram.SendingThreadTest;
+import org.electrocodeogram.TestEventPacket;
+import org.electrocodeogram.core.SensorServer;
+import org.electrocodeogram.sensor.TestSensor;
 
 /**
  * Test to validate the behaviour of connection attemps to the ECG server and tests
@@ -53,7 +54,7 @@ public class ConnectionTests extends TestCase
         
         assertTrue(threadTest.testConnection(false,0));
         
-        EventPacket eventPacket = testSensor.createEventPacket(true,true,true,true,10,10);
+        TestEventPacket eventPacket = testSensor.createEventPacket(true,true,true,true,10,10);
         
         testSensor.sendEvent(eventPacket);
         
@@ -76,7 +77,7 @@ public class ConnectionTests extends TestCase
         
         int connectionTrialsBefore = threadTest.getConnectionTrials();
         
-        EventPacket eventPacket = testSensor.createEventPacket(true,true,true,true,10,10);
+        TestEventPacket eventPacket = testSensor.createEventPacket(true,true,true,true,10,10);
         
         testSensor.sendEvent(eventPacket);
         
@@ -104,7 +105,7 @@ public class ConnectionTests extends TestCase
         
         int connectionTrialsBefore = threadTest.getConnectionTrials();
         
-        EventPacket eventPacket = testSensor.createEventPacket(true,true,true,true,10,10);
+        TestEventPacket eventPacket = testSensor.createEventPacket(true,true,true,true,10,10);
         
         testSensor.sendEvent(eventPacket);
 
@@ -125,4 +126,53 @@ public class ConnectionTests extends TestCase
      
         assertTrue(count>0);
     }
+    
+    
+    public void testD()
+    {
+        assertTrue(threadTest.testConnection(false,0));
+        
+        TestEventPacket eventPacket = testSensor.createEventPacket(true,true,true,true,10,10);
+        
+        while(threadTest.getBufferSize() <= 10)
+        {
+            testSensor.sendEvent(eventPacket);
+        }
+        
+        assertTrue(threadTest.getBufferSize() > 10);
+        
+        startECGServer();
+        
+        try {
+            Thread.sleep(10000);
+
+            assertTrue(threadTest.testConnection(true,0));
+            
+            assertTrue(threadTest.getBufferSize() == 0);
+        }
+        catch (InterruptedException e) {
+         
+            
+            e.printStackTrace();
+        }
+        
+        
+        
+    }
+    
+    private void startECGServer()
+    {
+        new ECGServerStarter().start();
+    }
+    
+    // this Thread is used to run the ECG server asynchrneously
+    private class ECGServerStarter extends Thread
+    {
+        public void run()
+        {
+            SensorServer.main(null);
+        }
+    }
 }
+
+    

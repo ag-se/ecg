@@ -2,8 +2,8 @@ package org.electrocodeogram.test;
 
 import junit.framework.TestCase;
 
-import org.electrocodeogram.EventPacket;
 import org.electrocodeogram.SendingThreadTest;
+import org.electrocodeogram.TestEventPacket;
 import org.electrocodeogram.sensor.TestSensor;
 
 /**
@@ -39,7 +39,7 @@ public class ClientsideTests extends TestCase
      */
     public void testA()
     {
-        EventPacket eventPacket = testSensor.createEventPacket(true,true,true,true,10,10);
+        TestEventPacket eventPacket = testSensor.createEventPacket(true,true,true,true,10,10);
         
         boolean result = testSensor.sendEvent(eventPacket);
         
@@ -55,7 +55,7 @@ public class ClientsideTests extends TestCase
      */
     public void testB()
     {
-        EventPacket eventPacket = testSensor.createEventPacket(true,true,true,true,10,10);
+        TestEventPacket eventPacket = testSensor.createEventPacket(true,true,true,true,10,10);
         
         testSensor.sendEvent(eventPacket);
         
@@ -79,7 +79,7 @@ public class ClientsideTests extends TestCase
      */
     public void testC()
     {
-        EventPacket eventPacket = testSensor.createEventPacket(false,true,true,true,10,10);
+        TestEventPacket eventPacket = testSensor.createEventPacket(false,true,true,true,10,10);
         
         boolean result = testSensor.sendEvent(eventPacket);
         
@@ -95,7 +95,7 @@ public class ClientsideTests extends TestCase
      */
     public void testD()
     {
-        EventPacket eventPacket = testSensor.createEventPacket(true,false,true,true,10,10);
+        TestEventPacket eventPacket = testSensor.createEventPacket(true,false,true,true,10,10);
         
         boolean result = testSensor.sendEvent(eventPacket);
         
@@ -112,7 +112,7 @@ public class ClientsideTests extends TestCase
      */
     public void testE()
     {
-        EventPacket eventPacket = testSensor.createEventPacket(true,true,false,true,10,10);
+        TestEventPacket eventPacket = testSensor.createEventPacket(true,true,false,true,10,10);
         
         boolean result = testSensor.sendEvent(eventPacket);
         
@@ -128,7 +128,7 @@ public class ClientsideTests extends TestCase
      */
     public void testF()
     {
-        EventPacket eventPacket = testSensor.createEventPacket(true,true,true,true,0,10);
+        TestEventPacket eventPacket = testSensor.createEventPacket(true,true,true,true,0,10);
         
         boolean result = testSensor.sendEvent(eventPacket);
         
@@ -144,7 +144,7 @@ public class ClientsideTests extends TestCase
      */
     public void testG()
     {
-        EventPacket eventPacket = testSensor.createEventPacket(true,true,true,false,10,10);
+        TestEventPacket eventPacket = testSensor.createEventPacket(true,true,true,false,10,10);
         
         boolean result = testSensor.sendEvent(eventPacket);
         
