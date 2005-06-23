@@ -55,7 +55,7 @@ public class SendingThreadTest
         
     }
     
-    public boolean testLastElement(EventPacket eventPacket)
+    public boolean testLastElement(TestEventPacket eventPacket)
     {
         ArrayList<EventPacket> bufferCopy = createBufferCopy();
         

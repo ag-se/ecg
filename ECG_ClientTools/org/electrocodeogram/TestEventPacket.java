@@ -9,7 +9,7 @@ import java.util.List;
  * It contains the events data and is conforming to the syntactical
  * rules for MPE.
  */
-public class EventPacket implements Serializable
+public class TestEventPacket implements Serializable
 {
     private static final long serialVersionUID = 2353171166739768704L;
     
@@ -73,18 +73,8 @@ public class EventPacket implements Serializable
     * @param argList The argList of parameters containing all the relevant event data
     * @throws IllegalEventParameterException If the given parameters are not conforming to the syntactical MPE rules
     */
-    public EventPacket(int id, Date timeStamp, String hsCommandName, List argList) throws IllegalEventParameterException
+    public TestEventPacket(int id, Date timeStamp, String hsCommandName, List argList)
     {
-        if(!isSyntacticallyCorrect(timeStamp,hsCommandName,argList))
-        {
-            throw new IllegalEventParameterException();
-        }
-        
-        if(id < 0)
-        {
-            throw new IllegalEventParameterException();
-        }
-        
         this.sourceId = id;
         
         this.timeStamp = timeStamp;
@@ -92,11 +82,6 @@ public class EventPacket implements Serializable
         this.hsCommandName = hsCommandName;
         
         this.argList = argList;
-        
-        assert(isSyntacticallyCorrect(this.timeStamp,this.hsCommandName,this.argList));
-        
-        assert(this.sourceId >= 0);
-        
     }
 
    /**
@@ -150,25 +135,6 @@ public class EventPacket implements Serializable
     {
         return argList;
     }
-    
-    /**
-     * This Classmethod proof the syntactcally corectness of an EventPacket.
-     * @param timeStamp The timeStamp tells when the event was recorded
-     * @param hsCommandName The HackyStat comandName param the event is embedded in
-     * @param argList The argList of parameters containing all the relevant event data
-     * @return "true" if the eventPacket is syntactically correct nad "false" if not
-     */
-    public static boolean isSyntacticallyCorrect(Date timeStamp, String commandName, List argList)
-    {
-        if(timeStamp == null || commandName == null || argList == null || argList.isEmpty() || !(argList.get(0) instanceof String))
-        {
-            return false;
-        }
-        else
-        {
-            return true;
-        }
-    }
-
+       
 }
 
