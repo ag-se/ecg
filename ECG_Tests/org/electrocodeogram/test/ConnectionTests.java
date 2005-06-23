@@ -19,27 +19,34 @@ public class ConnectionTests extends TestCase
     
     private SendingThreadTest threadTest = null;
     
+    /**
+     * This creates the connection testcases
+     * @param name The name of the testcase to create
+     */
     public ConnectionTests(String name)
     {
         super(name);
     }
     
+    
+    @Override
     protected void setUp() throws Exception
     {
         super.setUp();
         
-        testSensor = new TestSensor();
+        this.testSensor = new TestSensor();
         
-        threadTest = new SendingThreadTest();
+        this.threadTest = new SendingThreadTest();
     }
 
+    @Override
     protected void tearDown() throws Exception
     {
         super.tearDown();
         
-        testSensor = null;
+        this.testSensor = null;
         
-        threadTest = null;
+        this.threadTest = null;
     }
     
     /**
@@ -52,13 +59,13 @@ public class ConnectionTests extends TestCase
     public void testA()
     {
         
-        assertTrue(threadTest.testConnection(false,0));
+        assertTrue(this.threadTest.testConnection(false,0));
         
-        TestEventPacket eventPacket = testSensor.createEventPacket(true,true,true,true,10,10);
+        TestEventPacket eventPacket = this.testSensor.createEventPacket(true,true,true,true,10,10);
         
-        testSensor.sendEvent(eventPacket);
+        this.testSensor.sendEvent(eventPacket);
         
-        assertTrue(threadTest.testConnection(false,100));
+        assertTrue(this.threadTest.testConnection(false,100));
     }
     
     /**
@@ -71,24 +78,24 @@ public class ConnectionTests extends TestCase
      */
     public void testB()
     {
-        assertTrue(threadTest.testConnection(false,0));
+        assertTrue(this.threadTest.testConnection(false,0));
         
-        int connectionDelay = threadTest.getConnectionDelay();
+        int connectionDelay = this.threadTest.getConnectionDelay();
         
-        int connectionTrialsBefore = threadTest.getConnectionTrials();
+        int connectionTrialsBefore = this.threadTest.getConnectionTrials();
         
-        TestEventPacket eventPacket = testSensor.createEventPacket(true,true,true,true,10,10);
+        TestEventPacket eventPacket = this.testSensor.createEventPacket(true,true,true,true,10,10);
         
-        testSensor.sendEvent(eventPacket);
+        this.testSensor.sendEvent(eventPacket);
         
         try {
             Thread.sleep(connectionDelay);
         }
         catch (InterruptedException e) {
-            
+             // This is not a problem
         }
             
-        int connectionTrialsAfter = threadTest.getConnectionTrials();
+        int connectionTrialsAfter = this.threadTest.getConnectionTrials();
             
         assertTrue(connectionTrialsBefore >= connectionTrialsAfter-1);
      
@@ -101,25 +108,25 @@ public class ConnectionTests extends TestCase
      */
     public void testC()
     {
-        assertTrue(threadTest.testConnection(false,0));
+        assertTrue(this.threadTest.testConnection(false,0));
         
-        int connectionTrialsBefore = threadTest.getConnectionTrials();
+        int connectionTrialsBefore = this.threadTest.getConnectionTrials();
         
-        TestEventPacket eventPacket = testSensor.createEventPacket(true,true,true,true,10,10);
+        TestEventPacket eventPacket = this.testSensor.createEventPacket(true,true,true,true,10,10);
         
-        testSensor.sendEvent(eventPacket);
+        this.testSensor.sendEvent(eventPacket);
 
-        int bufferSizeBefore = threadTest.getBufferSize();
+        int bufferSizeBefore = this.threadTest.getBufferSize();
         
         int count = 0;
         
-        while(threadTest.getConnectionTrials()<=connectionTrialsBefore)
+        while(this.threadTest.getConnectionTrials()<=connectionTrialsBefore)
         {
-            testSensor.sendEvent(eventPacket);
+            this.testSensor.sendEvent(eventPacket);
             
-            assertTrue(bufferSizeBefore == threadTest.getBufferSize()-1);
+            assertTrue(bufferSizeBefore == this.threadTest.getBufferSize()-1);
             
-            bufferSizeBefore = threadTest.getBufferSize();
+            bufferSizeBefore = this.threadTest.getBufferSize();
             
             count++;
         }
@@ -127,28 +134,33 @@ public class ConnectionTests extends TestCase
         assertTrue(count>0);
     }
     
-    
+    /**
+     * After the ECG server is started a connection to it should be established and
+     * all queued EventPackets should be send to the ECG server. This testcase
+     * succeeds if exactly this happens.
+     *
+     */
     public void testD()
     {
-        assertTrue(threadTest.testConnection(false,0));
+        assertTrue(this.threadTest.testConnection(false,0));
         
-        TestEventPacket eventPacket = testSensor.createEventPacket(true,true,true,true,10,10);
+        TestEventPacket eventPacket = this.testSensor.createEventPacket(true,true,true,true,10,10);
         
-        while(threadTest.getBufferSize() <= 10)
+        while(this.threadTest.getBufferSize() <= 10)
         {
-            testSensor.sendEvent(eventPacket);
+            this.testSensor.sendEvent(eventPacket);
         }
         
-        assertTrue(threadTest.getBufferSize() > 10);
+        assertTrue(this.threadTest.getBufferSize() > 10);
         
         startECGServer();
         
         try {
             Thread.sleep(10000);
 
-            assertTrue(threadTest.testConnection(true,0));
+            assertTrue(this.threadTest.testConnection(true,0));
             
-            assertTrue(threadTest.getBufferSize() == 0);
+            assertTrue(this.threadTest.getBufferSize() == 0);
         }
         catch (InterruptedException e) {
          
@@ -168,6 +180,12 @@ public class ConnectionTests extends TestCase
     // this Thread is used to run the ECG server asynchrneously
     private class ECGServerStarter extends Thread
     {
+    
+        /**
+         * @see java.lang.Thread#run()
+         * This starts the ECG server.
+         */
+        @Override
         public void run()
         {
             SensorServer.main(null);

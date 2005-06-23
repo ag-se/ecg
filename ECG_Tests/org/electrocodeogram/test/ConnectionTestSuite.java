@@ -3,9 +3,16 @@ package org.electrocodeogram.test;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+/**
+ * This class contains a suite of connection tests.
+ */
 public class ConnectionTestSuite
 {
 
+    /**
+     * This returns the connection test suite.
+     * @return The connection test suite
+     */
     public static Test suite()
     {
         TestSuite suite = new TestSuite("Connection tests for the ECG");

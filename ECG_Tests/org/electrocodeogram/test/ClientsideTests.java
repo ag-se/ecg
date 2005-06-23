@@ -16,19 +16,26 @@ public class ClientsideTests extends TestCase
 
     private TestSensor testSensor = null;
  
+    /**
+     * This creates the testcases of this collection.
+     * @param name The name of the testcase to create
+     */
     public ClientsideTests(String name)
     {
         super(name);
     }
     
+    
+    @Override
     protected void setUp()
     {
-        testSensor = new TestSensor();
+        this.testSensor = new TestSensor();
     }
     
+    @Override
     protected void tearDown()
     {
-        testSensor = null;
+        this.testSensor = null;
     }
     
     /**
@@ -39,9 +46,9 @@ public class ClientsideTests extends TestCase
      */
     public void testA()
     {
-        TestEventPacket eventPacket = testSensor.createEventPacket(true,true,true,true,10,10);
+        TestEventPacket eventPacket = this.testSensor.createEventPacket(true,true,true,true,10,10);
         
-        boolean result = testSensor.sendEvent(eventPacket);
+        boolean result = this.testSensor.sendEvent(eventPacket);
         
         assertTrue(result);
     }
@@ -55,15 +62,15 @@ public class ClientsideTests extends TestCase
      */
     public void testB()
     {
-        TestEventPacket eventPacket = testSensor.createEventPacket(true,true,true,true,10,10);
+        TestEventPacket eventPacket = this.testSensor.createEventPacket(true,true,true,true,10,10);
         
-        testSensor.sendEvent(eventPacket);
+        this.testSensor.sendEvent(eventPacket);
         
         SendingThreadTest threadTest = new SendingThreadTest();
         
         int bufferSizeBefore = threadTest.getBufferSize();
         
-        testSensor.sendEvent(eventPacket);
+        this.testSensor.sendEvent(eventPacket);
         
         assertTrue(threadTest.testBufferSize(bufferSizeBefore+1));
         
@@ -79,9 +86,9 @@ public class ClientsideTests extends TestCase
      */
     public void testC()
     {
-        TestEventPacket eventPacket = testSensor.createEventPacket(false,true,true,true,10,10);
+        TestEventPacket eventPacket = this.testSensor.createEventPacket(false,true,true,true,10,10);
         
-        boolean result = testSensor.sendEvent(eventPacket);
+        boolean result = this.testSensor.sendEvent(eventPacket);
         
         assertFalse(result);
     }
@@ -95,9 +102,9 @@ public class ClientsideTests extends TestCase
      */
     public void testD()
     {
-        TestEventPacket eventPacket = testSensor.createEventPacket(true,false,true,true,10,10);
+        TestEventPacket eventPacket = this.testSensor.createEventPacket(true,false,true,true,10,10);
         
-        boolean result = testSensor.sendEvent(eventPacket);
+        boolean result = this.testSensor.sendEvent(eventPacket);
         
         assertFalse(result);
     }
@@ -112,9 +119,9 @@ public class ClientsideTests extends TestCase
      */
     public void testE()
     {
-        TestEventPacket eventPacket = testSensor.createEventPacket(true,true,false,true,10,10);
+        TestEventPacket eventPacket = this.testSensor.createEventPacket(true,true,false,true,10,10);
         
-        boolean result = testSensor.sendEvent(eventPacket);
+        boolean result = this.testSensor.sendEvent(eventPacket);
         
         assertFalse(result);
     }
@@ -128,9 +135,9 @@ public class ClientsideTests extends TestCase
      */
     public void testF()
     {
-        TestEventPacket eventPacket = testSensor.createEventPacket(true,true,true,true,0,10);
+        TestEventPacket eventPacket = this.testSensor.createEventPacket(true,true,true,true,0,10);
         
-        boolean result = testSensor.sendEvent(eventPacket);
+        boolean result = this.testSensor.sendEvent(eventPacket);
         
         assertFalse(result);
     }
@@ -144,9 +151,9 @@ public class ClientsideTests extends TestCase
      */
     public void testG()
     {
-        TestEventPacket eventPacket = testSensor.createEventPacket(true,true,true,false,10,10);
+        TestEventPacket eventPacket = this.testSensor.createEventPacket(true,true,true,false,10,10);
         
-        boolean result = testSensor.sendEvent(eventPacket);
+        boolean result = this.testSensor.sendEvent(eventPacket);
         
         assertFalse(result);
     }

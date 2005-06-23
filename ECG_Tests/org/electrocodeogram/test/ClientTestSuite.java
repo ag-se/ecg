@@ -3,9 +3,16 @@ package org.electrocodeogram.test;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+/**
+ * This class contains a suite of client-side tests for the ECG framework, which runs all client-side tests multiple times.
+ */
 public class ClientTestSuite
 {
     
+    /**
+     * This method returns the current testsuite.
+     * @return The testsuite
+     */
     public static Test suite()
     {
         TestSuite suite = new TestSuite("Test for the client side of the ECG");

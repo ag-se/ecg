@@ -28,20 +28,20 @@ public class TestSensor
      */
     public TestSensor()
     {
-        properties = new SensorProperties("TestSensor");
+        this.properties = new SensorProperties("TestSensor");
 
-        shell = new SensorShell(properties, false, "TestSensor");
+        this.shell = new SensorShell(this.properties, false, "TestSensor");
     }
 
     // create a syntactically valid or invalid Date
-    private Date createDate(boolean syntValidDate)
+    private Date createDate(boolean syntValidDatePar)
     {
-        if (syntValidDate) {
+        if (syntValidDatePar) {
             return new Date();
         }
-        else {
-            return null;
-        }
+
+        return null;
+
     }
 
     // create a syntactically valid or invalid commandName
@@ -50,9 +50,9 @@ public class TestSensor
         if (syntValidCommandName) {
             return createRandomString(20);
         }
-        else {
-            return null;
-        }
+
+        return null;
+
     }
 
     //  create a syntactically valid or invalid argList of given size
@@ -61,14 +61,13 @@ public class TestSensor
         if (!argListNotNull) {
             return null;
         }
-        else {
-            if (!argListOfString) {
-                return createListOfIntegers(argListLength);
-            }
-            else {
-                return createValidArglist(createPayloadStringArray(argListLength, argListEntrySize));
-            }
+
+        if (!argListOfString) {
+            return createListOfIntegers(argListLength);
         }
+
+        return createValidArglist(createPayloadStringArray(argListLength, argListEntrySize));
+
     }
 
     /**
@@ -111,7 +110,7 @@ public class TestSensor
      */
     public boolean sendEvent(TestEventPacket eventPacket)
     {
-        return shell.doCommand(eventPacket.getTimeStamp(), eventPacket.getHsCommandName(), eventPacket.getArglist());
+        return this.shell.doCommand(eventPacket.getTimeStamp(), eventPacket.getHsCommandName(), eventPacket.getArglist());
     }
 
     /**
