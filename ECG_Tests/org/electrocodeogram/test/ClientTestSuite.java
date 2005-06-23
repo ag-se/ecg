@@ -21,49 +21,49 @@ public class ClientTestSuite
         
         for(int i=0;i<testACount;i++)
         {
-            suite.addTest(new ClientsideTests("testA"));
+            suite.addTest(new ClientsideTests("testValidEventIsAccepted"));
         }
         
         int testBCount = 100;
         
         for(int i=0;i<testBCount;i++)
         {
-            suite.addTest(new ClientsideTests("testB"));
+            suite.addTest(new ClientsideTests("testValidEventIsQueued"));
         }
         
         int testCCount = 100;
         
         for(int i=0;i<testCCount;i++)
         {
-            suite.addTest(new ClientsideTests("testC"));
+            suite.addTest(new ClientsideTests("testInvalidEventIsNotAcceptedTimeStampIsNull"));
         }
         
         int testDCount = 100;
         
         for(int i=0;i<testDCount;i++)
         {
-            suite.addTest(new ClientsideTests("testD"));
+            suite.addTest(new ClientsideTests("testInvalidEventIsNotAcceptedCommandNameIsNull"));
         }
         
         int testECount = 100;
         
         for(int i=0;i<testECount;i++)
         {
-            suite.addTest(new ClientsideTests("testE"));
+            suite.addTest(new ClientsideTests("testInvalidEventIsNotAcceptedArgListIsNull"));
         }
         
         int testFCount = 100;
         
         for(int i=0;i<testFCount;i++)
         {
-            suite.addTest(new ClientsideTests("testF"));
+            suite.addTest(new ClientsideTests("testInvalidEventIsNotAcceptedArgListIsEmpty"));
         }
         
         int testGCount = 100;
         
         for(int i=0;i<testGCount;i++)
         {
-            suite.addTest(new ClientsideTests("testG"));
+            suite.addTest(new ClientsideTests("testInvalidEventIsNotAcceptedArgListIsNotOfTypeString"));
         }
         
         return suite;

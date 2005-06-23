@@ -39,12 +39,13 @@ public class ClientsideTests extends TestCase
     }
     
     /**
+     * Testcase 1 according to the document TESTPLAN Version 1.0 or higher.
      * This testcase passes a single syntactically valid EventPacket from a TestSensor
      * to the ECG SensorShell. The test is successfull if the result from the ECG
      * SensorShell is "true", meaning the EventPacket is syntactically valid and accepted. 
      *
      */
-    public void testA()
+    public void testValidEventIsAccepted()
     {
         TestEventPacket eventPacket = this.testSensor.createEventPacket(true,true,true,true,10,10);
         
@@ -54,13 +55,14 @@ public class ClientsideTests extends TestCase
     }
     
     /**
+     * Testcase 2 according to the document TESTPLAN Version 1.0 or higher.
      * This testcase passes a single syntactically valid EventPacket from a TestSensor
      * to the ECG SensorShell. The test is successfull if the SendingThreatTest tells
      * that the size of the SendingThreat EventPacketBuffer is increased by one element
      * and that this element is the sended EventPacket. 
      *
      */
-    public void testB()
+    public void testValidEventIsQueued()
     {
         TestEventPacket eventPacket = this.testSensor.createEventPacket(true,true,true,true,10,10);
         
@@ -78,13 +80,14 @@ public class ClientsideTests extends TestCase
     }
     
     /**
+     * Testcase 3 according to the document TESTPLAN Version 1.0 or higher.
      * This testcase passes a single syntactically invalid EventPacket from a TestSensor
      * to the ECG SensorShell. In this case the timestamp of the EventPacket has the value "null".
      * The test is successfull if the result from the ECG SensorShell is "false", meaning the
      * EventPacket is syntactically invalid and not accepted. 
      *
      */
-    public void testC()
+    public void testInvalidEventIsNotAcceptedTimeStampIsNull()
     {
         TestEventPacket eventPacket = this.testSensor.createEventPacket(false,true,true,true,10,10);
         
@@ -94,13 +97,14 @@ public class ClientsideTests extends TestCase
     }
     
     /**
+     * Testcase 4 according to the document TESTPLAN Version 1.0 or higher.
      * This testcase passes a single syntactically invalid EventPacket from a TestSensor
      * to the ECG SensorShell. In this case the commandName of the EventPacket has the value "null".
      * The test is successfull if the result from the ECG SensorShell is "false", meaning the
      * EventPacket is syntactically invalid and not accepted. 
      *
      */
-    public void testD()
+    public void testInvalidEventIsNotAcceptedCommandNameIsNull()
     {
         TestEventPacket eventPacket = this.testSensor.createEventPacket(true,false,true,true,10,10);
         
@@ -111,13 +115,14 @@ public class ClientsideTests extends TestCase
     
     
     /**
+     * Testcase 5 according to the document TESTPLAN Version 1.0 or higher.
      * This testcase passes a single syntactically invalid EventPacket from a TestSensor
      * to the ECG SensorShell. In this case the argList of the EventPacket has the value "null".
      * The test is successfull if the result from the ECG SensorShell is "false", meaning the
      * EventPacket is syntactically invalid and not accepted. 
      *
      */
-    public void testE()
+    public void testInvalidEventIsNotAcceptedArgListIsNull()
     {
         TestEventPacket eventPacket = this.testSensor.createEventPacket(true,true,false,true,10,10);
         
@@ -127,13 +132,14 @@ public class ClientsideTests extends TestCase
     }
     
     /**
+     * Testcase 6 according to the document TESTPLAN Version 1.0 or higher.
      * This testcase passes a single syntactically invalid EventPacket from a TestSensor
      * to the ECG SensorShell. In this case the argList is empty.
      * The test is successfull if the result from the ECG SensorShell is "false", meaning the
      * EventPacket is syntactically invalid and not accepted. 
      *
      */
-    public void testF()
+    public void testInvalidEventIsNotAcceptedArgListIsEmpty()
     {
         TestEventPacket eventPacket = this.testSensor.createEventPacket(true,true,true,true,0,10);
         
@@ -143,13 +149,14 @@ public class ClientsideTests extends TestCase
     }
     
     /**
+     * Testcase 7 according to the document TESTPLAN Version 1.0 or higher.
      * This testcase passes a single syntactically invalid EventPacket from a TestSensor
      * to the ECG SensorShell. In this case the argList is not of type List<String>.
      * The test is successfull if the result from the ECG SensorShell is "false", meaning the
      * EventPacket is syntactically invalid and not accepted. 
      *
      */
-    public void testG()
+    public void testInvalidEventIsNotAcceptedArgListIsNotOfTypeString()
     {
         TestEventPacket eventPacket = this.testSensor.createEventPacket(true,true,true,false,10,10);
         
