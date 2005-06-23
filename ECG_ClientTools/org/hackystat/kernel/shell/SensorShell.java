@@ -32,21 +32,28 @@ public class SensorShell
 {
     private SensorProperties properties = null;
     
-    /*
-     * This creates a SensorShelll instance.
+    /**
+     * This creates a ECG SensorShell instance with the given properties.
+     * @param propertiesPar The properties to configure the ECG SensorShell
+     * @param b not used
+     * @param s not used
      */
-    public SensorShell(SensorProperties properties, boolean b, String string)
+    public SensorShell(SensorProperties propertiesPar, @SuppressWarnings("unused") boolean b, @SuppressWarnings("unused") String s)
     {
         // assert parameters
-        assert(properties != null);
+        assert(propertiesPar != null);
         
-        this.properties = properties;
+        this.properties = propertiesPar;
     }
 
-    /*
+    /**
      * This method is called by the ECG sensors whenever they record an event. The data
      * of the event is then passed over to the singleton SendingThread and therefore
      * processed asynchroneously.
+     * @param timeStamp The timeStamp of the event
+     * @param commandName The HackyStat commandName of the event
+     * @param argList The argList of the event
+     * @return "true" if the event's data is syntactically valid and "false" otherwises
      */
     public boolean doCommand(Date timeStamp, String commandName, List argList)
     {
@@ -63,9 +70,11 @@ public class SensorShell
         SendingThread sendingThread = null;
         
         try {
-            sendingThread = SendingThread.getInstance(properties.getECGServerAddress(),properties.getECGServerPort());
+            sendingThread = SendingThread.getInstance(this.properties.getECGServerAddress(),this.properties.getECGServerPort());
         }
         catch (IllegalHostOrPortException e) {
+            
+            e.printStackTrace();
             
         }
       

@@ -60,17 +60,17 @@ public class SendingThread extends Thread
     private boolean runningFlag = false;
 
     // This is a private constructor only used internally
-    private SendingThread(InetAddress host, int port)
+    private SendingThread(InetAddress hostPar, int portPar)
     {
 
         this();
 
         // assert parameter value are legal
-        assert (host != null && port > 0 && port < 65565);
+        assert (hostPar != null && portPar > 0 && portPar < 65565);
 
-        this.host = host;
+        this.host = hostPar;
 
-        this.port = port;
+        this.port = portPar;
     }
 
     //  This is a private constructor only used internally
@@ -140,10 +140,9 @@ public class SendingThread extends Thread
         {
             return false;
         }
-        else
-        {
-            return this.queue.add(packet);
-        }
+       
+        return this.queue.add(packet);
+       
     }
 
     /*
@@ -152,28 +151,28 @@ public class SendingThread extends Thread
      */
     private void connectToServer()
     {
-        connectionTrials++;
+        this.connectionTrials++;
         
         try {
 
             // open a new socket
-            socketToServer = new Socket(host, port);
+            this.socketToServer = new Socket(this.host, this.port);
 
             // set the flag
-            connectedFlag = true;
+            this.connectedFlag = true;
 
             // create a stream upon the socket
-            oos = new ObjectOutputStream(socketToServer.getOutputStream());
+            this.oos = new ObjectOutputStream(this.socketToServer.getOutputStream());
 
         }
         catch (IOException e) {
 
-            System.err.println("Es konnte keine Verbindung zum ECG Server unter " + host.toString() + ":" + port + " hergestellt werden.\nNächster Verbindungsversuch in " + connectionDelay / 1000 + " Sekunden.");
+            System.err.println("Es konnte keine Verbindung zum ECG Server unter " + this.host.toString() + ":" + this.port + " hergestellt werden.\nNächster Verbindungsversuch in " + this.connectionDelay / 1000 + " Sekunden.");
 
             try {
                 
                 // delay for another attemp 
-                Thread.sleep(connectionDelay);
+                Thread.sleep(this.connectionDelay);
             }
             catch (InterruptedException e1) {
                 // no need of special treatment here
@@ -191,22 +190,23 @@ public class SendingThread extends Thread
      * Sended EventPackets are then removed from the buffer. If the connection
      * is lost reestablishment is initialized.
      */
+    @Override
     public void run()
     {
-        runningFlag = true;
+        this.runningFlag = true;
 
         // first attempt to connect to server
         connectToServer();
 
         // is the SendngThread running?
-        while (runningFlag) {
+        while (this.runningFlag) {
             // any EventPackets to transmit?
-            if (queue.getSize() > 0) {
+            if (this.queue.getSize() > 0) {
                 // is the connection up?
-                if (connectedFlag) {
+                if (this.connectedFlag) {
                     try {
                         // assert new EventPackets
-                        assert (queue.getSize() > 0);
+                        assert (this.queue.getSize() > 0);
 
                         // for every new EventPacket
                         // throws an ConcurrentModificationException after the first sent EventPacket!
@@ -214,10 +214,10 @@ public class SendingThread extends Thread
 
                         EventPacket packet = null;
 
-                        while (queue.getSize() > 0) {
+                        while (this.queue.getSize() > 0) {
 
                             try {
-                                packet = queue.removeFromHead();
+                                packet = this.queue.removeFromHead();
                             }
                             catch (EventPacketQueueUnderflowException e) {
                                 
@@ -227,22 +227,22 @@ public class SendingThread extends Thread
                                 
                             }
 
-                            oos.flush();
+                            this.oos.flush();
 
                             // send serialized over socket
-                            oos.writeObject(packet);
+                            this.oos.writeObject(packet);
                             
-                            oos.flush();
+                            this.oos.flush();
                         }
 
                         // assert buffer is empty
 
-                        assert (queue.getSize() == 0);
+                        assert (this.queue.getSize() == 0);
                     }
                     catch (IOException e) {
                         // connection is lost
 
-                        connectedFlag = false;
+                        this.connectedFlag = false;
                     }
                 }
                 else {
@@ -259,7 +259,7 @@ public class SendingThread extends Thread
      */
     public boolean isRunning()
     {
-        return runningFlag;
+        return this.runningFlag;
     }
     
     /**
@@ -271,12 +271,12 @@ public class SendingThread extends Thread
 
         /**
          * This method add a single EventPacket to the tail of the queue.
-         * @param The EventPacket to queue
+         * @param packetPar The EventPacket to queue
          * @return "true if queueing succeded and "false" otherwise
          */
-        public boolean addToTail(EventPacket packet)
+        public boolean addToTail(EventPacket packetPar)
         {
-            return this.add(packet);
+            return this.add(packetPar);
         }
         
         /**
@@ -300,10 +300,9 @@ public class SendingThread extends Thread
                 return packet;
                 
             }
-            else
-            {
-                throw new EventPacketQueueUnderflowException();
-            }
+           
+            throw new EventPacketQueueUnderflowException();
+           
         }
         
         /**
@@ -315,4 +314,19 @@ public class SendingThread extends Thread
             return this.size();
         }
     }
+    
+    /**
+    * This Exception shall be thrown, when the EventPacketQueue is empty
+    * but an EventPacket is to be removed.
+    *
+    */
+   private class EventPacketQueueUnderflowException extends Exception
+   {
+
+       /**
+        * 
+        */
+       private static final long serialVersionUID = 870916601241806158L;
+
+   }
 }
