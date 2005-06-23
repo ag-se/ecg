@@ -2,11 +2,11 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="/ECG_Jars/sensorshell.jar"/>
 	<classpathentry kind="lib" path="/ECG_Jars/componentset.jar"/>
 	<classpathentry kind="lib" path="/ECG_Jars/jgraph.jar"/>
 	<classpathentry kind="lib" path="/ECG_Jars/jgraphaddons.jar"/>
 	<classpathentry kind="lib" path="/ECG_Jars/OfficeLnFs.jar"/>
-	<classpathentry kind="src" path="/ECG_ClientTools"/>
+	<classpathentry sourcepath="/ECG_ClientTools" kind="lib" path="lib/hackystat/sensorshell.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/ECG_ClientTools"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

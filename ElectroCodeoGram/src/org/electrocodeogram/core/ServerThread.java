@@ -18,7 +18,7 @@ import org.electrocodeogram.EventPacket;
  * @author 7oas7er
  *
  */
-public class SensorThread extends Thread
+public class ServerThread extends Thread
 {
 
     private static int count = 0;
@@ -52,7 +52,7 @@ public class SensorThread extends Thread
         }
     }
     
-    public SensorThread(SensorServer seso, Socket socketToSensor)
+    public ServerThread(SensorServer seso, Socket socketToSensor)
     {
         super();
                 

@@ -64,7 +64,7 @@ public class SensorServer extends Observable
         
         for(int i=0;i<count;i++)
         {
-            addresses[i] = ((SensorThread)sensorThreads[i]).getSensorAddress();
+            addresses[i] = ((ServerThread)sensorThreads[i]).getSensorAddress();
         }
         
         return addresses;
@@ -130,7 +130,7 @@ public class SensorServer extends Observable
                 Socket socketToSensor = seso.accept();
                 
               
-                SensorThread st = new SensorThread(theInstance,socketToSensor);
+                ServerThread st = new ServerThread(theInstance,socketToSensor);
                 
                 theInstance.sensorThreadPool.put(new Integer(st.getSensorThreadId()),st);
                 
@@ -161,7 +161,7 @@ public class SensorServer extends Observable
         
         for(int i=0;i<count;i++)
         {
-            names[i] = ((SensorThread)sensorThreads[i]).getSensorName();
+            names[i] = ((ServerThread)sensorThreads[i]).getSensorName();
         }
         
         return names;
