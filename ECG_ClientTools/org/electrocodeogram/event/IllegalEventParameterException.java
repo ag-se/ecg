@@ -1,4 +1,4 @@
-package org.electrocodeogram;
+package org.electrocodeogram.event;
 
 /**
  * If the parameters given to an eventPacket are not valid in syntax,

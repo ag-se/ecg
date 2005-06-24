@@ -1,4 +1,4 @@
-package org.electrocodeogram;
+package org.electrocodeogram.event;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -6,8 +6,7 @@ import java.util.List;
 
 /**
  * An EventPacket is a representation for a MicroProcessEvent (MPE).
- * It contains the events data and is conforming to the syntactical
- * rules for MPE.
+ * It contains the events data.
  */
 public class EventPacket implements Serializable
 {
@@ -56,13 +55,13 @@ public class EventPacket implements Serializable
 
     // end
 
-    private int sourceId = -1;
+    protected int sourceId = -1;
 
-    private Date timeStamp = null;
+    protected Date timeStamp = null;
 
-    private String hsCommandName = null;
+    protected String hsCommandName = null;
 
-    private List argList = null;
+    protected List argList = null;
 
     /**
      * This creates a new EventPacket object
@@ -70,18 +69,10 @@ public class EventPacket implements Serializable
      * @param timeStampPar The timeStamp tells when the event was recorded
      * @param hsCommandNamePar The HackyStat comandName param the event is embedded in
      * @param argListPar The argList of parameters containing all the relevant event data
-     * @throws IllegalEventParameterException If the given parameters are not conforming to the syntactical MPE rules
      */
-    public EventPacket(int id, Date timeStampPar, String hsCommandNamePar, List argListPar) throws IllegalEventParameterException
+    public EventPacket(int id, Date timeStampPar, String hsCommandNamePar, List argListPar)
     {
-        if (!isSyntacticallyCorrect(timeStampPar, hsCommandNamePar, argListPar)) {
-            throw new IllegalEventParameterException();
-        }
-
-        if (id < 0) {
-            throw new IllegalEventParameterException();
-        }
-
+        
         this.sourceId = id;
 
         this.timeStamp = timeStampPar;
@@ -89,11 +80,7 @@ public class EventPacket implements Serializable
         this.hsCommandName = hsCommandNamePar;
 
         this.argList = argListPar;
-
-        assert (isSyntacticallyCorrect(this.timeStamp, this.hsCommandName, this.argList));
-
-        assert (this.sourceId >= 0);
-
+        
     }
 
     /**

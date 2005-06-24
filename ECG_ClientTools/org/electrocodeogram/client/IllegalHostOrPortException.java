@@ -1,4 +1,4 @@
-package org.electrocodeogram;
+package org.electrocodeogram.client;
 
 /**
  * If the "host" or "port" value are malformed when beeing passed to the SendingThread for connection to the

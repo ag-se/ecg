@@ -1,10 +1,12 @@
-package org.electrocodeogram;
+package org.electrocodeogram.client;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
+
+import org.electrocodeogram.event.ValidEventPacket;
 
 /**
  * The singleton class SendingThread supports the asynchrneous transfer of
@@ -134,7 +136,7 @@ public class SendingThread extends Thread
      * @param packet This is the EventPacket to transmit.
      * @return "true" if adding the EventPacket was successfulll and "false" otherwise
      */
-    public boolean addEventPacket(EventPacket packet)
+    public boolean addEventPacket(ValidEventPacket packet)
     {
         if (packet == null)
         {
@@ -212,7 +214,7 @@ public class SendingThread extends Thread
                         // throws an ConcurrentModificationException after the first sent EventPacket!
                         //for (EventPacket packet : backupBuffer)
 
-                        EventPacket packet = null;
+                        ValidEventPacket packet = null;
 
                         while (this.queue.getSize() > 0) {
 
@@ -265,7 +267,7 @@ public class SendingThread extends Thread
     /**
      * This class represents a queue with FIFO characteristic for buffering incoming EventPackets.
      */
-    private class EventPacketQueue extends ArrayList<EventPacket>
+    private class EventPacketQueue extends ArrayList<ValidEventPacket>
     {
         private static final long serialVersionUID = -7457045862890074109L;
 
@@ -274,7 +276,7 @@ public class SendingThread extends Thread
          * @param packetPar The EventPacket to queue
          * @return "true if queueing succeded and "false" otherwise
          */
-        public boolean addToTail(EventPacket packetPar)
+        public boolean addToTail(ValidEventPacket packetPar)
         {
             return this.add(packetPar);
         }
@@ -284,14 +286,14 @@ public class SendingThread extends Thread
          * @return The head EventPacket
          * @throws EventPacketQueueUnderflowException If the queue is empty allready
          */
-        public EventPacket removeFromHead() throws EventPacketQueueUnderflowException
+        public ValidEventPacket removeFromHead() throws EventPacketQueueUnderflowException
         {
             int sizeBefore;
             
             if((sizeBefore = this.size()) > 0)
             {
                                 
-                EventPacket packet = this.get(0);
+                ValidEventPacket packet = this.get(0);
                 
                 this.remove(0);
                 

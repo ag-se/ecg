@@ -1,6 +1,9 @@
-package org.electrocodeogram;
+package org.electrocodeogram.client;
 
 import java.util.ArrayList;
+
+import org.electrocodeogram.event.EventPacket;
+import org.electrocodeogram.event.ValidEventPacket;
 
 /**
  * This class contains methods to access the protected fields of the SendingThread
@@ -26,7 +29,7 @@ public class SendingThreadTest
      */
     public int getBufferSize()
     {
-        ArrayList<EventPacket> bufferCopy = createBufferCopy();
+        ArrayList<ValidEventPacket> bufferCopy = createBufferCopy();
         
         return bufferCopy.size();
     }
@@ -38,7 +41,7 @@ public class SendingThreadTest
      */
     public boolean testBufferSize(int size)
     {
-        ArrayList<EventPacket> bufferCopy = createBufferCopy();
+        ArrayList<ValidEventPacket> bufferCopy = createBufferCopy();
         
         if(bufferCopy.size() == size)
         {
@@ -81,11 +84,11 @@ public class SendingThreadTest
      * @param eventPacket The EventPacket to test against
      * @return "true" if it is equal nad "false" if not
      */
-    public boolean testLastElement(TestEventPacket eventPacket)
+    public boolean testLastElement(EventPacket eventPacket)
     {
-        ArrayList<EventPacket> bufferCopy = createBufferCopy();
+        ArrayList<ValidEventPacket> bufferCopy = createBufferCopy();
         
-        EventPacket lastAdded = bufferCopy.get(bufferCopy.size()-1);
+        ValidEventPacket lastAdded = bufferCopy.get(bufferCopy.size()-1);
         
         if(lastAdded.getSourceId() == eventPacket.getSourceId() && lastAdded.getTimeStamp().equals(eventPacket.getTimeStamp()) && lastAdded.getHsCommandName().equals(eventPacket.getHsCommandName()) && lastAdded.getArglist().equals(eventPacket.getArglist()))
         {
@@ -96,11 +99,11 @@ public class SendingThreadTest
         
     }
     
-    private ArrayList<EventPacket> createBufferCopy()
+    private ArrayList<ValidEventPacket> createBufferCopy()
     {
-        ArrayList<EventPacket> bufferCopy = new ArrayList<EventPacket>(); 
+        ArrayList<ValidEventPacket> bufferCopy = new ArrayList<ValidEventPacket>(); 
         
-        for(EventPacket elem : this.sendingThread.queue)
+        for(ValidEventPacket elem : this.sendingThread.queue)
         {
             bufferCopy.add(elem);
         }

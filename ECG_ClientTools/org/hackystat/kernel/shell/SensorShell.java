@@ -8,10 +8,10 @@ package org.hackystat.kernel.shell;
 import java.util.Date;
 import java.util.List;
 
-import org.electrocodeogram.EventPacket;
-import org.electrocodeogram.IllegalEventParameterException;
-import org.electrocodeogram.IllegalHostOrPortException;
-import org.electrocodeogram.SendingThread;
+import org.electrocodeogram.client.IllegalHostOrPortException;
+import org.electrocodeogram.client.SendingThread;
+import org.electrocodeogram.event.IllegalEventParameterException;
+import org.electrocodeogram.event.ValidEventPacket;
 import org.hackystat.kernel.admin.SensorProperties;
 
 /**
@@ -58,13 +58,13 @@ public class SensorShell
     public boolean doCommand(Date timeStamp, String commandName, List argList)
     {
         // check parameters
-        if(!EventPacket.isSyntacticallyCorrect(timeStamp,commandName,argList))
+        if(!ValidEventPacket.isSyntacticallyCorrect(timeStamp,commandName,argList))
         {
             return false;
         }
         
         // assert parameters
-        assert(EventPacket.isSyntacticallyCorrect(timeStamp,commandName,argList));
+        assert(ValidEventPacket.isSyntacticallyCorrect(timeStamp,commandName,argList));
         
         // get SendingThread
         SendingThread sendingThread = null;
@@ -83,7 +83,7 @@ public class SensorShell
         
         // pass EventPacket to SendingThread
         try {
-            sendingThread.addEventPacket(new EventPacket(0,timeStamp,commandName,argList));
+            sendingThread.addEventPacket(new ValidEventPacket(0,timeStamp,commandName,argList));
         }
         catch (IllegalEventParameterException e) {
             
@@ -95,6 +95,28 @@ public class SensorShell
         
     }
     
+    /**
+     * 
+     * @return
+     */
+    public SensorProperties getSensorProperties()
+    {
+        return this.properties;
+    }
     
+    /**
+     * 
+     */
+    public void send()
+    {
+        
+    }
     
+    /**
+     * @param str
+     */
+    public void println(String str)
+    {
+        
+    }
 }
