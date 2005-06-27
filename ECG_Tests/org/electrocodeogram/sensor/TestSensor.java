@@ -6,9 +6,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
-import org.electrocodeogram.TestEventPacket;
+import org.electrocodeogram.event.EventPacket;
+import org.electrocodeogram.event.IllegalEventParameterException;
+import org.electrocodeogram.event.ValidEventPacket;
 import org.hackystat.kernel.admin.SensorProperties;
-import org.hackystat.kernel.shell.SensorShell;
+import org.hackystat.kernel.shell.ECGSensorShell;
 
 /**
  * This is the ECG TestSensor used for automated JUnit tests. It is capable of
@@ -18,7 +20,7 @@ import org.hackystat.kernel.shell.SensorShell;
 public class TestSensor
 {
 
-    private SensorShell shell = null;
+    private ECGSensorShell shell = null;
 
     private SensorProperties properties = null;
 
@@ -30,7 +32,7 @@ public class TestSensor
     {
         this.properties = new SensorProperties("TestSensor");
 
-        this.shell = new SensorShell(this.properties, false, "TestSensor");
+        this.shell = new ECGSensorShell(this.properties, false, "TestSensor");
     }
 
     // create a syntactically valid or invalid Date
@@ -71,7 +73,9 @@ public class TestSensor
     }
 
     /**
-     * This method creates and returns a single EventPacket for testing purpose.
+     * This method creates and returns a single EventPacket.
+     * The data stored in the EventPacket is allowed to be syntactically invalid
+     * in respect to the event data rules. So this method is used for testing purposes. 
      * 
      * @param syntValidDate
      *            Shall the timestamp be syntacticallly vaild?
@@ -87,10 +91,10 @@ public class TestSensor
      *            The size of each list element
      * @return An EventPacket of the desired kind
      */
-    public TestEventPacket createEventPacket(boolean syntValidDate, boolean syntValidCommandName, boolean argListNotNull, boolean argListOfString, int argListLength, int argListEntrySize)
+    public EventPacket createEventPacket(boolean syntValidDate, boolean syntValidCommandName, boolean argListNotNull, boolean argListOfString, int argListLength, int argListEntrySize)
     {
-        TestEventPacket eventPacket = null;
-        eventPacket = new TestEventPacket(
+        EventPacket eventPacket = null;
+        eventPacket = new EventPacket(
                 0,
                 createDate(syntValidDate),
                 createCommandName(syntValidCommandName),
@@ -100,6 +104,41 @@ public class TestSensor
     }
 
     /**
+     * This method creates and returns a single ValidEventPacket.
+     * If this method returns the ValidEventPacket it is assured that
+     * this object carries syntactically valid event data in it.
+     * If this method is not able to create an ValidEventPacket from
+     * the given event data parameters, am IllegalEventParameterException
+     * is thrown.
+     * 
+     * @param syntValidDate
+     *            Shall the timestamp be syntacticallly vaild?
+     * @param syntValidCommandName
+     *            Shall the commmandName be syntacticallly vaild?
+     * @param argListNotNull
+     *            Shall the argList be not null?
+     * @param argListOfString
+     *            Shall the argList be of type List<String>?
+     * @param argListLength
+     *            The length of the argList
+     * @param argListEntrySize
+     *            The size of each list element
+     * @return An EventPacket of the desired kind
+     * @throws IllegalEventParameterException This is thrown if the passes parameter data does not conform to the syntax rules of event data.
+     */
+    public ValidEventPacket createValidEventPacket(boolean syntValidDate, boolean syntValidCommandName, boolean argListNotNull, boolean argListOfString, int argListLength, int argListEntrySize) throws IllegalEventParameterException
+    {
+        ValidEventPacket eventPacket = null;
+        eventPacket = new ValidEventPacket(
+                0,
+                createDate(syntValidDate),
+                createCommandName(syntValidCommandName),
+                createArgList(argListNotNull, argListOfString, argListLength, argListEntrySize));
+
+        return eventPacket;
+    }
+    
+    /**
      * This method passes a single given EventPacket to the ECG SensorShell.
      * 
      * @param eventPacket
@@ -108,7 +147,7 @@ public class TestSensor
      *         EventPacket is syntactically valid and accepted. "false" means
      *         the eventPacket is syntactically invalid and not acccepted.
      */
-    public boolean sendEvent(TestEventPacket eventPacket)
+    public boolean sendEvent(EventPacket eventPacket)
     {
         return this.shell.doCommand(eventPacket.getTimeStamp(), eventPacket.getHsCommandName(), eventPacket.getArglist());
     }

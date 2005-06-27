@@ -66,6 +66,13 @@ public class ClientTestSuite
             suite.addTest(new ClientsideTests("testInvalidEventIsNotAcceptedArgListIsNotOfTypeString"));
         }
         
+        int testHCount = 100;
+        
+        for(int i=0;i<testHCount;i++)
+        {
+            suite.addTest(new ClientsideTests("testIllegalEventParametersCauseException"));
+        }
+        
         return suite;
     }
 

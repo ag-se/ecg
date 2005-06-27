@@ -2,8 +2,10 @@ package org.electrocodeogram.test;
 
 import junit.framework.TestCase;
 
-import org.electrocodeogram.SendingThreadTest;
-import org.electrocodeogram.TestEventPacket;
+import org.electrocodeogram.client.SendingThreadTest;
+import org.electrocodeogram.event.EventPacket;
+import org.electrocodeogram.event.IllegalEventParameterException;
+import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.sensor.TestSensor;
 
 /**
@@ -15,7 +17,7 @@ public class ClientsideTests extends TestCase
 {
 
     private TestSensor testSensor = null;
- 
+
     /**
      * This creates the testcases of this collection.
      * @param name The name of the testcase to create
@@ -24,20 +26,19 @@ public class ClientsideTests extends TestCase
     {
         super(name);
     }
-    
-    
+
     @Override
     protected void setUp()
     {
         this.testSensor = new TestSensor();
     }
-    
+
     @Override
     protected void tearDown()
     {
         this.testSensor = null;
     }
-    
+
     /**
      * Testcase 1 according to the document TESTPLAN Version 1.0 or higher.
      * This testcase passes a single syntactically valid EventPacket from a TestSensor
@@ -47,13 +48,24 @@ public class ClientsideTests extends TestCase
      */
     public void testValidEventIsAccepted()
     {
-        TestEventPacket eventPacket = this.testSensor.createEventPacket(true,true,true,true,10,10);
-        
-        boolean result = this.testSensor.sendEvent(eventPacket);
-        
-        assertTrue(result);
+        ValidEventPacket eventPacket;
+
+        try {
+            eventPacket = this.testSensor.createValidEventPacket(true, true, true, true, 10, 10);
+
+            boolean result = this.testSensor.sendEvent(eventPacket);
+
+            assertTrue(result);
+        }
+        catch (IllegalEventParameterException e) {
+
+            e.printStackTrace();
+
+            fail();
+        }
+
     }
-    
+
     /**
      * Testcase 2 according to the document TESTPLAN Version 1.0 or higher.
      * This testcase passes a single syntactically valid EventPacket from a TestSensor
@@ -64,21 +76,31 @@ public class ClientsideTests extends TestCase
      */
     public void testValidEventIsQueued()
     {
-        TestEventPacket eventPacket = this.testSensor.createEventPacket(true,true,true,true,10,10);
-        
-        this.testSensor.sendEvent(eventPacket);
-        
-        SendingThreadTest threadTest = new SendingThreadTest();
-        
-        int bufferSizeBefore = threadTest.getBufferSize();
-        
-        this.testSensor.sendEvent(eventPacket);
-        
-        assertTrue(threadTest.testBufferSize(bufferSizeBefore+1));
-        
-        assertTrue(threadTest.testLastElement(eventPacket));
+        ValidEventPacket eventPacket;
+        try {
+            eventPacket = this.testSensor.createValidEventPacket(true, true, true, true, 10, 10);
+
+            this.testSensor.sendEvent(eventPacket);
+
+            SendingThreadTest threadTest = new SendingThreadTest();
+
+            int bufferSizeBefore = threadTest.getBufferSize();
+
+            this.testSensor.sendEvent(eventPacket);
+
+            assertTrue(threadTest.testBufferSize(bufferSizeBefore + 1));
+
+            assertTrue(threadTest.testLastElement(eventPacket));
+        }
+        catch (IllegalEventParameterException e) {
+
+            e.printStackTrace();
+
+            fail();
+        }
+
     }
-    
+
     /**
      * Testcase 3 according to the document TESTPLAN Version 1.0 or higher.
      * This testcase passes a single syntactically invalid EventPacket from a TestSensor
@@ -89,13 +111,13 @@ public class ClientsideTests extends TestCase
      */
     public void testInvalidEventIsNotAcceptedTimeStampIsNull()
     {
-        TestEventPacket eventPacket = this.testSensor.createEventPacket(false,true,true,true,10,10);
-        
+        EventPacket eventPacket = this.testSensor.createEventPacket(false, true, true, true, 10, 10);
+
         boolean result = this.testSensor.sendEvent(eventPacket);
-        
+
         assertFalse(result);
     }
-    
+
     /**
      * Testcase 4 according to the document TESTPLAN Version 1.0 or higher.
      * This testcase passes a single syntactically invalid EventPacket from a TestSensor
@@ -106,14 +128,13 @@ public class ClientsideTests extends TestCase
      */
     public void testInvalidEventIsNotAcceptedCommandNameIsNull()
     {
-        TestEventPacket eventPacket = this.testSensor.createEventPacket(true,false,true,true,10,10);
-        
+        EventPacket eventPacket = this.testSensor.createEventPacket(true, false, true, true, 10, 10);
+
         boolean result = this.testSensor.sendEvent(eventPacket);
-        
+
         assertFalse(result);
     }
-    
-    
+
     /**
      * Testcase 5 according to the document TESTPLAN Version 1.0 or higher.
      * This testcase passes a single syntactically invalid EventPacket from a TestSensor
@@ -124,13 +145,13 @@ public class ClientsideTests extends TestCase
      */
     public void testInvalidEventIsNotAcceptedArgListIsNull()
     {
-        TestEventPacket eventPacket = this.testSensor.createEventPacket(true,true,false,true,10,10);
-        
+        EventPacket eventPacket = this.testSensor.createEventPacket(true, true, false, true, 10, 10);
+
         boolean result = this.testSensor.sendEvent(eventPacket);
-        
+
         assertFalse(result);
     }
-    
+
     /**
      * Testcase 6 according to the document TESTPLAN Version 1.0 or higher.
      * This testcase passes a single syntactically invalid EventPacket from a TestSensor
@@ -141,13 +162,13 @@ public class ClientsideTests extends TestCase
      */
     public void testInvalidEventIsNotAcceptedArgListIsEmpty()
     {
-        TestEventPacket eventPacket = this.testSensor.createEventPacket(true,true,true,true,0,10);
-        
+        EventPacket eventPacket = this.testSensor.createEventPacket(true, true, true, true, 0, 10);
+
         boolean result = this.testSensor.sendEvent(eventPacket);
-        
+
         assertFalse(result);
     }
-    
+
     /**
      * Testcase 7 according to the document TESTPLAN Version 1.0 or higher.
      * This testcase passes a single syntactically invalid EventPacket from a TestSensor
@@ -158,11 +179,66 @@ public class ClientsideTests extends TestCase
      */
     public void testInvalidEventIsNotAcceptedArgListIsNotOfTypeString()
     {
-        TestEventPacket eventPacket = this.testSensor.createEventPacket(true,true,true,false,10,10);
-        
+        EventPacket eventPacket = this.testSensor.createEventPacket(true, true, true, false, 10, 10);
+
         boolean result = this.testSensor.sendEvent(eventPacket);
-        
+
         assertFalse(result);
     }
-    
+
+    /**
+     * Testcase 8 according to the document TESTPLAN Version 1.0 or higher.
+     * This testcase validates the correct behaviour of creating an ValidEventPacket.
+     * The test succeeds if the creation brings up an Exception, if invalid
+     * parameters are passed to the ValidEventPacket constructor.
+     */
+    public void testIllegalEventParametersCauseException()
+    {
+        try {
+            this.testSensor.createValidEventPacket(false, true, true, true, 10, 10);
+
+            fail("IllegalEventParameterException should be thrown");
+        }
+        catch (IllegalEventParameterException e) {
+            assertTrue(true);
+
+            try {
+                this.testSensor.createValidEventPacket(true, false, true, true, 10, 10);
+
+                fail("IllegalEventParameterException should be thrown");
+            }
+            catch (IllegalEventParameterException e1) {
+
+                assertTrue(true);
+
+                try {
+                    this.testSensor.createValidEventPacket(true, true, false, true, 10, 10);
+
+                    fail("IllegalEventParameterException should be thrown");
+                }
+                catch (IllegalEventParameterException e2) {
+                    assertTrue(true);
+
+                    try {
+                        this.testSensor.createValidEventPacket(true, true, true, true, 0, 10);
+
+                        fail("IllegalEventParameterException should be thrown");
+                    }
+                    catch (IllegalEventParameterException e3) {
+                        assertTrue(true);
+
+                        try {
+                            this.testSensor.createValidEventPacket(true, true, true, false, 10, 10);
+
+                            fail("IllegalEventParameterException should be thrown");
+                        }
+                        catch (IllegalEventParameterException e4) {
+                            assertTrue(true);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 }
