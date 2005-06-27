@@ -28,7 +28,7 @@ import org.hackystat.kernel.admin.SensorProperties;
  * Instead of processing the sensor data into the HackyStat environment, it is passed
  * over to the ECG server.
  */
-public class SensorShell
+public class ECGSensorShell
 {
     private SensorProperties properties = null;
     
@@ -38,7 +38,7 @@ public class SensorShell
      * @param b not used
      * @param s not used
      */
-    public SensorShell(SensorProperties propertiesPar, @SuppressWarnings("unused") boolean b, @SuppressWarnings("unused") String s)
+    public ECGSensorShell(SensorProperties propertiesPar, @SuppressWarnings("unused") boolean b, @SuppressWarnings("unused") String s)
     {
         // assert parameters
         assert(propertiesPar != null);

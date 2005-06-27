@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jardesc>
+<jar path="E:/Dokumente und Einstellungen/7oas7er/Desktop/sensorshell.jar"/>
+<options buildIfNeeded="true" compress="true" descriptionLocation="/ECG_SensorShell/description.jardesc" exportErrors="false" exportWarnings="true" includeDirectoryEntries="false" overwrite="true" saveDescription="true" useSourceFolders="false"/>
+<manifest generateManifest="false" manifestLocation="/ECG_SensorShell/manifest.txt" manifestVersion="1.0" reuseManifest="false" saveManifest="true" usesManifest="true">
+<sealing sealJar="false">
+<packagesToSeal/>
+<packagesToUnSeal/>
+</sealing>
+</manifest>
+<selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
+<javaElement handleIdentifier="=ECG_SensorShell/&lt;doc"/>
+<javaElement handleIdentifier="=ECG_SensorShell/&lt;org.hackystat.kernel.shell"/>
+<javaElement handleIdentifier="=ECG_SensorShell/&lt;org.hackystat.kernel.admin"/>
+<javaElement handleIdentifier="=ECG_SensorShell/&lt;org.electrocodeogram.event"/>
+<javaElement handleIdentifier="=ECG_SensorShell/&lt;org.electrocodeogram.client"/>
+</selectedElements>
+</jardesc>

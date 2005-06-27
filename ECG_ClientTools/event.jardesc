@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jardesc>
+<jar path="E:/Dokumente und Einstellungen/7oas7er/Desktop/event.jar"/>
+<options buildIfNeeded="true" compress="true" descriptionLocation="/ECG_SensorShell/event.jardesc" exportErrors="false" exportWarnings="true" includeDirectoryEntries="false" overwrite="true" saveDescription="true" useSourceFolders="false"/>
+<manifest generateManifest="true" manifestLocation="/ECG_SensorShell/evevtn_manifest.txt" manifestVersion="1.0" reuseManifest="false" saveManifest="true" usesManifest="true">
+<sealing sealJar="false">
+<packagesToSeal/>
+<packagesToUnSeal/>
+</sealing>
+</manifest>
+<selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
+<javaElement handleIdentifier="=ECG_SensorShell/&lt;doc"/>
+<file path="/ECG_SensorShell/build.xml"/>
+<file path="/ECG_SensorShell/build-user.xml"/>
+<file path="/ECG_SensorShell/.classpath"/>
+<file path="/ECG_SensorShell/description.jardesc"/>
+<file path="/ECG_SensorShell/.project"/>
+<file path="/ECG_SensorShell/manifest.txt"/>
+<javaElement handleIdentifier="=ECG_SensorShell/&lt;org.electrocodeogram.event"/>
+</selectedElements>
+</jardesc>
