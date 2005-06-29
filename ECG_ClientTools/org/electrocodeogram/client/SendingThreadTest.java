@@ -64,12 +64,12 @@ public class SendingThreadTest
         
         int connectionTrialDelta = 0; 
         
-        while(connectionTrialDelta > trials  && this.sendingThread.connectedFlag != connected)
+        while(connectionTrialDelta > trials  && this.sendingThread.ping() != connected)
         {
             connectionTrialDelta = this.sendingThread.connectionTrials - connectionTrialOffset;
         }
         
-        if(this.sendingThread.connectedFlag == connected)
+        if(this.sendingThread.ping() == connected)
         {
             return true;
         }

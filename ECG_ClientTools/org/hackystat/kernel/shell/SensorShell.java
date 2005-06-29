@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.electrocodeogram.client.IllegalHostOrPortException;
 import org.electrocodeogram.client.SendingThread;
+import org.electrocodeogram.event.EventPacket;
 import org.electrocodeogram.event.IllegalEventParameterException;
 import org.electrocodeogram.event.ValidEventPacket;
 import org.hackystat.kernel.admin.SensorProperties;
@@ -28,7 +29,7 @@ import org.hackystat.kernel.admin.SensorProperties;
  * Instead of processing the sensor data into the HackyStat environment, it is passed
  * over to the ECG server.
  */
-public class ECGSensorShell
+public class SensorShell
 {
     private SensorProperties properties = null;
     
@@ -38,7 +39,7 @@ public class ECGSensorShell
      * @param b not used
      * @param s not used
      */
-    public ECGSensorShell(SensorProperties propertiesPar, @SuppressWarnings("unused") boolean b, @SuppressWarnings("unused") String s)
+    public SensorShell(SensorProperties propertiesPar, @SuppressWarnings("unused") boolean b, @SuppressWarnings("unused") String s)
     {
         // assert parameters
         assert(propertiesPar != null);
@@ -58,13 +59,13 @@ public class ECGSensorShell
     public boolean doCommand(Date timeStamp, String commandName, List argList)
     {
         // check parameters
-        if(!ValidEventPacket.isSyntacticallyCorrect(timeStamp,commandName,argList))
+        if(!EventPacket.isSyntacticallyCorrect(timeStamp,commandName,argList))
         {
             return false;
         }
         
         // assert parameters
-        assert(ValidEventPacket.isSyntacticallyCorrect(timeStamp,commandName,argList));
+        assert(EventPacket.isSyntacticallyCorrect(timeStamp,commandName,argList));
         
         // get SendingThread
         SendingThread sendingThread = null;

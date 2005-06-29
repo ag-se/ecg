@@ -37,18 +37,13 @@ public class SendingThread extends Thread
     protected EventPacketQueue queue = null;
 
     /**
-     * Is the SendingThread connected to a ECG server?
-     */
-    protected boolean connectedFlag = false;
-
-    /**
      * How often did the SendingThread tried to connect since its creation
      */
     protected int connectionTrials = 0;
 
     private ObjectOutputStream oos = null;
 
-    private Socket socketToServer = null;
+    protected Socket socketToServer = null;
 
     private InetAddress host = null;
 
@@ -160,9 +155,6 @@ public class SendingThread extends Thread
             // open a new socket
             this.socketToServer = new Socket(this.host, this.port);
 
-            // set the flag
-            this.connectedFlag = true;
-
             // create a stream upon the socket
             this.oos = new ObjectOutputStream(this.socketToServer.getOutputStream());
 
@@ -203,9 +195,11 @@ public class SendingThread extends Thread
         // is the SendngThread running?
         while (this.runningFlag) {
             // any EventPackets to transmit?
+            
+            
             if (this.queue.getSize() > 0) {
                 // is the connection up?
-                if (this.connectedFlag) {
+                if (this.socketToServer.isConnected()) {
                     try {
                         // assert new EventPackets
                         assert (this.queue.getSize() > 0);
@@ -241,10 +235,9 @@ public class SendingThread extends Thread
 
                         assert (this.queue.getSize() == 0);
                     }
-                    catch (IOException e) {
-                        // connection is lost
-
-                        this.connectedFlag = false;
+                    catch (Exception e) {
+                        
+                        e.printStackTrace();
                     }
                 }
                 else {
@@ -314,6 +307,20 @@ public class SendingThread extends Thread
         public int getSize()
         {
             return this.size();
+        }
+    }
+    
+    protected boolean ping()
+    {
+        try
+        {
+            this.socketToServer.sendUrgentData(0);
+            
+            return true;
+        }
+        catch(Exception e)
+        {
+            return false;
         }
     }
     
