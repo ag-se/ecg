@@ -22,7 +22,7 @@ public class ModuleRegistry extends Observable
     
     private Logger logger = Logger.getLogger("ModuleRegistry");
 
-    private final static ModuleRegistry theInstance = new ModuleRegistry();
+    private static ModuleRegistry theInstance = null;
 
     private RunningModules runningModules = null;
 
@@ -58,7 +58,10 @@ public class ModuleRegistry extends Observable
      */
     public static ModuleRegistry getInstance()
     {
-        assert (theInstance != null);
+        if(theInstance == null)
+        {
+            theInstance = new ModuleRegistry();
+        }
         
         return theInstance;
     }
@@ -587,6 +590,13 @@ public class ModuleRegistry extends Observable
         assert(childModule != null);
         
         parentModule.disconnectChildModule(childModule);
+        
+    }
+
+
+    public void shutDown()
+    {
+        theInstance = null;
         
     }
     

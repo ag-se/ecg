@@ -13,8 +13,8 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.logging.*;
 
-import org.electrocodeogram.EventPacket;
-import org.electrocodeogram.IllegalEventParameterException;
+import org.electrocodeogram.event.IllegalEventParameterException;
+import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.module.annotator.EventProcessor;
 import org.electrocodeogram.ui.Configurator;
 import org.electrocodeogram.ui.GuiEventWriter;
@@ -119,15 +119,15 @@ public abstract class Module extends Observable implements Observer
 
     private void analyseNotification(Observable o, Object arg)
     {
-        if(arg instanceof EventPacket)
+        if(arg instanceof ValidEventPacket)
         {
-            EventPacket eventPacket = (EventPacket) arg;
+            ValidEventPacket eventPacket = (ValidEventPacket) arg;
             
             receiveEventPacket(eventPacket);
         }
     }
     
-    public abstract void receiveEventPacket(EventPacket eventPacket);
+    public abstract void receiveEventPacket(ValidEventPacket eventPacket);
     
     public int getId() {
         return id;
@@ -142,13 +142,13 @@ public abstract class Module extends Observable implements Observer
     }
 
     
-    protected void sendEventPacket(EventPacket eventPacket)
+    protected void sendEventPacket(ValidEventPacket eventPacket)
     {
         if(runningFlag && (eventPacket != null))
         {
 	        setChanged();
 	        try {
-                notifyObservers(new EventPacket(this.getId(),eventPacket.getTimeStamp(),eventPacket.getHsCommandName(),eventPacket.getArglist()));
+                notifyObservers(new ValidEventPacket(this.getId(),eventPacket.getTimeStamp(),eventPacket.getHsCommandName(),eventPacket.getArglist()));
             }
             catch (IllegalEventParameterException e) {
                 // TODO Auto-generated catch block
@@ -164,7 +164,7 @@ public abstract class Module extends Observable implements Observer
      * @param string2
      * @return
      */
-    protected boolean isPacketMatching(EventPacket e, String hsCommmandName, String ecgCommandName)
+    protected boolean isPacketMatching(ValidEventPacket e, String hsCommmandName, String ecgCommandName)
     {
         assert(e != null);
         
@@ -281,7 +281,7 @@ public abstract class Module extends Observable implements Observer
         
         private LinkedList bufferList = new LinkedList();
 
-        public void append(EventPacket eventPacket)
+        public void append(ValidEventPacket eventPacket)
         {
             if(bufferList.size() > bufferSize)
             {
@@ -291,14 +291,14 @@ public abstract class Module extends Observable implements Observer
             bufferList.add(eventPacket);
         }
         
-        public EventPacket getFirst()
+        public ValidEventPacket getFirst()
         {
-            return (EventPacket) bufferList.getFirst();
+            return (ValidEventPacket) bufferList.getFirst();
         }
         
-        public EventPacket getLast()
+        public ValidEventPacket getLast()
         {
-            return (EventPacket) bufferList.getLast();
+            return (ValidEventPacket) bufferList.getLast();
         }
         
     }

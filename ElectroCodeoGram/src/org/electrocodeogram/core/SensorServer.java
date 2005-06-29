@@ -11,6 +11,7 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Observable;
 
@@ -22,9 +23,9 @@ import org.hackystat.kernel.admin.SensorProperties;
  * @author 7oas7er
  *
  */
-public class SensorServer extends Observable
+public class SensorServer extends Thread
 {
-    public static SensorServer theInstance = null;
+    private static SensorServer theInstance = null;
     
     public static final int PORT = 22222;
     
@@ -34,24 +35,32 @@ public class SensorServer extends Observable
 
     private SensorShellWrapper shellWrapper = null;
     
+    private ServerSocket seso = null;
+    
+    private SensorServer()
+    {
+        this.sensorThreadPool = new HashMap();
+    }
+    
     public static SensorServer getInstance()
     {
+        if(theInstance == null)
+        {
+            theInstance = new SensorServer();
+        }
+        
         return theInstance;
     }
     
-    public SensorServer()
-    {
-        sensorThreadPool = new HashMap();
-                
-        ModuleRegistry.getInstance();
-        
-        shellWrapper = new SensorShellWrapper(new SensorProperties("",""),false,"ECG");
-        
-    }
-    
-    public SensorShellWrapper getSensorShellWrapper()
-    {
-        return shellWrapper;
+    /* (non-Javadoc)
+     * @see java.lang.Thread#start()
+     */
+    @Override
+    public void start()
+    {   if(!this.isAlive())
+        {
+           super.start();
+        }
     }
     
     public InetAddress[] getSensorAddresses()
@@ -79,18 +88,18 @@ public class SensorServer extends Observable
     {
         sensorThreadPool.remove(new Integer(id));
         
-        doNotifyObservers();
+        //doNotifyObservers();
     }
     
-    /**
-     * 
-     */
-    public void doNotifyObservers()
-    {
-        setChanged();
-        notifyObservers(this);
-        clearChanged();
-    }
+//    /**
+//     * 
+//     */
+//    public void doNotifyObservers()
+//    {
+//        setChanged();
+//        notifyObservers(this);
+//        clearChanged();
+//    }
 
     public String[] getAddress()
     {
@@ -106,44 +115,43 @@ public class SensorServer extends Observable
         return toReturn;
     }
     
-    public static void main(String[] args)
+    
+    
+    public void run()
     {
-        SensorServer.theInstance = new SensorServer();
-        
-        theInstance.addObserver(Configurator.getInstance());
                    
-        ServerSocket seso = null;
         
         try {
             seso = new ServerSocket(PORT);
             
-            theInstance.doNotifyObservers();
+            //this.doNotifyObservers();
         }
         catch (IOException e) {
-            // TODO Auto-generated catch block
+            
             e.printStackTrace();
+            
+            runningFlag = false;
+            
         }
-        
-        while(theInstance.runningFlag)
+        while(this.runningFlag)
         {
             try {
                 Socket socketToSensor = seso.accept();
                 
               
-                ServerThread st = new ServerThread(theInstance,socketToSensor);
+                ServerThread st = new ServerThread(this,socketToSensor);
                 
-                theInstance.sensorThreadPool.put(new Integer(st.getSensorThreadId()),st);
+                this.sensorThreadPool.put(new Integer(st.getSensorThreadId()),st);
                 
-                theInstance.setChanged();
-                theInstance.notifyObservers(theInstance);
-                theInstance.clearChanged();
+//                this.setChanged();
+//                this.notifyObservers(this);
+//                this.clearChanged();
                 
                 st.start();
                 
             }
             catch (IOException e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
+                System.err.println("Shut Down?!");
             }
         }
     }
@@ -165,5 +173,31 @@ public class SensorServer extends Observable
         }
         
         return names;
+    }
+
+    public void shutDown()
+    {
+        Object[] threadArray = sensorThreadPool.values().toArray();
+        
+        for(Object threadObject : threadArray)
+        {
+            ServerThread thread = (ServerThread) threadObject;
+            
+            thread.stopSensorThread();
+            
+        }
+                
+        this.runningFlag = false;
+        
+        try {
+            seso.close();
+        }
+        catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        
+        theInstance = null;
+        
     }
 }

@@ -8,7 +8,7 @@ package org.electrocodeogram.ui;
 
 import java.util.List;
 
-import org.electrocodeogram.EventPacket;
+import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.module.writer.EventWriter;
 
 /**
@@ -71,7 +71,7 @@ public class GuiEventWriter extends EventWriter
     /* (non-Javadoc)
      * @see org.electrocodeogram.module.writer.EventWriter#write(org.electrocodeogram.EventPacket)
      */
-    public void write(EventPacket eventPacket)
+    public void write(ValidEventPacket eventPacket)
     {
         if(target != null)
         {

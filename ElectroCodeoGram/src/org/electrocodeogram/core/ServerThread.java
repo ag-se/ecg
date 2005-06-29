@@ -12,7 +12,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
 
-import org.electrocodeogram.EventPacket;
+import org.electrocodeogram.event.ValidEventPacket;
 
 /**
  * @author 7oas7er
@@ -80,6 +80,16 @@ public class ServerThread extends Thread
     public void stopSensorThread()
     {
         runningFlag = false;
+        
+        try {
+            ois.close();
+            
+            socketToSensor.close();
+        }
+        catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
     
     public void run()
@@ -87,9 +97,9 @@ public class ServerThread extends Thread
         while(runningFlag)
         {
             try {
-                EventPacket e = (EventPacket) ois.readObject();
+                ValidEventPacket e = (ValidEventPacket) ois.readObject();
                 
-                if (seso.getSensorShellWrapper().doCommand(e.getTimeStamp(),e.getHsCommandName(),e.getArglist()))
+                if (SensorShellWrapper.getInstance().doCommand(e.getTimeStamp(),e.getHsCommandName(),e.getArglist()))
                 {
                     if(e.getHsCommandName().equals(new String("Activity")) && e.getArglist().get(0).equals(new String("setTool")))
                     {
@@ -99,7 +109,7 @@ public class ServerThread extends Thread
                         {
                             this.sensorName = sensorName;
                             
-                            seso.doNotifyObservers();
+                            //seso.doNotifyObservers();
                         }
                     }
                 }
@@ -116,9 +126,21 @@ public class ServerThread extends Thread
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
+            catch(ClassCastException e)
+            {
+                e.printStackTrace();
+            }
         }
         
         seso.removeSensorThread(id);
+        
+        try {
+            this.socketToSensor.close();
+        }
+        catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         
     }
 

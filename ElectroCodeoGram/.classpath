@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry sourcepath="E:/public_hackystat/hackystat-uh-6.4.117/hackystat-uh-6.4.117/hackyKernel/src" kind="lib" path="lib/hackystat/sensorshell.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="/ECG_Jars/componentset.jar"/>
-	<classpathentry kind="lib" path="/ECG_Jars/jgraph.jar"/>
-	<classpathentry kind="lib" path="/ECG_Jars/jgraphaddons.jar"/>
-	<classpathentry kind="lib" path="/ECG_Jars/OfficeLnFs.jar"/>
-	<classpathentry sourcepath="/ECG_ClientTools" kind="lib" path="lib/hackystat/sensorshell.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/ECG_ClientTools"/>
+	<classpathentry kind="lib" path="lib/misc/componentset.jar"/>
+	<classpathentry kind="lib" path="lib/misc/jgraph.jar"/>
+	<classpathentry kind="lib" path="lib/misc/jgraphaddons.jar"/>
+	<classpathentry kind="lib" path="lib/misc/OfficeLnFs.jar"/>
+	<classpathentry kind="lib" path="lib/ecg/event.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

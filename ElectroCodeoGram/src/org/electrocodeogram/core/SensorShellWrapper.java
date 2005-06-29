@@ -1,13 +1,20 @@
 package org.electrocodeogram.core;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.StringTokenizer;
+import java.util.logging.Logger;
 
-import org.electrocodeogram.EventPacket;
-import org.electrocodeogram.IllegalEventParameterException;
+import org.electrocodeogram.event.IllegalEventParameterException;
+import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.module.ModuleRegistry;
 import org.electrocodeogram.module.source.Source;
+import org.electrocodeogram.ui.Configurator;
 import org.hackystat.kernel.admin.SensorProperties;
 import org.hackystat.kernel.shell.SensorShell;
 
@@ -16,10 +23,18 @@ import org.hackystat.kernel.shell.SensorShell;
  */
 public class SensorShellWrapper extends SensorShell
 {
+    private static SensorShellWrapper theInstance = null;
     
     private Source sensorSource = null;
      
     private int eventPacketCount = 0;
+    
+    private SensorServer seso = null;
+    
+    private ModuleRegistry more = null;
+
+    private BufferedReader bufferedReader = null;
+    
     
     /**
      * The constructor takes the same parameters as the HS SensorShell and sipmly passes
@@ -33,23 +48,39 @@ public class SensorShellWrapper extends SensorShell
      * @param isInteractive 
      * @param toolName The name of the developing tool the sending sensor is working inside
      */
-    public SensorShellWrapper(SensorProperties sensorProperties, boolean isInteractive, String toolName)
+    private SensorShellWrapper(SensorProperties sensorProperties, boolean isInteractive, String toolName)
     {
         super(sensorProperties, isInteractive, toolName);
 
+        this.bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+         
+        seso = SensorServer.getInstance();
+        
+        seso.start();
+        
         sensorSource = new Source();
         
         sensorSource.setName("Sensor Source");
         
-        ModuleRegistry.getInstance().addModuleInstance(sensorSource);
-     
+        more = ModuleRegistry.getInstance();
+        
+        more.addModuleInstance(sensorSource);
+        
+      
+        
     }
    
-    public int getEventPacketCount()
+    public static SensorShellWrapper getInstance()
     {
-        return eventPacketCount;
+        if(theInstance == null)
+        {
+            theInstance = new SensorShellWrapper(new SensorProperties("",""),false,"ECG");
+        }
+        
+        return theInstance;
     }
     
+   
     /** 
      * This method overwrites the Hs doCommand method
      * @see org.hackystat.kernel.shell.SensorShell#doCommand(java.util.Date, java.lang.String, java.util.List)
@@ -110,10 +141,10 @@ public class SensorShellWrapper extends SensorShell
     {
         if (sensorSource != null)
         {
-	        EventPacket toAppend;
+	        ValidEventPacket toAppend;
             try {
                 
-                toAppend = new EventPacket(0,timeStamp,commandName,argList);
+                toAppend = new ValidEventPacket(0,timeStamp,commandName,argList);
                 
                 sensorSource.append(toAppend);
             }
@@ -123,4 +154,35 @@ public class SensorShellWrapper extends SensorShell
             }
 	    }
      }
+   
+    private String readLine() {
+        try {
+           return this.bufferedReader.readLine();
+        }
+        catch (IOException e) {
+          return "quit";
+        }
+      }
+    
+    
+    private void quit()
+    {
+        System.exit(0);
+    }
+    
+    public static void main(String[] args)
+    {
+        SensorShellWrapper shell = new SensorShellWrapper(new SensorProperties("",""),false,"ElectroCodeoGram");
+        
+        while (true) {
+            System.out.print(">>");
+            String inputString = shell.readLine();
+
+            // Quit if necessary.
+            if (inputString.equalsIgnoreCase("quit")) {
+              shell.quit();
+              return;
+            }
+        }
+    }
 }

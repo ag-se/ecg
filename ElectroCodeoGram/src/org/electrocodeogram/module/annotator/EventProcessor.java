@@ -6,7 +6,7 @@ package org.electrocodeogram.module.annotator;
 
 import java.util.logging.Level;
 
-import org.electrocodeogram.EventPacket;
+import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.module.Module;
 
 /**
@@ -87,7 +87,7 @@ public abstract class EventProcessor extends Module
     {
         this.separator = separator;
     }
-    public void receiveEventPacket(EventPacket eventPacket)
+    public void receiveEventPacket(ValidEventPacket eventPacket)
     {
         if(processorMode == -1)
         {
@@ -95,7 +95,7 @@ public abstract class EventProcessor extends Module
         }
         if(processorMode == EventProcessor.ANNOTATOR)
         {
-	        EventPacket resultPacket = getProcessingResult(eventPacket);
+	        ValidEventPacket resultPacket = getProcessingResult(eventPacket);
 	
 	        if (annnotationType == EventProcessor.PRE_ANNOTATION) {
 	            sendEventPacket(resultPacket);
@@ -109,7 +109,7 @@ public abstract class EventProcessor extends Module
         }
         else if(processorMode == EventProcessor.FILTER)
         {
-            EventPacket resultPacket = getProcessingResult(eventPacket);
+            ValidEventPacket resultPacket = getProcessingResult(eventPacket);
         	
             sendEventPacket(resultPacket);
         }
@@ -118,7 +118,7 @@ public abstract class EventProcessor extends Module
     /**
      * @param str
      */
-    private EventPacket getProcessingResult(EventPacket eventPacket)
+    private ValidEventPacket getProcessingResult(ValidEventPacket eventPacket)
     {
         logger.log(Level.INFO, "getAnnotation");
 
@@ -130,6 +130,6 @@ public abstract class EventProcessor extends Module
      * @param str
      * @return
      */
-    public abstract EventPacket annotate(EventPacket eventPacket);
+    public abstract ValidEventPacket annotate(ValidEventPacket eventPacket);
 
 }

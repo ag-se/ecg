@@ -1,7 +1,7 @@
 package org.electrocodeogram.module.source;
 
+import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.module.Module;
-import org.electrocodeogram.EventPacket;
     /**
      * @author Frank Schlesinger
      * 
@@ -19,7 +19,7 @@ import org.electrocodeogram.EventPacket;
             super(Module.SOURCE_MODULE);
         }
         
-        public void append(EventPacket eventPacket)
+        public void append(ValidEventPacket eventPacket)
         {
             assert(eventBuffer != null);
             
@@ -39,7 +39,7 @@ import org.electrocodeogram.EventPacket;
         /* (non-Javadoc)
          * @see org.electrocodeogram.module.Module#receiveEventPacket(org.electrocodeogram.EventPacket)
          */
-        public void receiveEventPacket(EventPacket eventPacket)
+        public void receiveEventPacket(ValidEventPacket eventPacket)
         {
             // TODO Auto-generated method stub
             

@@ -627,4 +627,12 @@ public class Configurator extends JFrame implements Observer
         
     }
 
+    public void shutDown()
+    {
+       this.dispose();
+       
+       theInstance = null;
+        
+    }
+
 }
