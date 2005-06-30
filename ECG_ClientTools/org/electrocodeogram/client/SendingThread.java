@@ -199,7 +199,7 @@ public class SendingThread extends Thread
             
             if (this.queue.getSize() > 0) {
                 // is the connection up?
-                if (this.socketToServer.isConnected()) {
+                if (this.socketToServer != null && this.socketToServer.isConnected()) {
                     try {
                         // assert new EventPackets
                         assert (this.queue.getSize() > 0);
