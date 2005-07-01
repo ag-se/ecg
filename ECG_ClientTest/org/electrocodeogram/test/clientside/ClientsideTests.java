@@ -7,6 +7,7 @@ import org.electrocodeogram.event.EventPacket;
 import org.electrocodeogram.event.IllegalEventParameterException;
 import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.sensor.TestSensor;
+import org.electrocodeogram.test.EventGenerator;
 
 /**
  * This class collects all testcases for testing the client side of the ECG framework for
@@ -17,6 +18,9 @@ public class ClientsideTests extends TestCase
 {
 
     private TestSensor testSensor = null;
+    
+    private EventGenerator eventGenerator = null;
+    
 
     /**
      * This creates the testcases of this collection.
@@ -31,12 +35,16 @@ public class ClientsideTests extends TestCase
     protected void setUp()
     {
         this.testSensor = new TestSensor();
+        
+        this.eventGenerator = new EventGenerator();
     }
 
     @Override
     protected void tearDown()
     {
         this.testSensor = null;
+        
+        this.eventGenerator = null;
     }
 
     /**
@@ -51,7 +59,7 @@ public class ClientsideTests extends TestCase
         ValidEventPacket eventPacket;
 
         try {
-            eventPacket = this.testSensor.createValidEventPacket(true, true, true, true, 10, 10);
+            eventPacket = this.eventGenerator.createValidEventPacket(true, true, true, true, 10, 10);
 
             boolean result = this.testSensor.sendEvent(eventPacket);
 
@@ -78,7 +86,7 @@ public class ClientsideTests extends TestCase
     {
         ValidEventPacket eventPacket;
         try {
-            eventPacket = this.testSensor.createValidEventPacket(true, true, true, true, 10, 10);
+            eventPacket = this.eventGenerator.createValidEventPacket(true, true, true, true, 10, 10);
 
             this.testSensor.sendEvent(eventPacket);
 
@@ -111,7 +119,7 @@ public class ClientsideTests extends TestCase
      */
     public void testInvalidEventIsNotAcceptedTimeStampIsNull()
     {
-        EventPacket eventPacket = this.testSensor.createEventPacket(false, true, true, true, 10, 10);
+        EventPacket eventPacket = this.eventGenerator.createEventPacket(false, true, true, true, 10, 10);
 
         boolean result = this.testSensor.sendEvent(eventPacket);
 
@@ -128,7 +136,7 @@ public class ClientsideTests extends TestCase
      */
     public void testInvalidEventIsNotAcceptedCommandNameIsNull()
     {
-        EventPacket eventPacket = this.testSensor.createEventPacket(true, false, true, true, 10, 10);
+        EventPacket eventPacket = this.eventGenerator.createEventPacket(true, false, true, true, 10, 10);
 
         boolean result = this.testSensor.sendEvent(eventPacket);
 
@@ -145,7 +153,7 @@ public class ClientsideTests extends TestCase
      */
     public void testInvalidEventIsNotAcceptedArgListIsNull()
     {
-        EventPacket eventPacket = this.testSensor.createEventPacket(true, true, false, true, 10, 10);
+        EventPacket eventPacket = this.eventGenerator.createEventPacket(true, true, false, true, 10, 10);
 
         boolean result = this.testSensor.sendEvent(eventPacket);
 
@@ -162,7 +170,7 @@ public class ClientsideTests extends TestCase
      */
     public void testInvalidEventIsNotAcceptedArgListIsEmpty()
     {
-        EventPacket eventPacket = this.testSensor.createEventPacket(true, true, true, true, 0, 10);
+        EventPacket eventPacket = this.eventGenerator.createEventPacket(true, true, true, true, 0, 10);
 
         boolean result = this.testSensor.sendEvent(eventPacket);
 
@@ -179,7 +187,7 @@ public class ClientsideTests extends TestCase
      */
     public void testInvalidEventIsNotAcceptedArgListIsNotOfTypeString()
     {
-        EventPacket eventPacket = this.testSensor.createEventPacket(true, true, true, false, 10, 10);
+        EventPacket eventPacket = this.eventGenerator.createEventPacket(true, true, true, false, 10, 10);
 
         boolean result = this.testSensor.sendEvent(eventPacket);
 
@@ -195,7 +203,7 @@ public class ClientsideTests extends TestCase
     public void testIllegalEventParametersCauseException()
     {
         try {
-            this.testSensor.createValidEventPacket(false, true, true, true, 10, 10);
+            this.eventGenerator.createValidEventPacket(false, true, true, true, 10, 10);
 
             fail("IllegalEventParameterException should be thrown");
         }
@@ -203,7 +211,7 @@ public class ClientsideTests extends TestCase
             assertTrue(true);
 
             try {
-                this.testSensor.createValidEventPacket(true, false, true, true, 10, 10);
+                this.eventGenerator.createValidEventPacket(true, false, true, true, 10, 10);
 
                 fail("IllegalEventParameterException should be thrown");
             }
@@ -212,7 +220,7 @@ public class ClientsideTests extends TestCase
                 assertTrue(true);
 
                 try {
-                    this.testSensor.createValidEventPacket(true, true, false, true, 10, 10);
+                    this.eventGenerator.createValidEventPacket(true, true, false, true, 10, 10);
 
                     fail("IllegalEventParameterException should be thrown");
                 }
@@ -220,7 +228,7 @@ public class ClientsideTests extends TestCase
                     assertTrue(true);
 
                     try {
-                        this.testSensor.createValidEventPacket(true, true, true, true, 0, 10);
+                        this.eventGenerator.createValidEventPacket(true, true, true, true, 0, 10);
 
                         fail("IllegalEventParameterException should be thrown");
                     }
@@ -228,7 +236,7 @@ public class ClientsideTests extends TestCase
                         assertTrue(true);
 
                         try {
-                            this.testSensor.createValidEventPacket(true, true, true, false, 10, 10);
+                            this.eventGenerator.createValidEventPacket(true, true, true, false, 10, 10);
 
                             fail("IllegalEventParameterException should be thrown");
                         }

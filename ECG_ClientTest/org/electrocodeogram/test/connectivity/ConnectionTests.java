@@ -13,6 +13,7 @@ import junit.framework.TestCase;
 import org.electrocodeogram.client.SendingThreadTest;
 import org.electrocodeogram.event.EventPacket;
 import org.electrocodeogram.sensor.TestSensor;
+import org.electrocodeogram.test.EventGenerator;
 
 /**
  * Test to validate the behaviour of connection attemps to the ECG server and
@@ -28,6 +29,8 @@ public class ConnectionTests extends TestCase
     private SendingThreadTest threadTest = null;
 
     private Process ecgServer = null;
+    
+    private EventGenerator eventGenerator = null;
 
     /**
      * This creates the connection testcases
@@ -48,6 +51,8 @@ public class ConnectionTests extends TestCase
         this.testSensor = new TestSensor();
 
         this.threadTest = new SendingThreadTest();
+        
+        this.eventGenerator = new EventGenerator();
 
     }
 
@@ -59,6 +64,8 @@ public class ConnectionTests extends TestCase
         this.testSensor = null;
 
         this.threadTest = null;
+        
+        this.eventGenerator = null;
         
         stopECGServer();
 
@@ -79,7 +86,7 @@ public class ConnectionTests extends TestCase
 
         assertTrue(this.threadTest.testConnection(false, 0));
 
-        EventPacket eventPacket = this.testSensor.createEventPacket(true, true, true, true, 10, 10);
+        EventPacket eventPacket = this.eventGenerator.createEventPacket(true, true, true, true, 10, 10);
 
         this.testSensor.sendEvent(eventPacket);
 
@@ -103,7 +110,7 @@ public class ConnectionTests extends TestCase
 
         int connectionTrialsBefore = this.threadTest.getConnectionTrials();
 
-        EventPacket eventPacket = this.testSensor.createEventPacket(true, true, true, true, 10, 10);
+        EventPacket eventPacket = this.eventGenerator.createEventPacket(true, true, true, true, 10, 10);
 
         this.testSensor.sendEvent(eventPacket);
 
@@ -133,7 +140,7 @@ public class ConnectionTests extends TestCase
 
         int connectionTrialsBefore = this.threadTest.getConnectionTrials();
 
-        EventPacket eventPacket = this.testSensor.createEventPacket(true, true, true, true, 10, 10);
+        EventPacket eventPacket = this.eventGenerator.createEventPacket(true, true, true, true, 10, 10);
 
         this.testSensor.sendEvent(eventPacket);
 
@@ -167,7 +174,7 @@ public class ConnectionTests extends TestCase
 
         assertTrue(this.threadTest.testConnection(false, 0));
 
-        EventPacket eventPacket = this.testSensor.createEventPacket(true, true, true, true, 10, 10);
+        EventPacket eventPacket = this.eventGenerator.createEventPacket(true, true, true, true, 10, 10);
 
         int size = this.threadTest.getBufferSize();
 
