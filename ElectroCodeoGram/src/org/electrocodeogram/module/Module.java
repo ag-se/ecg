@@ -188,6 +188,11 @@ public abstract class Module extends Observable implements Observer
         return childModules.size();
     }
     
+    /**
+     * @param module
+     * @return
+     * @throws ModuleConnectionException
+     */
     public int connectChildModule(Module module) throws ModuleConnectionException
     {
         

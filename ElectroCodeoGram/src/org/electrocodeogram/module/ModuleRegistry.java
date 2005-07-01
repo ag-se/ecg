@@ -4,12 +4,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Observable;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.electrocodeogram.core.SensorShellWrapper;
 import org.electrocodeogram.module.annotator.EventProcessor;
 import org.electrocodeogram.ui.Configurator;
 
@@ -28,6 +30,7 @@ public class ModuleRegistry extends Observable
 
     private InstalledModules installedModules = null;
 
+    private File moduleDirectory = null;
     
     private ModuleClassLoader moduleClassLoader = null;
 
@@ -48,9 +51,15 @@ public class ModuleRegistry extends Observable
         
         runningModules = new RunningModules();
         
-        installedModules = new InstalledModules();
+        
     }
     
+    private ModuleRegistry(File filePar)
+    {
+        this();
+        
+        installedModules = new InstalledModules(filePar);
+    }
     
     /**
      * This method returns the singleton instance of the ModuleRegistry.
@@ -66,6 +75,24 @@ public class ModuleRegistry extends Observable
         return theInstance;
     }
 
+    public static void getInstance(File file)
+    {
+        if(theInstance == null)
+        {
+            theInstance = new ModuleRegistry(file);
+        }
+        else
+        {
+            if(theInstance.moduleDirectory == null)
+            {
+                theInstance.moduleDirectory = file;
+                
+                theInstance.installedModules = theInstance.new InstalledModules(file);
+            }
+        }
+        
+    }
+    
     /**
      * This method instanciates the ModuleClassLoader and passes the curretn ClassLoader
      * as a parameter to be the parent ClassLoader.
@@ -161,15 +188,13 @@ public class ModuleRegistry extends Observable
         private HashMap availableModules = new HashMap();
         
         
-        private InstalledModules()
-        {
-            this(new File("modules/"));
-        }
-
         private InstalledModules(File moduleDirectory)
         {
-            assert(moduleDirectory != null);
-                        
+            if (moduleDirectory == null)
+            {
+                return;
+            }
+            
             if (moduleDirectory.exists() && moduleDirectory.isDirectory()) {
                 
                 String[] moduleDirectories = moduleDirectory.list();
@@ -599,5 +624,8 @@ public class ModuleRegistry extends Observable
         theInstance = null;
         
     }
+
+
+ 
     
 }

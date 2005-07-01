@@ -4,9 +4,16 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.net.JarURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
 
@@ -16,10 +23,11 @@ import org.electrocodeogram.module.ModuleRegistry;
 import org.electrocodeogram.module.source.Source;
 import org.electrocodeogram.ui.Configurator;
 import org.hackystat.kernel.admin.SensorProperties;
+import org.hackystat.kernel.sdt.SdtManager;
 import org.hackystat.kernel.shell.SensorShell;
 
 /**
- * @author Frank Schlesinger *  * This class is the is the project's main- and base-class as it is the entry point * of the ElectroCodeoGram (ECG) extension into the "HackyStat" (HS) framework. *  * It's function is to colllect all the event data that is captured by running sensors * and to process it into the ECG framework for analysis and storing. It is therefore * the source of event data in the ECG module modell.  *  * It extends the HS class SensorShell, so it conforms to the "SensorDataType" * (SDT) concept of HS. That means every konventionell HS sensor is able to communicate * with the ECG's SensorShellWrapper.
+ * This class is the is the project's main- and base-class as it is the entry point * of the ElectroCodeoGram (ECG) extension into the "HackyStat" (HS) framework. *  * It's function is to colllect all the event data that is captured by running sensors * and to process it into the ECG framework for analysis and storing. It is therefore * the source of event data in the ECG module modell.  *  * It extends the HS class SensorShell, so it conforms to the "SensorDataType" * (SDT) concept of HS. That means every konventionell HS sensor is able to communicate * with the ECG's SensorShellWrapper.
  */
 public class SensorShellWrapper extends SensorShell
 {
@@ -33,7 +41,7 @@ public class SensorShellWrapper extends SensorShell
     
     private ModuleRegistry more = null;
 
-    private BufferedReader bufferedReader = null;
+    
     
     
     /**
@@ -48,11 +56,11 @@ public class SensorShellWrapper extends SensorShell
      * @param isInteractive 
      * @param toolName The name of the developing tool the sending sensor is working inside
      */
-    private SensorShellWrapper(SensorProperties sensorProperties, boolean isInteractive, String toolName)
+    private SensorShellWrapper()
     {
-        super(sensorProperties, isInteractive, toolName);
-
-        this.bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+        super(new SensorProperties("",""),false,"ElectroCodeoGram");
+      
+        Console gob = new Console();
          
         seso = SensorServer.getInstance();
         
@@ -66,21 +74,27 @@ public class SensorShellWrapper extends SensorShell
         
         more.addModuleInstance(sensorSource);
         
-      
+        gob.start();
         
     }
    
+    public SensorShellWrapper(File file)
+    {
+       this();
+       
+       ModuleRegistry.getInstance(file);
+    }
+
     public static SensorShellWrapper getInstance()
     {
         if(theInstance == null)
         {
-            theInstance = new SensorShellWrapper(new SensorProperties("",""),false,"ECG");
+            theInstance = new SensorShellWrapper();
         }
         
         return theInstance;
     }
-    
-   
+
     /** 
      * This method overwrites the Hs doCommand method
      * @see org.hackystat.kernel.shell.SensorShell#doCommand(java.util.Date, java.lang.String, java.util.List)
@@ -155,34 +169,82 @@ public class SensorShellWrapper extends SensorShell
 	    }
      }
    
-    private String readLine() {
-        try {
-           return this.bufferedReader.readLine();
-        }
-        catch (IOException e) {
-          return "quit";
-        }
-      }
+   
     
-    
-    private void quit()
+    private class Console extends Thread
     {
-        System.exit(0);
+        
+        private BufferedReader bufferedReader = null;
+        
+        public Console()
+        {
+            System.out.println("ElectroCodeoGram Server & Lab is starting...");
+            
+            this.bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+            
+        }
+        
+        public void run()
+        {
+            
+            while (true) {
+                
+                System.out.println(">>");
+                
+                String inputString = "" + this.readLine();
+                
+                System.out.println("Echo: " + inputString);
+                
+                if (inputString.equalsIgnoreCase("quit")) {
+                  this.quit();
+                  return;
+                }
+            }
+        }
+        
+        private String readLine() {
+            try {
+               return this.bufferedReader.readLine();
+            }
+            catch (IOException e) {
+              return "quit";
+            }
+          }
+        
+        
+        private void quit()
+        {
+            System.exit(0);
+        }
     }
     
     public static void main(String[] args)
     {
-        SensorShellWrapper shell = new SensorShellWrapper(new SensorProperties("",""),false,"ElectroCodeoGram");
+     
+        File file = null;
         
-        while (true) {
-            System.out.print(">>");
-            String inputString = shell.readLine();
-
-            // Quit if necessary.
-            if (inputString.equalsIgnoreCase("quit")) {
-              shell.quit();
-              return;
+        if(args != null && args.length > 0)
+        {
+            
+            file = new File(args[0]);
+            
+            
+            
+            if(file.exists() && file.isDirectory())
+            {
+                SensorShellWrapper shell = new SensorShellWrapper(file);
             }
+            else
+            {
+                SensorShellWrapper shell = new SensorShellWrapper();
+            }
+            
         }
+        else
+        {
+            SensorShellWrapper shell = new SensorShellWrapper();
+        }
+        
+        
     }
 }

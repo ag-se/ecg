@@ -9,8 +9,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Observable;
@@ -26,8 +24,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
-import javax.swing.JToolTip;
-import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.LineBorder;
@@ -37,9 +33,6 @@ import org.electrocodeogram.core.SensorServer;
 import org.electrocodeogram.module.Module;
 import org.electrocodeogram.module.ModuleDescriptor;
 import org.electrocodeogram.module.ModuleRegistry;
-import org.jgraph.graph.DefaultEdge;
-import org.jgraph.graph.GraphConstants;
-import org.jgraph.layout.TreeLayoutAlgorithm;
 
 import com.zfqjava.swing.JStatusBar;
 
@@ -52,6 +45,11 @@ import com.zfqjava.swing.JStatusBar;
 
 public class Configurator extends JFrame implements Observer
 {
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
 
     /**
      * 

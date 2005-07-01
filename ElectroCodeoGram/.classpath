@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry sourcepath="E:/public_hackystat/hackystat-uh-6.4.117/hackystat-uh-6.4.117/hackyKernel/src" kind="lib" path="lib/hackystat/sensorshell.jar"/>
+	<classpathentry sourcepath="E:/public_hackystat/hackystat-uh-6.4.117/hackystat-uh-6.4.117" kind="lib" path="lib/hackystat/sensorshell.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/misc/componentset.jar"/>
 	<classpathentry kind="lib" path="lib/misc/jgraph.jar"/>
