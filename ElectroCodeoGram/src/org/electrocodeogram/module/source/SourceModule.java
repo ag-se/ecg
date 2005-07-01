@@ -10,11 +10,11 @@ import org.electrocodeogram.module.Module;
      * the module tree of the ECG framework.
      *
      */
-    public class Source extends Module
+    public class SourceModule extends Module
     {
         
         
-        public Source()
+        public SourceModule()
         {
             super(Module.SOURCE_MODULE);
         }
