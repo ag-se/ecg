@@ -205,7 +205,7 @@ public class EventGenerator
 
         case COMMIT:
             
-            args = new String[]{"add","test","test","test","test","test","test","test","test","test","test","test"};
+            args = new String[]{"add","test","test","test","test","test","test","1","1","1","test"};
             
             try {
                 eventPacket = new ValidEventPacket(
@@ -217,6 +217,42 @@ public class EventGenerator
             catch (IllegalEventParameterException e) {
                 e.printStackTrace();
             }
+            
+            break;
+            
+        case FILEMETRIC:
+            
+            args = new String[]{"addFileMetric","bcml","C:\\cvs\\foobarproject\\src\foo\\bar\\Bar.java","foo.bar.Bar","cbo=1,loc=2","1049798488530"};
+            
+            try {
+                eventPacket = new ValidEventPacket(
+                        0,
+                        createDate(true),
+                        "FileMetric",
+                        Arrays.asList(args));
+            }
+            catch (IllegalEventParameterException e) {
+                e.printStackTrace();
+            }
+            
+            break;
+          
+        case UNITTEST:
+            
+            args = new String[]{"add","test","test","3000","test","test"};
+            
+            try {
+                eventPacket = new ValidEventPacket(
+                        0,
+                        createDate(true),
+                        "UnitTest",
+                        Arrays.asList(args));
+            }
+            catch (IllegalEventParameterException e) {
+                e.printStackTrace();
+            }
+            
+            break;
             
         default:
             break;
