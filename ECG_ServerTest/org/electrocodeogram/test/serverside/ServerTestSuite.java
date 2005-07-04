@@ -81,6 +81,27 @@ public class ServerTestSuite
             suite.addTest(new ServersideTests("testHackyStatBuffTransEventsAccepted"));
         }
         
+        int testLCount = 1;
+        
+        for(int i=0;i<testLCount;i++)
+        {
+            suite.addTest(new ServersideTests("testHackyStatCommitEventsAccepted"));
+        }
+        
+        int testMCount = 1;
+        
+        for(int i=0;i<testMCount;i++)
+        {
+            suite.addTest(new ServersideTests("testHackyStatFileMetricEventsAccepted"));
+        }
+        
+        int testNCount = 1;
+        
+        for(int i=0;i<testNCount;i++)
+        {
+            suite.addTest(new ServersideTests("testHackyStatUnitTestEventsAccepted"));
+        }
+        
         return suite;
     }
 

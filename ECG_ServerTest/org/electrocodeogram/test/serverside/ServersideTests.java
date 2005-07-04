@@ -54,7 +54,7 @@ public class ServersideTests extends TestCase
     }
     
     /**
-     * Testcase 1 according to the document TESTPLAN Version 1.0 or higher.
+     * Testcase SE1 according to the document TESTPLAN Version 1.0 or higher.
      * This testcase passes a single syntactically invalid EventPacket from a TestClient
      * to the ECG SensorShellWrapper. In this case the timestamp of the EventPacket has the value "null".
      * The test is successfull if the result from the ECG SensorShell is "false", meaning the
@@ -71,7 +71,7 @@ public class ServersideTests extends TestCase
     }
     
     /**
-     * Testcase 2 according to the document TESTPLAN Version 1.0 or higher.
+     * Testcase SE2 according to the document TESTPLAN Version 1.0 or higher.
      * This testcase passes a single syntactically invalid EventPacket from a TestClient
      * to the ECG SensorShellWrapper. In this case the commandName of the EventPacket has the value "null".
      * The test is successfull if the result from the ECG SensorShellWrapper is "false", meaning the
@@ -88,7 +88,7 @@ public class ServersideTests extends TestCase
     }
 
     /**
-     * Testcase 3 according to the document TESTPLAN Version 1.0 or higher.
+     * Testcase SE3 according to the document TESTPLAN Version 1.0 or higher.
      * This testcase passes a single syntactically invalid EventPacket from a TestClient
      * to the ECG SensorShellWrapper. In this case the argList of the EventPacket has the value "null".
      * The test is successfull if the result from the ECG SensorShellWrapper is "false", meaning the
@@ -105,7 +105,7 @@ public class ServersideTests extends TestCase
     }
 
     /**
-     * Testcase 4 according to the document TESTPLAN Version 1.0 or higher.
+     * Testcase SE4 according to the document TESTPLAN Version 1.0 or higher.
      * This testcase passes a single syntactically invalid EventPacket from a TestClient
      * to the ECG SensorShellWrapper. In this case the argList is empty.
      * The test is successfull if the result from the ECG SensorShellWrapper is "false", meaning the
@@ -122,7 +122,7 @@ public class ServersideTests extends TestCase
     }
 
     /**
-     * Testcase 5 according to the document TESTPLAN Version 1.0 or higher.
+     * Testcase SE5 according to the document TESTPLAN Version 1.0 or higher.
      * This testcase passes a single syntactically invalid EventPacket from a TestClient
      * to the ECG SensorShellWrapper. In this case the argList is not of type List<String>.
      * The test is successfull if the result from the ECG SensorShellWrapper is "false", meaning the
@@ -139,7 +139,7 @@ public class ServersideTests extends TestCase
     }
     
     /**
-     * Testcase 6 according to the document TESTPLAN Version 1.0 or higher.
+     * Testcase SE6 according to the document TESTPLAN Version 1.0 or higher.
      * This testcase passes a single syntactically valid EventPacket from a TestClient
      * to the ECG SensorShellWrapper. But the EventPacket's commandName value is not any of the HackyStat
      * SensorDataTypes.
@@ -165,7 +165,7 @@ public class ServersideTests extends TestCase
     }
     
    /**
-   * Testcase 7 according to the document TESTPLAN Version 1.0 or higher.
+   * Testcase SE7 according to the document TESTPLAN Version 1.0 or higher.
    * This testcase passes a HackyStat "Activity" SensorDataType event to the ECG SensorShellWrapper.
    * 
    * The test is successfull if the result from the ECG SensorShellWrapper is "true".
@@ -182,7 +182,7 @@ public class ServersideTests extends TestCase
     }
     
     /**
-     * Testcase 8 according to the document TESTPLAN Version 1.0 or higher.
+     * Testcase SE8 according to the document TESTPLAN Version 1.0 or higher.
      * This testcase passes a HackyStat "Build" SensorDataType event to the ECG SensorShellWrapper.
      * 
      * The test is successfull if the result from the ECG SensorShellWrapper is "true".
@@ -199,7 +199,7 @@ public class ServersideTests extends TestCase
       }
       
       /**
-       * Testcase 9 according to the document TESTPLAN Version 1.0 or higher.
+       * Testcase SE9 according to the document TESTPLAN Version 1.0 or higher.
        * This testcase passes a HackyStat "BuffTrans" SensorDataType event to the ECG SensorShellWrapper.
        * 
        * The test is successfull if the result from the ECG SensorShellWrapper is "true".
@@ -215,20 +215,54 @@ public class ServersideTests extends TestCase
            
         }
         
-//        /**
-//         * Testcase 10 according to the document TESTPLAN Version 1.0 or higher.
-//         * This testcase passes a HackyStat "Commit" SensorDataType event to the ECG SensorShellWrapper.
-//         * 
-//         * The test is successfull if the result from the ECG SensorShellWrapper is "true".
-//         *
-//         */
-//          public void testHackyStatCommitEventsAccepted()
-//          {
-//              ValidEventPacket eventPacket = this.testClient.createHackyStatEventPacket(SensorDataType.COMMIT);
-//              
-//              boolean result = this.testClient.passEventData(this.shell,eventPacket);
-//
-//              assertTrue(result);
-//             
-//          }
+        /**
+         * Testcase SE10 according to the document TESTPLAN Version 1.0 or higher.
+         * This testcase passes a HackyStat "Commit" SensorDataType event to the ECG SensorShellWrapper.
+         * 
+         * The test is successfull if the result from the ECG SensorShellWrapper is "true".
+         *
+         */
+          public void testHackyStatCommitEventsAccepted()
+          {
+              ValidEventPacket eventPacket = this.eventGenerator.createHackyStatEventPacket(SensorDataType.COMMIT);
+              
+              boolean result = this.testClient.passEventData(this.shell,eventPacket);
+
+              assertTrue(result);
+             
+          }
+          
+          /**
+           * Testcase SE11 according to the document TESTPLAN Version 1.0 or higher.
+           * This testcase passes a HackyStat "Commit" SensorDataType event to the ECG SensorShellWrapper.
+           * 
+           * The test is successfull if the result from the ECG SensorShellWrapper is "true".
+           *
+           */
+            public void testHackyStatFileMetricEventsAccepted()
+            {
+                ValidEventPacket eventPacket = this.eventGenerator.createHackyStatEventPacket(SensorDataType.FILEMETRIC);
+                
+                boolean result = this.testClient.passEventData(this.shell,eventPacket);
+
+                assertTrue(result);
+               
+            }
+            
+            /**
+             * Testcase SE12 according to the document TESTPLAN Version 1.0 or higher.
+             * This testcase passes a HackyStat "Commit" SensorDataType event to the ECG SensorShellWrapper.
+             * 
+             * The test is successfull if the result from the ECG SensorShellWrapper is "true".
+             *
+             */
+              public void testHackyStatUnitTestEventsAccepted()
+              {
+                  ValidEventPacket eventPacket = this.eventGenerator.createHackyStatEventPacket(SensorDataType.UNITTEST);
+                  
+                  boolean result = this.testClient.passEventData(this.shell,eventPacket);
+
+                  assertTrue(result);
+                 
+              }
 }
