@@ -1,9 +1,3 @@
-/*
- * Created on 02.04.2005
- *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
- */
 package org.electrocodeogram.core;
 
 import java.io.IOException;
@@ -11,16 +5,19 @@ import java.io.ObjectInputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 import org.electrocodeogram.event.ValidEventPacket;
 
 /**
- * @author 7oas7er
- *
+ * A ServerThread maintains communication with a single ECG sesnor.
+ * Communication is done by (de)serialization over sockets.
  */
 public class ServerThread extends Thread
 {
-
+    private Logger logger = null;
+    
     private static int count = 0;
     
     private int id = -1;
@@ -29,121 +26,148 @@ public class ServerThread extends Thread
     
     private boolean runningFlag = true;
     
-    private ObjectInputStream ois = null;
+    private ObjectInputStream objectInputStream = null;
     
-    private SensorServer seso = null;
+    private SensorServer sensorServer = null;
 
     private String sensorName = null;
    
+    /**
+     * This method returns the name of the currently connected ECG sensor.
+     * @return The name of the currently connected ECG sensor
+     */
     public String getSensorName()
     {
-        return sensorName;
+        return this.sensorName;
     }
     
+    /**
+     * This method returns the IP address of the currently connected ECG sensor.
+     * @return The IP address of the currently connected ECG sensor
+     */
     public InetAddress getSensorAddress()
     {
-        if (socketToSensor != null)
+        if (this.socketToSensor != null)
         {
-            return socketToSensor.getInetAddress();
+            return this.socketToSensor.getInetAddress();
         }
-        else
-        {
-            return null;
-        }
+       
+        return null;
+       
     }
     
-    public ServerThread(SensorServer seso, Socket socketToSensor)
+    /**
+     * This creates a new ServerThread.
+     * @param sensorServerPar A reference to the SensorServer that is managing this ServerThread
+     * @param socketToSensorPar The socket to the ECG sensor
+     * @throws IOException If the creation of the ObjectInputStream fails
+     */
+    public ServerThread(SensorServer sensorServerPar, Socket socketToSensorPar) throws IOException
     {
         super();
-                
-        id = ++count;
+
+        this.logger = Logger.getLogger("ECG Server");
         
-        this.seso = seso;
+        // give the ServerThread a unique ID
+        this.id = ++count;
         
-        this.socketToSensor = socketToSensor;
+        this.sensorServer = sensorServerPar;
         
-        try {
-            ois = new ObjectInputStream(socketToSensor.getInputStream());
-        }
-        catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        this.socketToSensor = socketToSensorPar;
+        
+        this.objectInputStream = new ObjectInputStream(socketToSensorPar.getInputStream());
+       
     }
     
-    public int getSensorThreadId()
+    /**
+     * This method returns the unique ID of the ServerThread.
+     * @return The unique ID of the ServerThread
+     */
+    public int getServerThreadId()
     {
-        return id;
+        return this.id;
     }
     
-    
+    /**
+     * This method stops this ServerThread and closes the socket and stream.
+     *
+     */
     public void stopSensorThread()
     {
-        runningFlag = false;
+        this.runningFlag = false;
+        
+        this.sensorServer.removeSensorThread(this.id);
+        
         
         try {
-            ois.close();
-            
-            socketToSensor.close();
+            if(this.objectInputStream != null)
+            {
+                this.objectInputStream.close();
+            }
+            if(this.socketToSensor != null)
+            {
+                this.socketToSensor.close();
+            }
         }
         catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            
+            this.logger.log(Level.WARNING,"The ServerThread could not be stopped cleanly.");
         }
     }
     
+    
+    /**
+     * @see java.lang.Thread#run()
+     * 
+     * The receiving of event data from the connected ECG sensor is done here. 
+     */
+    @Override
     public void run()
     {
-        while(runningFlag)
+        while(this.runningFlag)
         {
             try {
-                ValidEventPacket e = (ValidEventPacket) ois.readObject();
+                
+                // This method call blocks until a serialized object couls be received.
+                ValidEventPacket e = (ValidEventPacket) this.objectInputStream.readObject();
                 
                 if (SensorShellWrapper.getInstance().doCommand(e.getTimeStamp(),e.getHsCommandName(),e.getArglist()))
                 {
+                    /* If the event data contains the "setTool" String, which is giving the name of the application
+                     * the sensor runs in, this String is used as the sensor name.
+                     */
                     if(e.getHsCommandName().equals(new String("Activity")) && e.getArglist().get(0).equals(new String("setTool")))
                     {
-                        String sensorName;
+                        String tmpSensorName;
                         
-                        if((sensorName = (String)e.getArglist().get(1)) != null)
+                        if((tmpSensorName = (String)e.getArglist().get(1)) != null)
                         {
-                            this.sensorName = sensorName;
+                            this.sensorName = tmpSensorName;
                             
-                            //seso.doNotifyObservers();
                         }
                     }
                 }
             }
             catch(SocketException e)
             {
-                runningFlag = false;
+                this.runningFlag = false;
+                
+                this.logger.log(Level.WARNING,"The socket connection to the ECG Sensor is lost.");
             }
             catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                
+                this.logger.log(Level.WARNING,"Error while reading from the ECG sensor.");
             }
             catch (ClassNotFoundException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+
+                this.logger.log(Level.WARNING,"Error while reading from the ECG sensor.");
+                
             }
             catch(ClassCastException e)
             {
-                e.printStackTrace();
+                // If something elese then a ValidEventPacket is received, we don't care!
             }
         }
         
-        seso.removeSensorThread(id);
-        
-        try {
-            this.socketToSensor.close();
-        }
-        catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        
     }
-
-
-
 }

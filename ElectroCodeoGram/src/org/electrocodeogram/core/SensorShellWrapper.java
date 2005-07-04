@@ -7,7 +7,10 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
+import org.electrocodeogram.event.EventPacket;
 import org.electrocodeogram.event.IllegalEventParameterException;
 import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.module.ModuleRegistry;
@@ -17,13 +20,16 @@ import org.hackystat.kernel.shell.SensorShell;
 
 /**
  * This is the root class of the ECG Server & Lab component. It is also the entry point
- * for the collected event data to be processed through the ECG Lab's modules.
+ * for the event data that is recorded by all running ECG sensors
+ * to be processed through the ECG Lab's modules for analysis and storage.
  *  
  * The SensorShellWrapper extends and uses the HackyStat SensorShell class to validate
  * incoming events as beeing events of a legal HackyStat SensorDataType.
  */
 public class SensorShellWrapper extends SensorShell
 {
+    private Logger logger = null;
+    
     private static SensorShellWrapper theInstance = null;
 
     private SourceModule sensorSource = null;
@@ -31,6 +37,8 @@ public class SensorShellWrapper extends SensorShell
     private SensorServer sensorServer = null;
 
     private ModuleRegistry moduleRegistry = null;
+    
+    private int processingID = 0;
 
     /*
      * The private constructot creates one instance of the SensorShellWrapper and
@@ -40,24 +48,36 @@ public class SensorShellWrapper extends SensorShell
     {
         super(new SensorProperties("", ""), false, "ElectroCodeoGram");
 
+        this.logger = Logger.getLogger("ECG Server");
+        
         Console gob = new Console();
 
-        this.sensorServer = SensorServer.getInstance();
+        // start the ECG server to listen for incoming events
+        this.sensorServer = new SensorServer();
 
-        this.sensorServer.start();
+        //this.sensorServer.start();
 
         this.sensorSource = new SourceModule();
 
         this.sensorSource.setName("Sensor Source");
 
+        
+        // instanciate the ModuleRegistry to manage the modules
         this.moduleRegistry = ModuleRegistry.getInstance();
 
         this.moduleRegistry.addModuleInstance(this.sensorSource);
 
         gob.start();
+        
+        SensorShellWrapper.theInstance = this;
 
     }
 
+    /*
+     * If a File is given to the constructor as a parameter that File
+     * is taken for the module-directory of the ECG Lab.
+     * The filename can be provided at startup as a command line parameter.
+     */
     private SensorShellWrapper(File file)
     {
         this();
@@ -79,18 +99,37 @@ public class SensorShellWrapper extends SensorShell
     }
 
     /**
+     * This method quits the ECG Server & Lab application.
+     * 
+     */
+    public void quit()
+    {
+        this.sensorServer.shutDown();
+        
+        System.exit(0);
+    }
+    
+    /**
      * @see org.hackystat.kernel.shell.SensorShell#doCommand(java.util.Date, java.lang.String, java.util.List)
      * 
      * This is the overriden version of the HackyStat SensorShell's method. After calling the original
-     * method it performs further steps to pass the event data into the ECG Lab.
+     * method it performs further steps to pass the event data into the ECG Lab. It is marked
+     * as synchronized as it can be called by multiple running ServerThreads at the same time.
      */
     @Override
     public synchronized boolean doCommand(Date timeStamp, String commandName, List argList)
     {
+        this.processingID++;
+        
+        this.logger.log(Level.INFO,this.processingID + ": Begin to process new event data at " +  new Date().toString());
+        
+        // validate the incoming event data by using the HackyStat framework
         boolean result = super.doCommand(timeStamp, commandName, argList);
-
+        
         if (result) {
 
+            this.logger.log(Level.INFO,this.processingID + ": Event data is conforming to a HackyStat SensorDataType and is processed.");
+            
             List<String> newArgList = new ArrayList<String>(argList.size());
 
             Object[] entries = argList.toArray();
@@ -109,6 +148,11 @@ public class SensorShellWrapper extends SensorShell
 
             return true;
         }
+        
+        this.logger.log(Level.INFO,this.processingID + ": Event data is not conforming to a HackyStat SensorDataType and is discarded.");
+        
+        this.logger.log(Level.INFO,this.processingID + ":" + new EventPacket(0,timeStamp,commandName,argList).toString());
+        
         return false;
 
     }
@@ -125,21 +169,33 @@ public class SensorShellWrapper extends SensorShell
 
                 toAppend = new ValidEventPacket(0, timeStamp, commandName,
                         argList);
-
+                
                 this.sensorSource.append(toAppend);
             }
             catch (IllegalEventParameterException e) {
 
+                // As only ValidEventPackets come this far, this should never happen
+                
                 e.printStackTrace();
+                
+                this.logger.log(Level.SEVERE,"An unexpected exception has occured. Please report this at www.electrocodeogram.org");
             }
         }
     }
 
+    /*
+     * This thread maintains the console of the ECG Server & Lab application.
+s     * 
+     */
     private class Console extends Thread
     {
 
         private BufferedReader bufferedReader = null;
 
+        /**
+         * Creates the console to manage the ECG Server & Lab.
+         *
+         */
         public Console()
         {
             System.out.println("ElectroCodeoGram Server & Lab is starting...");
@@ -149,6 +205,10 @@ public class SensorShellWrapper extends SensorShell
 
         }
 
+        /**
+         * Here the reading of the console-input is done.
+         */
+        @Override
         public void run()
         {
 
@@ -179,10 +239,15 @@ public class SensorShellWrapper extends SensorShell
 
         private void quit()
         {
-            System.exit(0);
+            SensorShellWrapper.getInstance().quit();
+
         }
     }
 
+    /**
+     * This method starts the ECG Server & Lab application. 
+     * @param args If a String parameter is given, it is taken to be the mdoule-directory path.
+     */
     public static void main(String[] args)
     {
 
@@ -193,15 +258,15 @@ public class SensorShellWrapper extends SensorShell
             file = new File(args[0]);
 
             if (file.exists() && file.isDirectory()) {
-                SensorShellWrapper shell = new SensorShellWrapper(file);
+                new SensorShellWrapper(file);
             }
             else {
-                SensorShellWrapper shell = new SensorShellWrapper();
+                new SensorShellWrapper();
             }
 
         }
         else {
-            SensorShellWrapper shell = new SensorShellWrapper();
+            new SensorShellWrapper();
         }
 
     }

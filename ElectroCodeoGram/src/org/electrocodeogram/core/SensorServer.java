@@ -1,9 +1,3 @@
-/*
- * Created on 02.04.2005
- *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
- */
 package org.electrocodeogram.core;
 
 import java.io.IOException;
@@ -11,65 +5,59 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.Observable;
-
-import org.electrocodeogram.module.ModuleRegistry;
-import org.electrocodeogram.ui.Configurator;
-import org.hackystat.kernel.admin.SensorProperties;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 /**
- * @author 7oas7er
+ * The SensorServer Thread is contoniously listening for connection requests
+ * by ECG sensors. If a connection attemp by a ECG sensor was successfull
+ * a new ServerThread is created and started to maintain the socket communication
+ * to the ECG sensor.
+ * All running ServerThreads are managed in a threadpool.
  *
  */
 public class SensorServer extends Thread
 {
-    private static SensorServer theInstance = null;
     
+    private Logger logger = null;
+    
+    // TODO : Make this configurable
+    
+    /**
+     * This is the TCP port to listen on
+     */
     public static final int PORT = 22222;
     
     private boolean runningFlag = true;
     
-    private HashMap sensorThreadPool = null;
-
-    private SensorShellWrapper shellWrapper = null;
+    private HashMap<Integer,ServerThread> serverThreadPool = null;
     
-    private ServerSocket seso = null;
+    private ServerSocket serverSocket = null;
     
-    private SensorServer()
-    {
-        this.sensorThreadPool = new HashMap();
-    }
-    
-    public static SensorServer getInstance()
-    {
-        if(theInstance == null)
-        {
-            theInstance = new SensorServer();
-        }
-        
-        return theInstance;
-    }
-    
-    /* (non-Javadoc)
-     * @see java.lang.Thread#start()
+    /**
+     * This creates a new SensorServer and a new threadpool. 
      */
-    @Override
-    public void start()
-    {   if(!this.isAlive())
-        {
-           super.start();
-        }
+    public SensorServer()
+    {
+        this.serverThreadPool = new HashMap<Integer,ServerThread>();
+     
+        this.logger = Logger.getLogger("ECG Server");
+        
+        this.start();
     }
     
+    /**
+     * This method is returning all known IP addresses of connected ECG sensors.
+     * @return An Array of all known IP addresses of connected ECG sensors
+     */
     public InetAddress[] getSensorAddresses()
     {
         int count = this.getSensorCount();
         
         InetAddress[] addresses = new InetAddress[count];
         
-        Object[] sensorThreads = sensorThreadPool.values().toArray();
+        Object[] sensorThreads = this.serverThreadPool.values().toArray();
         
         for(int i=0;i<count;i++)
         {
@@ -79,28 +67,31 @@ public class SensorServer extends Thread
         return addresses;
     }
     
+    /**
+     * This method returns the current number of connected ECG sensors.
+     * @return The current number of connected ECG sensors
+     */
     public int getSensorCount()
     {
-        return sensorThreadPool.size();
+        return this.serverThreadPool.size();
     }
     
+    /**
+     * This method removes a single ServerThread from the threadpool
+     * in the case the ServerThread is not needed anymore.
+     * @param id The unique ID of the ServerThread to remove. 
+     */
     public void removeSensorThread(int id)
     {
-        sensorThreadPool.remove(new Integer(id));
-        
-        //doNotifyObservers();
+        this.serverThreadPool.remove(new Integer(id));
     }
-    
-//    /**
-//     * 
-//     */
-//    public void doNotifyObservers()
-//    {
-//        setChanged();
-//        notifyObservers(this);
-//        clearChanged();
-//    }
 
+    /**
+     * This method returns a String containing the IP address and TCP port this SensorServer
+     * is listening on.
+     * @return The IP address and TCP port this SensorServer
+     * is listening on as a String.
+     */
     public String[] getAddress()
     {
         String[] toReturn = null;
@@ -109,55 +100,68 @@ public class SensorServer extends Thread
             toReturn = new String[] {InetAddress.getLocalHost().toString(),new Integer(SensorServer.PORT).toString()};
         }
         catch (UnknownHostException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            
+            // As the localhost should not be unknown, this should never happen. 
+            
+            this.logger.log(Level.SEVERE,"An unexpected exception has occured. Please report this at www.electrocodeogram.org");
         }
         return toReturn;
     }
     
     
     
+    /**
+     * @see java.lang.Thread#run()
+     * 
+     * Here the listening for connection requests and starting of new ServerThreads is done.
+     */
+    @Override
     public void run()
     {
-                   
-        
         try {
-            seso = new ServerSocket(PORT);
+
+            this.serverSocket = new ServerSocket(PORT);
+
+            System.out.println("ECG Server is up and listening on port: " + PORT);
             
-            //this.doNotifyObservers();
         }
         catch (IOException e) {
             
-            e.printStackTrace();
+            this.logger.log(Level.SEVERE,"The ECG Server could not be started. (Maybe port " + PORT + " is in use?");
             
-            runningFlag = false;
+            this.runningFlag = false;
             
         }
         while(this.runningFlag)
         {
             try {
-                Socket socketToSensor = seso.accept();
                 
-              
-                ServerThread st = new ServerThread(this,socketToSensor);
+                // this mathod call blocks until a new incoming connection request
+                Socket socketToSensor = this.serverSocket.accept();
                 
-                this.sensorThreadPool.put(new Integer(st.getSensorThreadId()),st);
+                this.logger.log(Level.INFO,"New connection request");
                 
-//                this.setChanged();
-//                this.notifyObservers(this);
-//                this.clearChanged();
+                // create a new ServerThread to communicate on the given Socket
+                ServerThread serverThread = new ServerThread(this,socketToSensor);
                 
-                st.start();
+                // put the Serverthread in the threadpool
+                this.serverThreadPool.put(new Integer(serverThread.getServerThreadId()),serverThread);
+                
+                // start the ServerThread
+                serverThread.start();
                 
             }
-            catch (IOException e1) {
-                System.err.println("Shut Down?!");
+            catch (IOException e) {
+                
+                this.logger.log(Level.WARNING,"New connection request failed");
+                
             }
         }
     }
 
     /**
-     * @return
+     * This methos returns all known ECG sensor names of connected ECG sensors.
+     * @return All known ECG sensor names of connected ECG sensors in an Array of Strings
      */
     public String[] getSensorNames()
     {
@@ -165,7 +169,7 @@ public class SensorServer extends Thread
         
         String[] names = new String[count];
         
-        Object[] sensorThreads = sensorThreadPool.values().toArray();
+        Object[] sensorThreads = this.serverThreadPool.values().toArray();
         
         for(int i=0;i<count;i++)
         {
@@ -175,9 +179,14 @@ public class SensorServer extends Thread
         return names;
     }
 
+    /**
+     * This methos is used to shut down the SensorServer thread and all
+     * running ServerThreads.
+     *
+     */
     public void shutDown()
     {
-        Object[] threadArray = sensorThreadPool.values().toArray();
+        Object[] threadArray = this.serverThreadPool.values().toArray();
         
         for(Object threadObject : threadArray)
         {
@@ -189,15 +198,16 @@ public class SensorServer extends Thread
                 
         this.runningFlag = false;
         
-        try {
-            seso.close();
+        if(this.serverSocket != null)
+        {
+            try {
+                this.serverSocket.close();
+            }
+            catch (IOException e) {
+                
+                this.logger.log(Level.WARNING,"The socket could not be closed. Shut down was not clean.");
+            }
         }
-        catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        
-        theInstance = null;
         
     }
 }
