@@ -74,6 +74,51 @@ public class ClientTestSuite
             suite.addTest(new ClientsideTests("testIllegalEventParametersCauseException"));
         }
         
+        int testICount = 1;
+        
+        for(int i=0;i<testICount;i++)
+        {
+            suite.addTest(new ClientsideTests("testHackyStatActivityEventsAccepted"));
+        }
+        
+        int testJCount = 1;
+        
+        for(int i=0;i<testJCount;i++)
+        {
+            suite.addTest(new ClientsideTests("testHackyStatBuildEventsAccepted"));
+        }
+        
+        int testKCount = 1;
+        
+        for(int i=0;i<testKCount;i++)
+        {
+            suite.addTest(new ClientsideTests("testHackyStatBuffTransEventsAccepted"));
+        }
+        
+        
+        int testLCount = 1;
+        
+        for(int i=0;i<testLCount;i++)
+        {
+            suite.addTest(new ClientsideTests("testHackyStatCommitEventsAccepted"));
+        }
+        
+        
+        int testMCount = 1;
+        
+        for(int i=0;i<testMCount;i++)
+        {
+            suite.addTest(new ClientsideTests("testHackyStatFileMetricEventsAccepted"));
+        }
+        
+        
+        int testNCount = 1;
+        
+        for(int i=0;i<testNCount;i++)
+        {
+            suite.addTest(new ClientsideTests("testHackyStatUnitTestEventsAccepted"));
+        }
+        
         return suite;
     }
 

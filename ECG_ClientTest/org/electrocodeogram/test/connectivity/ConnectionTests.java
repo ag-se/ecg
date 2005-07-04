@@ -72,7 +72,7 @@ public class ConnectionTests extends TestCase
     }
 
     /**
-     * Testcase 1 according to the document TESTPLAN Version 1.0 or higher.
+     * Testcase CO1 according to the document TESTPLAN Version 1.0 or higher.
      * This testcase validates that the SendingThread will stay in the state
      * "not connected" if the connection to the ECG server cannot be
      * established. In this case the ECG server has not been started. The
@@ -94,7 +94,7 @@ public class ConnectionTests extends TestCase
     }
 
     /**
-     * Testcase 2 according to the document TESTPLAN Version 1.0 or higher. The
+     * Testcase CO2 according to the document TESTPLAN Version 1.0 or higher. The
      * SendingThread is expected to continously initiate connection attemps to
      * the ECG server when its buffer contains any EventPackets to submit. This
      * connection attemps are only interrupted by the set connection delay. This
@@ -128,7 +128,7 @@ public class ConnectionTests extends TestCase
     }
 
     /**
-     * Testcase 3 according to the document TESTPLAN Version 1.0 or higher.
+     * Testcase CO3 according to the document TESTPLAN Version 1.0 or higher.
      * During a connnection delay the Sendingthread is "sleeping". This testcase
      * is succesfull if the SendingThread is still able to receive new
      * EventPackets durong its "sleeping" state.
@@ -163,7 +163,7 @@ public class ConnectionTests extends TestCase
     }
 
     /**
-     * Testcase 4 according to the document TESTPLAN Version 1.0 or higher.
+     * Testcase CO4 according to the document TESTPLAN Version 1.0 or higher.
      * After the ECG server is started a connection to it should be established
      * and all queued EventPackets should be send to the ECG server. This
      * testcase succeeds if exactly this happens.
