@@ -153,4 +153,23 @@ public class EventPacket implements Serializable
 
     }
 
+    /**
+     * This method retuns a String representation of the EventPacket.
+     * @return A String representation of the EventPacket
+     * 
+     */
+    @Override
+    public String toString()
+    {
+        String string = new String();
+        
+        string += "SourceID: " + this.getSourceId() + " HS SDT: " + this.getHsCommandName() + " ECG Type: " + this.getEcgCommandName();
+        
+        for(int i=0;i<this.getArglist().size();i++)
+        {
+            string += (String) this.getArglist().get(i);
+        }
+        
+        return string;
+    }
 }
