@@ -32,7 +32,7 @@ public class SensorShellWrapper extends SensorShell
     
     private static SensorShellWrapper theInstance = null;
 
-    private SourceModule sensorSource = null;
+    protected SourceModule sensorSource = null;
 
     private SensorServer sensorServer = null;
 
@@ -55,18 +55,11 @@ public class SensorShellWrapper extends SensorShell
         // start the ECG server to listen for incoming events
         this.sensorServer = new SensorServer();
 
-        //this.sensorServer.start();
-
-        this.sensorSource = new SourceModule();
-
-        this.sensorSource.setName("Sensor Source");
-
-        
         // instanciate the ModuleRegistry to manage the modules
         this.moduleRegistry = ModuleRegistry.getInstance();
-
-        this.moduleRegistry.addModuleInstance(this.sensorSource);
-
+        
+        this.sensorSource = new SourceModule();
+         
         gob.start();
         
         SensorShellWrapper.theInstance = this;
@@ -138,13 +131,13 @@ public class SensorShellWrapper extends SensorShell
                 String entryString = (String) entries[i];
 
                 if (commandName.equals("Activity") && i == 0) {
-                    entryString = "HS_ACTIVITY_TYPE:" + entryString;
+                    entryString = "" + entryString;
                 }
 
                 newArgList.add(entryString);
             }
 
-            appendToEventSource(timeStamp, "HS_COMMAND:" + commandName, newArgList);
+            appendToEventSource(timeStamp, "" + commandName, newArgList);
 
             return true;
         }

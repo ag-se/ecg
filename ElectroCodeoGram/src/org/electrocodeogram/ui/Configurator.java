@@ -33,6 +33,7 @@ import org.electrocodeogram.core.SensorServer;
 import org.electrocodeogram.module.Module;
 import org.electrocodeogram.module.ModuleDescriptor;
 import org.electrocodeogram.module.ModuleRegistry;
+import org.electrocodeogram.module.Module.ModuleType;
 
 import com.zfqjava.swing.JStatusBar;
 
@@ -112,7 +113,7 @@ public class Configurator extends JFrame implements Observer
         }
         else {
 
-            if (source.getModuleType() == Module.SOURCE_MODULE) {
+            if (source.getModuleType() == ModuleType.SOURCE_MODULE) {
                 theInstance.sourceModules.add(source);
             }
 
@@ -356,7 +357,7 @@ public class Configurator extends JFrame implements Observer
     private Configurator(Module source) throws HeadlessException
     {
         this();
-        if (source.getModuleType() == Module.SOURCE_MODULE) {
+        if (source.getModuleType() == ModuleType.SOURCE_MODULE) {
 
             this.sourceModules.add(source);
             //traverseConnectedModules(null, this.sourceModules.get(0));
@@ -405,7 +406,7 @@ public class Configurator extends JFrame implements Observer
                 else
                 {
                     ModuleCell ml = new ModuleCell(module.getModuleType(),
-                        module.getId(), module.getName(), module.isRunning());
+                        module.getId(), module.getName(), module.isActive());
 
                     moduleGraph.addModuleCell(ml);
                 }

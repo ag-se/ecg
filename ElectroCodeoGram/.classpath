@@ -7,6 +7,6 @@
 	<classpathentry kind="lib" path="lib/misc/jgraph.jar"/>
 	<classpathentry kind="lib" path="lib/misc/jgraphaddons.jar"/>
 	<classpathentry kind="lib" path="lib/misc/OfficeLnFs.jar"/>
-	<classpathentry kind="lib" path="lib/ecg/event.jar"/>
+	<classpathentry sourcepath="/ECG_SensorShell" kind="lib" path="lib/ecg/event.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

@@ -20,6 +20,7 @@ import javax.swing.JPopupMenu;
 import org.electrocodeogram.module.ModuleRegistry;
 import org.electrocodeogram.module.Module;
 import org.electrocodeogram.module.UnknownModuleIDException;
+import org.electrocodeogram.module.Module.ModuleType;
 import org.electrocodeogram.module.annotator.EventProcessor;
 
 
@@ -144,7 +145,7 @@ public class MenuManager
         
         modulePopupMenu.addSeparator();
         
-        if(!ModuleRegistry.getInstance().isModuleType(Module.TARGET_MODULE,id))
+        if(!ModuleRegistry.getInstance().isModuleType(ModuleType.TARGET_MODULE,id))
         {
             modulePopupMenu.add(mniModuleConnectTo);
         }
@@ -157,7 +158,7 @@ public class MenuManager
         
         
         
-        if(ModuleRegistry.getInstance().isModuleType(Module.INTERMEDIATE_MODULE,id))
+        if(ModuleRegistry.getInstance().isModuleType(ModuleType.INTERMEDIATE_MODULE,id))
         {
             modulePopupMenu.addSeparator();
             

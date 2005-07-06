@@ -12,6 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.electrocodeogram.core.SensorShellWrapper;
+import org.electrocodeogram.module.Module.ModuleType;
 import org.electrocodeogram.module.annotator.EventProcessor;
 import org.electrocodeogram.ui.Configurator;
 
@@ -37,19 +38,12 @@ public class ModuleRegistry extends Observable
     
     private ModuleRegistry()
     {
-        try {
-            moduleClassLoader = getModuleClassLoader();
-        }
-        catch (ClassNotFoundException e2) {
-            
-            logger.log(Level.SEVERE,"Unable to initialize the module ClassLoader");
-            
-            e2.printStackTrace();
-        }
+       
+        this.moduleClassLoader = getModuleClassLoader();
         
         addObserver(Configurator.getInstance());
         
-        runningModules = new RunningModules();
+        this.runningModules = new RunningModules();
         
         
     }
@@ -58,7 +52,7 @@ public class ModuleRegistry extends Observable
     {
         this();
         
-        installedModules = new InstalledModules(filePar);
+        this.installedModules = new InstalledModules(filePar);
     }
     
     /**
@@ -102,7 +96,7 @@ public class ModuleRegistry extends Observable
      * @uml.property name="moduleClassLoader"
      */
     private ModuleClassLoader getModuleClassLoader()
-        throws ClassNotFoundException {
+    {
         
         Class clazz = this.getClass();
 
@@ -120,7 +114,7 @@ public class ModuleRegistry extends Observable
     private class RunningModules
     {
 
-        private HashMap runningModules = new HashMap();
+        private HashMap<Integer,Module> runningModuleMap = new HashMap<Integer,Module>();
         
         /**
          * This method is used to add a module instance to the registry.
@@ -130,7 +124,7 @@ public class ModuleRegistry extends Observable
         {
             assert (module != null);
             
-            runningModules.put(new Integer(module.getId()),module);
+            this.runningModuleMap.put(new Integer(module.getId()),module);
             
             setChanged();
             
@@ -148,7 +142,7 @@ public class ModuleRegistry extends Observable
         {
             assert (module != null);
             
-            runningModules.remove(new Integer(module.getId()));
+            runningModuleMap.remove(new Integer(module.getId()));
             
             setChanged();
             
@@ -167,9 +161,9 @@ public class ModuleRegistry extends Observable
         {
             assert(id > 0);
             
-            assert(runningModules.containsKey(new Integer(id)));
+            assert(runningModuleMap.containsKey(new Integer(id)));
             
-            return (Module) runningModules.get(new Integer(id));
+            return (Module) runningModuleMap.get(new Integer(id));
             
         }
 
@@ -462,7 +456,7 @@ public class ModuleRegistry extends Observable
     {
         Module module = getModuleInstance(moduleId);
         
-        module.stop();
+        module.deactivate();
         
     }
 
@@ -474,7 +468,7 @@ public class ModuleRegistry extends Observable
     {
         Module module = getModuleInstance(moduleId);
         
-        module.start();
+        module.activate();
         
         
     }
@@ -497,7 +491,7 @@ public class ModuleRegistry extends Observable
      * @param moduleId
      * @return
      */
-    public boolean isModuleType(int moduleType, int moduleId)
+    public boolean isModuleType(ModuleType moduleType, int moduleId)
     {
         Module module = getModuleInstance(moduleId);
         
@@ -552,7 +546,7 @@ public class ModuleRegistry extends Observable
         
         module.remove();
         
-        runningModules.delete(module);
+        this.runningModules.delete(module);
         
         
         

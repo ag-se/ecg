@@ -36,7 +36,7 @@ public abstract class EventProcessor extends Module
      */
     public EventProcessor(int processorMode, int annotationType, String separator)
     {
-        super(Module.INTERMEDIATE_MODULE);
+        super(ModuleType.INTERMEDIATE_MODULE);
 
         this.processorMode = processorMode;
         
@@ -47,7 +47,7 @@ public abstract class EventProcessor extends Module
     
     public EventProcessor(int annotationType, String separator)
     {
-        super(Module.INTERMEDIATE_MODULE);
+        super(ModuleType.INTERMEDIATE_MODULE);
 
         this.processorMode = EventProcessor.ANNOTATOR;
         
@@ -58,7 +58,7 @@ public abstract class EventProcessor extends Module
     
     public EventProcessor(int processorMode)
     {
-        super(Module.INTERMEDIATE_MODULE);
+        super(ModuleType.INTERMEDIATE_MODULE);
         
         this.processorMode = processorMode;
     }

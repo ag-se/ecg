@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import javax.swing.BorderFactory;
 
 import org.electrocodeogram.module.Module;
+import org.electrocodeogram.module.Module.ModuleType;
 import org.jgraph.graph.DefaultEdge;
 import org.jgraph.graph.DefaultGraphCell;
 import org.jgraph.graph.DefaultPort;
@@ -50,7 +51,7 @@ public class ModuleCell extends DefaultGraphCell
         return id;
     }
 
-    public ModuleCell(int moduleType, int id, String name, boolean b)
+    public ModuleCell(ModuleType moduleType, int id, String name, boolean b)
     {
         super(name);
 
@@ -72,13 +73,13 @@ public class ModuleCell extends DefaultGraphCell
                
         switch (moduleType)
         {
-        	case Module.SOURCE_MODULE:
+        	case SOURCE_MODULE:
         	    GraphConstants.setGradientColor(this.getAttributes(), Color.GREEN);
         	break;
-        	case Module.INTERMEDIATE_MODULE:
+        	case INTERMEDIATE_MODULE:
         	    GraphConstants.setGradientColor(this.getAttributes(), Color.orange);
         	break;
-        	case Module.TARGET_MODULE:
+        	case TARGET_MODULE:
         	    GraphConstants.setGradientColor(this.getAttributes(), Color.BLUE);
         	break;
         }

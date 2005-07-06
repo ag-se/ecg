@@ -184,11 +184,11 @@ public class ModuleGraph extends JGraph
             
             ModuleCell moduleCell = (ModuleCell) moduleCells.get(new Integer(id));
             
-            GraphConstants.setOpaque(moduleCell.getAttributes(),module.isRunning());
+            GraphConstants.setOpaque(moduleCell.getAttributes(),module.isActive());
             
             this.getGraphLayoutCache().insert(moduleCell);
 
-            Object[] modules = module.getChildModules();
+            Object[] modules = module.getReceivingModules();
             
             Object[] edges = moduleCell.getChildEdges();
             

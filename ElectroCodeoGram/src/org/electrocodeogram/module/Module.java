@@ -1,9 +1,3 @@
-/*
- * Created on 08.03.2005
- *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
- */
 package org.electrocodeogram.module;
 
 import java.util.Collection;
@@ -20,219 +14,279 @@ import org.electrocodeogram.ui.Configurator;
 import org.electrocodeogram.ui.GuiEventWriter;
 
 /**
- * @author 7oas7er *  */
-
+ * This abstract class represents an ECG analysis module. A module is an entity able
+ * of receiving events from modules it is connected to and sending events to modules
+ * that are connected to it.
+ * Additionaly a module can be implemented to modify the data of received events
+ * and to generate new outgoing events.
+ * There are three distinct module types defined:
+ * Source modules are not able to be connected to other modules, but other (non-source)
+ * modules are able to be connected to it.
+ * Intermediate modules are connectable to each other.
+ * And target modules are only able to be connected to other modules, but no module
+ * can be connected to them.
+ * The connection degree, wich is the number of modules connected to another module, is
+ * not limited by the implementation. 
+ * Each module gets an unique integer id during its object creation.
+ *
+ */
 public abstract class Module extends Observable implements Observer
 {
 
     protected Logger logger = null;
-    
-    public final static int SOURCE_MODULE = 0;
 
-    public final static int INTERMEDIATE_MODULE = 1;
-
-    private static ModuleRegistry moduleRegistry = ModuleRegistry.getInstance();
-
-    public final static int TARGET_MODULE = 2;
-    
-    private int moduleType = -1;
-    
-    private static int count = 0;
-    
-    private int id = 0;
-    
-    private String name = null;
-    
-    private HashMap childModuleMap = null;
-     
-    private Collection childModules = null;
-    
-    private HashMap parentModuleMap = null;
-    
-   private Collection parentModules = null;
-
-    protected EventBuffer eventBuffer = null;
-
-    protected boolean runningFlag = false;
-   
-    public Module(int moduleType)
-    {
-      id = ++count;
-      
-      this.name = this.getClass().getName();
-      
-      this.moduleType = moduleType;
-      
-      this.logger = Logger.getLogger(this.name);
-      
-      eventBuffer = new EventBuffer();
-      
-      childModuleMap = new HashMap();
-      
-      childModules = childModuleMap.values();
-      
-      parentModuleMap = new HashMap();
-      
-      parentModules = childModuleMap.values();
-      
-      if (!(this instanceof GuiEventWriter))
-      {
-          addObserver(Configurator.getInstance(this));
-          
-          addObserver(GuiEventWriter.getInstance());
-      }
-      
-      start();
-
-    }
-    
-    public boolean isRunning()
-    {
-        return runningFlag;
-    }
-    
-    public void stop()
-    {
-        if(runningFlag == false) return;
-        
-        this.runningFlag = false;
-        
-        notifyModuleChanged(this);
-    }
-    
-    public void start()
-    {
-        if(runningFlag == true) return;
-        
-        this.runningFlag = true;
-        
-        notifyModuleChanged(this);
-    }
-    
-    /* (non-Javadoc)
-     * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
+    /**
+     * These values are indicating the type of the module.
      */
-    public final void update(Observable o, Object arg)
-    {
-        analyseNotification(o,arg);
+    public enum ModuleType {
+        /**
+         * This is a module type value that indicates that the module
+         * is a source module.
+         * Source modules are not able to be connected to other modules, but other (non-source)
+         * modules are able to be connected to it.
+         */
+        SOURCE_MODULE,
+        /**
+         * This is a module type value that indicates that the module
+         * is a intermediate module.
+         * Intermediate modules are connectable to each other.
+         */
+        INTERMEDIATE_MODULE,
+        /**
+         * This is a module type value that indicates that the module
+         * is a target module.
+         * And target modules are only able to be connected to other modules, but no module
+         * can be connected to them.
+         */
+        TARGET_MODULE
     }
 
-    private void analyseNotification(Observable o, Object arg)
+    private ModuleType moduleType;
+
+    private static int count = 0;
+
+    private int id = 0;
+
+    private String name = null;
+
+    private HashMap<Integer, Module> receiverModuleMap = null;
+
+    private HashMap<Integer, Module> senderModuleMap = null;
+
+    protected boolean activeFlag = false;
+
+    /**
+     * This creates a new Module of the given module type and registers it with the ModuleRegistry.
+     * @param moduleTypePar Is the module type
+     */
+    public Module(ModuleType moduleTypePar)
     {
-        if(arg instanceof ValidEventPacket)
-        {
-            ValidEventPacket eventPacket = (ValidEventPacket) arg;
-            
+        this.id = ++count;
+
+        this.name = this.getClass().getName();
+
+        this.moduleType = moduleTypePar;
+
+        this.logger = Logger.getLogger(this.name);
+
+        this.receiverModuleMap = new HashMap<Integer, Module>();
+
+        this.senderModuleMap = new HashMap<Integer, Module>();
+
+        if (!(this instanceof GuiEventWriter)) {
+
+            addObserver(Configurator.getInstance(this));
+
+            addObserver(GuiEventWriter.getInstance());
+        }
+
+        ModuleRegistry.getInstance().addModuleInstance(this);
+
+        activate();
+
+    }
+
+    /**
+     * This method returns "true" if the module is active and "false" if not.
+     * @return "true" if the module is active and "false" if not
+     */
+    public boolean isActive()
+    {
+        return this.activeFlag;
+    }
+
+    /**
+     * This method deactivates the module. The module might be allready deactivated.
+     *
+     */
+    protected void deactivate()
+    {
+        if (this.activeFlag == false)
+            return;
+
+        this.activeFlag = false;
+
+        notifyModuleChanged(this);
+    }
+
+    /**
+     * This method activates the module. The module might be allready activated.
+     *
+     */
+    protected void activate()
+    {
+        if (this.activeFlag == true)
+            return;
+
+        this.activeFlag = true;
+
+        notifyModuleChanged(this);
+    }
+
+    /**
+     * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
+     * As this is the Observer's update method it is called whenever this module is
+     * notified of a change of state in an Observable this module is observating.
+     * This mechanism is used in the module communication to transport events.
+     * When a module is receiving an event its state has changed and it notifies all
+     * connected modules and passes the event to them as a parameter.
+     */
+    public final void update(Observable module, Object event)
+    {
+        if (!(module instanceof Module)) {
+            return;
+        }
+
+        analyseNotification(module, event);
+    }
+
+    private void analyseNotification(Observable module, Object event)
+    {
+        assert (module instanceof Module);
+
+        if (event instanceof ValidEventPacket) {
+
+            ValidEventPacket eventPacket = (ValidEventPacket) event;
+
             receiveEventPacket(eventPacket);
         }
     }
-    
-    public abstract void receiveEventPacket(ValidEventPacket eventPacket);
-    
-    public int getId() {
-        return id;
-    }
 
-    public int getModuleType() {
-        return moduleType;
-    }
+    /**
+     * This abstarct method is to be implemented by all actual moduls.
+     * Its implementation tells what to do with a received event.
+     * @param eventPacket Is the received event
+     */
+    protected abstract void receiveEventPacket(ValidEventPacket eventPacket);
 
-   public String getName() {
-        return name;
-    }
-
-    
-    protected void sendEventPacket(ValidEventPacket eventPacket)
+    /**
+     * This method returns the unique id of this module.
+     * @return The unique id of this module
+     */
+    public int getId()
     {
-        if(runningFlag && (eventPacket != null))
-        {
-	        setChanged();
-	        try {
-                notifyObservers(new ValidEventPacket(this.getId(),eventPacket.getTimeStamp(),eventPacket.getHsCommandName(),eventPacket.getArglist()));
+        return this.id;
+    }
+
+    /**
+     * This method returns the ModuleType of this module.
+     * @return The ModuleType of this module
+     */
+    public ModuleType getModuleType()
+    {
+        return this.moduleType;
+    }
+
+    /**
+     * This method returns the name of this module.
+     * @return The name of this module
+     */
+    public String getName()
+    {
+        return this.name;
+    }
+
+    /**
+     * This method is inherited to all extending modules. It sends the given event to
+     * all connected modules. The sourceId attribute of the event is changed to thie id
+     * of this the sending module.
+     * @param eventPacket Is the event to send
+     */
+    protected final void sendEventPacket(ValidEventPacket eventPacket)
+    {
+        if (this.activeFlag && (eventPacket != null)) {
+            setChanged();
+
+            try {
+                notifyObservers(new ValidEventPacket(this.getId(),
+                        eventPacket.getTimeStamp(),
+                        eventPacket.getHsCommandName(),
+                        eventPacket.getArglist()));
             }
             catch (IllegalEventParameterException e) {
-                // TODO Auto-generated catch block
+
+                // As only the id of a ValidEventPackets is changed, it has to stay valid
+
+                clearChanged();
+
                 e.printStackTrace();
+
+                this.logger.log(Level.SEVERE, "An unexpected exception has occured. Please report this at www.electrocodeogram.org");
+
             }
-	        clearChanged();
-	    }
+            clearChanged();
+        }
+    }
+
+ 
+    /**
+     * This methos returns the number of connected modules.
+     * @return The number of connected modules
+     */
+    public int getReceivingModuleCount()
+    {
+        return this.receiverModuleMap.size();
     }
 
     /**
-     * @param e
-     * @param string
-     * @param string2
-     * @return
+     * This method is used to connect a given module to this module.
+     * @param module Is the module that should be connected to this module.
+     * @return The id of the connected module
+     * @throws ModuleConnectionException If the given module could not be connected to this module.
+     * This happens if this module is a target module or if the given module is alllready connected to this module.
      */
-    protected boolean isPacketMatching(ValidEventPacket e, String hsCommmandName, String ecgCommandName)
+    protected int connectChildModule(Module module) throws ModuleConnectionException
     {
-        assert(e != null);
-        
-        logger.log(Level.INFO,"isPacketMatching?");
-        
-        if(e.getHsCommandName().equals(hsCommmandName) && e.getEcgCommandName().equals(ecgCommandName))
-        {
-            // TODO : handle NullPointerException by no ECGCommand
-            logger.log(Level.INFO,"Yes");
-            return true;
+
+        if (this.moduleType == ModuleType.TARGET_MODULE) {
+            throw new ModuleConnectionException(
+                    "An diese Modul können Sie keine weiteren Module anhängen");
         }
-        else
-        {
-            logger.log(Level.INFO,"No");
-            return false;
+        else if (this.receiverModuleMap.containsKey(new Integer(module.getId()))) {
+            throw new ModuleConnectionException(
+                    "Diese Module sind bereits verbunden.");
         }
-    }
-    
-    public int countChildModules()
-    {
-        return childModules.size();
-    }
-    
-    /**
-     * @param module
-     * @return
-     * @throws ModuleConnectionException
-     */
-    public int connectChildModule(Module module) throws ModuleConnectionException
-    {
-        
-        if (moduleType == Module.TARGET_MODULE)
-        {
-            throw new ModuleConnectionException("An diese Modul können Sie keine weiteren Module anhängen");
+        else {
+
+            addObserver(module);
+
+            this.receiverModuleMap.put(new Integer(module.id), module);
+
+            module.addParentModule(this);
+
+            notifyModuleChanged(this);
+
+            return module.id;
+
         }
-        else if(childModuleMap.containsKey(new Integer(module.getId())))
-        {
-            throw new ModuleConnectionException("Diese Module sind bereits verbunden.");
-        }
-        else
-        {
-	        
-        	addObserver(module);
-	        
-	        childModuleMap.put(new Integer(module.id),module);
-	        
-	        module.addParentModule(this);
-	        
-	        notifyModuleChanged(this);
-	        
-	        return module.id;
-	        
-        }
-        
-        
+
     }
 
-    /**
-     * @param module
-     */
     private void addParentModule(Module module)
     {
-        this.parentModuleMap.put(new Integer(module.getId()),module);
+        this.senderModuleMap.put(new Integer(module.getId()), module);
     }
 
-    /**
-     * @param module
-     */
     private void notifyModuleChanged(Module module)
     {
         setChanged();
@@ -240,73 +294,58 @@ public abstract class Module extends Observable implements Observer
         clearChanged();
     }
 
-    public Object[] getChildModules() {
-        
-        childModules = childModuleMap.values();
-        
-        return childModules.toArray();
-    }
-
-    private Object[] getParentModules() {
-        
-        parentModules = parentModuleMap.values();
-        
-        return parentModules.toArray();
-    }
-    
-    public void disconnectChildModule(Module module) throws UnknownModuleIDException
+    /**
+     * This method retuns an Array of all modules that are connected to this module.
+     * @return An Array of all modules that are connected to this module
+     */
+    public Module[] getReceivingModules()
     {
-        	if(!childModuleMap.containsKey(new Integer(module.getId())))
-	        {
-	            throw new UnknownModuleIDException("The given module id " + id + " is unknown.");
-	        }
-	        else
-	        {
-		        assert(module != null);
-		        
-		        deleteObserver(module);
-		        
-		        childModuleMap.remove(new Integer(module.getId()));
-		       
-		        notifyModuleChanged(this);
-	        }
+        Collection<Module> receivingModules = this.receiverModuleMap.values();
+
+        return receivingModules.toArray(new Module[0]);
+    }
+
+    private Module[] getSendingModules()
+    {
+
+        Collection<Module> sendingModules = this.senderModuleMap.values();
+
+        return sendingModules.toArray(new Module[0]);
+    }
+
+    /**
+     * This method disconnects a connected module.
+     * @param module The module to disconnect
+     * @throws UnknownModuleIDException If the given module is not connected to this module
+     */
+    protected void disconnectChildModule(Module module) throws UnknownModuleIDException
+    {
+        if (!this.receiverModuleMap.containsKey(new Integer(module.getId()))) {
+            throw new UnknownModuleIDException(
+                    "The given module id " + this.id + " is unknown.");
         }
+        assert (module != null);
+
+        deleteObserver(module);
+
+        this.receiverModuleMap.remove(new Integer(module.getId()));
+
+        notifyModuleChanged(this);
+
+    }
+
     
-
-
+    /**
+     * @see java.lang.Object#toString()
+     * This implementation of the toString method returns the module-name.
+     */
+    @Override
     public String toString()
     {
-        return name;
-        
-    }
-    
-    protected class EventBuffer
-    {
-        private final int bufferSize = 10;
-        
-        private LinkedList bufferList = new LinkedList();
+        return this.name;
 
-        public void append(ValidEventPacket eventPacket)
-        {
-            if(bufferList.size() > bufferSize)
-            {
-                bufferList.removeFirst();
-            }
-            
-            bufferList.add(eventPacket);
-        }
-        
-        public ValidEventPacket getFirst()
-        {
-            return (ValidEventPacket) bufferList.getFirst();
-        }
-        
-        public ValidEventPacket getLast()
-        {
-            return (ValidEventPacket) bufferList.getLast();
-        }
-        
     }
+
 
     /**
      * @param currentPropertyName
@@ -315,93 +354,95 @@ public abstract class Module extends Observable implements Observer
     public abstract void setProperty(String currentPropertyName, Object propertyValue);
 
     /**
-     * @return
+     * This method collects detailed infomration about the module and returns them as a String.
+     * @return A String of detailed information about the module
      */
     public String getDetails()
     {
         String text = "Name: \t" + getName() + "\nID: \t " + getId() + "\nTyp: \t";
+
+        ModuleType type = getModuleType();
         
-        int type = getModuleType();
-        switch(type)
+        switch (type)
         {
-            case Module.SOURCE_MODULE:
-                text += "Quellmodul";
+        case SOURCE_MODULE:
+            text += "Quellmodul";
             break;
-            
-            case Module.INTERMEDIATE_MODULE:
-                text += "Zwischenmodul";
+
+        case INTERMEDIATE_MODULE:
+            text += "Zwischenmodul";
             break;
-            
-            case Module.TARGET_MODULE:
-                text += "Zielmodul";
+
+        case TARGET_MODULE:
+            text += "Zielmodul";
             break;
         }
-        
-        if(this instanceof EventProcessor)
-        {
+
+        if (this instanceof EventProcessor) {
             EventProcessor eventProcessor = (EventProcessor) this;
-            
+
             int mode = eventProcessor.getProcessorMode();
-            
+
             text += "\nModus: \t";
-            
-            switch(mode)
+
+            switch (mode)
             {
-            	case EventProcessor.ANNOTATOR:
-            	    text += "Annotation";
-            	break;
-            	
-            	case EventProcessor.FILTER:
-            	    text += "Filterung";
-            	break;
-            	    
+            case EventProcessor.ANNOTATOR:
+                text += "Annotation";
+                break;
+
+            case EventProcessor.FILTER:
+                text += "Filterung";
+                break;
+
             }
         }
-        
+
         String moduleDescription = ModuleRegistry.getInstance().getModuleDescription(this.getName());
-        
-        if(moduleDescription != null)
-        {
+
+        if (moduleDescription != null) {
             text += "\nBeschreibung: \t";
-            
+
             text += moduleDescription;
-            
+
         }
-        
+
         return text;
-    
+
     }
 
-    /**
-     * @throws UnknownModuleIDException
-     * 
-     */
-    public void remove() throws UnknownModuleIDException
+    protected void remove()
     {
-        
-        if(parentModuleMap.size() != 0)
-        {
-        
-        Object[] parentModules = getParentModules();
-        
-        for(int i=0;i<parentModules.length;i++)
-        {
-            Module module = (Module) parentModules[i];
-            
-            module.disconnectChildModule(this);
+        if (this.senderModuleMap.size() != 0) {
+
+            Module[] parentModules = getSendingModules();
+
+            for (int i = 0; i < parentModules.length; i++) {
+                
+                Module module = parentModules[i];
+
+                try {
+                    module.disconnectChildModule(this);
+                }
+                catch (UnknownModuleIDException e) {
+                    
+                    e.printStackTrace();
+
+                    this.logger.log(Level.SEVERE, "An unexpected exception has occured. Please report this at www.electrocodeogram.org");
+                }
+            }
         }
-        }
+       
     }
 
     /**
-     * @param moduleName
+     * This method sets the name of this module to the given name.
+     * @param moduleName the new name for the module. 
      */
-    public void setName(String moduleName)
+    protected void setName(String moduleName)
     {
         this.name = moduleName;
-        
+
     }
 
-   
-    
 }

@@ -16,15 +16,11 @@ import org.electrocodeogram.module.Module;
         
         public SourceModule()
         {
-            super(Module.SOURCE_MODULE);
+            super(ModuleType.SOURCE_MODULE);
         }
         
         public void append(ValidEventPacket eventPacket)
         {
-            assert(eventBuffer != null);
-            
-            eventBuffer.append(eventPacket);
-                       
             sendEventPacket(eventPacket);
         }
 

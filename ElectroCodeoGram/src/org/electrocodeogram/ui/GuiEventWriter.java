@@ -35,7 +35,7 @@ public class GuiEventWriter extends EventWriter
         
         this.target = target;
         
-        this.start();
+        this.activate();
     }
     
     private GuiEventWriter()

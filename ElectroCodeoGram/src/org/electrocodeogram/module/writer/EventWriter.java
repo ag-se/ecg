@@ -25,7 +25,7 @@ public abstract class EventWriter extends Module
      */
     public EventWriter(String name)
     {
-        super(Module.TARGET_MODULE);
+        super(ModuleType.TARGET_MODULE);
     }
     
 //    public void update(Observable o, Object arg)
