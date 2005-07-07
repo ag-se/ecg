@@ -154,6 +154,7 @@ public class ServersideTests extends TestCase
             eventPacket = this.eventGenerator.createValidEventPacket(true, true, true, true, 10, 10);
         }
         catch (IllegalEventParameterException e) {
+            
             fail();
             
             e.printStackTrace();

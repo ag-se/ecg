@@ -8,6 +8,8 @@ import org.electrocodeogram.module.ModuleConnectionException;
 import org.electrocodeogram.test.EventGenerator;
 import org.electrocodeogram.test.EventGenerator.SensorDataType;
 
+import utmj.threaded.RetriedAssert;
+
 /**
  * This class collects testcases that are testing the transportation of events between
  * connected modules. 
@@ -48,9 +50,24 @@ public class ModuleTests extends TestCase
             
             this.testModuleTransport.makeModuleList(100);
             
-            boolean result = this.testModuleTransport.checkModuleEventTransport(eventPacket);
+            this.testModuleTransport.checkModuleEventTransport(eventPacket);
             
-            assertTrue(result);
+            try {
+                new RetriedAssert(5000,100)
+                {
+                    @Override
+                    public void run() throws Exception
+                    {
+                        assertTrue(testModuleTransport.getResult());
+                    }
+                }.start();
+            }
+            catch (Exception e) {
+                
+                fail();
+                
+                e.printStackTrace();
+            }
         }
         catch (ModuleConnectionException e) {
             
