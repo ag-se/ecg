@@ -30,9 +30,11 @@ import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
 import org.electrocodeogram.core.SensorServer;
+import org.electrocodeogram.module.IllegalModuleIDException;
 import org.electrocodeogram.module.Module;
 import org.electrocodeogram.module.ModuleDescriptor;
 import org.electrocodeogram.module.ModuleRegistry;
+import org.electrocodeogram.module.UnknownModuleIDException;
 import org.electrocodeogram.module.Module.ModuleType;
 
 import com.zfqjava.swing.JStatusBar;
@@ -206,7 +208,17 @@ public class Configurator extends JFrame implements Observer
             public void actionPerformed(ActionEvent e)
             {
 
-                ModuleRegistry.getInstance().stopModule(1);
+                try {
+                    ModuleRegistry.getInstance().getModuleInstance(1).deactivate();
+                }
+                catch (IllegalModuleIDException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
+                catch (UnknownModuleIDException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
 
             }
         });
@@ -217,7 +229,17 @@ public class Configurator extends JFrame implements Observer
             public void actionPerformed(ActionEvent e)
             {
 
-                ModuleRegistry.getInstance().startModule(1);
+                try {
+                    ModuleRegistry.getInstance().getModuleInstance(1).activate();
+                }
+                catch (IllegalModuleIDException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
+                catch (UnknownModuleIDException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
 
             }
         });
@@ -417,10 +439,12 @@ public class Configurator extends JFrame implements Observer
                 ModuleDescriptor moduleDescriptor = (ModuleDescriptor) arg;
 
                 String moduleName = moduleDescriptor.getName();
+                
+                int moduleClassId = moduleDescriptor.getId();
 
                 JButton btnModule = new JButton(moduleName);
 
-                btnModule.addActionListener(new ActionAdapter(this, moduleName));
+                btnModule.addActionListener(new ActionAdapter(this, moduleClassId, moduleName));
 
                 pnlButtons.add(btnModule);
                 
@@ -577,7 +601,18 @@ public class Configurator extends JFrame implements Observer
 
         if (id != -1) {
 
-            String text = ModuleRegistry.getInstance().getModuleDetails(id);
+            String text = "";
+            try {
+                text = ModuleRegistry.getInstance().getModuleInstance(id).getDetails();
+            }
+            catch (IllegalModuleIDException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            catch (UnknownModuleIDException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
 
             JOptionPane.showMessageDialog(this, text, "Moduleigenschaften", JOptionPane.INFORMATION_MESSAGE);
         }

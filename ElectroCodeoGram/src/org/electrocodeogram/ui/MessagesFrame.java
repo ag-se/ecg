@@ -19,7 +19,9 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.electrocodeogram.module.IllegalModuleIDException;
 import org.electrocodeogram.module.ModuleRegistry;
+import org.electrocodeogram.module.UnknownModuleIDException;
 
 /**
  * @author 7oas7er
@@ -105,7 +107,17 @@ public class MessagesFrame extends JFrame implements MessagesTarget
         }
         else
         {
-            this.titledBorder.setTitle(MODULE_SELECTED + ModuleRegistry.getInstance().getModulNameForId(moduleId));
+            try {
+                this.titledBorder.setTitle(MODULE_SELECTED + ModuleRegistry.getInstance().getModuleInstance(moduleId).getName());
+            }
+            catch (IllegalModuleIDException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            catch (UnknownModuleIDException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
         repaint();
     }

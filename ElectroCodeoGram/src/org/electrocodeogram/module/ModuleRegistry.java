@@ -4,26 +4,29 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Observable;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.electrocodeogram.core.SensorShellWrapper;
-import org.electrocodeogram.module.Module.ModuleType;
-import org.electrocodeogram.module.annotator.EventProcessor;
 import org.electrocodeogram.ui.Configurator;
 
 /**
- * @author Frank Schlesinger *  * The singleton class ModuleRegistry finds installed ECG modules and makes their module-descriptions * available to the framework. It also keeps track of all currently running modules.
+ * This is the central ModuleRegistry which maintains information about all
+ * currently created modules and even all module class files in the module
+ * directory from which module instances could be created. During its creation
+ * every module object registers with the ModuleRegistry by its unique id. On
+ * deletion of a module the module is deregistered from the ModuleRegistry.
+ * Writing access to all created module objects, such as module deletion, module
+ * connection and module renaming, is only permitted through the
+ * ModuleRegistry's methods. Additionaly the ModuleRegistry stores maintains
+ * information about module class files that are able to be instanciated.
  */
-
 public class ModuleRegistry extends Observable
 {
-    
-    private Logger logger = Logger.getLogger("ModuleRegistry");
+
+    private Logger logger = null;
 
     private static ModuleRegistry theInstance = null;
 
@@ -32,594 +35,461 @@ public class ModuleRegistry extends Observable
     private InstalledModules installedModules = null;
 
     private File moduleDirectory = null;
-    
-    private ModuleClassLoader moduleClassLoader = null;
 
-    
     private ModuleRegistry()
     {
-       
-        this.moduleClassLoader = getModuleClassLoader();
-        
+        this.logger = Logger.getLogger("ModuleRegistry");
+
         addObserver(Configurator.getInstance());
-        
+
         this.runningModules = new RunningModules();
-        
-        
+
     }
-    
+
     private ModuleRegistry(File filePar)
     {
         this();
-        
+
         this.installedModules = new InstalledModules(filePar);
+        
+        setChanged();
+
+        notifyObservers();
+
+        clearChanged();
     }
-    
+
     /**
      * This method returns the singleton instance of the ModuleRegistry.
+     * 
      * @return the singleton instance of the ModuleRegistry
      */
     public static ModuleRegistry getInstance()
     {
-        if(theInstance == null)
-        {
+        if (theInstance == null) {
             theInstance = new ModuleRegistry();
         }
-        
+
         return theInstance;
     }
 
-    public static void getInstance(File file)
+    /**
+     * This method returns the singleton instance of the ModuleRegistry. The
+     * file parameter is used to indicate the location where module class files
+     * are stored if no other location was given before.
+     * 
+     * @param file
+     *            Indicate the location where module class files are stored
+     * @return the singleton instance of the ModuleRegistry
+     */
+    public static ModuleRegistry getInstance(File file)
     {
-        if(theInstance == null)
-        {
+        if (theInstance == null) {
             theInstance = new ModuleRegistry(file);
         }
-        else
-        {
-            if(theInstance.moduleDirectory == null)
-            {
+        else {
+            if (theInstance.moduleDirectory == null) {
                 theInstance.moduleDirectory = file;
-                
+
                 theInstance.installedModules = theInstance.new InstalledModules(file);
             }
         }
-        
+
+        return theInstance;
+
     }
-    
-    /**
-     * This method instanciates the ModuleClassLoader and passes the curretn ClassLoader
-     * as a parameter to be the parent ClassLoader.
-     * 
-     * @throws ClassNotFoundException This should never occur.
-     * 
-     * @uml.property name="moduleClassLoader"
-     */
-    private ModuleClassLoader getModuleClassLoader()
+
+    Logger getLogger()
     {
-        
-        Class clazz = this.getClass();
-
-        ClassLoader currentClassLoader = clazz.getClassLoader();
-
-        return new ModuleClassLoader(currentClassLoader);
+        return this.logger;
     }
 
-    
     /**
-     * @author Frank Schlesinger
-     *
-     * This nested class keeps track of all running modules.
+     * This method returns the IDs of all currently known module class files
+     * that are ready to be instanciated.
+     * 
+     * @return The IDs of all currently known module class files
      */
+    public Integer[] getAvailableModuleClassIds()
+    {
+        if (this.installedModules.availableModuleClassesMap.size() > 0) {
+            return this.installedModules.availableModuleClassesMap.keySet().toArray(new Integer[0]);
+        }
+
+        return null;
+    }
+
+    /**
+     * This method returns the module class object with the given moduleClassId.
+     * 
+     * @param moduleClassId
+     * @return The class object
+     * @throws IllegalModuleIDException
+     *             If the given moduleClassId has a value of < 1
+     * @throws UnknownModuleIDException
+     *             If a module class with the given id could not be found
+     */
+    public Class getModuleClassForId(int moduleClassId) throws IllegalModuleIDException, UnknownModuleIDException
+    {
+        if (!(moduleClassId > 1)) {
+            throw new IllegalModuleIDException();
+        }
+
+        if (!this.installedModules.availableModuleClassesMap.containsKey(new Integer(
+                moduleClassId))) {
+            throw new UnknownModuleIDException();
+        }
+
+        ModuleDescriptor moduleDescriptor = this.installedModules.availableModuleClassesMap.get(new Integer(
+                moduleClassId));
+
+        return moduleDescriptor.getClazz();
+    }
+
+    /**
+     * This method returns the module properties of the module class with the
+     * given moduleClassId.
+     * 
+     * @param moduleClassId
+     * @return The module properties as declared in the "module.properties" file
+     *         of the module
+     * @throws IllegalModuleIDException
+     *             If the given moduleClassId has a value of < 1
+     * @throws UnknownModuleIDException
+     *             If a module class with the given id could not be found
+     */
+    public Properties getModulePropertiesForId(int moduleClassId) throws IllegalModuleIDException, UnknownModuleIDException
+    {
+        if (!(moduleClassId > 1)) {
+            throw new IllegalModuleIDException();
+        }
+
+        if (!this.installedModules.availableModuleClassesMap.containsKey(new Integer(
+                moduleClassId))) {
+            throw new UnknownModuleIDException();
+        }
+
+       
+            ModuleDescriptor moduleDescriptor = this.installedModules.availableModuleClassesMap.get(new Integer(
+                    moduleClassId));
+
+            return moduleDescriptor.getProperties();
+        
+
+    }
+
     private class RunningModules
     {
-
-        private HashMap<Integer,Module> runningModuleMap = new HashMap<Integer,Module>();
-        
-        /**
-         * This method is used to add a module instance to the registry.
-         * @param module The reference to the module istance
-         */
-        public void add(Module module)
-        {
-            assert (module != null);
-            
-            this.runningModuleMap.put(new Integer(module.getId()),module);
-            
-            setChanged();
-            
-            notifyObservers(module);
-            
-            clearChanged();
-            
-        }
-
-        /**
-         * This method is used to delete a module instance from the registry.
-         * @param module The module instance to delete
-         */
-        public void delete(Module module)
-        {
-            assert (module != null);
-            
-            runningModuleMap.remove(new Integer(module.getId()));
-            
-            setChanged();
-            
-            notifyObservers(module);
-            
-            clearChanged();
-
-            
-        }
-
-        /**
-         * Use this method to get a module instance with the give unique id.
-         * @param id The unique id of the module
-         */
-        public Module getModule(int id)
-        {
-            assert(id > 0);
-            
-            assert(runningModuleMap.containsKey(new Integer(id)));
-            
-            return (Module) runningModuleMap.get(new Integer(id));
-            
-        }
-
+        HashMap<Integer, Module> runningModuleMap = new HashMap<Integer, Module>();
     }
+
     
-    /**
-     * @author Frank Schlesinger
-     *
-     * This class processes the module directory for installed modules.
-     */
     private class InstalledModules
     {
 
         private final String MODULE_PROPERTY_FILE = "module.properties";
 
-        private HashMap availableModules = new HashMap();
-        
-        
-        private InstalledModules(File moduleDirectory)
+        HashMap<Integer, ModuleDescriptor> availableModuleClassesMap = null;
+
+        private int id = 1;
+
+        private ModuleClassLoader moduleClassLoader = null;
+
+        private InstalledModules(File moduleDirectoryPar)
         {
-            if (moduleDirectory == null)
-            {
+            this.availableModuleClassesMap = new HashMap<Integer, ModuleDescriptor>();
+
+            this.moduleClassLoader = getModuleClassLoader();
+
+            initialize(moduleDirectoryPar);
+        }
+
+        private ModuleClassLoader getModuleClassLoader()
+        {
+
+            Class clazz = this.getClass();
+
+            ClassLoader currentClassLoader = clazz.getClassLoader();
+
+            return new ModuleClassLoader(currentClassLoader);
+        }
+
+        private void initialize(File moduleDirectoryPar)
+        {
+            // is the parameter not null?
+            if (moduleDirectoryPar == null) {
                 return;
             }
-            
-            if (moduleDirectory.exists() && moduleDirectory.isDirectory()) {
-                
-                String[] moduleDirectories = moduleDirectory.list();
 
-                assert (moduleDirectories != null);
-                
-                for (int i = 0; i < moduleDirectories.length; i++) {
-                    
-                    String modulePropertyFileString = moduleDirectory + File.separator + moduleDirectories[i] + File.separator + MODULE_PROPERTY_FILE;
-                    
-                    File modulePropertyFile = new File(modulePropertyFileString);
-                    
-                    if (!modulePropertyFile.exists() || !modulePropertyFile.isFile()) {
-                    
-                        logger.log(Level.WARNING,"Error inspecting module property file " + modulePropertyFileString);
-                        
+            assert (moduleDirectoryPar != null);
+
+            // does the file exist and is it a directory?
+            if (!moduleDirectoryPar.exists() || !moduleDirectoryPar.isDirectory()) {
+                return;
+            }
+
+            assert (moduleDirectoryPar.exists() && moduleDirectoryPar.isDirectory());
+
+            // get all filenames in it
+            String[] moduleDirectories = moduleDirectoryPar.list();
+
+            // assert no IO-Error has occured
+            if (moduleDirectories == null) {
+                return;
+            }
+
+            assert (moduleDirectories != null);
+
+            int length = moduleDirectories.length;
+
+            // are there any files in it?
+            if (!(length > 0)) {
+                return;
+            }
+
+            assert (length > 0);
+
+            for (int i = 0; i < length; i++) {
+
+                String actModuleDirectoryPath = moduleDirectoryPar + File.separator + moduleDirectories[i];
+
+                File actModuleDirectory = new File(actModuleDirectoryPath);
+
+                // skip all simple files
+                if (!actModuleDirectory.isDirectory()) {
+                    continue;
+                }
+
+                String modulePropertyFileString = actModuleDirectoryPath + File.separator + this.MODULE_PROPERTY_FILE;
+
+                File modulePropertyFile = new File(modulePropertyFileString);
+
+                // inspect module.property file and skip if neccessary
+                if (!modulePropertyFile.exists() || !modulePropertyFile.isFile()) {
+
+                    getLogger().log(Level.WARNING, "Error inspecting module property file " + modulePropertyFileString);
+
+                    continue;
+
+                }
+
+                Properties properties = new Properties();
+
+                try {
+
+                    properties.load(new FileInputStream(modulePropertyFile));
+                }
+                catch (FileNotFoundException e1) {
+
+                    getLogger().log(Level.SEVERE, "File not found: " + modulePropertyFile.getName());
+                }
+                catch (IOException e1) {
+
+                    getLogger().log(Level.SEVERE, "Error while reading: " + modulePropertyFile.getName());
+                }
+
+                if (properties.size() > 0) {
+
+                    String moduleName = properties.getProperty("MODULE_NAME");
+
+                    // skip this module if its name is not given
+                    if (moduleName == null || moduleName.length() == 0) {
                         continue;
-                        
                     }
-                    else {
-                        
-                        Properties properties = new Properties();
-                                                
-                        try {
-                             
-                            properties.load(new FileInputStream(modulePropertyFile));
-                        }
-                        catch (FileNotFoundException e1) {
-                            
-                            logger.log(Level.SEVERE,"File not found: " + modulePropertyFile.getName());
-                        }
-                        catch (IOException e1) {
-                            
-                            logger.log(Level.SEVERE,"Error while reading: " + modulePropertyFile.getName());
-                        }
-                        
-                        if (properties.size() > 0) {
-                            
-                            String moduleName = properties.getProperty("MODULE_NAME");
-                            
-                            assert(moduleName != null);
-                            
-                            String moduleClassString =  properties.getProperty("MODULE_CLASS");
-                            
-                            assert(moduleClassString != null);
-                            
-                            String fQmoduleClassString = moduleDirectory + File.separator + moduleDirectories[i] + File.separator + moduleClassString + ".class";
 
-                            Class moduleClass = null;
-                            
-                            try {
-                                
-                                assert(moduleClassLoader != null);
-                                
-                                moduleClass = moduleClassLoader.loadClass(fQmoduleClassString);
-                                
-                                assert(availableModules != null);
-                                
-                                ModuleDescriptor moduleDescriptor = new ModuleDescriptor(moduleName,moduleClass,properties);
-                                                                
-                                availableModules.put(moduleName, moduleDescriptor);
-                                
-                                setChanged();
-                                
-                                notifyObservers(moduleDescriptor);
-                                
-                                clearChanged();
-                            }
-                            catch (ClassNotFoundException e) {
-                                
-                               logger.log(Level.SEVERE,"Unable to load the module " + moduleName + " because the class " + fQmoduleClassString + " is not found.\nProceeding with next module if any.");
-                            }
-                            
-                            
+                    assert (moduleName != null && moduleName.length() > 0);
 
-                        }
+                    String moduleClassString = properties.getProperty("MODULE_CLASS");
+
+                    // skip this module if its class name is not given
+                    if (moduleClassString == null || moduleClassString.length() == 0) {
+                        continue;
+                    }
+
+                    assert (moduleClassString != null && moduleClassString.length() > 0);
+
+                    String fQmoduleClassString = moduleDirectoryPar + File.separator + moduleDirectories[i] + File.separator + moduleClassString + ".class";
+
+                    Class moduleClass = null;
+
+                    try {
+
+                        moduleClass = this.moduleClassLoader.loadClass(fQmoduleClassString);
+
+                        int moduleClassId = this.id++;
+
+                        ModuleDescriptor moduleDescriptor = new ModuleDescriptor(
+                                moduleClassId, moduleName, moduleClass,
+                                properties);
+
+                        this.availableModuleClassesMap.put(new Integer(
+                                moduleClassId), moduleDescriptor);
+                       
+                    }
+                    catch (ClassNotFoundException e) {
+
+                        getLogger().log(Level.SEVERE, "Unable to load the module " + moduleName + " because the class " + fQmoduleClassString + " is not found.\nProceeding with next module if any.");
                     }
                 }
-            }
-            else
-            {
-                logger.log(Level.WARNING,"The Module directory " + moduleDirectory.getAbsolutePath() + " could not be found.");
+
             }
         }
-
-        
-
-        
-        public Object[] getAvailableModulesNames()
-        {
-            assert(availableModules != null);
-            
-            if (availableModules.size() > 0) {
-                return availableModules.keySet().toArray();
-            }
-            else {
-                return null;
-            }
-        }
-
-        public Class getModuleClassForName(String name)
-        {
-            assert(name != null);
-            
-            assert(availableModules.containsKey(name));
-            
-            ModuleDescriptor moduleDescriptor = (ModuleDescriptor) availableModules.get(name);
-            
-            return moduleDescriptor.getClazz();
-        }
-        
-        public Properties getModulePropertiesForName(String name)
-        {
-            assert(name != null);
-            
-            //assert(availableModules.containsKey(name));
-            
-            if(availableModules.containsKey(name))
-            {
-            
-                ModuleDescriptor moduleDescriptor = (ModuleDescriptor) availableModules.get(name);
-            
-                return moduleDescriptor.getProperties();
-            }
-            else
-            {
-                return null;
-            }
-        }
-       
-
     }
 
     /**
+     * This method registers a module instance with the ModuleRegistry. If the module
+     * instance is allready registered with the ModuleRegistry nothing happens.
+     * This method is automatically called whenever a new object of class Module
+     * is created.
+     * 
      * @param module
+     *            Is the module instance to register
      */
-    public void addModuleInstance(Module module)
+    protected void registerModuleInstance(Module module)
     {
-        assert(module != null);
-        
-        assert(runningModules != null);
-        
-        runningModules.add(module);
-        
-    }
-
-    /**
-     * @return
-     */
-    public Object[] getInstalledModulesNames()
-    {
-         return installedModules.getAvailableModulesNames();
-    }
-
-    /**
-     * @param moduleName
-     * @return
-     */
-    public Class getModuleClassForName(String moduleName)
-    {
-        assert(moduleName != null);
-        
-        assert(installedModules != null);
-        
-        return installedModules.getModuleClassForName(moduleName);
-    }
-
-    
-    public Properties getModulePropertiesForName(String moduleName)
-    {
-        assert(moduleName != null);
-        
-        assert(installedModules != null);
-        
-        return installedModules.getModulePropertiesForName(moduleName);
-    }
-    
-    public Properties getModulePropertiesForId(int id)
-    {
-        assert(id != -1);
-        
-        if(id == 1)
-        {
-            return null;
+        // check parameter
+        if (module == null) {
+            return;
         }
-        
-        Module module = getModuleInstance(id);
-        
-        assert(module != null);
-        
-        assert(installedModules != null);
-        
-        return installedModules.getModulePropertiesForName(module.getName());
+
+        assert (module != null);
+
+        if (this.runningModules.runningModuleMap.containsKey(new Integer(
+                module.getId()))) {
+            return;
+        }
+
+        this.runningModules.runningModuleMap.put(new Integer(module.getId()), module);
+
+        setChanged();
+
+        notifyObservers(module);
+
+        clearChanged();
+
     }
+
     /**
-     * @param id
-     * @return
+     * This method returns the module instance with the given moduleId.
+     * 
+     * @param moduleId
+     *            Is the id of the module instance to return
+     * @return The desired module instance
+     * @throws IllegalModuleIDException
+     *             If the given moduleClassId has a value of < 1
+     * @throws UnknownModuleIDException
+     *             If a module class with the given id could not be found
      */
-    private Module getModuleInstance(int id)
+    public Module getModuleInstance(int moduleId) throws IllegalModuleIDException, UnknownModuleIDException
     {
-       assert(id > 0);
-       
-       assert(runningModules != null);
-       
-       return runningModules.getModule(id);
+        if (!(moduleId > 1)) {
+            throw new IllegalModuleIDException();
+        }
+
+        assert (moduleId > 0);
+
+        if (!(this.runningModules.runningModuleMap.containsKey(new Integer(
+                moduleId)))) {
+            throw new UnknownModuleIDException();
+        }
+
+        return this.runningModules.runningModuleMap.get(new Integer(moduleId));
     }
 
-
     /**
-     * @param selectedModuleCellId
+     * This method takes the id of a module class and returns the module
+     * instance of it. It also gives the module instance the given name.
+     * 
+     * @param moduleClassId
+     *            Is the id of the module class to be instanciated
      * @param moduleName
-     * @throws IllegalAccessException
-     * @throws InstantiationException
+     *            Is the name that should be given to the new module object
+     * @throws ModuleInstantiationException
+     *             If an exception occurs during the instanciation of the module
+     * @throws IllegalModuleIDException
+     *             If the given moduleClassId has a value of < 1
+     * @throws UnknownModuleIDException
+     *             If a module class with the given id could not be found
      */
-    public void createModuleInstance(String moduleName) throws ModuleInstantiationException
+    public void createModuleInstanceFromModuleClassId(int moduleClassId, String moduleName) throws ModuleInstantiationException, IllegalModuleIDException, UnknownModuleIDException
     {
+        if (!(moduleClassId > 1)) {
+            throw new IllegalModuleIDException();
+        }
+
+        assert (moduleClassId > 0);
+
+        Class moduleClass = getModuleClassForId(moduleClassId);
+
+        Module module = null;
         try {
-            
-            Class moduleClass = getModuleClassForName(moduleName);
-            
-            Module module = (Module) moduleClass.newInstance();
-            
-            module.setName(moduleName);
-            
-            runningModules.add(module);
-  
+            module = (Module) moduleClass.newInstance();
         }
         catch (InstantiationException e) {
+
             throw new ModuleInstantiationException(e.getMessage());
+
         }
         catch (IllegalAccessException e) {
+
             throw new ModuleInstantiationException(e.getMessage());
         }
+
+        module.setName(moduleName);
         
+        String description = getModulePropertiesForId(moduleClassId).getProperty("MODULE_DESCRIPTION");
+        
+        module.setDescription(description);
     }
-
-
+  
     /**
-     * @param currentModuleId
-     * @param currentPropertyName
-     * @param propertyValue
-     */
-    public void setModuleProperty(int currentModuleId, String currentPropertyName, Object propertyValue)
-    {
-        
-        assert(currentModuleId != 1);
-        
-        Module module = getModuleInstance(currentModuleId);
-        
-        assert(module != null);
-        
-        Properties moduleProperties = getModulePropertiesForId(currentModuleId);
-        
-        assert(moduleProperties != null);
-        
-        module.setProperty(currentPropertyName,propertyValue);
-        
-    }
-
-
-    /**
-     * @param modulId
-     */
-    public void stopModule(int moduleId)
-    {
-        Module module = getModuleInstance(moduleId);
-        
-        module.deactivate();
-        
-    }
-
-
-    /**
-     * @param moduleId
-     */
-    public void startModule(int moduleId)
-    {
-        Module module = getModuleInstance(moduleId);
-        
-        module.activate();
-        
-        
-    }
-
-
-    /**
-     * @param id
-     * @return
-     */
-    public String getModuleDetails(int moduleId)
-    {
-        Module module = getModuleInstance(moduleId);
-        
-        return module.getDetails();
-    }
-
-
-    /**
-     * @param intermediate_module
-     * @param moduleId
-     * @return
-     */
-    public boolean isModuleType(ModuleType moduleType, int moduleId)
-    {
-        Module module = getModuleInstance(moduleId);
-        
-        if(module.getModuleType() == moduleType)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-
-
-    /**
-     * @param annotator
-     * @param moduleId
-     */
-    public void setProcessorMode(int mode, int moduleId)
-    {
-        Module module = getModuleInstance(moduleId);
-        
-        if(module instanceof EventProcessor)
-        {
-            EventProcessor eventProcessor = (EventProcessor) module;
-            
-            eventProcessor.setProcessorMode(mode);
-        }
-    
-    }
-
-
-    /**
-     * @param moduleId
-     * @return
-     */
-    public String getModulNameForId(int moduleId)
-    {
-        Module module = getModuleInstance(moduleId);
-        
-        return module.getName();
-    }
-
-
-    /**
-     * @param selectedModuleCellId
+     * This method removes a module instance from the ModuleRegistry.
+     * It is called from the Module.remove() method.
+     * @param moduleId Is the id of the module to deregister.
+     * @throws IllegalModuleIDException
+     *             If the given moduleClassId has a value of < 1
      * @throws UnknownModuleIDException
+     *             If a module class with the given id could not be found
+  
      */
-    public void removeModule(int moduleId) throws UnknownModuleIDException
+    protected void deregisterModuleInstance(int moduleId) throws UnknownModuleIDException, IllegalModuleIDException
     {
+        if (!(moduleId > 1)) {
+            throw new IllegalModuleIDException();
+        }
+
+        assert (moduleId > 0);
+        
         Module module = getModuleInstance(moduleId);
+
+        this.runningModules.runningModuleMap.remove(new Integer(moduleId));
         
-        module.remove();
-        
-        this.runningModules.delete(module);
-        
-        
-        
+        setChanged();
+
+        notifyObservers(module);
+
+        clearChanged();
+
     }
 
-
     /**
-     * @param name
+     * This method returns the description of the module class with the given id.
+     * The description is given by the module developer in the module's "module.property" file.
+     * @param moduleClassId Is the id of the module class to get the description of
+     * @return The description about the module class
+    * @throws IllegalModuleIDException
+     *             If the given moduleClassId has a value of < 1
+     * @throws UnknownModuleIDException
+     *             If a module class with the given id could not be found
      */
-    public String getModuleDescription(String name)
+    public String getModuleDescription(int moduleClassId) throws IllegalModuleIDException, UnknownModuleIDException
     {
+
+        Properties properties = getModulePropertiesForId(moduleClassId);
        
-        Properties properties = getModulePropertiesForName(name);
-        
-        if(properties != null)
-        {
-            String moduleDescription = properties.getProperty("MODULE_DESCRIPTION");
-        
-            return moduleDescription;
-        }
-        else
-        {
-            return null;
-        }
-        
+        String moduleDescription = properties.getProperty("MODULE_DESCRIPTION");
+
+        return moduleDescription;
     }
 
-
-    /**
-     * @param sourceModule
-     * @param selectedModuleCellId
-     */
-    public void connectModule(int sourceModuleId, int targetModuleId) throws ModuleConnectionException
-    {
-
-        Module sourceModule = getModuleInstance(sourceModuleId);
-        
-        Module targetModule = getModuleInstance(targetModuleId);
-        
-        sourceModule.connectChildModule(targetModule);
-        
-    }
-
-
-    /**
-     * @param parentId
-     * @param childId
-     * @throws UnknownModuleIDException
-     */
-    public void disconnectModule(int parentId, int childId) throws UnknownModuleIDException
-    {
-        assert(parentId != -1 && childId != -1);
-        
-        Module parentModule = getModuleInstance(parentId);
-        
-        assert(parentModule != null);
-        
-        Module childModule = getModuleInstance(childId);
-        
-        assert(childModule != null);
-        
-        parentModule.disconnectChildModule(childModule);
-        
-    }
-
-
-    public void shutDown()
-    {
-        theInstance = null;
-        
-    }
-
-
- 
-    
 }

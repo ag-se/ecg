@@ -8,85 +8,99 @@ import java.io.IOException;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
-/*
- * Created on 11.03.2005
- *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
- */
-
 /**
- * @author 7oas7er
+ * The ModuleClassLoader is able to load classes directly from a
+ * given location in the file system, which should be the
+ * module directory.
+ * So the ModuleClassLoader makes it possible to have modules loaded
+ * from locations that are not in the classpath.
  *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
  */
 public class ModuleClassLoader extends java.lang.ClassLoader
 {
    
-    private Logger logger = Logger.getLogger(this.getClass().getName());
+    private Logger logger = null;
     
+    /**
+     * This creates theModuleClassLoader and sets the given ClassLoader to be the parent
+     * ClassLoader oh the ModulClassLoader in the ClassLoader hierarchy.
+     * @param cl
+     */
     public ModuleClassLoader(ClassLoader cl)
     {
         super(cl);
+        
+        this.logger = Logger.getLogger(this.getClass().getName());
     }
     
-    protected Class findClass(String name) throws ClassNotFoundException
+    @Override
+    protected Class<?> findClass(String classFilePath) throws ClassNotFoundException
     {
-        Class toReturn = null;
+        Class<?> toReturn = null;
         
-        File classFile = new File(name);
+        File classFile = new File(classFilePath);
         
-        if(classFile.exists() && classFile.isFile())
-        {
-            FileInputStream fis;
-            try {
-                fis = new FileInputStream(classFile);
-            }
-            catch (FileNotFoundException e1) {
-                throw new ClassNotFoundException();
-            }
-          
-            byte[] data = new byte[(int)classFile.length()];
+        assert(classFile.exists() && classFile.isFile());
+        
+        FileInputStream fis = null;
             
+        try {
+        
+            fis = new FileInputStream(classFile);
+        
+        }
+        
+        catch (FileNotFoundException e1) {
+        
+            throw new ClassNotFoundException();
+            
+        }
+          
+           
+        byte[] data = new byte[(int)classFile.length()];
+            
+     
             try {
                 fis.read(data);
-                
-                toReturn = defineClass(null,data,0,data.length);
-                
-                logger.log(Level.INFO,"Succesfully loaded module class: " + classFile.getName());
             }
-            catch (IOException e) {
-                throw new ClassNotFoundException();
+            catch (IOException e2) {
+
+                this.logger.log(Level.INFO,"IOException while reading module class: " + classFile.getName());
+                
+                return null;
             }
+                
             
-            File moduleDir = classFile.getParentFile();
+            toReturn = this.defineClass(null,data,0,data.length);
+                
             
-            assert(moduleDir.exists());
+            this.logger.log(Level.INFO,"Succesfully loaded module class: " + classFile.getName());
             
-            assert(moduleDir.isDirectory());
+            File moduleDirectory = classFile.getParentFile();
+            
+            assert(moduleDirectory.exists());
+            
+            assert(moduleDirectory.isDirectory());
             
             FilenameFilter filter = new FilenameFilter() {
-                public boolean accept(File dir, String name)
+                
+                public boolean accept(@SuppressWarnings("unused") File dir, String name)
                 {
                     if(name.endsWith(".class"))
                     {
                         return true;
                     }
-                    else
-                    {
-                        return false;
-                    }
+                   
+                    return false;
+                   
                 }
             };
             
-            String[] files = moduleDir.list(filter);
-            
-            assert(files != null);
+            String[] files = moduleDirectory.list(filter);
             
             for(int i=0;i<files.length;i++)
             {
-                File file = new File(moduleDir + File.separator + files[i]);
+                File file = new File(moduleDirectory + File.separator + files[i]);
                 
                 if(!file.equals(classFile))
                 {
@@ -104,7 +118,7 @@ public class ModuleClassLoader extends java.lang.ClassLoader
                         
                         defineClass(null,data,0,data.length);
                         
-                        logger.log(Level.INFO,"Succesfully loaded additional class: " + file.getName() + " required by module " + classFile.getName());
+                        this.logger.log(Level.INFO,"Succesfully loaded additional class: " + file.getName() + " required by module " + classFile.getName());
                     }
                     catch (IOException e) {
                         throw new ClassNotFoundException();
@@ -113,10 +127,7 @@ public class ModuleClassLoader extends java.lang.ClassLoader
             }
                         
             return toReturn;            
-        }
-        else
-        {
-            throw new ClassNotFoundException();
-        }
+        
+        
     }
 }

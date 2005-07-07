@@ -3,7 +3,6 @@ package org.electrocodeogram.core;
 import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.module.Module;
 import org.electrocodeogram.module.ModuleConnectionException;
-import org.electrocodeogram.module.ModuleRegistry;
 import org.electrocodeogram.module.TestModule;
 
 /**
@@ -25,9 +24,7 @@ public class TestModuleTransportModule extends Module
 
     private ValidEventPacket testPacket = null;
 
-    private boolean received = false;
-
-    private boolean same = false;
+    private boolean result = false;
 
     /**
      * This creates the class as a module. 
@@ -50,25 +47,24 @@ public class TestModuleTransportModule extends Module
     public void makeModuleList(int length) throws ModuleConnectionException
     {
 
-        ModuleRegistry mr = ModuleRegistry.getInstance();
-        
         for (int i = 0; i < length; i++) {
+            
             Module next = new TestModule();
 
             if (i == 0) {
                 //this.root.connectChildModule(next);
-                mr.connectModule(this.root.getId(),next.getId());
+                this.root.connectReceiverModule(next);
             }
             else {
                 //this.last.connectChildModule(next);
-                mr.connectModule(this.last.getId(),next.getId());
+                this.last.connectReceiverModule(next);
             }
 
             this.last = next;
         }
 
         //this.last.connectChildModule(this);
-        mr.connectModule(this.last.getId(),this.getId());
+        this.last.connectReceiverModule(this);
     }
 
 //    public void makeModuleBinTree(int depth) throws ModuleConnectionException
@@ -109,28 +105,25 @@ public class TestModuleTransportModule extends Module
      * then this method returns "true". Otherwise it returns "false".
      * The kind of collection used during event transportation is determined by calls to the make... methods.
      * @param packet Is the ValidEventPacket to tranport
-     * @return "true" if an indentical ValidEventPacket is received and "false" otherwise.
      */
-    public boolean checkModuleEventTransport(ValidEventPacket packet)
+    public void checkModuleEventTransport(ValidEventPacket packet)
     {
         this.testPacket = packet;
 
+        this.result = false;
+        
         SensorShellWrapper.getInstance().doCommand(packet.getTimeStamp(), packet.getHsCommandName(), packet.getArglist());
-
-        while (!this.received) {
-            // wait
-        }
-
-        if (this.same) {
-            this.same = false;
-
-            return true;
-        }
-
-        return false;
-
     }
 
+    /**
+     * This method returns the value of the result field.
+     * @return The value of the result field
+     */
+    public boolean getResult()
+    {
+        return this.result;
+    }
+    
     /**
      * @see org.electrocodeogram.module.Module#receiveEventPacket(org.electrocodeogram.event.ValidEventPacket)
      * This method compares the received event data to the original event data and sets flags to indicate
@@ -148,14 +141,13 @@ public class TestModuleTransportModule extends Module
 
                     String receivedString = (String) eventPacket.getArglist().get(i);
 
-                    if (!testString.equals(receivedString)) {
-                        this.received = true;
-                        this.same = false;
-                        return;
+                    if (testString.equals(receivedString)) {
+                        this.result = true;
                     }
-
-                    this.received = true;
-                    this.same = true;
+                    else
+                    {
+                        this.result = false;
+                    }
                 }
             }
         }

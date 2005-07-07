@@ -15,9 +15,11 @@ import java.util.Observable;
 import javax.swing.JOptionPane;
 import javax.swing.border.LineBorder;
 
+import org.electrocodeogram.module.IllegalModuleIDException;
 import org.electrocodeogram.module.Module;
 import org.electrocodeogram.module.ModuleConnectionException;
 import org.electrocodeogram.module.ModuleRegistry;
+import org.electrocodeogram.module.UnknownModuleIDException;
 import org.jgraph.JGraph;
 import org.jgraph.event.GraphSelectionEvent;
 import org.jgraph.event.GraphSelectionListener;
@@ -106,7 +108,17 @@ public class ModuleGraph extends JGraph
 			                    {
 			                        try {
                                         
-			                            ModuleRegistry.getInstance().connectModule(Configurator.getInstance().getSourceModule(),selectedModuleCellId);
+			                            try {
+                                            ModuleRegistry.getInstance().getModuleInstance(Configurator.getInstance().getSourceModule()).connectReceiverModule(ModuleRegistry.getInstance().getModuleInstance(selectedModuleCellId));
+                                        }
+                                        catch (IllegalModuleIDException e1) {
+                                            // TODO Auto-generated catch block
+                                            e1.printStackTrace();
+                                        }
+                                        catch (UnknownModuleIDException e1) {
+                                            // TODO Auto-generated catch block
+                                            e1.printStackTrace();
+                                        }
                                         
 			                            Configurator.getInstance().exitModuleConnectionMode();
                                     }

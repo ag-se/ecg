@@ -9,9 +9,11 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JOptionPane;
 
+import org.electrocodeogram.module.IllegalModuleIDException;
 import org.electrocodeogram.module.ModuleConnectionException;
 import org.electrocodeogram.module.ModuleInstantiationException;
 import org.electrocodeogram.module.ModuleRegistry;
+import org.electrocodeogram.module.UnknownModuleIDException;
 
 /**
  * @author 7oas7er *  * TODO To change the template for this generated type comment go to * Window - Preferences - Java - Code Style - Code Templates
@@ -22,15 +24,20 @@ public class ActionAdapter implements ActionListener
 
     
     private String moduleName = null;
+    
+    private int moduleClassId = -1;
+    
     /**
      * @param configurator
      * @param selectedModuleCellId
      * @param moduleName
      */
-    public ActionAdapter(Configurator configurator, String moduleName)
+    public ActionAdapter(Configurator configurator, int moduleClassId, String moduleName)
     {
         
         this.moduleName = moduleName;
+        
+        this.moduleClassId = moduleClassId;
     }
 
     public void actionPerformed(ActionEvent e)
@@ -52,11 +59,19 @@ public class ActionAdapter implements ActionListener
 //      }
         
         try {
-            ModuleRegistry.getInstance().createModuleInstance(moduleName);
+            ModuleRegistry.getInstance().createModuleInstanceFromModuleClassId(moduleClassId,moduleName);
         }
         catch (ModuleInstantiationException e1) {
             // TODO Auto-generated catch block
             e1.printStackTrace();
+        }
+        catch (IllegalModuleIDException e2) {
+            // TODO Auto-generated catch block
+            e2.printStackTrace();
+        }
+        catch (UnknownModuleIDException e3) {
+            // TODO Auto-generated catch block
+            e3.printStackTrace();
         }
         
     }

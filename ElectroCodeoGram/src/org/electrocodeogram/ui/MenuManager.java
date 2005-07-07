@@ -17,6 +17,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 
+import org.electrocodeogram.module.IllegalModuleIDException;
+import org.electrocodeogram.module.ModuleConnectionException;
 import org.electrocodeogram.module.ModuleRegistry;
 import org.electrocodeogram.module.Module;
 import org.electrocodeogram.module.UnknownModuleIDException;
@@ -64,11 +66,15 @@ public class MenuManager
             public void actionPerformed(ActionEvent e)
             {
                 try {
-                    ModuleRegistry.getInstance().removeModule(Configurator.getInstance().getSelectedModuleCellId());
+                    ModuleRegistry.getInstance().getModuleInstance(Configurator.getInstance().getSelectedModuleCellId()).remove();
                 }
                 catch (UnknownModuleIDException e1) {
                     // TODO Auto-generated catch block
                     e1.printStackTrace();
+                }
+                catch (IllegalModuleIDException e2) {
+                    // TODO Auto-generated catch block
+                    e2.printStackTrace();
                 }
                 
             }});
@@ -84,7 +90,17 @@ public class MenuManager
 
             public void actionPerformed(ActionEvent e)
             {
-               ModuleRegistry.getInstance().stopModule(Configurator.getInstance().getSelectedModuleCellId());
+               try {
+                ModuleRegistry.getInstance().getModuleInstance(Configurator.getInstance().getSelectedModuleCellId()).activate();
+            }
+            catch (IllegalModuleIDException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+            catch (UnknownModuleIDException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
                 
             }});
         
@@ -92,7 +108,17 @@ public class MenuManager
 
             public void actionPerformed(ActionEvent e)
             {
-               ModuleRegistry.getInstance().startModule(Configurator.getInstance().getSelectedModuleCellId());
+               try {
+                ModuleRegistry.getInstance().getModuleInstance(Configurator.getInstance().getSelectedModuleCellId()).deactivate();
+            }
+            catch (IllegalModuleIDException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+            catch (UnknownModuleIDException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
                 
             }});
         
@@ -108,7 +134,25 @@ public class MenuManager
 
             public void actionPerformed(ActionEvent e)
             {
-                ModuleRegistry.getInstance().setProcessorMode(EventProcessor.ANNOTATOR,Configurator.getInstance().getSelectedModuleCellId());
+                Module module = null;
+                try {
+                    module = ModuleRegistry.getInstance().getModuleInstance(Configurator.getInstance().getSelectedModuleCellId());
+                }
+                catch (IllegalModuleIDException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
+                catch (UnknownModuleIDException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
+                if (module instanceof EventProcessor)
+                {
+                    EventProcessor eventProcessor = (EventProcessor) module;
+                    
+                    eventProcessor.setProcessorMode(EventProcessor.ANNOTATOR);
+
+                }
                 
             }});
     
@@ -124,7 +168,25 @@ public class MenuManager
 
             public void actionPerformed(ActionEvent e)
             {
-                ModuleRegistry.getInstance().setProcessorMode(EventProcessor.FILTER,Configurator.getInstance().getSelectedModuleCellId());
+                Module module = null;
+                try {
+                    module = ModuleRegistry.getInstance().getModuleInstance(Configurator.getInstance().getSelectedModuleCellId());
+                }
+                catch (IllegalModuleIDException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
+                catch (UnknownModuleIDException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
+                if (module instanceof EventProcessor)
+                {
+                    EventProcessor eventProcessor = (EventProcessor) module;
+                    
+                    eventProcessor.setProcessorMode(EventProcessor.FILTER);
+
+                }
                 
             }});
         
@@ -145,9 +207,19 @@ public class MenuManager
         
         modulePopupMenu.addSeparator();
         
-        if(!ModuleRegistry.getInstance().isModuleType(ModuleType.TARGET_MODULE,id))
-        {
-            modulePopupMenu.add(mniModuleConnectTo);
+        try {
+            if(!ModuleRegistry.getInstance().getModuleInstance(id).isModuleType(ModuleType.TARGET_MODULE))
+            {
+                modulePopupMenu.add(mniModuleConnectTo);
+            }
+        }
+        catch (IllegalModuleIDException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
+        catch (UnknownModuleIDException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
         }
                 
         modulePopupMenu.add(mniModuleRemove);
@@ -158,16 +230,37 @@ public class MenuManager
         
         
         
-        if(ModuleRegistry.getInstance().isModuleType(ModuleType.INTERMEDIATE_MODULE,id))
-        {
-            modulePopupMenu.addSeparator();
-            
-            modulePopupMenu.add(mniMakeAnnotator);
-            
-            modulePopupMenu.add(mniMakeFilter);
+        try {
+            if(!ModuleRegistry.getInstance().getModuleInstance(id).isModuleType(ModuleType.INTERMEDIATE_MODULE))
+            {
+                modulePopupMenu.addSeparator();
+                
+                modulePopupMenu.add(mniMakeAnnotator);
+                
+                modulePopupMenu.add(mniMakeFilter);
+            }
+        }
+        catch (IllegalModuleIDException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
+        catch (UnknownModuleIDException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
         }
         
-        Properties moduleProperties = ModuleRegistry.getInstance().getModulePropertiesForId(id);
+        Properties moduleProperties = null;
+        try {
+            moduleProperties = ModuleRegistry.getInstance().getModulePropertiesForId(id);
+        }
+        catch (IllegalModuleIDException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
+        catch (UnknownModuleIDException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
         
         if(moduleProperties != null)
         {
@@ -250,11 +343,19 @@ public class MenuManager
         public void actionPerformed(ActionEvent e)
         {
             try {
-                ModuleRegistry.getInstance().disconnectModule(parentId,childId);
+                ModuleRegistry.getInstance().getModuleInstance(parentId).connectReceiverModule(ModuleRegistry.getInstance().getModuleInstance(childId));
             }
             catch (UnknownModuleIDException e1) {
               
                 // only occurs because this event is fired twice internaly
+            }
+            catch (ModuleConnectionException e2) {
+                // TODO Auto-generated catch block
+                e2.printStackTrace();
+            }
+            catch (IllegalModuleIDException e3) {
+                // TODO Auto-generated catch block
+                e3.printStackTrace();
             }
             
         }
@@ -313,12 +414,20 @@ public class MenuManager
            
                 //assert(propertyValue != null);
                 
-                ModuleRegistry.getInstance().setModuleProperty(moduleId,propertyName,propertyValue);
+                ModuleRegistry.getInstance().getModuleInstance(moduleId).setProperty(propertyName,propertyValue);
             
             }
             catch (ClassNotFoundException e1) {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
+            }
+            catch (IllegalModuleIDException e2) {
+                // TODO Auto-generated catch block
+                e2.printStackTrace();
+            }
+            catch (UnknownModuleIDException e3) {
+                // TODO Auto-generated catch block
+                e3.printStackTrace();
             }
         }
         
@@ -364,7 +473,18 @@ public class MenuManager
         
         menu.add(mniModuleRemove);
                 
-        Properties moduleProperties = ModuleRegistry.getInstance().getModulePropertiesForId(id);
+        Properties moduleProperties = null;
+        try {
+            moduleProperties = ModuleRegistry.getInstance().getModulePropertiesForId(id);
+        }
+        catch (IllegalModuleIDException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
+        catch (UnknownModuleIDException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
         
         if(moduleProperties != null)
         {

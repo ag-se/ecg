@@ -20,8 +20,13 @@ public class UnknownModuleIDException extends Exception
      */
     public UnknownModuleIDException(String string)
     {
-        
        super(string);
     }
 
+    public UnknownModuleIDException()
+    {
+       super();
+    }
+
+    
 }

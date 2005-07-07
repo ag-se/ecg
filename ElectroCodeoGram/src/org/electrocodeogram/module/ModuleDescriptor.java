@@ -17,6 +17,8 @@ import java.util.Properties;
 public class ModuleDescriptor
 {
 
+    private int id = -1;
+    
     private String name = null;
     
     private Class clazz = null;
@@ -25,8 +27,10 @@ public class ModuleDescriptor
     
     // TODO : make the prop file XML
     
-    public ModuleDescriptor(String name, Class clazz, Properties properties)
+    public ModuleDescriptor(int id, String name, Class clazz, Properties properties)
     {
+        this.id = id;
+        
         this.properties = properties;
         
         this.name = name;
@@ -46,5 +50,10 @@ public class ModuleDescriptor
     public Properties getProperties()
     {
         return properties;
+    }
+
+    public int getId()
+    {
+        return this.id;
     }
 }

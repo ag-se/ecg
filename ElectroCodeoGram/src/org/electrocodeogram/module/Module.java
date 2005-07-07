@@ -2,10 +2,10 @@ package org.electrocodeogram.module;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.logging.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.electrocodeogram.event.IllegalEventParameterException;
 import org.electrocodeogram.event.ValidEventPacket;
@@ -61,6 +61,8 @@ public abstract class Module extends Observable implements Observer
         TARGET_MODULE
     }
 
+    private String moduleDescription = null;
+    
     private ModuleType moduleType;
 
     private static int count = 0;
@@ -100,7 +102,7 @@ public abstract class Module extends Observable implements Observer
             addObserver(GuiEventWriter.getInstance());
         }
 
-        ModuleRegistry.getInstance().addModuleInstance(this);
+        ModuleRegistry.getInstance().registerModuleInstance(this);
 
         activate();
 
@@ -119,7 +121,7 @@ public abstract class Module extends Observable implements Observer
      * This method deactivates the module. The module might be allready deactivated.
      *
      */
-    protected void deactivate()
+    public void deactivate()
     {
         if (this.activeFlag == false)
             return;
@@ -133,7 +135,7 @@ public abstract class Module extends Observable implements Observer
      * This method activates the module. The module might be allready activated.
      *
      */
-    protected void activate()
+    public void activate()
     {
         if (this.activeFlag == true)
             return;
@@ -255,7 +257,7 @@ public abstract class Module extends Observable implements Observer
      * @throws ModuleConnectionException If the given module could not be connected to this module.
      * This happens if this module is a target module or if the given module is alllready connected to this module.
      */
-    protected int connectChildModule(Module module) throws ModuleConnectionException
+    public int connectReceiverModule(Module module) throws ModuleConnectionException
     {
 
         if (this.moduleType == ModuleType.TARGET_MODULE) {
@@ -318,7 +320,7 @@ public abstract class Module extends Observable implements Observer
      * @param module The module to disconnect
      * @throws UnknownModuleIDException If the given module is not connected to this module
      */
-    protected void disconnectChildModule(Module module) throws UnknownModuleIDException
+    public void disconnectReceiverModule(Module module) throws UnknownModuleIDException
     {
         if (!this.receiverModuleMap.containsKey(new Integer(module.getId()))) {
             throw new UnknownModuleIDException(
@@ -398,12 +400,10 @@ public abstract class Module extends Observable implements Observer
             }
         }
 
-        String moduleDescription = ModuleRegistry.getInstance().getModuleDescription(this.getName());
-
-        if (moduleDescription != null) {
+        if (this.moduleDescription != null) {
             text += "\nBeschreibung: \t";
 
-            text += moduleDescription;
+            text += this.moduleDescription;
 
         }
 
@@ -411,7 +411,7 @@ public abstract class Module extends Observable implements Observer
 
     }
 
-    protected void remove()
+    public void remove()
     {
         if (this.senderModuleMap.size() != 0) {
 
@@ -422,7 +422,7 @@ public abstract class Module extends Observable implements Observer
                 Module module = parentModules[i];
 
                 try {
-                    module.disconnectChildModule(this);
+                    module.disconnectReceiverModule(this);
                 }
                 catch (UnknownModuleIDException e) {
                     
@@ -431,6 +431,24 @@ public abstract class Module extends Observable implements Observer
                     this.logger.log(Level.SEVERE, "An unexpected exception has occured. Please report this at www.electrocodeogram.org");
                 }
             }
+        }
+        
+        try {
+            ModuleRegistry.getInstance().deregisterModuleInstance(this.getId());
+        }
+        catch (UnknownModuleIDException e) {
+            
+            e.printStackTrace();
+            
+            this.logger.log(Level.SEVERE, "An unexpected exception has occured. Please report this at www.electrocodeogram.org");
+
+        }
+        catch (IllegalModuleIDException e) {
+
+            e.printStackTrace();
+
+            this.logger.log(Level.SEVERE, "An unexpected exception has occured. Please report this at www.electrocodeogram.org");
+
         }
        
     }
@@ -443,6 +461,28 @@ public abstract class Module extends Observable implements Observer
     {
         this.name = moduleName;
 
+    }
+    
+    
+    /**
+     * This checks if the module is of the given ModuleType
+     * @param moduleTypePar
+     * @return "true" If the module is of the given ModuleType and "false" if not
+     */
+    public boolean isModuleType(ModuleType moduleTypePar)
+    {
+        if (this.moduleType == moduleTypePar) {
+            return true;
+        }
+       
+        return false;
+        
+    }
+
+    protected void setDescription(String description)
+    {
+        this.moduleDescription = description;
+        
     }
 
 }
