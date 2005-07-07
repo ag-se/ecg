@@ -15,6 +15,8 @@ import org.electrocodeogram.event.EventPacket;
 import org.electrocodeogram.sensor.TestSensor;
 import org.electrocodeogram.test.EventGenerator;
 
+import utmj.threaded.RetriedAssert;
+
 /**
  * Test to validate the behaviour of connection attemps to the ECG server and
  * tests that validate how the SendingThread deals with failing and succeeding
@@ -198,16 +200,19 @@ public class ConnectionTests extends TestCase
         }
 
         try {
-            Thread.sleep(10000);
-
-            assertTrue(this.threadTest.testConnection(true, 0));
-
-            size = this.threadTest.getBufferSize();
-
-            assertTrue(size == 0);
+            new RetriedAssert(10000,1000)
+            {
+                @Override
+                public void run() throws Exception
+                {
+                    assertEquals(threadTest.getBufferSize(),0);
+                }
+            }.start();
         }
-        catch (InterruptedException e) {
-
+        catch (Exception e) {
+            
+            fail();
+            
             e.printStackTrace();
         }
 
