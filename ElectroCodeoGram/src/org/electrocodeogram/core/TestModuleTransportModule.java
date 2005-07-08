@@ -26,6 +26,10 @@ public class TestModuleTransportModule extends Module
 
     private boolean result = false;
 
+    private int packetCount = -1;
+    
+    private int receivedCount = 0;
+
     /**
      * This creates the class as a module. 
      *
@@ -35,9 +39,22 @@ public class TestModuleTransportModule extends Module
         super(ModuleType.SOURCE_MODULE);
 
         this.root = SensorShellWrapper.getInstance().sensorSource;
-
+        
+        removeConnectedModules(this.root);
     }
 
+    private void removeConnectedModules(Module node)
+    {
+        Module[] connectedModules = node.getReceivingModules();
+        
+        for (Module module : connectedModules)
+        {
+            removeConnectedModules(module);
+            
+            module.remove();
+        }
+    }
+    
     /**
      * This method creates a list of connected TestModules with the SensorShellWrapper.sensorSource
      * as head and the class itself as the last element in the list.
@@ -52,50 +69,103 @@ public class TestModuleTransportModule extends Module
             Module next = new TestModule();
 
             if (i == 0) {
-                //this.root.connectChildModule(next);
+             
                 this.root.connectReceiverModule(next);
             }
             else {
-                //this.last.connectChildModule(next);
+             
                 this.last.connectReceiverModule(next);
             }
 
             this.last = next;
         }
 
-        //this.last.connectChildModule(this);
+
         this.last.connectReceiverModule(this);
     }
 
-//    public void makeModuleBinTree(int depth) throws ModuleConnectionException
-//    {
-//        
-//        Module node = root;
-//        
-//        
-//    }
-//    
-//    private void buildBinTree(Module node) throws ModuleConnectionException
-//    {
-//        
-//        Module[] childreen = node.getChildModules();
-//        
-//        for(Module child : childreen)
-//        {
-//            connectChildreen(child);
-//        }
-//    }
-//    
-//    private void connectChildreen(Module node) throws ModuleConnectionException
-//    {
-//        TestModule leftChild = new TestModule();
-//        
-//        TestModule rightChild = new TestModule();
-//        
-//        node.connectChildModule(leftChild);
-//        
-//        node.connectChildModule(rightChild);
-//    }
+    /**
+     * This method creates a binary tree of connected modules with the SensorShellWrapper.sensorSource
+     * as the root and this TestModuleTransportModule connected to each leaf.
+     * @throws ModuleConnectionException If something goes wrong during conection of the modules
+     */
+    public void makeModuleBinTree() throws ModuleConnectionException
+    {
+        
+        Module leftChild = new TestModule();
+        
+        Module rightChild = new TestModule();
+        
+        this.root.connectReceiverModule(leftChild);
+        
+        this.root.connectReceiverModule(rightChild);
+        
+        Module leftleftChild = new TestModule();
+        
+        Module leftrightChild = new TestModule();
+        
+        Module rightleftChild = new TestModule();
+        
+        Module rightrightChild = new TestModule();
+        
+        leftChild.connectReceiverModule(leftleftChild);
+        
+        leftChild.connectReceiverModule(leftrightChild);
+        
+        rightChild.connectReceiverModule(rightleftChild);
+        
+        rightChild.connectReceiverModule(rightrightChild);
+        
+        Module leftleftleftChild = new TestModule();
+        
+        Module leftleftrightChild = new TestModule();
+        
+        Module leftrightleftChild = new TestModule();
+        
+        Module leftrightrightChild = new TestModule();
+
+        Module rightleftleftChild = new TestModule();
+        
+        Module rightleftrightChild = new TestModule();
+        
+        Module rightrightleftChild = new TestModule();
+        
+        Module rightrightrightChild = new TestModule();
+        
+        leftleftChild.connectReceiverModule(leftleftleftChild);
+        
+        leftleftChild.connectReceiverModule(leftleftrightChild);
+        
+        leftrightChild.connectReceiverModule(leftrightleftChild);
+        
+        leftrightChild.connectReceiverModule(leftrightrightChild);
+        
+        rightleftChild.connectReceiverModule(rightleftleftChild);
+        
+        rightleftChild.connectReceiverModule(rightleftrightChild);
+        
+        rightrightChild.connectReceiverModule(rightrightleftChild);
+        
+        rightrightChild.connectReceiverModule(rightrightrightChild);
+        
+        leftleftleftChild.connectReceiverModule(this);
+        
+        leftleftrightChild.connectReceiverModule(this);
+        
+        leftrightleftChild.connectReceiverModule(this);
+        
+        leftrightrightChild.connectReceiverModule(this);
+        
+        rightleftleftChild.connectReceiverModule(this);
+        
+        rightleftrightChild.connectReceiverModule(this);
+        
+        rightrightleftChild.connectReceiverModule(this);
+        
+        rightrightrightChild.connectReceiverModule(this);
+ 
+    }
+
     
     /**
      * This method passes the given ValidEventPacket object to the SensorShellWrapper.sensorSource module
@@ -105,12 +175,16 @@ public class TestModuleTransportModule extends Module
      * then this method returns "true". Otherwise it returns "false".
      * The kind of collection used during event transportation is determined by calls to the make... methods.
      * @param packet Is the ValidEventPacket to tranport
+     * @param packetCountPar Tells how often the same packet shall be received. Used if this class is connected to multiple
+     * other modules.
      */
-    public void checkModuleEventTransport(ValidEventPacket packet)
+    public void checkModuleEventTransport(ValidEventPacket packet, int packetCountPar)
     {
         this.testPacket = packet;
 
         this.result = false;
+        
+        this.packetCount  = packetCountPar;
         
         SensorShellWrapper.getInstance().doCommand(packet.getTimeStamp(), packet.getHsCommandName(), packet.getArglist());
     }
@@ -132,6 +206,8 @@ public class TestModuleTransportModule extends Module
     @Override
     public void receiveEventPacket(ValidEventPacket eventPacket)
     {
+        boolean equals = false;
+        
         if (eventPacket.getTimeStamp().equals(this.testPacket.getTimeStamp()) && eventPacket.getHsCommandName().equals(this.testPacket.getHsCommandName())) {
             if (eventPacket.getArglist().size() == this.testPacket.getArglist().size()) {
                 int size = this.testPacket.getArglist().size();
@@ -142,6 +218,20 @@ public class TestModuleTransportModule extends Module
                     String receivedString = (String) eventPacket.getArglist().get(i);
 
                     if (testString.equals(receivedString)) {
+                        
+                        equals = true;
+                    }
+                    else
+                    {
+                        equals = false;
+                    }
+                }
+                if(equals)
+                {
+                    this.receivedCount++;
+                    
+                    if(this.receivedCount == this.packetCount)
+                    {
                         this.result = true;
                     }
                     else

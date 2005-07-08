@@ -191,7 +191,7 @@ public class ModuleRegistry extends Observable
 
         HashMap<Integer, ModuleDescriptor> availableModuleClassesMap = null;
 
-        private int id = 1;
+        private int id = 0;
 
         private ModuleClassLoader moduleClassLoader = null;
 
@@ -382,7 +382,7 @@ public class ModuleRegistry extends Observable
      */
     public Module getModuleInstance(int moduleId) throws IllegalModuleIDException, UnknownModuleIDException
     {
-        if (!(moduleId > 1)) {
+        if (!(moduleId > 0)) {
             throw new IllegalModuleIDException();
         }
 
@@ -413,7 +413,7 @@ public class ModuleRegistry extends Observable
      */
     public void createModuleInstanceFromModuleClassId(int moduleClassId, String moduleName) throws ModuleInstantiationException, IllegalModuleIDException, UnknownModuleIDException
     {
-        if (!(moduleClassId > 1)) {
+        if (!(moduleClassId > 0)) {
             throw new IllegalModuleIDException();
         }
 
@@ -454,7 +454,7 @@ public class ModuleRegistry extends Observable
      */
     protected void deregisterModuleInstance(int moduleId) throws UnknownModuleIDException, IllegalModuleIDException
     {
-        if (!(moduleId > 1)) {
+        if (!(moduleId > 0)) {
             throw new IllegalModuleIDException();
         }
 

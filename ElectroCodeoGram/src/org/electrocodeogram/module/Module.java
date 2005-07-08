@@ -67,7 +67,7 @@ public abstract class Module extends Observable implements Observer
 
     private static int count = 0;
 
-    private int id = 0;
+    private int id = -1;
 
     private String name = null;
 
