@@ -18,88 +18,88 @@ public class ServerTestSuite
     {
         TestSuite suite = new TestSuite("Test for the server side of the ECG");
         
-        int testCCount = 1;
+        int testCCount = 100;
         
         for(int i=0;i<testCCount;i++)
         {
-            suite.addTest(new ServersideTests("testInvalidEventIsNotAcceptedTimeStampIsNull"));
+            suite.addTest(new ServersideTests("testInvalidEventIsNotAcceptedTimeStampIsNull",i));
         }
         
-        int testDCount = 1;
+        int testDCount = 100;
         
         for(int i=0;i<testDCount;i++)
         {
-            suite.addTest(new ServersideTests("testInvalidEventIsNotAcceptedCommandNameIsNull"));
+            suite.addTest(new ServersideTests("testInvalidEventIsNotAcceptedCommandNameIsNull",i));
         }
         
-        int testECount = 1;
+        int testECount = 100;
         
         for(int i=0;i<testECount;i++)
         {
-            suite.addTest(new ServersideTests("testInvalidEventIsNotAcceptedArgListIsNull"));
+            suite.addTest(new ServersideTests("testInvalidEventIsNotAcceptedArgListIsNull",i));
         }
         
-        int testFCount = 1;
+        int testFCount = 100;
         
         for(int i=0;i<testFCount;i++)
         {
-            suite.addTest(new ServersideTests("testInvalidEventIsNotAcceptedArgListIsEmpty"));
+            suite.addTest(new ServersideTests("testInvalidEventIsNotAcceptedArgListIsEmpty",i));
         }
         
-        int testGCount = 1;
+        int testGCount = 100;
         
         for(int i=0;i<testGCount;i++)
         {
-            suite.addTest(new ServersideTests("testInvalidEventIsNotAcceptedArgListIsNotOfTypeString"));
+            suite.addTest(new ServersideTests("testInvalidEventIsNotAcceptedArgListIsNotOfTypeString",i));
         }
         
-        int testHCount = 1;
+        int testHCount = 100;
         
         for(int i=0;i<testHCount;i++)
         {
-            suite.addTest(new ServersideTests("testUnknownCommandNameIsNotAccepted"));
+            suite.addTest(new ServersideTests("testUnknownCommandNameIsNotAccepted",i));
         }
         
-        int testICount = 1;
+        int testICount = 100;
         
         for(int i=0;i<testICount;i++)
         {
-            suite.addTest(new ServersideTests("testHackyStatActivityEventsAccepted"));
+            suite.addTest(new ServersideTests("testHackyStatActivityEventsAccepted",i));
         }
         
-        int testJCount = 1;
+        int testJCount = 100;
         
         for(int i=0;i<testJCount;i++)
         {
-            suite.addTest(new ServersideTests("testHackyStatBuildEventsAccepted"));
+            suite.addTest(new ServersideTests("testHackyStatBuildEventsAccepted",i));
         }
         
-        int testKCount = 1;
+        int testKCount = 100;
         
         for(int i=0;i<testKCount;i++)
         {
-            suite.addTest(new ServersideTests("testHackyStatBuffTransEventsAccepted"));
+            suite.addTest(new ServersideTests("testHackyStatBuffTransEventsAccepted",i));
         }
         
-        int testLCount = 1;
+        int testLCount = 100;
         
         for(int i=0;i<testLCount;i++)
         {
-            suite.addTest(new ServersideTests("testHackyStatCommitEventsAccepted"));
+            suite.addTest(new ServersideTests("testHackyStatCommitEventsAccepted",i));
         }
         
-        int testMCount = 1;
+        int testMCount = 100;
         
         for(int i=0;i<testMCount;i++)
         {
-            suite.addTest(new ServersideTests("testHackyStatFileMetricEventsAccepted"));
+            suite.addTest(new ServersideTests("testHackyStatFileMetricEventsAccepted",i));
         }
         
-        int testNCount = 1;
+        int testNCount = 100;
         
         for(int i=0;i<testNCount;i++)
         {
-            suite.addTest(new ServersideTests("testHackyStatUnitTestEventsAccepted"));
+            suite.addTest(new ServersideTests("testHackyStatUnitTestEventsAccepted",i));
         }
         
         return suite;
