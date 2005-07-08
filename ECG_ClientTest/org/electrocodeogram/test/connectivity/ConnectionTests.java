@@ -14,6 +14,7 @@ import org.electrocodeogram.client.SendingThreadTest;
 import org.electrocodeogram.event.EventPacket;
 import org.electrocodeogram.sensor.TestSensor;
 import org.electrocodeogram.test.EventGenerator;
+import org.electrocodeogram.test.NoTestDataException;
 
 import utmj.threaded.RetriedAssert;
 
@@ -31,7 +32,7 @@ public class ConnectionTests extends TestCase
     private SendingThreadTest threadTest = null;
 
     private Process ecgServer = null;
-    
+
     private EventGenerator eventGenerator = null;
 
     /**
@@ -53,7 +54,7 @@ public class ConnectionTests extends TestCase
         this.testSensor = new TestSensor();
 
         this.threadTest = new SendingThreadTest();
-        
+
         this.eventGenerator = new EventGenerator();
 
     }
@@ -66,9 +67,9 @@ public class ConnectionTests extends TestCase
         this.testSensor = null;
 
         this.threadTest = null;
-        
+
         this.eventGenerator = null;
-        
+
         stopECGServer();
 
     }
@@ -81,14 +82,15 @@ public class ConnectionTests extends TestCase
      * test is succesfull if the SendingThread stays in the "not connected"
      * state even if it gets new EventPackets to transmit to the ECG server
      * and therefore tires to establish a connection to it.
+     * @throws NoTestDataException If a pseudorandom String is requested by a line number that is not available or if the requested String size is to higher then available
      *
      */
-    public void testStayNotConnectedIfServerIsDown()
+    public void testStayNotConnectedIfServerIsDown() throws NoTestDataException
     {
 
         assertTrue(this.threadTest.testConnection(false, 0));
 
-        EventPacket eventPacket = this.eventGenerator.createEventPacket(true, true, true, true, 10, 10);
+        EventPacket eventPacket = this.eventGenerator.createEventPacket(true, true, 0, true, true, 10, 10);
 
         this.testSensor.sendEvent(eventPacket);
 
@@ -102,9 +104,11 @@ public class ConnectionTests extends TestCase
      * connection attemps are only interrupted by the set connection delay. This
      * testcase is succesfsull if the count of initiated connection attemps
      * increases by one after each connection delay period.
+     * @throws InterruptedException If this Thread is interruptedduring its sleeping period
+     * @throws NoTestDataException If a pseudorandom String is requested by a line number that is not available or if the requested String size is to higher then available
      * 
      */
-    public void testConnectionTrialsAreIncreasing()
+    public void testConnectionTrialsAreIncreasing() throws InterruptedException, NoTestDataException
     {
         assertTrue(this.threadTest.testConnection(false, 0));
 
@@ -112,16 +116,11 @@ public class ConnectionTests extends TestCase
 
         int connectionTrialsBefore = this.threadTest.getConnectionTrials();
 
-        EventPacket eventPacket = this.eventGenerator.createEventPacket(true, true, true, true, 10, 10);
+        EventPacket eventPacket = this.eventGenerator.createEventPacket(true, true, 0, true, true, 10, 10);
 
         this.testSensor.sendEvent(eventPacket);
 
-        try {
-            Thread.sleep(connectionDelay);
-        }
-        catch (InterruptedException e) {
-            // This is not a problem
-        }
+        Thread.sleep(connectionDelay);
 
         int connectionTrialsAfter = this.threadTest.getConnectionTrials();
 
@@ -134,15 +133,16 @@ public class ConnectionTests extends TestCase
      * During a connnection delay the Sendingthread is "sleeping". This testcase
      * is succesfull if the SendingThread is still able to receive new
      * EventPackets durong its "sleeping" state.
+     * @throws NoTestDataException If a pseudorandom String is requested by a line number that is not available or if the requested String size is to higher then available
      * 
      */
-    public void testDelayedSendingThreadAcceptsNewEvents()
+    public void testDelayedSendingThreadAcceptsNewEvents() throws NoTestDataException
     {
         assertTrue(this.threadTest.testConnection(false, 0));
 
         int connectionTrialsBefore = this.threadTest.getConnectionTrials();
 
-        EventPacket eventPacket = this.eventGenerator.createEventPacket(true, true, true, true, 10, 10);
+        EventPacket eventPacket = this.eventGenerator.createEventPacket(true, true, 0, true, true, 10, 10);
 
         this.testSensor.sendEvent(eventPacket);
 
@@ -169,14 +169,15 @@ public class ConnectionTests extends TestCase
      * After the ECG server is started a connection to it should be established
      * and all queued EventPackets should be send to the ECG server. This
      * testcase succeeds if exactly this happens.
+     * @throws Exception If the RetriedAssert Thread causes an Exception
      * 
      */
-    public void testAfterConnectionBufferIsEmptied()
+    public void testAfterConnectionBufferIsEmptied() throws Exception
     {
 
         assertTrue(this.threadTest.testConnection(false, 0));
 
-        EventPacket eventPacket = this.eventGenerator.createEventPacket(true, true, true, true, 10, 10);
+        EventPacket eventPacket = this.eventGenerator.createEventPacket(true, true, 0, true, true, 10, 10);
 
         int size = this.threadTest.getBufferSize();
 
@@ -191,30 +192,15 @@ public class ConnectionTests extends TestCase
 
         }
 
-        try {
-            startECGServer("..\\ElectroCodeoGram\\application");
-        }
-        catch (IOException e1) {
-            fail();
-            e1.printStackTrace();
-        }
+        startECGServer("..\\ElectroCodeoGram\\application");
 
-        try {
-            new RetriedAssert(10000,1000)
+        new RetriedAssert(10000, 1000) {
+            @Override
+            public void run() throws Exception
             {
-                @Override
-                public void run() throws Exception
-                {
-                    assertEquals(threadTest.getBufferSize(),0);
-                }
-            }.start();
-        }
-        catch (Exception e) {
-            
-            fail();
-            
-            e.printStackTrace();
-        }
+                assertEquals(threadTest.getBufferSize(), 0);
+            }
+        }.start();
 
         stopECGServer();
     }

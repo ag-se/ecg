@@ -3,7 +3,7 @@
 	<classpathentry excluding="ECGServer/" kind="src" path=""/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="var" path="JUNIT_HOME/junit.jar"/>
-	<classpathentry kind="lib" path="lib/sensorshell.jar"/>
+	<classpathentry sourcepath="/ECG_SensorShell" kind="lib" path="lib/sensorshell.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ECG_Test"/>
 	<classpathentry kind="output" path=""/>
 </classpath>

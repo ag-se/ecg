@@ -1,5 +1,7 @@
 package org.electrocodeogram.test.clientside;
 
+import java.io.IOException;
+
 import junit.framework.TestCase;
 
 import org.electrocodeogram.client.SendingThreadTest;
@@ -8,6 +10,7 @@ import org.electrocodeogram.event.IllegalEventParameterException;
 import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.sensor.TestSensor;
 import org.electrocodeogram.test.EventGenerator;
+import org.electrocodeogram.test.NoTestDataException;
 import org.electrocodeogram.test.EventGenerator.SensorDataType;
 
 /**
@@ -19,24 +22,28 @@ public class ClientsideTests extends TestCase
 {
 
     private TestSensor testSensor = null;
-    
+
     private EventGenerator eventGenerator = null;
     
+    private int line = -1;
 
     /**
      * This creates the testcases of this collection.
      * @param name The name of the testcase to create
+     * @param linePar Is the linenumber according to the file "ECG_Test/pseudorandom.strings" that is giving the testdata
      */
-    public ClientsideTests(String name)
+    public ClientsideTests(String name, int linePar)
     {
         super(name);
+        
+        this.line = linePar;
     }
 
     @Override
-    protected void setUp()
+    protected void setUp() throws IOException
     {
         this.testSensor = new TestSensor();
-        
+
         this.eventGenerator = new EventGenerator();
     }
 
@@ -44,7 +51,7 @@ public class ClientsideTests extends TestCase
     protected void tearDown()
     {
         this.testSensor = null;
-        
+
         this.eventGenerator = null;
     }
 
@@ -53,61 +60,51 @@ public class ClientsideTests extends TestCase
      * This testcase passes a single syntactically valid EventPacket from a TestSensor
      * to the ECG SensorShell. The test is successfull if the result from the ECG
      * SensorShell is "true", meaning the EventPacket is syntactically valid and accepted. 
+     * @throws IllegalEventParameterException If the parameters passed to the event creating method are not legal
+     * @throws NoTestDataException If a pseudorandom String is requested by a line number that is not available or if the requested String size is to higher then available
      *
      */
-    public void testValidEventIsAccepted()
+    public void testValidEventIsAccepted() throws IllegalEventParameterException, NoTestDataException
     {
         ValidEventPacket eventPacket;
 
-        try {
-            eventPacket = this.eventGenerator.createValidEventPacket(true, true, true, true, 10, 10);
+        eventPacket = this.eventGenerator.createValidEventPacket(true, true, this.line, true, true, 10, 10);
 
-            boolean result = this.testSensor.sendEvent(eventPacket);
+        boolean result = this.testSensor.sendEvent(eventPacket);
 
-            assertTrue(result);
-        }
-        catch (IllegalEventParameterException e) {
-
-            e.printStackTrace();
-
-            fail();
-        }
-
+        assertTrue("" + this.line,result);
+       
     }
 
+    
+    
     /**
      * Testcase CL2 according to the document TESTPLAN Version 1.0 or higher.
      * This testcase passes a single syntactically valid EventPacket from a TestSensor
      * to the ECG SensorShell. The test is successfull if the SendingThreatTest tells
      * that the size of the SendingThreat EventPacketBuffer is increased by one element
      * and that this element is the sended EventPacket. 
+     * @throws IllegalEventParameterException If the parameters passed to the event creating method are not legal
+     * @throws NoTestDataException If a pseudorandom String is requested by a line number that is not available or if the requested String size is to higher then available
      *
      */
-    public void testValidEventIsQueued()
+    public void testValidEventIsQueued() throws IllegalEventParameterException, NoTestDataException
     {
         ValidEventPacket eventPacket;
-        try {
-            eventPacket = this.eventGenerator.createValidEventPacket(true, true, true, true, 10, 10);
 
-            this.testSensor.sendEvent(eventPacket);
+        eventPacket = this.eventGenerator.createValidEventPacket(true, true, this.line,  true, true, 10, 10);
 
-            SendingThreadTest threadTest = new SendingThreadTest();
+        this.testSensor.sendEvent(eventPacket);
 
-            int bufferSizeBefore = threadTest.getBufferSize();
+        SendingThreadTest threadTest = new SendingThreadTest();
 
-            this.testSensor.sendEvent(eventPacket);
+        int bufferSizeBefore = threadTest.getBufferSize();
 
-            assertTrue(threadTest.testBufferSize(bufferSizeBefore + 1));
+        this.testSensor.sendEvent(eventPacket);
 
-            assertTrue(threadTest.testLastElement(eventPacket));
-        }
-        catch (IllegalEventParameterException e) {
+        assertTrue("" + this.line,threadTest.testBufferSize(bufferSizeBefore + 1));
 
-            e.printStackTrace();
-
-            fail();
-        }
-
+        assertTrue("" + this.line,threadTest.testLastElement(eventPacket));
     }
 
     /**
@@ -116,15 +113,16 @@ public class ClientsideTests extends TestCase
      * to the ECG SensorShell. In this case the timestamp of the EventPacket has the value "null".
      * The test is successfull if the result from the ECG SensorShell is "false", meaning the
      * EventPacket is syntactically invalid and not accepted. 
+     * @throws NoTestDataException If a pseudorandom String is requested by a line number that is not available or if the requested String size is to higher then available
      *
      */
-    public void testInvalidEventIsNotAcceptedTimeStampIsNull()
+    public void testInvalidEventIsNotAcceptedTimeStampIsNull() throws NoTestDataException
     {
-        EventPacket eventPacket = this.eventGenerator.createEventPacket(false, true, true, true, 10, 10);
+        EventPacket eventPacket = this.eventGenerator.createEventPacket(false, true, this.line, true, true, 10, 10);
 
         boolean result = this.testSensor.sendEvent(eventPacket);
 
-        assertFalse(result);
+        assertFalse("" + this.line,result);
     }
 
     /**
@@ -133,15 +131,16 @@ public class ClientsideTests extends TestCase
      * to the ECG SensorShell. In this case the commandName of the EventPacket has the value "null".
      * The test is successfull if the result from the ECG SensorShell is "false", meaning the
      * EventPacket is syntactically invalid and not accepted. 
+     * @throws NoTestDataException If a pseudorandom String is requested by a line number that is not available or if the requested String size is to higher then available
      *
      */
-    public void testInvalidEventIsNotAcceptedCommandNameIsNull()
+    public void testInvalidEventIsNotAcceptedCommandNameIsNull() throws NoTestDataException
     {
-        EventPacket eventPacket = this.eventGenerator.createEventPacket(true, false, true, true, 10, 10);
+        EventPacket eventPacket = this.eventGenerator.createEventPacket(true, false, this.line, true, true, 10, 10);
 
         boolean result = this.testSensor.sendEvent(eventPacket);
 
-        assertFalse(result);
+        assertFalse("" + this.line,result);
     }
 
     /**
@@ -150,15 +149,16 @@ public class ClientsideTests extends TestCase
      * to the ECG SensorShell. In this case the argList of the EventPacket has the value "null".
      * The test is successfull if the result from the ECG SensorShell is "false", meaning the
      * EventPacket is syntactically invalid and not accepted. 
+     * @throws NoTestDataException If a pseudorandom String is requested by a line number that is not available or if the requested String size is to higher then available
      *
      */
-    public void testInvalidEventIsNotAcceptedArgListIsNull()
+    public void testInvalidEventIsNotAcceptedArgListIsNull() throws NoTestDataException
     {
-        EventPacket eventPacket = this.eventGenerator.createEventPacket(true, true, false, true, 10, 10);
+        EventPacket eventPacket = this.eventGenerator.createEventPacket(true, true, this.line, false, true, 10, 10);
 
         boolean result = this.testSensor.sendEvent(eventPacket);
 
-        assertFalse(result);
+        assertFalse("" + this.line,result);
     }
 
     /**
@@ -167,15 +167,16 @@ public class ClientsideTests extends TestCase
      * to the ECG SensorShell. In this case the argList is empty.
      * The test is successfull if the result from the ECG SensorShell is "false", meaning the
      * EventPacket is syntactically invalid and not accepted. 
+     * @throws NoTestDataException If a pseudorandom String is requested by a line number that is not available or if the requested String size is to higher then available
      *
      */
-    public void testInvalidEventIsNotAcceptedArgListIsEmpty()
+    public void testInvalidEventIsNotAcceptedArgListIsEmpty() throws NoTestDataException
     {
-        EventPacket eventPacket = this.eventGenerator.createEventPacket(true, true, true, true, 0, 10);
+        EventPacket eventPacket = this.eventGenerator.createEventPacket(true, true, this.line, true, true, 0, 10);
 
         boolean result = this.testSensor.sendEvent(eventPacket);
 
-        assertFalse(result);
+        assertFalse("" + this.line,result);
     }
 
     /**
@@ -184,15 +185,16 @@ public class ClientsideTests extends TestCase
      * to the ECG SensorShell. In this case the argList is not of type List<String>.
      * The test is successfull if the result from the ECG SensorShell is "false", meaning the
      * EventPacket is syntactically invalid and not accepted. 
+     * @throws NoTestDataException If a pseudorandom String is requested by a line number that is not available or if the requested String size is to higher then available
      *
      */
-    public void testInvalidEventIsNotAcceptedArgListIsNotOfTypeString()
+    public void testInvalidEventIsNotAcceptedArgListIsNotOfTypeString() throws NoTestDataException
     {
-        EventPacket eventPacket = this.eventGenerator.createEventPacket(true, true, true, false, 10, 10);
+        EventPacket eventPacket = this.eventGenerator.createEventPacket(true, true, this.line, true, false, 10, 10);
 
         boolean result = this.testSensor.sendEvent(eventPacket);
 
-        assertFalse(result);
+        assertFalse("" + this.line,result);
     }
 
     /**
@@ -200,156 +202,163 @@ public class ClientsideTests extends TestCase
      * This testcase validates the correct behaviour of creating an ValidEventPacket.
      * The test succeeds if the creation brings up an Exception, if invalid
      * parameters are passed to the ValidEventPacket constructor.
+     * @throws NoTestDataException If a pseudorandom String is requested by a line number that is not available or if the requested String size is to higher then available
      */
-    public void testIllegalEventParametersCauseException()
+    public void testIllegalEventParametersCauseException() throws NoTestDataException
     {
         try {
-            this.eventGenerator.createValidEventPacket(false, true, true, true, 10, 10);
+            this.eventGenerator.createValidEventPacket(false, true, this.line, true, true, 10, 10);
 
             fail("IllegalEventParameterException should be thrown");
         }
         catch (IllegalEventParameterException e) {
-            assertTrue(true);
+            assertTrue("" + this.line,true);
 
             try {
-                this.eventGenerator.createValidEventPacket(true, false, true, true, 10, 10);
+                this.eventGenerator.createValidEventPacket(true, false, this.line, true, true, 10, 10);
 
                 fail("IllegalEventParameterException should be thrown");
             }
             catch (IllegalEventParameterException e1) {
 
-                assertTrue(true);
+                assertTrue("" + this.line,true);
 
                 try {
-                    this.eventGenerator.createValidEventPacket(true, true, false, true, 10, 10);
+                    this.eventGenerator.createValidEventPacket(true, true, this.line, false, true, 10, 10);
 
                     fail("IllegalEventParameterException should be thrown");
                 }
                 catch (IllegalEventParameterException e2) {
-                    assertTrue(true);
+                    assertTrue("" + this.line,true);
 
                     try {
-                        this.eventGenerator.createValidEventPacket(true, true, true, true, 0, 10);
+                        this.eventGenerator.createValidEventPacket(true, true, this.line, true, true, 0, 10);
 
                         fail("IllegalEventParameterException should be thrown");
                     }
                     catch (IllegalEventParameterException e3) {
-                        assertTrue(true);
+                        assertTrue("" + this.line,true);
 
                         try {
-                            this.eventGenerator.createValidEventPacket(true, true, true, false, 10, 10);
+                            this.eventGenerator.createValidEventPacket(true, true, this.line, true, false, 10, 10);
 
                             fail("IllegalEventParameterException should be thrown");
                         }
                         catch (IllegalEventParameterException e4) {
-                            assertTrue(true);
+                            assertTrue("" + this.line,true);
                         }
                     }
                 }
             }
         }
     }
-    
+
     /**
      * Testcase CL9 according to the document TESTPLAN Version 1.0 or higher.
      * This testcase passes a HackyStat "Activity" SensorDataType event to the ECG SensorShellWrapper.
      * 
      * The test is successfull if the result from the ECG SensorShellWrapper is "true".
+     * @throws NoTestDataException If a pseudorandom String is requested by a line number that is not available or if the requested String size is to higher then available
      *
      */
-      public void testHackyStatActivityEventsAccepted()
-      {
-          ValidEventPacket eventPacket = this.eventGenerator.createHackyStatEventPacket(SensorDataType.ACTIVITY);
-          
-          boolean result = this.testSensor.sendEvent(eventPacket);
+    public void testHackyStatActivityEventsAccepted() throws NoTestDataException
+    {
+        ValidEventPacket eventPacket = this.eventGenerator.createHackyStatEventPacket(SensorDataType.ACTIVITY,this.line);
 
-          assertTrue(result);
-         
-      }
-      
-      /**
-       * Testcase CL10 according to the document TESTPLAN Version 1.0 or higher.
-       * This testcase passes a HackyStat "Build" SensorDataType event to the ECG SensorShellWrapper.
-       * 
-       * The test is successfull if the result from the ECG SensorShellWrapper is "true".
-       *
-       */
-        public void testHackyStatBuildEventsAccepted()
-        {
-            ValidEventPacket eventPacket = this.eventGenerator.createHackyStatEventPacket(SensorDataType.BUILD);
-            
-            boolean result = this.testSensor.sendEvent(eventPacket);
+        boolean result = this.testSensor.sendEvent(eventPacket);
 
-            assertTrue(result);
-           
-        }
-        
-        /**
-         * Testcase CL11 according to the document TESTPLAN Version 1.0 or higher.
-         * This testcase passes a HackyStat "BuffTrans" SensorDataType event to the ECG SensorShellWrapper.
-         * 
-         * The test is successfull if the result from the ECG SensorShellWrapper is "true".
-         *
-         */
-          public void testHackyStatBuffTransEventsAccepted()
-          {
-              ValidEventPacket eventPacket = this.eventGenerator.createHackyStatEventPacket(SensorDataType.BUFFTRANS);
-              
-              boolean result = this.testSensor.sendEvent(eventPacket);
+        assertTrue("" + this.line,result);
 
-              assertTrue(result);
-             
-          }
-          
-          /**
-           * Testcase CL12 according to the document TESTPLAN Version 1.0 or higher.
-           * This testcase passes a HackyStat "Commit" SensorDataType event to the ECG SensorShellWrapper.
-           * 
-           * The test is successfull if the result from the ECG SensorShellWrapper is "true".
-           *
-           */
-            public void testHackyStatCommitEventsAccepted()
-            {
-                ValidEventPacket eventPacket = this.eventGenerator.createHackyStatEventPacket(SensorDataType.COMMIT);
-                
-                boolean result = this.testSensor.sendEvent(eventPacket);
+    }
 
-                assertTrue(result);
-               
-            }
-            
-            /**
-             * Testcase CL13 according to the document TESTPLAN Version 1.0 or higher.
-             * This testcase passes a HackyStat "Commit" SensorDataType event to the ECG SensorShellWrapper.
-             * 
-             * The test is successfull if the result from the ECG SensorShellWrapper is "true".
-             *
-             */
-              public void testHackyStatFileMetricEventsAccepted()
-              {
-                  ValidEventPacket eventPacket = this.eventGenerator.createHackyStatEventPacket(SensorDataType.FILEMETRIC);
-                  
-                  boolean result = this.testSensor.sendEvent(eventPacket);
+    /**
+     * Testcase CL10 according to the document TESTPLAN Version 1.0 or higher.
+     * This testcase passes a HackyStat "Build" SensorDataType event to the ECG SensorShellWrapper.
+     * 
+     * The test is successfull if the result from the ECG SensorShellWrapper is "true".
+     * @throws NoTestDataException If a pseudorandom String is requested by a line number that is not available or if the requested String size is to higher then available
+     *
+     */
+    public void testHackyStatBuildEventsAccepted() throws NoTestDataException
+    {
+        ValidEventPacket eventPacket = this.eventGenerator.createHackyStatEventPacket(SensorDataType.BUILD,this.line);
 
-                  assertTrue(result);
-                 
-              }
-              
-              /**
-               * Testcase CL14 according to the document TESTPLAN Version 1.0 or higher.
-               * This testcase passes a HackyStat "Commit" SensorDataType event to the ECG SensorShellWrapper.
-               * 
-               * The test is successfull if the result from the ECG SensorShellWrapper is "true".
-               *
-               */
-                public void testHackyStatUnitTestEventsAccepted()
-                {
-                    ValidEventPacket eventPacket = this.eventGenerator.createHackyStatEventPacket(SensorDataType.UNITTEST);
-                    
-                    boolean result = this.testSensor.sendEvent(eventPacket);
+        boolean result = this.testSensor.sendEvent(eventPacket);
 
-                    assertTrue(result);
-                   
-                }
+        assertTrue("" + this.line,result);
+
+    }
+
+    /**
+     * Testcase CL11 according to the document TESTPLAN Version 1.0 or higher.
+     * This testcase passes a HackyStat "BuffTrans" SensorDataType event to the ECG SensorShellWrapper.
+     * 
+     * The test is successfull if the result from the ECG SensorShellWrapper is "true".
+     * @throws NoTestDataException If a pseudorandom String is requested by a line number that is not available or if the requested String size is to higher then available
+     *
+     */
+    public void testHackyStatBuffTransEventsAccepted() throws NoTestDataException
+    {
+        ValidEventPacket eventPacket = this.eventGenerator.createHackyStatEventPacket(SensorDataType.BUFFTRANS,this.line);
+
+        boolean result = this.testSensor.sendEvent(eventPacket);
+
+        assertTrue("" + this.line,result);
+
+    }
+
+    /**
+     * Testcase CL12 according to the document TESTPLAN Version 1.0 or higher.
+     * This testcase passes a HackyStat "Commit" SensorDataType event to the ECG SensorShellWrapper.
+     * 
+     * The test is successfull if the result from the ECG SensorShellWrapper is "true".
+     * @throws NoTestDataException If a pseudorandom String is requested by a line number that is not available or if the requested String size is to higher then available
+     *
+     */
+    public void testHackyStatCommitEventsAccepted() throws NoTestDataException
+    {
+        ValidEventPacket eventPacket = this.eventGenerator.createHackyStatEventPacket(SensorDataType.COMMIT,this.line);
+
+        boolean result = this.testSensor.sendEvent(eventPacket);
+
+        assertTrue("" + this.line,result);
+
+    }
+
+    /**
+     * Testcase CL13 according to the document TESTPLAN Version 1.0 or higher.
+     * This testcase passes a HackyStat "Commit" SensorDataType event to the ECG SensorShellWrapper.
+     * 
+     * The test is successfull if the result from the ECG SensorShellWrapper is "true".
+     * @throws NoTestDataException If a pseudorandom String is requested by a line number that is not available or if the requested String size is to higher then available
+     *
+     */
+    public void testHackyStatFileMetricEventsAccepted() throws NoTestDataException
+    {
+        ValidEventPacket eventPacket = this.eventGenerator.createHackyStatEventPacket(SensorDataType.FILEMETRIC,this.line);
+
+        boolean result = this.testSensor.sendEvent(eventPacket);
+
+        assertTrue("" + this.line,result);
+
+    }
+
+    /**
+     * Testcase CL14 according to the document TESTPLAN Version 1.0 or higher.
+     * This testcase passes a HackyStat "Commit" SensorDataType event to the ECG SensorShellWrapper.
+     * 
+     * The test is successfull if the result from the ECG SensorShellWrapper is "true".
+     * @throws NoTestDataException If a pseudorandom String is requested by a line number that is not available or if the requested String size is to higher then available
+     *
+     */
+    public void testHackyStatUnitTestEventsAccepted() throws NoTestDataException
+    {
+        ValidEventPacket eventPacket = this.eventGenerator.createHackyStatEventPacket(SensorDataType.UNITTEST,this.line);
+
+        boolean result = this.testSensor.sendEvent(eventPacket);
+
+        assertTrue("" + this.line,result);
+
+    }
 
 }
