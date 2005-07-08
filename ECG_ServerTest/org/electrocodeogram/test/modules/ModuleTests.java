@@ -46,14 +46,40 @@ public class ModuleTests extends TestCase
      * @throws Exception If the module connection fails or if the RetriedAssert Thread causes an Exception
      *
      */
-    public void testEventTransportInModuleList() throws Exception
+    public void testEventTransportInHundredNodeModuleList() throws Exception
     {
 
         ValidEventPacket eventPacket = this.eventGenerator.createHackyStatEventPacket(SensorDataType.ACTIVITY,0);
 
         this.testModuleTransport.makeModuleList(100);
 
-        this.testModuleTransport.checkModuleEventTransport(eventPacket);
+        this.testModuleTransport.checkModuleEventTransport(eventPacket,1);
+
+        new RetriedAssert(5000, 100) {
+            @Override
+            public void run() throws Exception
+            {
+                assertTrue(testModuleTransport.getResult());
+            }
+        }.start();
+
+    }
+    
+    /**
+     * This is testcase MO1 according to the document TESTPLAN version 1.0 or higher.
+     * For this test 100 modules are connected as a list. The testcase is successfull
+     * if an event, that is passed to the first module, is received by the last module.  
+     * @throws Exception If the module connection fails or if the RetriedAssert Thread causes an Exception
+     *
+     */
+    public void testEventTransportInFifteenNodeModuleTree() throws Exception
+    {
+
+        ValidEventPacket eventPacket = this.eventGenerator.createHackyStatEventPacket(SensorDataType.ACTIVITY,0);
+
+        this.testModuleTransport.makeModuleBinTree();
+
+        this.testModuleTransport.checkModuleEventTransport(eventPacket,8);
 
         new RetriedAssert(5000, 100) {
             @Override
