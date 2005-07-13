@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="ECG SensorShell" default="deploy" basedir=".">
+	
+	<path id="project.classpath">
+		<pathelement location="." />
+	</path>
+
+	
+	<target name="init">
+	
+		<property name="ECG SensorShellTestDir" value="${basedir}/../ECG_SensorShellTests/lib" />
+		
+		<property name="ECG ServerAndModuleTestDir" value="${basedir}/../ECG_ServerAndModuleTests/lib" />
+		
+		<property name="ECG ConnectionTestDir" value="${basedir}/../ECG_ConnectionTests/lib" />
+		
+		<property name="ECG LabDir" value="${basedir}/../ElectroCodeoGram/lib/ecg" />
+		
+		<property name="builddir" value="${basedir}/build" />
+		
+		<property name="srcdir" value="${basedir}" />
+		
+		<property name="jardir" value="${basedir}/jar" />
+		
+		<property name="javadocdir" value="${basedir}/doc" />
+		
+		<property name="sensorshell.jar" value="${jardir}/sensorshell.jar" />
+		
+		<property name="event.jar" value="${jardir}/event.jar" />
+		
+		<property name="packages" value="org.electrocodeogram.client" /> 
+	</target>
+	
+	<target name="build" depends="init">
+		
+		<mkdir dir="${builddir}" />
+		
+		<javac destdir="${builddir}" srcdir="${srcdir}">
+			<classpath refid="project.classpath" />
+		</javac>
+		
+	</target>
+
+	<target name="javadoc" depends="init">
+		
+			<mkdir dir="${javadocdir}" />
+			
+			<javadoc sourcepath="${basedir}" destdir="${javadocdir}" packagenames="${packages}">
+			</javadoc>
+			
+	</target>
+	
+	<target name="jar" depends="build">
+
+		<mkdir dir="${jardir}" />
+		
+		<jar compress="true" duplicate="fail" jarfile="${sensorshell.jar}" basedir="${builddir}" />
+
+		<jar excludes="org/hackystat/" compress="true" duplicate="fail" jarfile="${event.jar}" basedir="${builddir}" />
+		
+		<delete dir="${builddir}" />
+		
+	</target>
+	
+	<target name="deploy" depends="jar">
+	
+		<copy todir="${ECG SensorShellTestDir}">
+
+			<fileset file="${sensorshell.jar}" />
+			
+		</copy>
+		
+		<copy todir="${ECG LabDir}">
+
+			<fileset file="${event.jar}" />
+			
+		</copy>
+
+		<copy todir="${ECG ServerAndModuleTestDir}">
+
+				<fileset file="${event.jar}" />
+					
+		</copy>
+		
+		<copy todir="${ECG ConnectionTestDir}">
+
+				<fileset file="${sensorshell.jar}" />
+							
+		</copy>
+
+		
+	</target>
+
+	
+	
+</project>
+
