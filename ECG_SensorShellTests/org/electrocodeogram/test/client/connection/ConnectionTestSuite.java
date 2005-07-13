@@ -1,0 +1,53 @@
+package org.electrocodeogram.test.client.connection;
+
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
+/**
+ * This class contains a suite of connection tests.
+ */
+public class ConnectionTestSuite
+{
+
+    /**
+     * This returns the connection test suite.
+     * @return The connection test suite
+     */
+    public static Test suite()
+    {
+        TestSuite suite = new TestSuite("Connection tests for the ECG");
+        
+        int testACount = 1;
+        
+        for(int i=0;i<testACount;i++)
+        {
+            suite.addTest(new ConnectionTests("testStayNotConnectedIfServerIsDown"));
+        }
+        
+        int testBCount = 1;
+        
+        for(int i=0;i<testBCount;i++)
+        {
+            suite.addTest(new ConnectionTests("testConnectionTrialsAreIncreasing"));
+        }
+        
+        int testCCount = 1;
+        
+        for(int i=0;i<testCCount;i++)
+        {
+            suite.addTest(new ConnectionTests("testDelayedSendingThreadAcceptsNewEvents"));
+        }
+        
+        int testDCount = 1;
+        
+        for(int i=0;i<testDCount;i++)
+        {
+            suite.addTest(new ConnectionTests("testAfterConnectionBufferIsEmptied"));
+        }
+        
+        return suite;
+        
+        
+    }
+
+}
