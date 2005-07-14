@@ -88,8 +88,9 @@ public class ReliabilityTests extends TestCase
     }
 
     /**
+     * Testcase RE1 according to the document TESTPLAN Version 1.0 or higher. 
      * This testcase is successfull if an EventPacket that is sended to the server
-     * brings the server to receive one EventPacket.
+     * leads the server to receive one EventPacket.
      * @throws IllegalEventParameterException If the parameters passed to the event creating method are not legal
      * @throws NoTestDataException If a pseudorandom String is requested by a line number that is not available or if the requested String size is to higher then available
      */
@@ -113,6 +114,7 @@ public class ReliabilityTests extends TestCase
     }
 
     /**
+     * Testcase RE2 according to the document TESTPLAN Version 1.0 or higher. 
      * This testcase is successsfull if an EventPacket is received by the server without any modifications to
      * its contained event data.
      * @throws IllegalEventParameterException If the parameters passed to the event creating method are not legal
