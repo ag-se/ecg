@@ -17,13 +17,6 @@ public class ConnectionTestSuite
     {
         TestSuite suite = new TestSuite("Connection tests for the ECG");
         
-        int testACount = 1;
-        
-        for(int i=0;i<testACount;i++)
-        {
-            suite.addTest(new ConnectionTests("testStayNotConnectedIfServerIsDown"));
-        }
-        
         int testBCount = 1;
         
         for(int i=0;i<testBCount;i++)

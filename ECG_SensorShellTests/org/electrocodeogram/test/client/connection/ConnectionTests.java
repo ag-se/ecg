@@ -74,31 +74,10 @@ public class ConnectionTests extends TestCase
 
     }
 
-    /**
-     * Testcase CO1 according to the document TESTPLAN Version 1.0 or higher.
-     * This testcase validates that the SendingThread will stay in the state
-     * "not connected" if the connection to the ECG server cannot be
-     * established. In this case the ECG server has not been started. The
-     * test is succesfull if the SendingThread stays in the "not connected"
-     * state even if it gets new EventPackets to transmit to the ECG server
-     * and therefore tires to establish a connection to it.
-     * @throws NoTestDataException If a pseudorandom String is requested by a line number that is not available or if the requested String size is to higher then available
-     *
-     */
-    public void testStayNotConnectedIfServerIsDown() throws NoTestDataException
-    {
-
-        assertTrue(this.threadTest.testConnection(false, 0));
-
-        EventPacket eventPacket = this.eventGenerator.createEventPacket(true, true, 0, true, true, 10, 10);
-
-        this.testSensor.sendEvent(eventPacket);
-
-        assertTrue(this.threadTest.testConnection(false, 100));
-    }
+    
 
     /**
-     * Testcase CO2 according to the document TESTPLAN Version 1.0 or higher. The
+     * Testcase CO1 according to the document TESTPLAN Version 1.0 or higher. The
      * SendingThread is expected to continously initiate connection attemps to
      * the ECG server when its buffer contains any EventPackets to submit. This
      * connection attemps are only interrupted by the set connection delay. This
@@ -129,7 +108,7 @@ public class ConnectionTests extends TestCase
     }
 
     /**
-     * Testcase CO3 according to the document TESTPLAN Version 1.0 or higher.
+     * Testcase CO2 according to the document TESTPLAN Version 1.0 or higher.
      * During a connnection delay the Sendingthread is "sleeping". This testcase
      * is succesfull if the SendingThread is still able to receive new
      * EventPackets durong its "sleeping" state.
@@ -165,7 +144,7 @@ public class ConnectionTests extends TestCase
     }
 
     /**
-     * Testcase CO4 according to the document TESTPLAN Version 1.0 or higher.
+     * Testcase CO3 according to the document TESTPLAN Version 1.0 or higher.
      * After the ECG server is started a connection to it should be established
      * and all queued EventPackets should be send to the ECG server. This
      * testcase succeeds if exactly this happens.
