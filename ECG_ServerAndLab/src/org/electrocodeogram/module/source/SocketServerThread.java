@@ -1,4 +1,4 @@
-package org.electrocodeogram.core;
+package org.electrocodeogram.module.source;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -8,13 +8,14 @@ import java.net.SocketException;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
+import org.electrocodeogram.core.SensorShellInterface;
 import org.electrocodeogram.event.ValidEventPacket;
 
 /**
  * A ServerThread maintains communication with a single ECG sesnor.
  * Communication is done by (de)serialization over sockets.
  */
-public class ServerThread extends Thread
+public class SocketServerThread extends Thread
 {
     private Logger logger = null;
     
@@ -28,7 +29,7 @@ public class ServerThread extends Thread
     
     private ObjectInputStream objectInputStream = null;
     
-    private SensorServer sensorServer = null;
+    private SocketServer sensorServer = null;
 
     private String sensorName = null;
     
@@ -65,7 +66,7 @@ public class ServerThread extends Thread
      * @param socketToSensorPar The socket to the ECG sensor
      * @throws IOException If the creation of the ObjectInputStream fails
      */
-    public ServerThread(SensorServer sensorServerPar, SensorShellInterface shellPar, Socket socketToSensorPar) throws IOException
+    public SocketServerThread(SocketServer sensorServerPar, SensorShellInterface shellPar, Socket socketToSensorPar) throws IOException
     {
         super();
         

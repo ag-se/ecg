@@ -8,6 +8,7 @@ package org.electrocodeogram.ui;
 
 import java.util.List;
 
+import org.electrocodeogram.core.Core;
 import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.module.writer.EventWriter;
 
@@ -29,7 +30,7 @@ public class GuiEventWriter extends EventWriter
      */
     private GuiEventWriter(MessagesTarget target)
     {
-        super("GuiEventWriter");
+        super(Core.getInstance().getModuleRegistry(),"GuiEventWriter");
         
         assert(target != null);
         
@@ -40,7 +41,7 @@ public class GuiEventWriter extends EventWriter
     
     private GuiEventWriter()
     {
-        super("GuiEventWriter");
+        super(Core.getInstance().getModuleRegistry(),"GuiEventWriter");
     }
 
     public static GuiEventWriter getInstance(MessagesTarget target)
@@ -75,7 +76,7 @@ public class GuiEventWriter extends EventWriter
     {
         if(target != null)
         {
-        if (eventPacket.getSourceId() == Configurator.getInstance().getSelectedModuleCellId())
+        if (eventPacket.getSourceId() == Core.getInstance().getConfigurator().getSelectedModuleCellId())
         {
           target.append(eventPacket.getTimeStamp().toString() + "," + eventPacket.getHsCommandName());
 

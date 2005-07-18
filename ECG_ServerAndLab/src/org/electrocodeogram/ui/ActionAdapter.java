@@ -9,6 +9,8 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JOptionPane;
 
+import org.electrocodeogram.core.Core;
+import org.electrocodeogram.core.SensorShellWrapper;
 import org.electrocodeogram.module.IllegalModuleIDException;
 import org.electrocodeogram.module.ModuleConnectionException;
 import org.electrocodeogram.module.ModuleInstantiationException;
@@ -59,7 +61,7 @@ public class ActionAdapter implements ActionListener
 //      }
         
         try {
-            ModuleRegistry.getInstance().createModuleInstanceFromModuleClassId(moduleClassId,moduleName);
+        	Core.getInstance().getModuleRegistry().createModuleInstanceFromModuleClassId(moduleClassId,moduleName);
         }
         catch (ModuleInstantiationException e1) {
             // TODO Auto-generated catch block

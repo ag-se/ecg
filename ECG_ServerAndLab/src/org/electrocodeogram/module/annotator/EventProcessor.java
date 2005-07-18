@@ -8,6 +8,7 @@ import java.util.logging.Level;
 
 import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.module.Module;
+import org.electrocodeogram.module.ModuleRegistry;
 
 /**
  * @author 7oas7er
@@ -34,9 +35,9 @@ public abstract class EventProcessor extends Module
     /**
      * @param name
      */
-    public EventProcessor(int processorMode, int annotationType, String separator)
+    public EventProcessor(ModuleRegistry moduleRegistryPar, int processorMode, int annotationType, String separator)
     {
-        super(ModuleType.INTERMEDIATE_MODULE);
+        super(moduleRegistryPar, ModuleType.INTERMEDIATE_MODULE);
 
         this.processorMode = processorMode;
         
@@ -45,9 +46,9 @@ public abstract class EventProcessor extends Module
         this.separator = separator;
     }
     
-    public EventProcessor(int annotationType, String separator)
+    public EventProcessor(ModuleRegistry moduleRegistryPar, int annotationType, String separator)
     {
-        super(ModuleType.INTERMEDIATE_MODULE);
+        super(moduleRegistryPar, ModuleType.INTERMEDIATE_MODULE);
 
         this.processorMode = EventProcessor.ANNOTATOR;
         
@@ -56,9 +57,9 @@ public abstract class EventProcessor extends Module
         this.separator = separator;
     }
     
-    public EventProcessor(int processorMode)
+    public EventProcessor(ModuleRegistry moduleRegistryPar, int processorMode)
     {
-        super(ModuleType.INTERMEDIATE_MODULE);
+        super(moduleRegistryPar, ModuleType.INTERMEDIATE_MODULE);
         
         this.processorMode = processorMode;
     }

@@ -7,6 +7,8 @@ import java.util.Observer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.electrocodeogram.core.Core;
+import org.electrocodeogram.core.SensorShellWrapper;
 import org.electrocodeogram.event.IllegalEventParameterException;
 import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.module.annotator.EventProcessor;
@@ -81,7 +83,7 @@ public abstract class Module extends Observable implements Observer
      * This creates a new Module of the given module type and registers it with the ModuleRegistry.
      * @param moduleTypePar Is the module type
      */
-    public Module(ModuleType moduleTypePar)
+    public Module(ModuleRegistry moduleRegistryPar, ModuleType moduleTypePar)
     {
         this.id = ++count;
 
@@ -95,14 +97,14 @@ public abstract class Module extends Observable implements Observer
 
         this.senderModuleMap = new HashMap<Integer, Module>();
 
-        if (!(this instanceof GuiEventWriter)) {
+//        if (!(this instanceof GuiEventWriter)) {
+//
+//            addObserver();
+//
+//            //addObserver(GuiEventWriter.getInstance());
+//        }
 
-            addObserver(Configurator.getInstance(this));
-
-            addObserver(GuiEventWriter.getInstance());
-        }
-
-        ModuleRegistry.getInstance().registerModuleInstance(this);
+        moduleRegistryPar.registerModuleInstance(this);
 
         activate();
 
@@ -434,7 +436,7 @@ public abstract class Module extends Observable implements Observer
         }
         
         try {
-            ModuleRegistry.getInstance().deregisterModuleInstance(this.getId());
+        	Core.getInstance().getModuleRegistry().deregisterModuleInstance(this.getId());
         }
         catch (UnknownModuleIDException e) {
             

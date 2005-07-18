@@ -1,7 +1,9 @@
 package org.electrocodeogram.module.source;
 
+import org.electrocodeogram.core.Core;
 import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.module.Module;
+import org.electrocodeogram.module.ModuleRegistry;
     /**
      * @author Frank Schlesinger
      * 
@@ -10,13 +12,17 @@ import org.electrocodeogram.module.Module;
      * the module tree of the ECG framework.
      *
      */
-    public class SourceModule extends Module
+    public class SocketSourceModule extends Module
     {
-        
-        
-        public SourceModule()
+    	private SocketServer sensorServer = null;
+
+    	
+        public SocketSourceModule(Core corePar)
         {
-            super(ModuleType.SOURCE_MODULE);
+            super(corePar.getModuleRegistry(),ModuleType.SOURCE_MODULE);
+            
+//        	start the ECG server to listen for incoming events
+            this.sensorServer = new SocketServer(corePar.getSensorShellWrapper());
         }
         
         public void append(ValidEventPacket eventPacket)

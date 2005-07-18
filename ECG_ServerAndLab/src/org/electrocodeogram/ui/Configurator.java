@@ -29,13 +29,15 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
-import org.electrocodeogram.core.SensorServer;
+import org.electrocodeogram.core.Core;
+import org.electrocodeogram.core.SensorShellWrapper;
 import org.electrocodeogram.module.IllegalModuleIDException;
 import org.electrocodeogram.module.Module;
 import org.electrocodeogram.module.ModuleDescriptor;
 import org.electrocodeogram.module.ModuleRegistry;
 import org.electrocodeogram.module.UnknownModuleIDException;
 import org.electrocodeogram.module.Module.ModuleType;
+import org.electrocodeogram.module.source.SocketServer;
 
 import com.zfqjava.swing.JStatusBar;
 
@@ -123,18 +125,18 @@ public class Configurator extends JFrame implements Observer
         return theInstance;
     }
 
-    /**
-     * @return
-     */
-    public static Configurator getInstance()
-    {
-        if (theInstance == null) {
-            theInstance = new Configurator();
-        }
-        return theInstance;
-    }
+//    /**
+//     * @return
+//     */
+//    public static Configurator getInstance()
+//    {
+//        if (theInstance == null) {
+//            theInstance = new Configurator();
+//        }
+//        return theInstance;
+//    }
 
-    private Configurator()
+    public Configurator()
     {
         super();
 
@@ -194,8 +196,7 @@ public class Configurator extends JFrame implements Observer
 
             public void actionPerformed(ActionEvent e)
             {
-                Configurator.getInstance().dispose();
-                System.exit(0);
+                Core.getInstance().quit();
 
             }
         });
@@ -209,7 +210,7 @@ public class Configurator extends JFrame implements Observer
             {
 
                 try {
-                    ModuleRegistry.getInstance().getModuleInstance(1).deactivate();
+                	Core.getInstance().getModuleRegistry().getModuleInstance(1).deactivate();
                 }
                 catch (IllegalModuleIDException e1) {
                     // TODO Auto-generated catch block
@@ -230,7 +231,7 @@ public class Configurator extends JFrame implements Observer
             {
 
                 try {
-                    ModuleRegistry.getInstance().getModuleInstance(1).activate();
+                	Core.getInstance().getModuleRegistry().getModuleInstance(1).activate();
                 }
                 catch (IllegalModuleIDException e1) {
                     // TODO Auto-generated catch block
@@ -468,8 +469,8 @@ public class Configurator extends JFrame implements Observer
             }
         }
         else {
-            if (arg instanceof SensorServer) {
-                SensorServer seso = (SensorServer) arg;
+            if (arg instanceof SocketServer) {
+                SocketServer seso = (SocketServer) arg;
 
                 int activeSensors = seso.getSensorCount();
 
@@ -603,7 +604,7 @@ public class Configurator extends JFrame implements Observer
 
             String text = "";
             try {
-                text = ModuleRegistry.getInstance().getModuleInstance(id).getDetails();
+                text = Core.getInstance().getModuleRegistry().getModuleInstance(id).getDetails();
             }
             catch (IllegalModuleIDException e) {
                 // TODO Auto-generated catch block

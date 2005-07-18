@@ -1,4 +1,4 @@
-package org.electrocodeogram.core;
+package org.electrocodeogram.module.source;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
+import org.electrocodeogram.core.SensorShellInterface;
+
 /**
  * The SensorServer Thread is contoniously listening for connection requests
  * by ECG sensors. If a connection attemp by a ECG sensor was successfull
@@ -17,7 +19,7 @@ import java.util.logging.Level;
  * All running ServerThreads are managed in a threadpool.
  *
  */
-public class SensorServer extends Thread
+public class SocketServer extends Thread
 {
     
     private Logger logger = null;
@@ -31,7 +33,7 @@ public class SensorServer extends Thread
     
     private boolean runningFlag = true;
     
-    private HashMap<Integer,ServerThread> serverThreadPool = null;
+    private HashMap<Integer,SocketServerThread> serverThreadPool = null;
     
     private ServerSocket serverSocket = null;
     
@@ -41,11 +43,11 @@ public class SensorServer extends Thread
      * This creates a new SensorServer and a new threadpool. 
      * @param shellPar Is the SensorShell to which all incoming event data shall be passed
      */
-    public SensorServer(SensorShellInterface shellPar)
+    public SocketServer(SensorShellInterface shellPar)
     {
         this.shell = shellPar;
         
-        this.serverThreadPool = new HashMap<Integer,ServerThread>();
+        this.serverThreadPool = new HashMap<Integer,SocketServerThread>();
      
         this.logger = Logger.getLogger("ECG Server");
         
@@ -66,7 +68,7 @@ public class SensorServer extends Thread
         
         for(int i=0;i<count;i++)
         {
-            addresses[i] = ((ServerThread)sensorThreads[i]).getSensorAddress();
+            addresses[i] = ((SocketServerThread)sensorThreads[i]).getSensorAddress();
         }
         
         return addresses;
@@ -102,7 +104,7 @@ public class SensorServer extends Thread
         String[] toReturn = null;
         
         try {
-            toReturn = new String[] {InetAddress.getLocalHost().toString(),new Integer(SensorServer.PORT).toString()};
+            toReturn = new String[] {InetAddress.getLocalHost().toString(),new Integer(SocketServer.PORT).toString()};
         }
         catch (UnknownHostException e) {
             
@@ -147,7 +149,7 @@ public class SensorServer extends Thread
                 this.logger.log(Level.INFO,"New connection request");
                 
                 // create a new ServerThread to communicate on the given Socket
-                ServerThread serverThread = new ServerThread(this,shell,socketToSensor);
+                SocketServerThread serverThread = new SocketServerThread(this,shell,socketToSensor);
                 
                 // put the Serverthread in the threadpool
                 this.serverThreadPool.put(new Integer(serverThread.getServerThreadId()),serverThread);
@@ -178,7 +180,7 @@ public class SensorServer extends Thread
         
         for(int i=0;i<count;i++)
         {
-            names[i] = ((ServerThread)sensorThreads[i]).getSensorName();
+            names[i] = ((SocketServerThread)sensorThreads[i]).getSensorName();
         }
         
         return names;
@@ -195,7 +197,7 @@ public class SensorServer extends Thread
         
         for(Object threadObject : threadArray)
         {
-            ServerThread thread = (ServerThread) threadObject;
+            SocketServerThread thread = (SocketServerThread) threadObject;
             
             thread.stopSensorThread();
             

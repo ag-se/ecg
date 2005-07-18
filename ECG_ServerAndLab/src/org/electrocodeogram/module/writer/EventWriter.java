@@ -9,6 +9,7 @@ package org.electrocodeogram.module.writer;
 import org.electrocodeogram.event.IllegalEventParameterException;
 import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.module.Module;
+import org.electrocodeogram.module.ModuleRegistry;
 
 
 /**
@@ -23,9 +24,9 @@ public abstract class EventWriter extends Module
     /**
      * @param name
      */
-    public EventWriter(String name)
+    public EventWriter(ModuleRegistry moduleRegistryPar, String name)
     {
-        super(ModuleType.TARGET_MODULE);
+        super(moduleRegistryPar,ModuleType.TARGET_MODULE);
     }
     
 //    public void update(Observable o, Object arg)

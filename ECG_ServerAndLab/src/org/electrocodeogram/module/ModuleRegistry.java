@@ -10,6 +10,7 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.electrocodeogram.core.Core;
 import org.electrocodeogram.ui.Configurator;
 
 /**
@@ -28,7 +29,7 @@ public class ModuleRegistry extends Observable
 
     private Logger logger = null;
 
-    private static ModuleRegistry theInstance = null;
+    //private static ModuleRegistry theInstance = null;
 
     private RunningModules runningModules = null;
 
@@ -36,19 +37,19 @@ public class ModuleRegistry extends Observable
 
     private File moduleDirectory = null;
 
-    private ModuleRegistry()
+    public ModuleRegistry(Core corePar)
     {
         this.logger = Logger.getLogger("ModuleRegistry");
 
-        addObserver(Configurator.getInstance());
+        addObserver(corePar.getConfigurator());
 
         this.runningModules = new RunningModules();
 
     }
 
-    private ModuleRegistry(File filePar)
+    public ModuleRegistry(Core corePar, File filePar)
     {
-        this();
+        this(corePar);
 
         this.installedModules = new InstalledModules(filePar);
         
@@ -59,45 +60,57 @@ public class ModuleRegistry extends Observable
         clearChanged();
     }
 
-    /**
-     * This method returns the singleton instance of the ModuleRegistry.
-     * 
-     * @return the singleton instance of the ModuleRegistry
-     */
-    public static ModuleRegistry getInstance()
-    {
-        if (theInstance == null) {
-            theInstance = new ModuleRegistry();
-        }
+    public void setFile(File filePar) {
+    	
+    	this.installedModules = new InstalledModules(filePar);
+    	
+    	setChanged();
 
-        return theInstance;
-    }
+        notifyObservers();
 
-    /**
-     * This method returns the singleton instance of the ModuleRegistry. The
-     * file parameter is used to indicate the location where module class files
-     * are stored if no other location was given before.
-     * 
-     * @param file
-     *            Indicate the location where module class files are stored
-     * @return the singleton instance of the ModuleRegistry
-     */
-    public static ModuleRegistry getInstance(File file)
-    {
-        if (theInstance == null) {
-            theInstance = new ModuleRegistry(file);
-        }
-        else {
-            if (theInstance.moduleDirectory == null) {
-                theInstance.moduleDirectory = file;
+        clearChanged();
+		
+	}
+    
+//    /**
+//     * This method returns the singleton instance of the ModuleRegistry.
+//     * 
+//     * @return the singleton instance of the ModuleRegistry
+//     */
+//    public static ModuleRegistry getInstance()
+//    {
+//        if (theInstance == null) {
+//            theInstance = new ModuleRegistry();
+//        }
+//
+//        return theInstance;
+//    }
 
-                theInstance.installedModules = theInstance.new InstalledModules(file);
-            }
-        }
-
-        return theInstance;
-
-    }
+//    /**
+//     * This method returns the singleton instance of the ModuleRegistry. The
+//     * file parameter is used to indicate the location where module class files
+//     * are stored if no other location was given before.
+//     * 
+//     * @param file
+//     *            Indicate the location where module class files are stored
+//     * @return the singleton instance of the ModuleRegistry
+//     */
+//    public static ModuleRegistry getInstance(File file)
+//    {
+//        if (theInstance == null) {
+//            theInstance = new ModuleRegistry(file);
+//        }
+//        else {
+//            if (theInstance.moduleDirectory == null) {
+//                theInstance.moduleDirectory = file;
+//
+//                theInstance.installedModules = theInstance.new InstalledModules(file);
+//            }
+//        }
+//
+//        return theInstance;
+//
+//    }
 
     Logger getLogger()
     {
@@ -491,5 +504,7 @@ public class ModuleRegistry extends Observable
 
         return moduleDescription;
     }
+
+	
 
 }

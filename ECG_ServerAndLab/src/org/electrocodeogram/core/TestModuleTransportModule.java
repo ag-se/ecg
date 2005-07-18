@@ -36,9 +36,9 @@ public class TestModuleTransportModule extends Module
      */
     public TestModuleTransportModule()
     {
-        super(ModuleType.SOURCE_MODULE);
+        super(Core.getInstance().getModuleRegistry(),ModuleType.SOURCE_MODULE);
 
-        this.root = SensorShellWrapper.getInstance().sensorSource;
+        this.root = Core.getInstance().getSensorSource();
         
         removeConnectedModules(this.root);
     }
@@ -186,7 +186,7 @@ public class TestModuleTransportModule extends Module
         
         this.packetCount  = packetCountPar;
         
-        SensorShellWrapper.getInstance().doCommand(packet.getTimeStamp(), packet.getHsCommandName(), packet.getArglist());
+        Core.getInstance().getSensorShellWrapper().doCommand(packet.getTimeStamp(), packet.getHsCommandName(), packet.getArglist());
     }
 
     /**

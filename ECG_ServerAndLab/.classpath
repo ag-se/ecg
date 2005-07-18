@@ -3,7 +3,7 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/ecg/event.jar"/>
-	<classpathentry kind="lib" path="lib/hackystat/sensorshell.jar"/>
+	<classpathentry sourcepath="/ECG_SensorShell" kind="lib" path="lib/hackystat/sensorshell.jar"/>
 	<classpathentry kind="lib" path="lib/misc/componentset.jar"/>
 	<classpathentry kind="lib" path="lib/misc/jgraph.jar"/>
 	<classpathentry kind="lib" path="lib/misc/jgraphaddons.jar"/>

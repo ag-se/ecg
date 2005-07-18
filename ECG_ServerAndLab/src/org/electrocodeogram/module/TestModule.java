@@ -1,5 +1,6 @@
 package org.electrocodeogram.module;
 
+import org.electrocodeogram.core.Core;
 import org.electrocodeogram.event.ValidEventPacket;
 
 /**
@@ -14,7 +15,7 @@ public class TestModule extends Module
      */
     public TestModule()
     {
-        super(ModuleType.INTERMEDIATE_MODULE);
+        super(Core.getInstance().getModuleRegistry(),ModuleType.INTERMEDIATE_MODULE);
     }
 
     /**
@@ -37,5 +38,6 @@ public class TestModule extends Module
         // not needed
         
     }
+
 
 }

@@ -19,6 +19,8 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.electrocodeogram.core.Core;
+import org.electrocodeogram.core.SensorShellWrapper;
 import org.electrocodeogram.module.IllegalModuleIDException;
 import org.electrocodeogram.module.ModuleRegistry;
 import org.electrocodeogram.module.UnknownModuleIDException;
@@ -108,7 +110,7 @@ public class MessagesFrame extends JFrame implements MessagesTarget
         else
         {
             try {
-                this.titledBorder.setTitle(MODULE_SELECTED + ModuleRegistry.getInstance().getModuleInstance(moduleId).getName());
+                this.titledBorder.setTitle(MODULE_SELECTED + Core.getInstance().getModuleRegistry().getModuleInstance(moduleId).getName());
             }
             catch (IllegalModuleIDException e) {
                 // TODO Auto-generated catch block

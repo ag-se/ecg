@@ -5,7 +5,7 @@ public class SensorShellWrapperTest
 
     public static SensorShellWrapper getInstance()
     {
-        return SensorShellWrapper.getInstance();
+        return Core.getInstance().getSensorShellWrapper();
     }
     
 }

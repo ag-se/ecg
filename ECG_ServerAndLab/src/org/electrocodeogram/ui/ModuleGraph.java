@@ -15,6 +15,8 @@ import java.util.Observable;
 import javax.swing.JOptionPane;
 import javax.swing.border.LineBorder;
 
+import org.electrocodeogram.core.Core;
+import org.electrocodeogram.core.SensorShellWrapper;
 import org.electrocodeogram.module.IllegalModuleIDException;
 import org.electrocodeogram.module.Module;
 import org.electrocodeogram.module.ModuleConnectionException;
@@ -87,7 +89,7 @@ public class ModuleGraph extends JGraph
             
             public void mouseClicked(MouseEvent e)
             {
-                if(Configurator.getInstance().getModuleConnectionMode())
+                if(Core.getInstance().getConfigurator().getModuleConnectionMode())
                 {
                     if(e.getButton() == MouseEvent.BUTTON1)
                     {
@@ -100,16 +102,16 @@ public class ModuleGraph extends JGraph
 			                    
 			                    selectedModuleCellId = mc.getId();
 			                    
-			                    if(selectedModuleCellId == Configurator.getInstance().getSourceModule())
+			                    if(selectedModuleCellId == Core.getInstance().getConfigurator().getSourceModule())
 			                    {
-			                        JOptionPane.showMessageDialog(Configurator.getInstance(),"Sie können ein Modul nicht mit sich selbst verbinden.", "Ungültige Modulverbindung",JOptionPane.ERROR_MESSAGE);
+			                        JOptionPane.showMessageDialog(Core.getInstance().getConfigurator(),"Sie können ein Modul nicht mit sich selbst verbinden.", "Ungültige Modulverbindung",JOptionPane.ERROR_MESSAGE);
 			                    }
 			                    else
 			                    {
 			                        try {
                                         
 			                            try {
-                                            ModuleRegistry.getInstance().getModuleInstance(Configurator.getInstance().getSourceModule()).connectReceiverModule(ModuleRegistry.getInstance().getModuleInstance(selectedModuleCellId));
+			                            	Core.getInstance().getModuleRegistry().getModuleInstance(Core.getInstance().getConfigurator().getSourceModule()).connectReceiverModule(Core.getInstance().getModuleRegistry().getModuleInstance(selectedModuleCellId));
                                         }
                                         catch (IllegalModuleIDException e1) {
                                             // TODO Auto-generated catch block
@@ -120,11 +122,11 @@ public class ModuleGraph extends JGraph
                                             e1.printStackTrace();
                                         }
                                         
-			                            Configurator.getInstance().exitModuleConnectionMode();
+                                        Core.getInstance().getConfigurator().exitModuleConnectionMode();
                                     }
                                     catch (ModuleConnectionException e1) {
                                         
-                                        JOptionPane.showMessageDialog(Configurator.getInstance(),e1.getMessage(), "Ungültige Modulverbindung",JOptionPane.ERROR_MESSAGE);
+                                        JOptionPane.showMessageDialog(Core.getInstance().getConfigurator(),e1.getMessage(), "Ungültige Modulverbindung",JOptionPane.ERROR_MESSAGE);
                                     }
 			                    }
 			                }
@@ -133,7 +135,7 @@ public class ModuleGraph extends JGraph
                     }
                     else if(e.getButton() == MouseEvent.BUTTON3)
                     {
-                        Configurator.getInstance().exitModuleConnectionMode();
+                    	Core.getInstance().getConfigurator().exitModuleConnectionMode();
                     }
                     
                     
