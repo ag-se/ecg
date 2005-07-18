@@ -5,6 +5,6 @@
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="lib" path="lib/cdtcore.jar"/>
 	<classpathentry kind="lib" path="lib/cdtparser.jar"/>
-	<classpathentry kind="src" path="/ECG_ClientTools"/>
+	<classpathentry sourcepath="/ECG_SensorShell" kind="lib" path="lib/sensorshell.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
