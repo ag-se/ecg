@@ -27,7 +27,7 @@
 		
 		<mkdir dir="${builddir}" />
 		
-		<javac destdir="${builddir}" srcdir="${srcdir}" deprecation="true">
+		<javac destdir="${builddir}" srcdir="${srcdir}" deprecation="true" source="1.5" debug="on">
 			
 			<classpath>
 			
