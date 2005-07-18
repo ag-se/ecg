@@ -19,7 +19,7 @@ import org.electrocodeogram.module.ModuleRegistry;
     	
         public SocketSourceModule(Core corePar)
         {
-            super(corePar.getModuleRegistry(),ModuleType.SOURCE_MODULE);
+            super(corePar,ModuleType.SOURCE_MODULE);
             
 //        	start the ECG server to listen for incoming events
             this.sensorServer = new SocketServer(corePar.getSensorShellWrapper());

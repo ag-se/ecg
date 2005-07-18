@@ -36,7 +36,7 @@ public class TestModuleTransportModule extends Module
      */
     public TestModuleTransportModule()
     {
-        super(Core.getInstance().getModuleRegistry(),ModuleType.SOURCE_MODULE);
+        super(Core.getInstance(),ModuleType.SOURCE_MODULE);
 
         this.root = Core.getInstance().getSensorSource();
         

@@ -98,7 +98,7 @@ public class MessagesFrame extends JFrame implements MessagesTarget
 
         this.getContentPane().add(pnlMessages);
 
-        GuiEventWriter.getInstance(this);
+        Core.getInstance().getGuiEventWriter().setTarget(this);
     }
 
     public void setSelectedModul(int moduleId)

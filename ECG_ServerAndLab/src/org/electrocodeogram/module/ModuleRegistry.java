@@ -173,8 +173,13 @@ public class ModuleRegistry extends Observable
      */
     public Properties getModulePropertiesForId(int moduleClassId) throws IllegalModuleIDException, UnknownModuleIDException
     {
-        if (!(moduleClassId > 1)) {
+        if (!(moduleClassId > 0)) {
             throw new IllegalModuleIDException();
+        }
+        
+        if(this.installedModules == null)
+        {
+        	return null;
         }
 
         if (!this.installedModules.availableModuleClassesMap.containsKey(new Integer(

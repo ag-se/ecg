@@ -69,7 +69,7 @@ public abstract class Module extends Observable implements Observer
 
     private static int count = 0;
 
-    private int id = -1;
+    private int id = 0;
 
     private String name = null;
 
@@ -83,7 +83,7 @@ public abstract class Module extends Observable implements Observer
      * This creates a new Module of the given module type and registers it with the ModuleRegistry.
      * @param moduleTypePar Is the module type
      */
-    public Module(ModuleRegistry moduleRegistryPar, ModuleType moduleTypePar)
+    public Module(Core corePar, ModuleType moduleTypePar)
     {
         this.id = ++count;
 
@@ -97,15 +97,15 @@ public abstract class Module extends Observable implements Observer
 
         this.senderModuleMap = new HashMap<Integer, Module>();
 
-//        if (!(this instanceof GuiEventWriter)) {
-//
-//            addObserver();
-//
-//            //addObserver(GuiEventWriter.getInstance());
-//        }
+        corePar.getModuleRegistry().registerModuleInstance(this);
 
-        moduleRegistryPar.registerModuleInstance(this);
+        if (!(this instanceof GuiEventWriter)) {
 
+            addObserver(corePar.getConfigurator());
+
+            addObserver(corePar.getGuiEventWriter());
+        }
+        
         activate();
 
     }

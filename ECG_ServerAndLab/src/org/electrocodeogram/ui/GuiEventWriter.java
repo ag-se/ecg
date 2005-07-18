@@ -25,49 +25,49 @@ public class GuiEventWriter extends EventWriter
     
     private MessagesTarget target = null;
     
-    /**
-     * @param name
-     */
-    private GuiEventWriter(MessagesTarget target)
-    {
-        super(Core.getInstance().getModuleRegistry(),"GuiEventWriter");
-        
-        assert(target != null);
-        
-        this.target = target;
-        
-        this.activate();
-    }
+//    /**
+//     * @param name
+//     */
+//    private GuiEventWriter(Core corePar,MessagesTarget target)
+//    {
+//        super(corePar,"GuiEventWriter");
+//        
+//        assert(target != null);
+//        
+//        this.target = target;
+//        
+//        this.activate();
+//    }
     
-    private GuiEventWriter()
+    public GuiEventWriter(Core corePar)
     {
-        super(Core.getInstance().getModuleRegistry(),"GuiEventWriter");
+        super(corePar,"GuiEventWriter");
     }
 
-    public static GuiEventWriter getInstance(MessagesTarget target)
-    {
-        if (theInstance == null)
-        {
-            theInstance = new GuiEventWriter(target);
-        }
-        else
-        {
-            if(theInstance.target == null)
-            {
-                theInstance.target = target;
-            }
-        }
-        return theInstance;
-    }
-    
-    public static GuiEventWriter getInstance()
-    {
-        if(theInstance == null)
-        {
-            theInstance = new GuiEventWriter();
-        }
-        return theInstance;
-    }
+//    public static GuiEventWriter getInstance(MessagesTarget target)
+//    {
+//        if (theInstance == null)
+//        {
+//            theInstance = new GuiEventWriter(target);
+//        }
+//        else
+//        {
+//            if(theInstance.target == null)
+//            {
+//                theInstance.target = target;
+//            }
+//        }
+//        return theInstance;
+//    }
+//    
+//    public static GuiEventWriter getInstance()
+//    {
+//        if(theInstance == null)
+//        {
+//            theInstance = new GuiEventWriter();
+//        }
+//        return theInstance;
+//    }
     
     /* (non-Javadoc)
      * @see org.electrocodeogram.module.writer.EventWriter#write(org.electrocodeogram.EventPacket)
@@ -119,6 +119,12 @@ public class GuiEventWriter extends EventWriter
         // TODO Auto-generated method stub
         
     }
+
+	public void setTarget(MessagesFrame frame) {
+
+		this.target = frame;
+		
+	}
 
     /* (non-Javadoc)
      * @see org.electrocodeogram.module.Module#receiveEventPacket(org.electrocodeogram.EventPacket)

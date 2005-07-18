@@ -46,10 +46,7 @@ public class SensorShellWrapper extends SensorShell implements SensorShellInterf
         this.core = corePar;
         
         this.logger = Logger.getLogger("ECG Server");
-                
-        
-         
-        
+            
     }
     
     
@@ -73,6 +70,10 @@ public class SensorShellWrapper extends SensorShell implements SensorShellInterf
         if (result) {
 
             this.logger.log(Level.INFO,this.processingID + ": Event data is conforming to a HackyStat SensorDataType and is processed.");
+            
+            EventPacket eventPacket = new EventPacket(0,timeStamp,commandName,argList);
+            
+            this.logger.log(Level.INFO,this.processingID + " : " + eventPacket.toString());
             
             List<String> newArgList = new ArrayList<String>(argList.size());
 
