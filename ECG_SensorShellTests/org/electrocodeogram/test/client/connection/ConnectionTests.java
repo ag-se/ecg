@@ -171,7 +171,7 @@ public class ConnectionTests extends TestCase
 
         }
 
-        startECGServer("..\\ElectroCodeoGram\\application");
+        startECGServer("..\\ECG_ServerAndLab\\application");
 
         new RetriedAssert(10000, 1000) {
             @Override
