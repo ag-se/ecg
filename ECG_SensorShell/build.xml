@@ -17,6 +17,8 @@
 		
 		<property name="ECG LabDir" value="${basedir}/../ElectroCodeoGram/lib/ecg" />
 		
+		<property name="ECG EclipseSensorDir" value="${basedir}/../ECG_EclipseSensor/lib" />
+		
 		<property name="builddir" value="${basedir}/build" />
 		
 		<property name="srcdir" value="${basedir}" />
@@ -36,7 +38,8 @@
 		
 		<mkdir dir="${builddir}" />
 		
-		<javac destdir="${builddir}" srcdir="${srcdir}">
+		<javac destdir="${builddir}" srcdir="${srcdir}" source="1.5" debug="on">
+			
 			<classpath refid="project.classpath" />
 		</javac>
 		
@@ -87,6 +90,12 @@
 
 				<fileset file="${sensorshell.jar}" />
 							
+		</copy>
+		
+		<copy todir="${ECG EclipseSensorDir}">
+
+						<fileset file="${sensorshell.jar}" />
+									
 		</copy>
 
 		

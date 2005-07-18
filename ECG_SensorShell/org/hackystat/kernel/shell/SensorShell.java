@@ -5,8 +5,11 @@
  * Window - Preferences - Java - Code Style - Code Templates
  */
 package org.hackystat.kernel.shell;
+import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 import org.electrocodeogram.client.IllegalHostOrPortException;
 import org.electrocodeogram.client.SendingThread;
@@ -33,6 +36,8 @@ public class SensorShell
 {
     private SensorProperties properties = null;
     
+    private Logger logger = null;
+    
     /**
      * This creates a ECG SensorShell instance with the given properties.
      * @param propertiesPar The properties to configure the ECG SensorShell
@@ -45,6 +50,8 @@ public class SensorShell
         assert(propertiesPar != null);
         
         this.properties = propertiesPar;
+        
+        this.logger = Logger.getLogger("ECG_SensorShell");
     }
 
     /**
@@ -71,13 +78,18 @@ public class SensorShell
         SendingThread sendingThread = null;
         
         try {
+        	
             sendingThread = SendingThread.getInstance(this.properties.getECGServerAddress(),this.properties.getECGServerPort());
         }
         catch (IllegalHostOrPortException e) {
             
-            e.printStackTrace();
+            this.logger.log(Level.SEVERE,"Die Adresse des ECG Servers ist ungültig.\nPrüfen Sie, ob in der Datei \".hackystat/sensor.properties\" in Ihrem Heimatverzeichnis gültige Werte für die Parameter ECG_SERVER_ADDRESS und ECG_SERVER_PORT angegeben sind");
+
             
-        }
+        } catch (UnknownHostException e) {
+			
+            this.logger.log(Level.SEVERE,"Die Adresse des ECG Servers ist ungültig.\nPrüfen Sie, ob in der Datei \".hackystat/sensor.properties\" in Ihrem Heimatverzeichnis gültige Werte für die Parameter ECG_SERVER_ADDRESS und ECG_SERVER_PORT angegeben sind");
+	}
       
         // must not be "null"
         assert(sendingThread != null);

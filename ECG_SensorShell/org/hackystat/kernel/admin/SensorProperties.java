@@ -52,7 +52,7 @@ public class SensorProperties {
    */
   public SensorProperties(String sensorType) {
     this(sensorType.toUpperCase(), new File(System.getProperty("user.home") +
-        "/electrocodeogram/sensor.properties"));
+        "/.hackystat/sensor.properties"));
   }
 
   /**
@@ -118,16 +118,12 @@ public class SensorProperties {
     }
   }
 
-  public InetAddress getECGServerAddress()
+  public InetAddress getECGServerAddress() throws UnknownHostException
   {
       String ECGServerAddressKey = "ECG_SERVER_ADDRESS";
       String str = sensorProps.getProperty(ECGServerAddressKey, "false").trim();
-      try {
-        return InetAddress.getByName(str);
-    }
-    catch (UnknownHostException e) {
-       return null;
-    }
+      return InetAddress.getByName(str);
+    
   }
 
   public int getECGServerPort()
