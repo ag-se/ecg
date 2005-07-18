@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.electrocodeogram.core.SensorServer;
 import org.electrocodeogram.core.SensorShellInterface;
 import org.electrocodeogram.event.EventPacket;
+import org.electrocodeogram.module.source.SocketServer;
 
 /**
  * @author 7oas7er
@@ -21,11 +21,11 @@ public class MockSensorshellWrapper implements SensorShellInterface
     
     private int receivingCounter = 0;
     
-    private SensorServer sensorServer = null;
+    private SocketServer sensorServer = null;
     
     public MockSensorshellWrapper()
     {
-        this.sensorServer = new SensorServer(this);
+        this.sensorServer = new SocketServer(this);
         
     }
     
