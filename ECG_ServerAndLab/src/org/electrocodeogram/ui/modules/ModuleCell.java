@@ -4,7 +4,7 @@
  * TODO To change the template for this generated file go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-package org.electrocodeogram.ui;
+package org.electrocodeogram.ui.modules;
 
 import java.awt.Color;
 import java.awt.Point;
@@ -15,6 +15,7 @@ import javax.swing.BorderFactory;
 
 import org.electrocodeogram.module.Module;
 import org.electrocodeogram.module.Module.ModuleType;
+import org.electrocodeogram.ui.Configurator;
 import org.jgraph.graph.DefaultEdge;
 import org.jgraph.graph.DefaultGraphCell;
 import org.jgraph.graph.DefaultPort;

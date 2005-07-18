@@ -13,7 +13,7 @@ import org.electrocodeogram.event.IllegalEventParameterException;
 import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.module.annotator.EventProcessor;
 import org.electrocodeogram.ui.Configurator;
-import org.electrocodeogram.ui.GuiEventWriter;
+import org.electrocodeogram.ui.messages.GuiEventWriter;
 
 /**
  * This abstract class represents an ECG analysis module. A module is an entity able

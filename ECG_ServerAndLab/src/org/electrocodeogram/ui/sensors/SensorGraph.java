@@ -4,12 +4,13 @@
  * TODO To change the template for this generated file go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-package org.electrocodeogram.ui;
+package org.electrocodeogram.ui.sensors;
 
 import java.awt.Color;
 
 import javax.swing.border.LineBorder;
 
+import org.electrocodeogram.ui.modules.ModuleCell;
 import org.jgraph.JGraph;
 import org.jgraph.event.GraphSelectionEvent;
 import org.jgraph.event.GraphSelectionListener;

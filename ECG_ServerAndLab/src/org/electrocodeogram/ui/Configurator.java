@@ -38,6 +38,12 @@ import org.electrocodeogram.module.ModuleRegistry;
 import org.electrocodeogram.module.UnknownModuleIDException;
 import org.electrocodeogram.module.Module.ModuleType;
 import org.electrocodeogram.module.source.SocketServer;
+import org.electrocodeogram.ui.messages.GuiEventWriter;
+import org.electrocodeogram.ui.messages.MessagesFrame;
+import org.electrocodeogram.ui.modules.ModuleCell;
+import org.electrocodeogram.ui.modules.ModuleGraph;
+import org.electrocodeogram.ui.sensors.SensorCell;
+import org.electrocodeogram.ui.sensors.SensorGraph;
 
 import com.zfqjava.swing.JStatusBar;
 

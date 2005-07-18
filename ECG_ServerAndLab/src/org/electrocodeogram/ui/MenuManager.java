@@ -93,7 +93,7 @@ public class MenuManager
             public void actionPerformed(ActionEvent e)
             {
                try {
-            	   Core.getInstance().getModuleRegistry().getModuleInstance(Core.getInstance().getConfigurator().getSelectedModuleCellId()).activate();
+            	   Core.getInstance().getModuleRegistry().getModuleInstance(Core.getInstance().getConfigurator().getSelectedModuleCellId()).deactivate();
             }
             catch (IllegalModuleIDException e1) {
                 // TODO Auto-generated catch block
@@ -111,7 +111,7 @@ public class MenuManager
             public void actionPerformed(ActionEvent e)
             {
                try {
-            	   Core.getInstance().getModuleRegistry().getModuleInstance(Core.getInstance().getConfigurator().getSelectedModuleCellId()).deactivate();
+            	   Core.getInstance().getModuleRegistry().getModuleInstance(Core.getInstance().getConfigurator().getSelectedModuleCellId()).activate();
             }
             catch (IllegalModuleIDException e1) {
                 // TODO Auto-generated catch block
@@ -233,7 +233,7 @@ public class MenuManager
         
         
         try {
-            if(!Core.getInstance().getModuleRegistry().getModuleInstance(id).isModuleType(ModuleType.INTERMEDIATE_MODULE))
+            if(Core.getInstance().getModuleRegistry().getModuleInstance(id).isModuleType(ModuleType.INTERMEDIATE_MODULE))
             {
                 modulePopupMenu.addSeparator();
                 

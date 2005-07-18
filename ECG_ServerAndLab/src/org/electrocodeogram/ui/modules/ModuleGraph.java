@@ -4,7 +4,7 @@
  * TODO To change the template for this generated file go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-package org.electrocodeogram.ui;
+package org.electrocodeogram.ui.modules;
 
 import java.awt.Color;
 import java.awt.event.MouseAdapter;
@@ -22,6 +22,8 @@ import org.electrocodeogram.module.Module;
 import org.electrocodeogram.module.ModuleConnectionException;
 import org.electrocodeogram.module.ModuleRegistry;
 import org.electrocodeogram.module.UnknownModuleIDException;
+import org.electrocodeogram.ui.Configurator;
+import org.electrocodeogram.ui.MenuManager;
 import org.jgraph.JGraph;
 import org.jgraph.event.GraphSelectionEvent;
 import org.jgraph.event.GraphSelectionListener;
