@@ -14,7 +14,7 @@
 		
 		<property name="builddir" value="${basedir}/build" />
 		
-		<property name="srcdir" value="${basedir}/src" />
+		<property name="srcdir" value="${basedir}/src/" />
 		
 		<property name="jardir" value="${basedir}/jar" />
 		
@@ -22,7 +22,7 @@
 		
 		<property name="ECGLab.jar" value="${jardir}/ECGLab.jar" />
 		
-		<property name="packages" value="org.electrocodeogram.core" /> 
+		<property name="packages" value="org.electrocodeogram" /> 
 	</target>
 	
 	<target name="build" depends="init">
@@ -52,7 +52,8 @@
 		
 			<mkdir dir="${javadocdir}" />
 			
-			<javadoc sourcepath="${basedir}" destdir="${javadocdir}" packagenames="${packages}">
+			<javadoc sourcepath="${srcdir}" destdir="${javadocdir}" packagenames="org.*">
+				
 			</javadoc>
 			
 	</target>

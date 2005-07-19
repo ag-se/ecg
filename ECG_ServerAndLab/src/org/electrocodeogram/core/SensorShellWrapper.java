@@ -16,8 +16,7 @@ import org.hackystat.kernel.admin.SensorProperties;
 import org.hackystat.kernel.shell.SensorShell;
 
 /**
- * This is the root class of the ECG Server & Lab component. It is also the entry point
- * for the event data that is recorded by all running ECG sensors
+ * It is also the entry point for the event data that is recorded by all running ECG sensors
  * to be processed through the ECG Lab's modules for analysis and storage.
  *  
  * The SensorShellWrapper extends and uses the HackyStat SensorShell class to validate
@@ -81,9 +80,7 @@ public class SensorShellWrapper extends SensorShell implements SensorShellInterf
 
                 if (commandName.equals("Activity") && i == 0) {
                     entryString = "" + entryString;
-                    
-                   
-                    
+                     
                 }
 
                 newArgList.add(entryString);
@@ -106,7 +103,7 @@ public class SensorShellWrapper extends SensorShell implements SensorShellInterf
 
     private void isMsdt(List<String> argList) {
 		
-    	String mSdtName = argList.get(0);
+    	String mSdtName = argList.get(1);
     	
     	if(mSdtName == null || mSdtName == "")
     	{

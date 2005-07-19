@@ -15,21 +15,18 @@ import org.electrocodeogram.ui.Configurator;
 
 /**
  * This is the central ModuleRegistry which maintains information about all
- * currently created modules and even all module class files in the module
- * directory from which module instances could be created. During its creation
- * every module object registers with the ModuleRegistry by its unique id. On
+ * currently instanciated modules and all module class files in the module
+ * directory from which module instances could be created at runtime.
+ * 
+ * During its creation
+ * every module object registers with the ModuleRegistry with its unique id. On
  * deletion of a module the module is deregistered from the ModuleRegistry.
- * Writing access to all created module objects, such as module deletion, module
- * connection and module renaming, is only permitted through the
- * ModuleRegistry's methods. Additionaly the ModuleRegistry stores maintains
- * information about module class files that are able to be instanciated.
+ * 
  */
 public class ModuleRegistry extends Observable
 {
 
     private Logger logger = null;
-
-    //private static ModuleRegistry theInstance = null;
 
     private RunningModules runningModules = null;
 
@@ -37,6 +34,10 @@ public class ModuleRegistry extends Observable
 
     private File moduleDirectory = null;
 
+    /**
+     * The constructor creates the ModuleRegistry instance.
+     * @param corePar A reference to the Core object
+     */
     public ModuleRegistry(Core corePar)
     {
         this.logger = Logger.getLogger("ModuleRegistry");
@@ -47,6 +48,11 @@ public class ModuleRegistry extends Observable
 
     }
 
+    /**
+     * The constructor creates the ModuleRegistry instance.
+     * @param corePar A reference to the Core object
+     * @param filePar This should be the module directory
+     */
     public ModuleRegistry(Core corePar, File filePar)
     {
         this(corePar);
@@ -60,6 +66,11 @@ public class ModuleRegistry extends Observable
         clearChanged();
     }
 
+    /**
+     * If the module directory is not knoen during ModuleRegistry creation
+     * this method can be used to set the mofule directory later.
+     * @param filePar This should be the module directory
+     */
     public void setFile(File filePar) {
     	
     	this.installedModules = new InstalledModules(filePar);
@@ -72,47 +83,8 @@ public class ModuleRegistry extends Observable
 		
 	}
     
-//    /**
-//     * This method returns the singleton instance of the ModuleRegistry.
-//     * 
-//     * @return the singleton instance of the ModuleRegistry
-//     */
-//    public static ModuleRegistry getInstance()
-//    {
-//        if (theInstance == null) {
-//            theInstance = new ModuleRegistry();
-//        }
-//
-//        return theInstance;
-//    }
 
-//    /**
-//     * This method returns the singleton instance of the ModuleRegistry. The
-//     * file parameter is used to indicate the location where module class files
-//     * are stored if no other location was given before.
-//     * 
-//     * @param file
-//     *            Indicate the location where module class files are stored
-//     * @return the singleton instance of the ModuleRegistry
-//     */
-//    public static ModuleRegistry getInstance(File file)
-//    {
-//        if (theInstance == null) {
-//            theInstance = new ModuleRegistry(file);
-//        }
-//        else {
-//            if (theInstance.moduleDirectory == null) {
-//                theInstance.moduleDirectory = file;
-//
-//                theInstance.installedModules = theInstance.new InstalledModules(file);
-//            }
-//        }
-//
-//        return theInstance;
-//
-//    }
-
-    Logger getLogger()
+    private Logger getLogger()
     {
         return this.logger;
     }
