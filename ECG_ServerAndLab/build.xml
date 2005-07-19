@@ -81,11 +81,7 @@
 			
 		</copy>
 
-		<copy todir="${applicationdir}/modules">
-
-			<fileset dir="${moduledir}" />
-				
-		</copy>
+		
 		
 	</target>
 

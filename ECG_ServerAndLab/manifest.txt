@@ -1,3 +1,3 @@
 Manifest-Version: 1.0
-Main-Class: org.electrocodeogram.core.SensorShellWrapper
+Main-Class: org.electrocodeogram.core.Core
 Class-Path: lib/hackystat/sensorshell.jar lib/misc/componentset.jar lib/ecg/event.jar lib/misc/jgraph.jar lib/misc/jgraphaddons.jar lib/misc/OfficeLnFs.jar
