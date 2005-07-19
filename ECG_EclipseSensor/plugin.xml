@@ -11,7 +11,7 @@
       <library name="EclipseSensor.jar">
          <export name="*"/>
       </library>
-      <library name="sensorshellwrapper.jar">
+      <library name="lib/sensorshell.jar">
          <export name="*"/>
       </library>
       <library name="lib/cdtcore.jar">
