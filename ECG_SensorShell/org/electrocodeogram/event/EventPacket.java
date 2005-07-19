@@ -25,6 +25,44 @@ public class EventPacket implements Serializable
     public static final String HS_TYPE_PREFIX = "HS_ACTIVITY_TYPE:";
     
     public static final String ECG_TYPE_PREFIX = "ECG_TYPE:";
+    
+//  begin: this will go into the MPE managment soon
+
+	public static final String ECG_TYPE_WINDOW_DEACTIVATED = "Window deactivated";
+
+	public static final String ECG_TYPE_WINDOW_ACTIVATED = "Window activated";
+
+	public static final String ECG_TYPE_WINDOW_OPENED = "Window opened";
+
+	public static final String ECG_TYPE_EDITOR_ACTIVATED = "Editor activated";
+
+	public static final String ECG_TYPE_EDITOR_DEACTIVATED = "Editor deactivated";
+
+	public static final String ECG_TYPE_PART_ACTIVATED = "Part activated";
+
+	public static final String ECG_TYPE_PART_DEACTIVATED = "Part deactivated";
+
+	public static final String ECG_TYPE_EDITOR_OPENED = "Editor opened";
+
+	public static final String ECG_TYPE_EDITOR_CLOSED = "Editor closed";
+
+	public static final String ECG_TYPE_PART_OPENED = "Part opened";
+
+	public static final String ECG_TYPE_PART_CLOSED = "Part closed";
+
+	public static final String ECG_TYPE_CODECHANGE = "Codechange";
+
+	public static final String ECG_TYPE_OPEN_FILE = "File opened";
+
+	public static final String ECG_TYPE_BREAKPOINT_SET = "Breakpoint set";
+
+	public static final String ECG_TYPE_BREAKPOINT_UNSET = "Breakpoint unset";
+
+	public static final String ECG_TYPE_RUN = "Run";
+
+	public static final String ECG_TYPE_DEBUG = "Debug";
+
+	// end
 
     /**
      * This creates a new EventPacket object
