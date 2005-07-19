@@ -5,9 +5,16 @@
  * Window - Preferences - Java - Code Style - Code Templates
  */
 package org.hackystat.kernel.shell;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.StringTokenizer;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
@@ -38,13 +45,25 @@ public class SensorShell
     
     private Logger logger = null;
     
+    private BufferedReader bufferedReader = null;
+    
+    private String cr = System.getProperty("line.separator");
+    
+    private String prompt = ">> ";
+    
+    private boolean isInteractive = false;
+    
+    private String delimiter = "#";
+
+
+    
     /**
      * This creates a ECG SensorShell instance with the given properties.
      * @param propertiesPar The properties to configure the ECG SensorShell
      * @param b not used
      * @param s not used
      */
-    public SensorShell(SensorProperties propertiesPar, @SuppressWarnings("unused") boolean b, @SuppressWarnings("unused") String s)
+    public SensorShell(SensorProperties propertiesPar, boolean b, String s)
     {
         // assert parameters
         assert(propertiesPar != null);
@@ -52,9 +71,19 @@ public class SensorShell
         this.properties = propertiesPar;
         
         this.logger = Logger.getLogger("ECG_SensorShell");
+        
+        this.isInteractive = b;
+        
+        this.bufferedReader = new BufferedReader(new InputStreamReader(System.in));
     }
 
-    /**
+    public SensorShell(SensorProperties sensorProperties, boolean interactive, String toolName, boolean offlineEnabled, File commandFile) {
+		
+    	this(sensorProperties,interactive,toolName);
+    	
+	}
+
+	/**
      * This method is called by the ECG sensors whenever they record an event. The data
      * of the event is then passed over to the singleton SendingThread and therefore
      * processed asynchroneously.
@@ -132,4 +161,130 @@ public class SensorShell
     {
         
     }
+    
+    private void print(String line) {
+        logger.info(line);
+        if (isInteractive) {
+          System.out.print(line);
+        }
+      }
+    
+    private String readLine() {
+        try {
+          String line = this.bufferedReader.readLine();
+          logger.info(line + cr);
+          return line;
+        }
+        catch (IOException e) {
+          //logger.info(cr);
+          return "quit";
+        }
+      }
+    
+    private void printPrompt() {
+        this.print(this.prompt);
+      }
+    
+    public static void main(String args[]) {
+        // Print help line and exit if arg is -help.
+        if ((args.length == 1) && (args[0].equalsIgnoreCase("-help"))) {
+          System.out.println("java -jar sensorshell.jar [toolname] [sensor.properties] [no offline] "
+               + "[command filename]");
+          return;
+        }
+        
+//        // Perform verification procedures and exit if arg is -verify.
+//        if ((args.length == 1) && (args[0].equalsIgnoreCase("-verify"))) {
+//          SensorShell.verifyClientSide();
+//          return;
+//        }
+
+        // Set Parameter 1 (toolname) to supplied or default value.
+        String toolName = (args.length > 0) ? args[0] : "interactive";
+
+        // Set Parameter 2 (sensor properties file) to supplied or default value. Exit if can't find it.
+        SensorProperties sensorProperties = (args.length >= 2) ?
+            new SensorProperties("Shell", new File(args[1])) :
+            new SensorProperties("Shell");
+        if (!sensorProperties.isFileAvailable()) {
+          System.out.println("Could not find sensor.properties file. ");
+          System.out.println("Expected in: " + sensorProperties.getAbsolutePath());
+          System.out.println("Exiting...");
+          return;
+        }
+
+        // Set Parameter 3 (offline). True if we don't supply a value, false if any value supplied.
+        boolean offlineEnabled = ((args.length < 3));
+
+        // Set Parameter 4 (command file). Null if not supplied. Exit if supplied and bogus.
+        File commandFile = null;
+        if (args.length == 4) {
+          commandFile = new File(args[3]);
+          if (!(commandFile.exists() && commandFile.isFile())) {
+            System.out.println("Could not find the command file. Exiting...");
+            return;
+          }
+        }
+
+        // Set interactive parameter. From command line, always interactive unless using command file.
+        boolean interactive = ((commandFile == null));
+
+        // Now create the shell instance, supplying it with all the appropriate arguments.
+        SensorShell shell = new SensorShell(sensorProperties, interactive, toolName, offlineEnabled,
+          commandFile);
+
+        // Start processing commands either interactively or from the command file.
+        int count = 0;
+        while (true) {
+          // Get the next command
+          shell.printPrompt();
+          String inputString = shell.readLine();
+
+//          // Quit if necessary.
+//          if (inputString.equalsIgnoreCase("quit")) {
+//            shell.quit();
+//            return;
+//          }
+
+//          // Print help strings.
+//          if (inputString.equalsIgnoreCase("help")) {
+//            shell.printHelp();
+//            continue;
+//          }
+
+//          // Send all the data.
+//          if (inputString.equalsIgnoreCase("send")) {
+//            shell.send();
+//            count = 0;
+//            continue;
+//          }
+
+          // Otherwise it's an extended command.
+          StringTokenizer tokenizer = new StringTokenizer(inputString, shell.delimiter);
+          int numTokens = tokenizer.countTokens();
+          // Go back to start of loop if the line is empty.
+          if (numTokens == 0) {
+            continue;
+          }
+
+          // Get the command name and any additional arguments.
+          String commandName = tokenizer.nextToken();
+          ArrayList argList = new ArrayList();
+          while (tokenizer.hasMoreElements()) {
+            argList.add(tokenizer.nextToken());
+          }
+          // Invoke the command with a timestamp of right now.
+          shell.doCommand(new Date(), commandName, argList);
+
+          // If the commandFile is large we can run into problems reading and sending the whole
+          // thing at once. so, we break up the file.      
+          if (count >= 500) {
+            shell.send();
+            count = 0;
+            continue;
+          }
+          count++;
+          
+        }
+      }
 }

@@ -58,7 +58,7 @@
 
 		<mkdir dir="${jardir}" />
 		
-		<jar compress="true" duplicate="fail" jarfile="${sensorshell.jar}" basedir="${builddir}" />
+		<jar compress="true" duplicate="fail" jarfile="${sensorshell.jar}" basedir="${builddir}" manifest="manifest.txt"/>
 
 		<jar excludes="org/hackystat/" compress="true" duplicate="fail" jarfile="${event.jar}" basedir="${builddir}" />
 		
