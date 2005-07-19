@@ -11,6 +11,7 @@ import org.electrocodeogram.event.IllegalEventParameterException;
 import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.msdt.MicroSensorDataType;
 import org.electrocodeogram.msdt.MicroSensorDataTypeNotFoundException;
+import org.electrocodeogram.msdt.MsdtManager;
 import org.hackystat.kernel.admin.SensorProperties;
 import org.hackystat.kernel.shell.SensorShell;
 
@@ -118,7 +119,18 @@ public class SensorShellWrapper extends SensorShell implements SensorShellInterf
     	
     	try {
     		
-			microSensorDataType = this.core.getMsdtManager().getMicroSensorDataType(mSdtName);
+    		
+    		
+			MsdtManager msdtManager = this.core.getMsdtManager();
+			
+			if(msdtManager == null)
+			{
+				this.logger.log(Level.WARNING,this.processingID + ": Event data is not conforming to a ECG MicroSensorDataType.");
+	    		
+	    		return;
+			}
+			
+			microSensorDataType = msdtManager.getMicroSensorDataType(mSdtName);
 			
 		} catch (MicroSensorDataTypeNotFoundException e) {
 			
