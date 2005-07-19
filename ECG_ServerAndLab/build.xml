@@ -8,6 +8,8 @@
 		
 		<property name="moduledir" value="${basedir}/modules" />
 		
+		<property name="msdtdir" value="${basedir}/msdt" />
+		
 		<property name="applicationdir" value="${basedir}/application" />
 		
 		<property name="builddir" value="${basedir}/build" />
@@ -30,7 +32,9 @@
 		<javac destdir="${builddir}" srcdir="${srcdir}" deprecation="true" source="1.5" debug="on">
 			
 			<classpath>
+				
 			
+				
 				<pathelement location="lib/hackystat/sensorshell.jar" />
 				<pathelement location="lib/ecg/event.jar" />
 				<pathelement location="lib/misc/componentset.jar" />
@@ -68,6 +72,7 @@
 		<mkdir dir="${applicationdir}" />
 		<mkdir dir="${applicationdir}/lib" />
 		<mkdir dir="${applicationdir}/modules" />
+		<mkdir dir="${applicationdir}/msdt" />
 			
 		<copy todir="${applicationdir}">
 
@@ -81,7 +86,11 @@
 			
 		</copy>
 
-		
+		<copy todir="${applicationdir}/msdt">
+
+			<fileset dir="${msdtdir}" />
+					
+		</copy>
 		
 	</target>
 

@@ -1,20 +1,16 @@
 package org.electrocodeogram.core;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.electrocodeogram.event.EventPacket;
 import org.electrocodeogram.event.IllegalEventParameterException;
 import org.electrocodeogram.event.ValidEventPacket;
-import org.electrocodeogram.module.ModuleRegistry;
-import org.electrocodeogram.module.source.SocketSourceModule;
+import org.electrocodeogram.msdt.MicroSensorDataType;
+import org.electrocodeogram.msdt.MicroSensorDataTypeNotFoundException;
 import org.hackystat.kernel.admin.SensorProperties;
 import org.hackystat.kernel.shell.SensorShell;
 
@@ -84,11 +80,16 @@ public class SensorShellWrapper extends SensorShell implements SensorShellInterf
 
                 if (commandName.equals("Activity") && i == 0) {
                     entryString = "" + entryString;
+                    
+                   
+                    
                 }
 
                 newArgList.add(entryString);
             }
 
+            isMsdt(newArgList);
+            
             appendToEventSource(timeStamp, "" + commandName, newArgList);
 
             return true;
@@ -102,7 +103,38 @@ public class SensorShellWrapper extends SensorShell implements SensorShellInterf
 
     }
 
-    /*
+    private void isMsdt(List<String> argList) {
+		
+    	String mSdtName = argList.get(0);
+    	
+    	if(mSdtName == null || mSdtName == "")
+    	{
+    		this.logger.log(Level.WARNING,this.processingID + ": Event data is not conforming to a ECG MicroSensorDataType.");
+    		
+    		return;
+    	}
+    	
+    	MicroSensorDataType microSensorDataType = null;
+    	
+    	try {
+    		
+			microSensorDataType = this.core.getMsdtManager().getMicroSensorDataType(mSdtName);
+			
+		} catch (MicroSensorDataTypeNotFoundException e) {
+			
+			this.logger.log(Level.WARNING,this.processingID + ": Event data is not conforming to a ECG MicroSensorDataType.");
+    		
+    		return;
+		}
+    	
+		this.logger.log(Level.INFO,this.processingID + ": Event data is conforming to the " + microSensorDataType.getName() + " ECG MicroSensorDataType.");
+		
+		return;
+		
+	}
+
+
+	/*
      * This method is used to pass the event data to the first module.
      *
      */
