@@ -1,5 +1,7 @@
 package org.electrocodeogram.test.connection.mockserver;
 
+import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -22,6 +24,8 @@ public class MockSensorshellWrapper implements SensorShellInterface
     private int receivingCounter = 0;
     
     private SocketServer sensorServer = null;
+
+	private MockSocketServer socketServer;
     
     public MockSensorshellWrapper()
     {
@@ -36,6 +40,13 @@ public class MockSensorshellWrapper implements SensorShellInterface
         this.receivedEventPacket = new EventPacket(0,timeStamp,commandName,argList);
         
         this.receivingCounter++;
+        
+        if(this.socketServer != null)
+        {
+        	InetAddress[] sensorAddresses = socketServer.getSensorAddresses();
+        	
+        	
+        }
         
         return true;
         
@@ -63,4 +74,10 @@ public class MockSensorshellWrapper implements SensorShellInterface
        
         return toReturn;
     }
+
+	public void setServer(MockSocketServer server) {
+
+		this.socketServer = server;
+		
+	}
 }
