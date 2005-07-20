@@ -24,7 +24,7 @@ public class EventPacket implements Serializable
 
     public static final String HS_TYPE_PREFIX = "HS_ACTIVITY_TYPE:";
     
-    public static final String ECG_TYPE_PREFIX = "ECG_TYPE:";
+    public static final String ECG_TYPE_PREFIX = "mSDT:";
     
 //  begin: this will go into the MPE managment soon
 
