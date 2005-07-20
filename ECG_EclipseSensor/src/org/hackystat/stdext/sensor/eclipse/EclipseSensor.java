@@ -270,7 +270,7 @@ public class EclipseSensor
             return;
         }
 
-        String[] args = { "add", EventPacket.ECG_TYPE_PREFIX + ecgCommandName, data};
+        String[] args = { "add", ecgCommandName, data};
         
         this.eclipseSensorShell.doCommand("Activity", Arrays.asList(args));
     }
