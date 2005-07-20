@@ -2,8 +2,10 @@ package org.hackystat.stdext.sensor.eclipse;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -27,6 +29,7 @@ import org.eclipse.debug.core.IBreakpointListener;
 import org.eclipse.debug.core.IBreakpointManager;
 import org.eclipse.debug.core.IDebugEventSetListener;
 import org.eclipse.debug.core.ILaunch;
+import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.ILineBreakpoint;
 import org.eclipse.debug.core.model.RuntimeProcess;
@@ -124,10 +127,17 @@ public class EclipseSensor
     private TimerTask buffTransTimerTask;
 
     private WindowListenerAdapter windowListener;
-
+    
+    private String username;
+    
+    private IWorkbench workbench;
+    
+    private IWorkbenchWindow[] activeWindows;
+    
     private EclipseSensor()
     {   
         
+    	this.username = System.getenv("user.name");
         this.eventListeners = new ArrayList();
         this.timer = new Timer();
         this.buffTransTimerTask = new BuffTransTimertask();
@@ -194,9 +204,9 @@ public class EclipseSensor
 
     private void initializeListeners()
     {
-        IWorkbench workbench = EclipseSensorPlugin.getInstance().getWorkbench();
+        workbench = EclipseSensorPlugin.getInstance().getWorkbench();
 
-        IWorkbenchWindow[] activeWindows = workbench.getWorkbenchWindows();
+        activeWindows = workbench.getWorkbenchWindows();
 
         if (this.windowListener == null) {
             this.windowListener = new WindowListenerAdapter();
@@ -270,7 +280,7 @@ public class EclipseSensor
             return;
         }
 
-        String[] args = { "add", ecgCommandName, data};
+        String[] args = { "add", ecgCommandName, this.username + "#" + "projectname" + "#" + data};
         
         this.eclipseSensorShell.doCommand("Activity", Arrays.asList(args));
     }
@@ -294,7 +304,7 @@ public class EclipseSensor
         
         int bs = activeBufferSize;
     
-        processActivity(EventPacket.ECG_TYPE_CODECHANGE, "TITLE:" + activeTitle + ",FILENAME:" + activeFileName + ",BEFORE:" + oldDocument.get() + ",AFTER:" + newDocument.get());
+        processActivity(EventPacket.ECG_TYPE_CODECHANGE, activeFileName + "#" + newDocument.get());
         
         this.latestStateChangeFileName = activeFileName;
         this.latestStateChangeFileSize = activeBufferSize;
@@ -464,7 +474,7 @@ public class EclipseSensor
         public void windowActivated(IWorkbenchWindow window)
         {
 
-           processActivity(EventPacket.ECG_TYPE_WINDOW_ACTIVATED, "");
+           processActivity(EventPacket.ECG_TYPE_WINDOW_ACTIVATED, window.getActivePage().getLabel());
 
         }
 
@@ -482,7 +492,7 @@ public class EclipseSensor
         public void windowClosed(IWorkbenchWindow window)
         {
 
-            processActivity(EventPacket.ECG_TYPE_WINDOW_DEACTIVATED, "");
+            processActivity(EventPacket.ECG_TYPE_WINDOW_CLOSED, window.getActivePage().getLabel());
 
             EclipseSensor.this.processFileMetric();
             EclipseSensor.this.eclipseSensorShell.send();
@@ -492,7 +502,7 @@ public class EclipseSensor
         public void windowDeactivated(IWorkbenchWindow window)
         {
 
-            processActivity(EventPacket.ECG_TYPE_WINDOW_DEACTIVATED, "");
+            processActivity(EventPacket.ECG_TYPE_WINDOW_DEACTIVATED, window.getActivePage().getLabel());
 
             EclipseSensor.this.isActivatedWindow = false;
             IEditorPart activeEditorPart = window.getActivePage().getActiveEditor();
@@ -515,7 +525,7 @@ public class EclipseSensor
         public void windowOpened(IWorkbenchWindow window)
         {
 
-            processActivity(EventPacket.ECG_TYPE_WINDOW_OPENED, "");
+            processActivity(EventPacket.ECG_TYPE_WINDOW_OPENED, window.getActivePage().getLabel());
 
             EclipseSensor.this.initializeListeners();
         }
@@ -880,7 +890,9 @@ public class EclipseSensor
 
             IResourceDeltaVisitor visitor = new IResourceDeltaVisitor() {
 
-                public boolean visit(IResourceDelta delta) throws CoreException
+                private String activeProject;
+
+				public boolean visit(IResourceDelta delta) throws CoreException
                 {
 
                     int kind = delta.getKind();
@@ -919,6 +931,11 @@ public class EclipseSensor
                         {
                         case IResourceDelta.OPEN:
 
+//                        	if(delta.getResource().getType() == IResource.PROJECT)
+//                        	{
+//                        		this.activeProject = delta.getResource().getName();
+//                        	}
+                        	
                             processActivity("Resource opened or closed ", delta.getResource().getName());
 
                             break;
@@ -1007,13 +1024,22 @@ public class EclipseSensor
          */
         private void analyseLaunch(ILaunch launch)
         {
+        	ILaunchConfiguration configuration = launch.getLaunchConfiguration();
+        	
+        	String file = "";
+        	
+        	if(configuration != null){
+        		file = configuration.getFile().getName();
+        	}
+        	
             if(launch.getLaunchMode().equals("run"))
             {
-                processActivity(EventPacket.ECG_TYPE_RUN,"");
+            	
+            	processActivity(EventPacket.ECG_TYPE_RUN,file);
             }
             else
             {
-                processActivity(EventPacket.ECG_TYPE_DEBUG,"");
+                processActivity(EventPacket.ECG_TYPE_DEBUG,file);
             }
         }
     }
