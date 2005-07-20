@@ -1,6 +1,7 @@
 package org.electrocodeogram.module.source;
 
 import org.electrocodeogram.core.Core;
+import org.electrocodeogram.core.ICore;
 import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.module.Module;
 import org.electrocodeogram.module.ModuleRegistry;
@@ -17,7 +18,7 @@ import org.electrocodeogram.module.ModuleRegistry;
     	private SocketServer sensorServer = null;
 
     	
-        public SocketSourceModule(Core corePar)
+        public SocketSourceModule(ICore corePar)
         {
             super(corePar,ModuleType.SOURCE_MODULE);
             

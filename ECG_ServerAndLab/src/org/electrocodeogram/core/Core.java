@@ -21,7 +21,7 @@ import org.electrocodeogram.ui.messages.GuiEventWriter;
  * It is implemented as a singleton class that gives centralized access to
  * all components.
  */
-public class Core {
+public class Core implements ICore {
 
 	private static Core theInstance = null;
 
@@ -101,10 +101,8 @@ public class Core {
 		return this.guiEventWriter;
 	}
 	
-	/**
-	 * This method returns a reference to the MicroSensorDataTypeManager (MsdtManager) component,
-	 * which is a registry for legal types of event data.
-	 * @return A reference to the MicroSensorDataTypeManager
+	/* (non-Javadoc)
+	 * @see org.electrocodeogram.core.Icore#getMsdtManager()
 	 */
 	public MsdtManager getMsdtManager()
 	{
@@ -117,10 +115,8 @@ public class Core {
 		return this.sensorSource;
 	}
 	
-	/**
-	 * This method returns a reference to the ModuleRegistry component,
-	 * which is managing installed and running modules.
-	 * @return A reference to the ModuleRegistry
+	/* (non-Javadoc)
+	 * @see org.electrocodeogram.core.Icore#getModuleRegistry()
 	 */
 	public ModuleRegistry getModuleRegistry() {
 		return this.moduleRegistry;
@@ -208,17 +204,15 @@ public class Core {
 
 	}
 
-	/**
-	 * This is returning a reference to the SensorShellWrapper, which validates all incoming event data.
-	 * @return A reference to the SensorShellWrapper
+	/* (non-Javadoc)
+	 * @see org.electrocodeogram.core.Icore#getSensorShellWrapper()
 	 */
 	public SensorShellWrapper getSensorShellWrapper() {
 		return this.sensorShellWrapper;
 	}
 
-	/**
-	 * The main GUI component is accessible through this method.
-	 * @return The Configurator, beeing the main GUI component
+	/* (non-Javadoc)
+	 * @see org.electrocodeogram.core.Icore#getConfigurator()
 	 */
 	public Configurator getConfigurator() {
 		return this.configurator;

@@ -10,7 +10,7 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.electrocodeogram.core.Core;
+import org.electrocodeogram.core.ICore;
 import org.electrocodeogram.ui.Configurator;
 
 /**
@@ -38,7 +38,7 @@ public class ModuleRegistry extends Observable
      * The constructor creates the ModuleRegistry instance.
      * @param corePar A reference to the Core object
      */
-    public ModuleRegistry(Core corePar)
+    public ModuleRegistry(ICore corePar)
     {
         this.logger = Logger.getLogger("ModuleRegistry");
 
@@ -53,7 +53,7 @@ public class ModuleRegistry extends Observable
      * @param corePar A reference to the Core object
      * @param filePar This should be the module directory
      */
-    public ModuleRegistry(Core corePar, File filePar)
+    public ModuleRegistry(ICore corePar, File filePar)
     {
         this(corePar);
 

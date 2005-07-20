@@ -8,6 +8,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.electrocodeogram.core.Core;
+import org.electrocodeogram.core.ICore;
 import org.electrocodeogram.core.SensorShellWrapper;
 import org.electrocodeogram.event.IllegalEventParameterException;
 import org.electrocodeogram.event.ValidEventPacket;
@@ -83,7 +84,7 @@ public abstract class Module extends Observable implements Observer
      * This creates a new Module of the given module type and registers it with the ModuleRegistry.
      * @param moduleTypePar Is the module type
      */
-    public Module(Core corePar, ModuleType moduleTypePar)
+    public Module(ICore corePar, ModuleType moduleTypePar)
     {
         this.id = ++count;
 

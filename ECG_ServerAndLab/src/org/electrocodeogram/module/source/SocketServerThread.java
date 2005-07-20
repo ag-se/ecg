@@ -15,39 +15,37 @@ import org.electrocodeogram.event.ValidEventPacket;
  * A ServerThread maintains communication with a single ECG sesnor.
  * Communication is done by (de)serialization over sockets.
  */
-public class SocketServerThread extends Thread
+public class SocketServerThread extends Thread implements ISocketServerThread
 {
-    private Logger logger = null;
+    protected Logger logger = null;
     
     private static int count = 0;
     
     private int id = -1;
     
-    private Socket socketToSensor = null;
+    protected Socket socketToSensor = null;
     
-    private boolean runningFlag = true;
+    protected boolean runningFlag = true;
     
-    private ObjectInputStream objectInputStream = null;
+    protected ObjectInputStream objectInputStream = null;
     
     private SocketServer sensorServer = null;
 
-    private String sensorName = null;
+    protected String sensorName = null;
     
-    private SensorShellInterface shell = null;
+    protected SensorShellInterface shell = null;
    
-    /**
-     * This method returns the name of the currently connected ECG sensor.
-     * @return The name of the currently connected ECG sensor
-     */
+    /* (non-Javadoc)
+	 * @see org.electrocodeogram.module.source.ISocketServerThread#getSensorName()
+	 */
     public String getSensorName()
     {
         return this.sensorName;
     }
     
-    /**
-     * This method returns the IP address of the currently connected ECG sensor.
-     * @return The IP address of the currently connected ECG sensor
-     */
+    /* (non-Javadoc)
+	 * @see org.electrocodeogram.module.source.ISocketServerThread#getSensorAddress()
+	 */
     public InetAddress getSensorAddress()
     {
         if (this.socketToSensor != null)
@@ -85,19 +83,17 @@ public class SocketServerThread extends Thread
        
     }
     
-    /**
-     * This method returns the unique ID of the ServerThread.
-     * @return The unique ID of the ServerThread
-     */
+    /* (non-Javadoc)
+	 * @see org.electrocodeogram.module.source.ISocketServerThread#getServerThreadId()
+	 */
     public int getServerThreadId()
     {
         return this.id;
     }
     
-    /**
-     * This method stops this ServerThread and closes the socket and stream.
-     *
-     */
+    /* (non-Javadoc)
+	 * @see org.electrocodeogram.module.source.ISocketServerThread#stopSensorThread()
+	 */
     public void stopSensorThread()
     {
         this.runningFlag = false;
@@ -122,11 +118,9 @@ public class SocketServerThread extends Thread
     }
     
     
-    /**
-     * @see java.lang.Thread#run()
-     * 
-     * The receiving of event data from the connected ECG sensor is done here. 
-     */
+    /* (non-Javadoc)
+	 * @see org.electrocodeogram.module.source.ISocketServerThread#run()
+	 */
     @Override
     public void run()
     {

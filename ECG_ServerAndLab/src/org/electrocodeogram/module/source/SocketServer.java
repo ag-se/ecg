@@ -22,7 +22,7 @@ import org.electrocodeogram.core.SensorShellInterface;
 public class SocketServer extends Thread
 {
     
-    private Logger logger = null;
+    protected Logger logger = null;
     
     // TODO : Make this configurable
     
@@ -31,13 +31,13 @@ public class SocketServer extends Thread
      */
     public static final int PORT = 22222;
     
-    private boolean runningFlag = true;
+    protected boolean runningFlag = true;
     
-    private HashMap<Integer,SocketServerThread> serverThreadPool = null;
+    protected HashMap<Integer,ISocketServerThread> serverThreadPool = null;
     
-    private ServerSocket serverSocket = null;
+    protected ServerSocket serverSocket = null;
     
-    private SensorShellInterface shell = null;
+    protected SensorShellInterface shell = null;
     
     /**
      * This creates a new SensorServer and a new threadpool. 
@@ -47,7 +47,7 @@ public class SocketServer extends Thread
     {
         this.shell = shellPar;
         
-        this.serverThreadPool = new HashMap<Integer,SocketServerThread>();
+        this.serverThreadPool = new HashMap<Integer,ISocketServerThread>();
      
         this.logger = Logger.getLogger("ECG Server");
         
@@ -68,7 +68,7 @@ public class SocketServer extends Thread
         
         for(int i=0;i<count;i++)
         {
-            addresses[i] = ((SocketServerThread)sensorThreads[i]).getSensorAddress();
+            addresses[i] = ((ISocketServerThread)sensorThreads[i]).getSensorAddress();
         }
         
         return addresses;
@@ -149,7 +149,7 @@ public class SocketServer extends Thread
                 this.logger.log(Level.INFO,"New connection request");
                 
                 // create a new ServerThread to communicate on the given Socket
-                SocketServerThread serverThread = new SocketServerThread(this,shell,socketToSensor);
+                ISocketServerThread serverThread = new SocketServerThread(this,this.shell,socketToSensor);
                 
                 // put the Serverthread in the threadpool
                 this.serverThreadPool.put(new Integer(serverThread.getServerThreadId()),serverThread);
@@ -180,7 +180,7 @@ public class SocketServer extends Thread
         
         for(int i=0;i<count;i++)
         {
-            names[i] = ((SocketServerThread)sensorThreads[i]).getSensorName();
+            names[i] = ((ISocketServerThread)sensorThreads[i]).getSensorName();
         }
         
         return names;
@@ -197,7 +197,7 @@ public class SocketServer extends Thread
         
         for(Object threadObject : threadArray)
         {
-            SocketServerThread thread = (SocketServerThread) threadObject;
+            ISocketServerThread thread = (ISocketServerThread) threadObject;
             
             thread.stopSensorThread();
             
