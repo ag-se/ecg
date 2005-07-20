@@ -33,6 +33,8 @@ public class EventPacket implements Serializable
 	public static final String ECG_TYPE_WINDOW_ACTIVATED = "Window activated";
 
 	public static final String ECG_TYPE_WINDOW_OPENED = "Window opened";
+	
+	public static final String ECG_TYPE_WINDOW_CLOSED = "Window closed";
 
 	public static final String ECG_TYPE_EDITOR_ACTIVATED = "Editor activated";
 
