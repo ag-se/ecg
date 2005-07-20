@@ -3,6 +3,7 @@ package org.electrocodeogram.core;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -32,7 +33,7 @@ public class SensorShellWrapper extends SensorShell implements SensorShellInterf
     private int processingID = 0;
 
     /*
-     * The private constructot creates one instance of the SensorShellWrapper and
+     * The private constructor creates one instance of the SensorShellWrapper and
      * also creates all other needed ECG Server & Lab components.
      */
     public SensorShellWrapper(Core corePar)
@@ -49,7 +50,7 @@ public class SensorShellWrapper extends SensorShell implements SensorShellInterf
     /**
      * @see org.hackystat.kernel.shell.SensorShell#doCommand(java.util.Date, java.lang.String, java.util.List)
      * 
-     * This is the overriden version of the HackyStat SensorShell's method. After calling the original
+     * This is the overridden version of the HackyStat SensorShell's method. After calling the original
      * method it performs further steps to pass the event data into the ECG Lab. It is marked
      * as synchronized as it can be called by multiple running ServerThreads at the same time.
      */
@@ -136,9 +137,35 @@ public class SensorShellWrapper extends SensorShell implements SensorShellInterf
     		return;
 		}
     	
-		this.logger.log(Level.INFO,this.processingID + ": Event data is conforming to the " + microSensorDataType.getName() + " ECG MicroSensorDataType.");
+		String[] entryAttriuteNames = microSensorDataType.getEntryAttributeNames();
 		
-		return;
+		String data = argList.get(2);
+		
+		if(entryAttriuteNames == null && data != null)
+		{
+			this.logger.log(Level.WARNING,this.processingID + ": Event data is not conforming to a ECG MicroSensorDataType. " + mSdtName);
+    		
+    		return;
+		}
+		
+		if(entryAttriuteNames == null && data == null)
+		{
+			this.logger.log(Level.WARNING,this.processingID + ": Event data is not conforming to a ECG MicroSensorDataType. " + mSdtName);
+    		
+    		return;		}
+		
+		StringTokenizer tokenizer = new StringTokenizer(data,"#");
+		
+		if(tokenizer.countTokens() != entryAttriuteNames.length)
+		{
+			this.logger.log(Level.WARNING,this.processingID + ": Event data is not conforming to a ECG MicroSensorDataType. " + mSdtName);
+    		
+    		return;		
+    	}
+		
+		this.logger.log(Level.WARNING,this.processingID + ": Event data is conforming to the ECG MicroSensorDataType: " + microSensorDataType.getName());
+		
+		return;	
 		
 	}
 

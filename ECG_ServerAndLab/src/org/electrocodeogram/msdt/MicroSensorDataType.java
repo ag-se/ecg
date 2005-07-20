@@ -17,7 +17,7 @@ public class MicroSensorDataType
 	
 	private List<MicroEntryAttribute> attributeList = new ArrayList<MicroEntryAttribute>();
 	
-	private Map<String, MicroEntryAttribute> attributeMap = new HashMap<String, MicroEntryAttribute>();
+	private HashMap<String, MicroEntryAttribute> attributeMap = new HashMap<String, MicroEntryAttribute>();
 	
 	private int typedAttributes = 0;
 	
@@ -42,7 +42,7 @@ public class MicroSensorDataType
  
 		this.attributeList.add(entry);
  
-		this.attributeMap.put(type, entry);
+		this.attributeMap.put(name, entry);
  
 		if (type != null)
 		{
@@ -53,5 +53,10 @@ public class MicroSensorDataType
 	public String getName()
 	{
 		return this.name;
+	}
+	
+	public String[] getEntryAttributeNames()
+	{
+		return this.attributeMap.keySet().toArray(new String[0]);
 	}
 }
