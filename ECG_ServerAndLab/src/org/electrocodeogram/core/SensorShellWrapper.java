@@ -107,7 +107,7 @@ public class SensorShellWrapper extends SensorShell implements SensorShellInterf
     	
     	if(mSdtName == null || mSdtName == "")
     	{
-    		this.logger.log(Level.WARNING,this.processingID + ": Event data is not conforming to a ECG MicroSensorDataType.");
+    		this.logger.log(Level.WARNING,this.processingID + ": Event data is not a known ECG MicroSensorDataType: " + mSdtName );
     		
     		return;
     	}
@@ -122,7 +122,7 @@ public class SensorShellWrapper extends SensorShell implements SensorShellInterf
 			
 			if(msdtManager == null)
 			{
-				this.logger.log(Level.WARNING,this.processingID + ": Event data is not conforming to a ECG MicroSensorDataType.");
+				this.logger.log(Level.WARNING,this.processingID + ": Event data is not conforming to a ECG MicroSensorDataType. " + mSdtName);
 	    		
 	    		return;
 			}
@@ -131,7 +131,7 @@ public class SensorShellWrapper extends SensorShell implements SensorShellInterf
 			
 		} catch (MicroSensorDataTypeNotFoundException e) {
 			
-			this.logger.log(Level.WARNING,this.processingID + ": Event data is not conforming to a ECG MicroSensorDataType.");
+			this.logger.log(Level.WARNING,this.processingID + ": Event data is not conforming to a ECG MicroSensorDataType. " + mSdtName);
     		
     		return;
 		}

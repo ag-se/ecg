@@ -52,7 +52,15 @@ public class MsdtManager {
 			{
 				File defFile = new File(stdDefsDirPath + File.separator + defs[i]);
 
-				FileInputStream fis = new FileInputStream(defFile);
+				FileInputStream fis = null;
+				try {
+					fis = new FileInputStream(defFile);
+				} catch (FileNotFoundException e) {
+					
+					this.logger.log(Level.WARNING,"The file " + defFile.getName() + " could not be opened.");
+					
+					continue;
+				}
 
 				this.logger.log(Level.INFO,"Lese mSDT Definition " + defFile.getName());
 				
