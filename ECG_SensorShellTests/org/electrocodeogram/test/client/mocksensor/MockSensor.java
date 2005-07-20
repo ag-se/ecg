@@ -18,7 +18,9 @@ public class MockSensor
 
     private SensorProperties properties = null;
     
-    private Date sendingTime = null;
+    protected Date sendingTime = null;
+    
+    
 
     /**
      * Creates a TestSensor instance and initializes it with a SensorShell.
