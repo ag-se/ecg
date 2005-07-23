@@ -3,7 +3,6 @@ package org.electrocodeogram.event;
 import java.util.Date;
 import java.util.List;
 
-
 /**
  * A ValidEventPacket is a subclass of EventPacket. The data
  * in a ValidEventPacket has been checked for compliance
@@ -12,22 +11,22 @@ import java.util.List;
  */
 public class ValidEventPacket extends EventPacket
 {
-    
+
     private static final long serialVersionUID = 2507406265346291700L;
 
     /**
      * This creates a new EventPacket object
      * @param id The module source ID identifies where the EventPacket comes from
      * @param timeStampPar The timeStamp tells when the event was recorded
-     * @param hsCommandNamePar The HackyStat comandName param the event is embedded in
+     * @param sensorDataTypePar The HackyStat SensorDataType of the event
      * @param argListPar The argList of parameters containing all the relevant event data
      * @throws IllegalEventParameterException If the given parameters are not conforming to the syntactical MPE rules
      */
-    public ValidEventPacket(int id, Date timeStampPar, String hsCommandNamePar, List argListPar) throws IllegalEventParameterException
+    public ValidEventPacket(int id, Date timeStampPar, String sensorDataTypePar, List argListPar) throws IllegalEventParameterException
     {
-        super(id,timeStampPar,hsCommandNamePar,argListPar);
-        
-        if (!isSyntacticallyCorrect(timeStampPar, hsCommandNamePar, argListPar)) {
+        super(id, timeStampPar, sensorDataTypePar, argListPar);
+
+        if (!isSyntacticallyCorrect(timeStampPar, sensorDataTypePar, argListPar)) {
             throw new IllegalEventParameterException();
         }
 
@@ -35,12 +34,10 @@ public class ValidEventPacket extends EventPacket
             throw new IllegalEventParameterException();
         }
 
-        assert (isSyntacticallyCorrect(this.timeStamp, this.hsCommandName, this.argList));
+        assert (isSyntacticallyCorrect(this.timeStamp, this.sensorDataType, this.argList));
 
         assert (this.sourceId >= 0);
 
     }
-
-   
 
 }

@@ -9,10 +9,9 @@ import java.util.ArrayList;
 import org.electrocodeogram.event.ValidEventPacket;
 
 /**
- * The singleton class SendingThread supports the asynchrneous transfer of
- * event data to the ECG server. It is a singleton class, because it is
- * implemented as a (nearly) ever running Thread, to avoid creating new Threads
- * for every single event data to transfer.
+ * The singleton class SendingThread provides asynchronous transfer of
+ * event data to the ECG Server & Lab.
+ * 
  * The SendingThread has an EventPacket buffer, which is filled continously by
  * the running ECG sensors. The buffer is checked periodically for new EventPackets. 
  * 
@@ -26,23 +25,27 @@ import org.electrocodeogram.event.ValidEventPacket;
 public class SendingThread extends Thread
 {
 
-    // the singleton instance
+    /**
+     * the singleton instance
+     */
     private static SendingThread theInstance = null;
 
     /**
-     * The FIFO eventPacket buffer to store event data temporarilly.
-     * It is implemented as an generic ArrayList with a type-parameter
-     * of EventPacket.
+     * The FIFO EventPacket buffer to store event data temporarily.
+     * It is implemented as an ArrayList<EventPacket>
      */
     protected EventPacketQueue queue = null;
 
     /**
-     * How often did the SendingThread tried to connect since its creation
+     * This tells how often did the SendingThread try to connect since its creation.
      */
     protected int connectionTrials = 0;
 
     private ObjectOutputStream oos = null;
 
+    /**
+     * This is the reference to the communication socket.
+     */
     protected Socket socketToServer = null;
 
     private InetAddress host = null;
@@ -50,13 +53,12 @@ public class SendingThread extends Thread
     private int port = -1;
 
     /**
-     * If a connection attemp fails, when shall the next connection attemp be made? 
+     * If a connection attempt fails this tells, when the next connection attempt shall occur. 
      */
     protected int connectionDelay = 5000;
 
     private boolean runningFlag = false;
 
-    // This is a private constructor only used internally
     private SendingThread(InetAddress hostPar, int portPar)
     {
 
@@ -78,13 +80,14 @@ public class SendingThread extends Thread
 
     /**
      * This method returns the singleton instance of the sending thread.
-     * If the instance of the SendingThread does not have legal values for
-     * "host" and "port", the parameter values are given to it.
+     * If the instance of the SendingThread does not yet have values for
+     * "host" and "port", the values that are passed as parameters to this
+     * method are given to to SendingThread.
      * 
      * @param host The InetAddress object giving the IP-Address/Hostname of the ECG server
-     * @param port The TCP port of the ECG server as an int
+     * @param port The TCP port of the ECG server
      * @return This method returns the instance of the SendingThread
-     * @throws IllegalHostOrPortException, when the parameter values are illegal e.g. host is "null" or port is "-1". This exception is not thrown every time the parameter values are illegal, but only when the parameter values are used for the SedningThread beacuse the SendingThread's "host" and "port" values have not been set yet.
+     * @throws IllegalHostOrPortException, when the parameter values are illegal e.g. Host is "null" or port is "-1". This exception is not thrown every time the parameter values are illegal, but only when the parameter values are used for the SendingThread because the SendingThread's "host" and "port" values have not been set yet.
      */
     public static SendingThread getInstance(InetAddress host, int port) throws IllegalHostOrPortException
     {
@@ -125,47 +128,47 @@ public class SendingThread extends Thread
     }
 
     /**
-     * This method is used to pass a new EventPacket over to the
-     * SendingThread for trasnmission to the ECG server.
+     * This method is used to pass a new EventPacket to the
+     * SendingThread for transmission to the ECG server.
      * 
      * @param packet This is the EventPacket to transmit.
-     * @return "true" if adding the EventPacket was successfulll and "false" otherwise
+     * @return "true" if adding the EventPacket was successful and "false" otherwise
      */
     public boolean addEventPacket(ValidEventPacket packet)
     {
-        if (packet == null)
-        {
+        if (packet == null) {
             return false;
         }
-       
+
         return this.queue.add(packet);
-       
+
     }
 
     /*
      * This private method tries to establish a Socket connection
-     * to the ECG server. If it fais it throws an IOException.
+     * to the ECG server. If it fails it throws an IOException.
      */
     private void connectToServer()
     {
         this.connectionTrials++;
-        
+
         try {
 
             // open a new socket
             this.socketToServer = new Socket(this.host, this.port);
 
             // create a stream upon the socket
-            this.oos = new ObjectOutputStream(this.socketToServer.getOutputStream());
+            this.oos = new ObjectOutputStream(
+                    this.socketToServer.getOutputStream());
 
         }
         catch (IOException e) {
 
-            System.err.println("Es konnte keine Verbindung zum ECG Server unter " + this.host.toString() + ":" + this.port + " hergestellt werden.\nNächster Verbindungsversuch in " + this.connectionDelay / 1000 + " Sekunden.");
+            System.err.println("Unable to connect to the ECG Server at " + this.host.toString() + ":" + this.port + " \nNext attempt in " + this.connectionDelay / 1000 + " seconds.");
 
             try {
-                
-                // delay for another attemp 
+
+                // delay for another attempt 
                 Thread.sleep(this.connectionDelay);
             }
             catch (InterruptedException e1) {
@@ -181,8 +184,8 @@ public class SendingThread extends Thread
      * If any new EventPackets are in the buffer and if a connection is
      * established, sending new EventPackets begins.
      * 
-     * Sended EventPackets are then removed from the buffer. If the connection
-     * is lost reestablishment is initialized.
+     * Sent EventPackets are then removed from the buffer. If the connection
+     * is lost reconnection is initiated.
      */
     @Override
     public void run()
@@ -192,11 +195,10 @@ public class SendingThread extends Thread
         // first attempt to connect to server
         connectToServer();
 
-        // is the SendngThread running?
+        // is the SendingThread running?
         while (this.runningFlag) {
             // any EventPackets to transmit?
-            
-            
+
             if (this.queue.getSize() > 0) {
                 // is the connection up?
                 if (this.socketToServer != null && this.socketToServer.isConnected()) {
@@ -216,18 +218,18 @@ public class SendingThread extends Thread
                                 packet = this.queue.removeFromHead();
                             }
                             catch (EventPacketQueueUnderflowException e) {
-                                
-                                // As the headcondition in the while proofs for the element count, this should never occur
-                                
+
+                                // As the head-condition in the while proofs for the element count, this should never occur
+
                                 e.printStackTrace();
-                                
+
                             }
 
                             this.oos.flush();
 
                             // send serialized over socket
                             this.oos.writeObject(packet);
-                            
+
                             this.oos.flush();
                         }
 
@@ -236,7 +238,7 @@ public class SendingThread extends Thread
                         assert (this.queue.getSize() == 0);
                     }
                     catch (Exception e) {
-                        
+
                         e.printStackTrace();
                     }
                 }
@@ -249,14 +251,14 @@ public class SendingThread extends Thread
     }
 
     /**
-     * This method indicates wether the SendingThread is running or not.
+     * This method tells whether the SendingThread is running or not.
      * @return "true" if the SendingThread is running and "false" otherwise
      */
     public boolean isRunning()
     {
         return this.runningFlag;
     }
-    
+
     /**
      * This class represents a queue with FIFO characteristic for buffering incoming EventPackets.
      */
@@ -267,39 +269,38 @@ public class SendingThread extends Thread
         /**
          * This method add a single EventPacket to the tail of the queue.
          * @param packetPar The EventPacket to queue
-         * @return "true if queueing succeded and "false" otherwise
+         * @return "true if cuing succeeded and "false" otherwise
          */
         public boolean addToTail(ValidEventPacket packetPar)
         {
             return this.add(packetPar);
         }
-        
+
         /**
-         * This method returns and removes the headmost EventPacket of the queue. 
+         * This method returns and removes the head-most EventPacket of the queue. 
          * @return The head EventPacket
-         * @throws EventPacketQueueUnderflowException If the queue is empty allready
+         * @throws EventPacketQueueUnderflowException If the queue is empty already
          */
         public ValidEventPacket removeFromHead() throws EventPacketQueueUnderflowException
         {
             int sizeBefore;
-            
-            if((sizeBefore = this.size()) > 0)
-            {
-                                
+
+            if ((sizeBefore = this.size()) > 0) {
+
                 ValidEventPacket packet = this.get(0);
-                
+
                 this.remove(0);
-                
-                assert(this.size() == sizeBefore-1);
-                
+
+                assert (this.size() == sizeBefore - 1);
+
                 return packet;
-                
+
             }
-           
+
             throw new EventPacketQueueUnderflowException();
-           
+
         }
-        
+
         /**
          * This method returns the number of EventPackets in the queue
          * @return The number of EventPackets
@@ -309,33 +310,27 @@ public class SendingThread extends Thread
             return this.size();
         }
     }
-    
+
     protected boolean ping()
     {
-        try
-        {
+        try {
             this.socketToServer.sendUrgentData(0);
-            
+
             return true;
         }
-        catch(Exception e)
-        {
+        catch (Exception e) {
             return false;
         }
     }
-    
+
     /**
-    * This Exception shall be thrown, when the EventPacketQueue is empty
-    * but an EventPacket is to be removed.
-    *
-    */
-   private class EventPacketQueueUnderflowException extends Exception
-   {
+     * This Exception shall be thrown, when the EventPacketQueue is empty
+     * but an EventPacket is to be removed.
+     *
+     */
+    private class EventPacketQueueUnderflowException extends Exception
+    {
+        private static final long serialVersionUID = 870916601241806158L;
 
-       /**
-        * 
-        */
-       private static final long serialVersionUID = 870916601241806158L;
-
-   }
+    }
 }

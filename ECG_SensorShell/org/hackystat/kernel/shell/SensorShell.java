@@ -1,13 +1,7 @@
-/*
- * Created on 02.04.2005
- *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
- */
 package org.hackystat.kernel.shell;
+
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.UnknownHostException;
@@ -15,9 +9,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.StringTokenizer;
-import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import org.electrocodeogram.client.ECG_SensorProperties;
 import org.electrocodeogram.client.IllegalHostOrPortException;
 import org.electrocodeogram.client.SendingThread;
 import org.electrocodeogram.event.EventPacket;
@@ -29,262 +24,272 @@ import org.hackystat.kernel.admin.SensorProperties;
  * This class is the ECG SensorShell. It is named org.hackystat.kernel.shell.SensorShell
  * after the class provided by the HackyStat project (please visit www.hackystat.org for more information).
  * 
- * It's purpose is to be used by every ECG sensor that is written in Java to take
- * the sensors recorded data and send it to the server. So a sensor developer must not
- * implement the functionality of sending data to the ECG server.
+ * It's purpose is to be used by every ECG sensor recorded data and send it to the ECG Server & Lab.
+ * So a sensor developer must not implement the functionality of sending data to the ECG server.
  * 
  * Because the ECG framework directly supports the usage of original HackyStat sensors
  * this class acts like the original HackyStat SensorShell class including the naming.
+ * That means that every original HackyStat sensor is able to collect data for the ECG
+ * framework by simply replacing the HackyStat's sensorshell.jar library ith the ECG sensorshell.jar.
  * 
- * Instead of processing the sensor data into the HackyStat environment, it is passed
- * over to the ECG server.
+ * Sensors are able to use this class in to different ways depending on the sensor programming
+ * language. If the sensor is written in Java, this class can be instanciated to a SensorShell
+ * object. On the SensorShell object the method doCommand is called to send recorded data to the
+ * ECG framework. The recorded data must at least conform to a HackyStat SensorDataType.
+ * 
+ * To support even sensors that are not written in Java, this class provides a main method that makes
+ * it a process that communicates via standard-input and -output. The process is created via a
+ * "java -jar sensorshell.jar" command at the operating system level. Every string that is passed
+ * to the standard-input of the SensorShell process, is taken for collected data.   
+ * 
  */
 public class SensorShell
 {
-    private SensorProperties properties = null;
-    
+    /**
+     * This is a reference to the SensorProperties object, that contains the information of
+     * the "sensor.properties" file. The file is used to configure all sensors in the system.
+     */
+    private ECG_SensorProperties properties = null;
+
     private Logger logger = null;
-    
+
     private BufferedReader bufferedReader = null;
-    
+
     private String cr = System.getProperty("line.separator");
-    
+
     private String prompt = ">> ";
-    
-    private boolean isInteractive = false;
-    
+
     private String delimiter = "#";
 
+    private boolean interactive;
 
-    
+    private String toolName;
+
     /**
      * This creates a ECG SensorShell instance with the given properties.
      * @param propertiesPar The properties to configure the ECG SensorShell
-     * @param b not used
-     * @param s not used
+     * @param interactivePar Is "true" if the SensorShell is run as a process and "false" if it is
+     * instantiated to a SensorShell object.
+     * @param toolNamePar If the SensorShell is run as a process, this tells the name of the environment
+     * that the sensors are running in.
      */
-    public SensorShell(SensorProperties propertiesPar, boolean b, String s)
+    public SensorShell(@SuppressWarnings("unused") SensorProperties propertiesPar, boolean interactivePar, String toolNamePar)
     {
-        // assert parameters
-        assert(propertiesPar != null);
-        
-        this.properties = propertiesPar;
-        
+
+        this.properties = new ECG_SensorProperties();
+
+        this.interactive = interactivePar;
+
+        this.toolName = toolNamePar;
+
         this.logger = Logger.getLogger("ECG_SensorShell");
-        
-        this.isInteractive = b;
-        
-        this.bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+
+        this.bufferedReader = new BufferedReader(new InputStreamReader(
+                System.in));
     }
 
-    public SensorShell(SensorProperties sensorProperties, boolean interactive, String toolName, boolean offlineEnabled, File commandFile) {
-		
-    	this(sensorProperties,interactive,toolName);
-    	
-	}
-
-	/**
-     * This method is called by the ECG sensors whenever they record an event. The data
-     * of the event is then passed over to the singleton SendingThread and therefore
-     * processed asynchroneously.
+    /**
+     * This method is called by the ECG sensors that are able to have an object reference to the
+     * SensorShell. Whenever they record an event they call the doCommand method and pass
+     * the parameters according to the HackyStat SensorDataType and ECG MicroSensorDataType
+     * definitions.
      * @param timeStamp The timeStamp of the event
-     * @param commandName The HackyStat commandName of the event
-     * @param argList The argList of the event
-     * @return "true" if the event's data is syntactically valid and "false" otherwises
+     * @param sensorDataType The HackyStat SensorDataType or of the event
+     * @param argList The argList of the event that contains additional data or an ECG MicroSensorDataType
+     * @return "true" if the event's data is syntactically correct and "false" otherwise
      */
-    public boolean doCommand(Date timeStamp, String commandName, List argList)
+    public boolean doCommand(Date timeStamp, String sensorDataType, List argList)
     {
         // check parameters
-        if(!EventPacket.isSyntacticallyCorrect(timeStamp,commandName,argList))
-        {
+        if (!EventPacket.isSyntacticallyCorrect(timeStamp, sensorDataType, argList)) {
             return false;
         }
-        
+
         // assert parameters
-        assert(EventPacket.isSyntacticallyCorrect(timeStamp,commandName,argList));
-        
+        assert (EventPacket.isSyntacticallyCorrect(timeStamp, sensorDataType, argList));
+
         // get SendingThread
         SendingThread sendingThread = null;
-        
+
         try {
-        	
-            sendingThread = SendingThread.getInstance(this.properties.getECGServerAddress(),this.properties.getECGServerPort());
+
+            sendingThread = SendingThread.getInstance(this.properties.getECGServerAddress(), this.properties.getECGServerPort());
         }
         catch (IllegalHostOrPortException e) {
-            
-            this.logger.log(Level.SEVERE,"Die Adresse des ECG Servers ist ungültig.\nPrüfen Sie, ob in der Datei \".hackystat/sensor.properties\" in Ihrem Heimatverzeichnis gültige Werte für die Parameter ECG_SERVER_ADDRESS und ECG_SERVER_PORT angegeben sind");
 
-            
-        } catch (UnknownHostException e) {
-			
-            this.logger.log(Level.SEVERE,"Die Adresse des ECG Servers ist ungültig.\nPrüfen Sie, ob in der Datei \".hackystat/sensor.properties\" in Ihrem Heimatverzeichnis gültige Werte für die Parameter ECG_SERVER_ADDRESS und ECG_SERVER_PORT angegeben sind");
-	}
-      
+            this.logger.log(Level.SEVERE, "The ECG Server's address is invalid.\nPlease check the ECG_SERVER_ADDRESS and ECG_SERVER_PORT values in the file \".hackystat/sensor.properties\" in your home directory.");
+
+        }
+        catch (UnknownHostException e) {
+
+            this.logger.log(Level.SEVERE, "The ECG Server's address is invalid.\nPlease check the ECG_SERVER_ADDRESS and ECG_SERVER_PORT values in the file \".hackystat/sensor.properties\" in your home directory.");
+        }
+
         // must not be "null"
-        assert(sendingThread != null);
-        
+        assert (sendingThread != null);
+
         // pass EventPacket to SendingThread
         try {
-            sendingThread.addEventPacket(new ValidEventPacket(0,timeStamp,commandName,argList));
+            sendingThread.addEventPacket(new ValidEventPacket(0, timeStamp,
+                    sensorDataType, argList));
         }
         catch (IllegalEventParameterException e) {
-            
+
             // As parameters are proofed above, this should never occur.
-            
+
+            // TODO : write out message here
+
             e.printStackTrace();
         }
         return true;
-        
+
     }
-    
+
     /**
-     * 
-     * @return
+     * This method returns the SensorProperties that are declared in the "sensor.properties" file.
+     * @return The SensorProperties
      */
     public SensorProperties getSensorProperties()
     {
         return this.properties;
     }
-    
+
     /**
-     * 
+     * This method is not implemented and only declared for compatibility reasons.
      */
     public void send()
     {
-        
+        return;
     }
-    
+
     /**
-     * @param str
+     * This method is not implemented and only declared for compatibility reasons.
+     * @param str not used
      */
-    public void println(String str)
+
+    public void println(@SuppressWarnings("unused")
+    String str)
     {
-        
+        return;
     }
-    
-    private void print(String line) {
-        logger.info(line);
-        if (isInteractive) {
-          System.out.print(line);
+
+    private void print(String line)
+    {
+
+        this.logger.info(line);
+
+        if (this.interactive) {
+            System.out.print(line);
         }
-      }
-    
-    private String readLine() {
+    }
+
+    private String readLine()
+    {
         try {
-          String line = this.bufferedReader.readLine();
-          logger.info(line + cr);
-          return line;
+            String line = this.bufferedReader.readLine();
+
+            this.logger.log(Level.INFO, line + this.cr);
+
+            return line;
         }
         catch (IOException e) {
-          //logger.info(cr);
-          return "quit";
-        }
-      }
-    
-    private void printPrompt() {
-        this.print(this.prompt);
-      }
-    
-    public static void main(String args[]) {
-        // Print help line and exit if arg is -help.
-        if ((args.length == 1) && (args[0].equalsIgnoreCase("-help"))) {
-          System.out.println("java -jar sensorshell.jar [toolname] [sensor.properties] [no offline] "
-               + "[command filename]");
-          return;
-        }
-        
-//        // Perform verification procedures and exit if arg is -verify.
-//        if ((args.length == 1) && (args[0].equalsIgnoreCase("-verify"))) {
-//          SensorShell.verifyClientSide();
-//          return;
-//        }
 
-        // Set Parameter 1 (toolname) to supplied or default value.
-        String toolName = (args.length > 0) ? args[0] : "interactive";
+            return "quit";
+
+        }
+    }
+
+    private void printPrompt()
+    {
+        this.print(this.prompt);
+    }
+
+    private void quit()
+    {
+        this.logger.log(Level.INFO, "Quitting SensorShell");
+
+        System.exit(0);
+
+    }
+
+    /**
+     * The main method makes this class a process that continuously reads from standard-input.
+     * Every string that is passed to its standard-input is handled as recorded event data.
+     * @param args The first parameter shall be the tool name string and the second shall be the path to the "sensor.properties" file.
+     */
+    public static void main(String args[])
+    {
+
+        if ((args.length == 1) && (args[0].equalsIgnoreCase("-help"))) {
+            System.out.println("java -jar sensorshell.jar [toolname] [sensor.properties]");
+            return;
+        }
+
+        String toolName;
+
+        if (args.length > 0) {
+            toolName = args[0];
+        }
+        else {
+            toolName = "interactive";
+        }
 
         // Set Parameter 2 (sensor properties file) to supplied or default value. Exit if can't find it.
-        SensorProperties sensorProperties = (args.length >= 2) ?
-            new SensorProperties("Shell", new File(args[1])) :
-            new SensorProperties("Shell");
-        if (!sensorProperties.isFileAvailable()) {
-          System.out.println("Could not find sensor.properties file. ");
-          System.out.println("Expected in: " + sensorProperties.getAbsolutePath());
-          System.out.println("Exiting...");
-          return;
+
+        SensorProperties sensorProperties;
+
+        if (args.length >= 2) {
+            sensorProperties = new SensorProperties("Shell", new File(args[1]));
+
+            if (!sensorProperties.isFileAvailable()) {
+                System.out.println("Could not find sensor.properties file. ");
+                System.out.println("Expected in: " + sensorProperties.getAbsolutePath());
+                System.out.println("Exiting...");
+                return;
+            }
+        }
+        else {
+            sensorProperties = new SensorProperties("Shell");
         }
 
-        // Set Parameter 3 (offline). True if we don't supply a value, false if any value supplied.
-        boolean offlineEnabled = ((args.length < 3));
+        boolean interactive = true;
 
-        // Set Parameter 4 (command file). Null if not supplied. Exit if supplied and bogus.
-        File commandFile = null;
-        if (args.length == 4) {
-          commandFile = new File(args[3]);
-          if (!(commandFile.exists() && commandFile.isFile())) {
-            System.out.println("Could not find the command file. Exiting...");
-            return;
-          }
-        }
+        SensorShell shell = new SensorShell(sensorProperties, interactive,
+                toolName);
 
-        // Set interactive parameter. From command line, always interactive unless using command file.
-        boolean interactive = ((commandFile == null));
-
-        // Now create the shell instance, supplying it with all the appropriate arguments.
-        SensorShell shell = new SensorShell(sensorProperties, interactive, toolName, offlineEnabled,
-          commandFile);
-
-        // Start processing commands either interactively or from the command file.
-        int count = 0;
         while (true) {
-          // Get the next command
-          shell.printPrompt();
-          String inputString = shell.readLine();
 
-//          // Quit if necessary.
-//          if (inputString.equalsIgnoreCase("quit")) {
-//            shell.quit();
-//            return;
-//          }
+            shell.printPrompt();
 
-//          // Print help strings.
-//          if (inputString.equalsIgnoreCase("help")) {
-//            shell.printHelp();
-//            continue;
-//          }
+            String inputString = shell.readLine();
 
-//          // Send all the data.
-//          if (inputString.equalsIgnoreCase("send")) {
-//            shell.send();
-//            count = 0;
-//            continue;
-//          }
+            // Quit if necessary.
+            if (inputString.equalsIgnoreCase("quit")) {
+                shell.quit();
 
-          // Otherwise it's an extended command.
-          StringTokenizer tokenizer = new StringTokenizer(inputString, shell.delimiter);
-          int numTokens = tokenizer.countTokens();
-          // Go back to start of loop if the line is empty.
-          if (numTokens == 0) {
-            continue;
-          }
+                return;
+            }
 
-          // Get the command name and any additional arguments.
-          String commandName = tokenizer.nextToken();
-          ArrayList argList = new ArrayList();
-          while (tokenizer.hasMoreElements()) {
-            argList.add(tokenizer.nextToken());
-          }
-          // Invoke the command with a timestamp of right now.
-          shell.doCommand(new Date(), commandName, argList);
+            StringTokenizer tokenizer = new StringTokenizer(inputString,
+                    shell.delimiter);
 
-          // If the commandFile is large we can run into problems reading and sending the whole
-          // thing at once. so, we break up the file.      
-          if (count >= 500) {
-            shell.send();
-            count = 0;
-            continue;
-          }
-          count++;
-          
+            int numTokens = tokenizer.countTokens();
+
+            if (numTokens == 0) {
+                continue;
+            }
+
+            String commandName = tokenizer.nextToken();
+
+            ArrayList<String> argList = new ArrayList<String>();
+
+            while (tokenizer.hasMoreElements()) {
+                argList.add(tokenizer.nextToken());
+            }
+
+            shell.doCommand(new Date(), commandName, argList);
+
         }
-      }
+    }
+
 }

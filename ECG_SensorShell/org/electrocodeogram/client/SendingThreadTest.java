@@ -90,7 +90,7 @@ public class SendingThreadTest
         
         ValidEventPacket lastAdded = bufferCopy.get(bufferCopy.size()-1);
         
-        if(lastAdded.getSourceId() == eventPacket.getSourceId() && lastAdded.getTimeStamp().equals(eventPacket.getTimeStamp()) && lastAdded.getHsCommandName().equals(eventPacket.getHsCommandName()) && lastAdded.getArglist().equals(eventPacket.getArglist()))
+        if(lastAdded.getSourceId() == eventPacket.getSourceId() && lastAdded.getTimeStamp().equals(eventPacket.getTimeStamp()) && lastAdded.getSensorDataType().equals(eventPacket.getSensorDataType()) && lastAdded.getArglist().equals(eventPacket.getArglist()))
         {
             return true;
         }

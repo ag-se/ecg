@@ -1,8 +1,8 @@
 package org.electrocodeogram.client;
 
 /**
- * If the "host" or "port" value are malformed when beeing passed to the SendingThread for connection to the
- * ECG server, this exception is thrown.
+ * If the "host" or "port" value are malformed when being passed to the
+ * SendingThread for connection to the ECG server, this exception is thrown.
  */
 public class IllegalHostOrPortException extends Exception
 {
