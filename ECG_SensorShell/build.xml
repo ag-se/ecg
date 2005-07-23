@@ -41,6 +41,8 @@
 		<javac destdir="${builddir}" srcdir="${srcdir}" source="1.5" debug="on">
 			
 			<classpath refid="project.classpath" />
+
+			<classpath><filelist dir="${basedir}/lib/hackystat/"><file name="sensorshell.jar"/></filelist></classpath>
 		</javac>
 		
 	</target>
@@ -68,6 +70,14 @@
 	
 	<target name="deploy" depends="jar">
 	
+		<mkdir dir="${jardir}/lib/hackystat/" />
+			
+		<copy todir="${jardir}/lib/hackystat/">
+
+			<fileset file="${basedir}/lib/hackystat/sensorshell.jar" />
+			
+		</copy>
+		
 		<copy todir="${ECG SensorShellTestDir}">
 
 			<fileset file="${sensorshell.jar}" />
