@@ -8,43 +8,36 @@ import java.io.InputStreamReader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.electrocodeogram.module.ModuleRegistry;
-import org.electrocodeogram.module.source.SocketSourceModule;
+import org.electrocodeogram.module.registry.ModuleRegistry;
 import org.electrocodeogram.msdt.MsdtManager;
-import org.electrocodeogram.ui.Configurator;
-import org.electrocodeogram.ui.messages.GuiEventWriter;
+import org.electrocodeogram.ui.Gui;
 
 /**
- * This is the root and main class of the ECG Server & Lab component. During its
- * initilisation it creates all other core ECG components. It alos provides
+ * This is the singleton root and main class of the ECG Server & Lab component. During its
+ * initialization it creates all other core ECG components. It also provides
  * a console for logging output and reading input commands.
  * It is implemented as a singleton class that gives centralized access to
  * all components.
  */
-public class Core implements ICore {
+public class Core {
 
 	private static Core theInstance = null;
 
 	private ModuleRegistry moduleRegistry = null;
 
-	private SensorShellWrapper sensorShellWrapper = null;
-
-	private Configurator configurator = null;
-
-	private SocketSourceModule sensorSource = null;
-	
-	private GuiEventWriter guiEventWriter = null;
+	private Gui gui = null;
 	
 	private MsdtManager mstdManager = null;
 
 	private Logger logger = null;
 	
-	
+    
+    
 	private Core() {
 		
 		this.logger = Logger.getLogger("Core");
 		
-		Console gob = new Console();
+		Console console = new Console();
 		
 		try {
 			
@@ -56,17 +49,11 @@ public class Core implements ICore {
 			
 		}
 		
-		this.configurator = new Configurator();
+        this.moduleRegistry = new ModuleRegistry();
+        
+        this.gui = new Gui(this.moduleRegistry);
 
-		this.moduleRegistry = new ModuleRegistry(this);
-
-		this.sensorShellWrapper = new SensorShellWrapper(this);
-
-		this.guiEventWriter = new GuiEventWriter(this);
-		
-		this.sensorSource = new SocketSourceModule(this);
-
-		gob.start();
+		console.start();
 		
 		theInstance = this;
 	}
@@ -76,7 +63,7 @@ public class Core implements ICore {
 		this();
 
 		if (this.moduleRegistry == null) {
-			this.moduleRegistry = new ModuleRegistry(this, file);
+			this.moduleRegistry = new ModuleRegistry(file);
 		} else {
 			this.moduleRegistry.setFile(file);
 		}
@@ -95,29 +82,20 @@ public class Core implements ICore {
 		return theInstance;
 	}
 
-	// TODO : bring into GUI
-	public GuiEventWriter getGuiEventWriter()
-	{
-		return this.guiEventWriter;
-	}
 	
-	/* (non-Javadoc)
-	 * @see org.electrocodeogram.core.Icore#getMsdtManager()
+	/**
+     * This method returns a reference to the MicroSensorDataType-Manager object. 
+     * @return A reference to the MicroSensorDataType-Manager object
 	 */
 	public MsdtManager getMsdtManager()
 	{
 		return this.mstdManager;
 	}
-	
-	// TODO : make a real module
-	public SocketSourceModule getSensorSource()
-	{
-		return this.sensorSource;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.electrocodeogram.core.Icore#getModuleRegistry()
-	 */
+
+    /**
+     * This method returns a reference to the ModuleRegistry object. 
+     * @return A reference to the ModuleRegistry object
+     */
 	public ModuleRegistry getModuleRegistry() {
 		return this.moduleRegistry;
 	}
@@ -125,7 +103,8 @@ public class Core implements ICore {
 	/**
 	 * This method quits the ECG Server & Lab application.
 	 */
-	public void quit() {
+	public void quit()
+    {
 		System.exit(0);
 	}
 
@@ -204,18 +183,12 @@ public class Core implements ICore {
 
 	}
 
-	/* (non-Javadoc)
-	 * @see org.electrocodeogram.core.Icore#getSensorShellWrapper()
+	/**
+     * This method returns a reference to the gui main frame object. 
+     * @return A reference to the gui main frame object
 	 */
-	public SensorShellWrapper getSensorShellWrapper() {
-		return this.sensorShellWrapper;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.electrocodeogram.core.Icore#getConfigurator()
-	 */
-	public Configurator getConfigurator() {
-		return this.configurator;
+	public Gui getGui() {
+		return this.gui;
 	}
 
 }

@@ -10,7 +10,7 @@ import java.util.List;
 
 import org.electrocodeogram.core.Core;
 import org.electrocodeogram.event.ValidEventPacket;
-import org.electrocodeogram.module.writer.EventWriter;
+import org.electrocodeogram.module.target.EventWriter;
 
 /**
  * @author 7oas7er
@@ -39,9 +39,9 @@ public class GuiEventWriter extends EventWriter
 //        this.activate();
 //    }
     
-    public GuiEventWriter(Core corePar)
+    public GuiEventWriter()
     {
-        super(corePar,"GuiEventWriter");
+        super();
     }
 
 //    public static GuiEventWriter getInstance(MessagesTarget target)
@@ -76,9 +76,9 @@ public class GuiEventWriter extends EventWriter
     {
         if(target != null)
         {
-        if (eventPacket.getSourceId() == Core.getInstance().getConfigurator().getSelectedModuleCellId())
+        if (eventPacket.getSourceId() == Core.getInstance().getGui().getSelectedModuleCellId())
         {
-          target.append(eventPacket.getTimeStamp().toString() + "," + eventPacket.getHsCommandName());
+          target.append(eventPacket.getTimeStamp().toString() + "," + eventPacket.getSensorDataType());
 
           List argList = eventPacket.getArglist();
 

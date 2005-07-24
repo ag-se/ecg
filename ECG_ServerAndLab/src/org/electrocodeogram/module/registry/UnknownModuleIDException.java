@@ -1,10 +1,5 @@
-/*
- * Created on 08.03.2005
- *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
- */
-package org.electrocodeogram.module;
+
+package org.electrocodeogram.module.registry;
 
 /**
  * @author 7oas7er
@@ -16,6 +11,11 @@ public class UnknownModuleIDException extends Exception
 {
 
     /**
+     * 
+     */
+    private static final long serialVersionUID = 5814851080758469529L;
+
+    /**
      * @param string
      */
     public UnknownModuleIDException(String string)
@@ -23,6 +23,9 @@ public class UnknownModuleIDException extends Exception
        super(string);
     }
 
+    /**
+     * 
+     */
     public UnknownModuleIDException()
     {
        super();

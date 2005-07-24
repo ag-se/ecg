@@ -1,4 +1,4 @@
-package org.electrocodeogram.module;
+package org.electrocodeogram.module.registry;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -10,8 +10,7 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.electrocodeogram.core.ICore;
-import org.electrocodeogram.ui.Configurator;
+import org.electrocodeogram.module.Module;
 
 /**
  * This is the central ModuleRegistry which maintains information about all
@@ -31,39 +30,28 @@ public class ModuleRegistry extends Observable
     private RunningModules runningModules = null;
 
     private InstalledModules installedModules = null;
-
-    private File moduleDirectory = null;
-
+    
     /**
      * The constructor creates the ModuleRegistry instance.
-     * @param corePar A reference to the Core object
      */
-    public ModuleRegistry(ICore corePar)
+    public ModuleRegistry()
     {
         this.logger = Logger.getLogger("ModuleRegistry");
-
-        addObserver(corePar.getConfigurator());
-
+       
         this.runningModules = new RunningModules();
-
+        
     }
 
     /**
      * The constructor creates the ModuleRegistry instance.
-     * @param corePar A reference to the Core object
-     * @param filePar This should be the module directory
+     * @param moduleDirectory This should be the module directory
      */
-    public ModuleRegistry(ICore corePar, File filePar)
+    public ModuleRegistry(File moduleDirectory)
     {
-        this(corePar);
+        this();
 
-        this.installedModules = new InstalledModules(filePar);
-        
-        setChanged();
-
-        notifyObservers();
-
-        clearChanged();
+        this.installedModules = new InstalledModules(moduleDirectory);
+       
     }
 
     /**
@@ -83,8 +71,8 @@ public class ModuleRegistry extends Observable
 		
 	}
     
-
-    private Logger getLogger()
+    
+    protected Logger getLogger()
     {
         return this.logger;
     }
@@ -116,7 +104,7 @@ public class ModuleRegistry extends Observable
      */
     public Class getModuleClassForId(int moduleClassId) throws IllegalModuleIDException, UnknownModuleIDException
     {
-        if (!(moduleClassId > 1)) {
+        if (!(moduleClassId > 0)) {
             throw new IllegalModuleIDException();
         }
 
@@ -167,10 +155,12 @@ public class ModuleRegistry extends Observable
         
 
     }
-
+    
     private class RunningModules
     {
         HashMap<Integer, Module> runningModuleMap = new HashMap<Integer, Module>();
+        
+        
     }
 
     
@@ -181,17 +171,17 @@ public class ModuleRegistry extends Observable
 
         HashMap<Integer, ModuleDescriptor> availableModuleClassesMap = null;
 
-        private int id = 0;
+        private int id = 1;
 
         private ModuleClassLoader moduleClassLoader = null;
 
-        private InstalledModules(File moduleDirectoryPar)
+        private InstalledModules(File moduleDirectory)
         {
             this.availableModuleClassesMap = new HashMap<Integer, ModuleDescriptor>();
 
             this.moduleClassLoader = getModuleClassLoader();
 
-            initialize(moduleDirectoryPar);
+            initialize(moduleDirectory);
         }
 
         private ModuleClassLoader getModuleClassLoader()
@@ -204,24 +194,24 @@ public class ModuleRegistry extends Observable
             return new ModuleClassLoader(currentClassLoader);
         }
 
-        private void initialize(File moduleDirectoryPar)
+        private void initialize(File moduleDirectory)
         {
             // is the parameter not null?
-            if (moduleDirectoryPar == null) {
+            if (moduleDirectory == null) {
                 return;
             }
 
-            assert (moduleDirectoryPar != null);
+            assert (moduleDirectory != null);
 
             // does the file exist and is it a directory?
-            if (!moduleDirectoryPar.exists() || !moduleDirectoryPar.isDirectory()) {
+            if (!moduleDirectory.exists() || !moduleDirectory.isDirectory()) {
                 return;
             }
 
-            assert (moduleDirectoryPar.exists() && moduleDirectoryPar.isDirectory());
+            assert (moduleDirectory.exists() && moduleDirectory.isDirectory());
 
             // get all filenames in it
-            String[] moduleDirectories = moduleDirectoryPar.list();
+            String[] moduleDirectories = moduleDirectory.list();
 
             // assert no IO-Error has occured
             if (moduleDirectories == null) {
@@ -241,7 +231,7 @@ public class ModuleRegistry extends Observable
 
             for (int i = 0; i < length; i++) {
 
-                String actModuleDirectoryPath = moduleDirectoryPar + File.separator + moduleDirectories[i];
+                String actModuleDirectoryPath = moduleDirectory + File.separator + moduleDirectories[i];
 
                 File actModuleDirectory = new File(actModuleDirectoryPath);
 
@@ -298,8 +288,8 @@ public class ModuleRegistry extends Observable
 
                     assert (moduleClassString != null && moduleClassString.length() > 0);
 
-                    String fQmoduleClassString = moduleDirectoryPar + File.separator + moduleDirectories[i] + File.separator + moduleClassString + ".class";
-
+                    String fQmoduleClassString = actModuleDirectoryPath + File.separator + moduleClassString + ".class";
+                    
                     Class moduleClass = null;
 
                     try {
@@ -314,7 +304,13 @@ public class ModuleRegistry extends Observable
 
                         this.availableModuleClassesMap.put(new Integer(
                                 moduleClassId), moduleDescriptor);
-                       
+                        
+                        setChanged();
+                        
+                        notifyObservers(moduleDescriptor);
+                        
+                        clearChanged();
+                        
                     }
                     catch (ClassNotFoundException e) {
 
@@ -335,7 +331,7 @@ public class ModuleRegistry extends Observable
      * @param module
      *            Is the module instance to register
      */
-    protected void registerModuleInstance(Module module)
+    public void registerModuleInstance(Module module)
     {
         // check parameter
         if (module == null) {
@@ -413,7 +409,15 @@ public class ModuleRegistry extends Observable
 
         Module module = null;
         try {
+            
+//            Constructor[] constructors = moduleClass.getConstructors();
+//            
+//            Object[] args = new Object[]{this.core};
+//            
+//            module = (Module) constructors[0].newInstance(args);
+            
             module = (Module) moduleClass.newInstance();
+            
         }
         catch (InstantiationException e) {
 
@@ -422,6 +426,9 @@ public class ModuleRegistry extends Observable
         }
         catch (IllegalAccessException e) {
 
+            throw new ModuleInstantiationException(e.getMessage());
+        }
+        catch (IllegalArgumentException e) {
             throw new ModuleInstantiationException(e.getMessage());
         }
 
@@ -442,7 +449,7 @@ public class ModuleRegistry extends Observable
      *             If a module class with the given id could not be found
   
      */
-    protected void deregisterModuleInstance(int moduleId) throws UnknownModuleIDException, IllegalModuleIDException
+    public void deregisterModuleInstance(int moduleId) throws UnknownModuleIDException, IllegalModuleIDException
     {
         if (!(moduleId > 0)) {
             throw new IllegalModuleIDException();

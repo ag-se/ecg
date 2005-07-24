@@ -4,12 +4,10 @@ import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
-import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
@@ -17,7 +15,6 @@ import java.util.Observer;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -30,19 +27,15 @@ import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
 import org.electrocodeogram.core.Core;
-import org.electrocodeogram.core.SensorShellWrapper;
-import org.electrocodeogram.module.IllegalModuleIDException;
 import org.electrocodeogram.module.Module;
-import org.electrocodeogram.module.ModuleDescriptor;
-import org.electrocodeogram.module.ModuleRegistry;
-import org.electrocodeogram.module.UnknownModuleIDException;
-import org.electrocodeogram.module.Module.ModuleType;
-import org.electrocodeogram.module.source.SocketServer;
+import org.electrocodeogram.module.registry.IllegalModuleIDException;
+import org.electrocodeogram.module.registry.ModuleDescriptor;
+import org.electrocodeogram.module.registry.ModuleRegistry;
+import org.electrocodeogram.module.registry.UnknownModuleIDException;
 import org.electrocodeogram.ui.messages.GuiEventWriter;
 import org.electrocodeogram.ui.messages.MessagesFrame;
 import org.electrocodeogram.ui.modules.ModuleCell;
 import org.electrocodeogram.ui.modules.ModuleGraph;
-import org.electrocodeogram.ui.sensors.SensorCell;
 import org.electrocodeogram.ui.sensors.SensorGraph;
 
 import com.zfqjava.swing.JStatusBar;
@@ -54,7 +47,7 @@ import com.zfqjava.swing.JStatusBar;
  * Preferences - Java - Code Style - Code Templates
  */
 
-public class Configurator extends JFrame implements Observer
+public class Gui extends JFrame implements Observer
 {
 
     /**
@@ -67,7 +60,7 @@ public class Configurator extends JFrame implements Observer
      * @uml.property name="theInstance"
      * @uml.associationEnd multiplicity="(0 1)"
      */
-    private static Configurator theInstance = null;
+    private static Gui theInstance = null;
 
     private MessagesFrame frmMessages = null;
 
@@ -114,22 +107,24 @@ public class Configurator extends JFrame implements Observer
 
     private int sourceModuleId;
 
-    public static Configurator getInstance(Module source)
-    {
-        assert (source != null);
+    private GuiEventWriter guiEventWriter;
 
-        if (theInstance == null) {
-            theInstance = new Configurator(source);
-        }
-        else {
-
-            if (source.getModuleType() == ModuleType.SOURCE_MODULE) {
-                theInstance.sourceModules.add(source);
-            }
-
-        }
-        return theInstance;
-    }
+//    public static Configurator getInstance(Module source)
+//    {
+//        assert (source != null);
+//
+//        if (theInstance == null) {
+//            theInstance = new Configurator(source);
+//        }
+//        else {
+//
+//            if (source.getModuleType() == ModuleType.SOURCE_MODULE) {
+//                theInstance.sourceModules.add(source);
+//            }
+//
+//        }
+//        return theInstance;
+//    }
 
 //    /**
 //     * @return
@@ -142,10 +137,12 @@ public class Configurator extends JFrame implements Observer
 //        return theInstance;
 //    }
 
-    public Configurator()
+    public Gui(ModuleRegistry moduleRegistry)
     {
         super();
 
+        moduleRegistry.addObserver(this);
+        
         try {
 
             UIManager.setLookAndFeel("org.fife.plaf.Office2003.Office2003LookAndFeel");
@@ -365,6 +362,8 @@ public class Configurator extends JFrame implements Observer
 
         //frmMessages = new MessagesFrame();
 
+        //this.guiEventWriter = new GuiEventWriter();
+        
         setVisible(true);
     }
 
@@ -383,15 +382,15 @@ public class Configurator extends JFrame implements Observer
     /**
      * @throws java.awt.HeadlessException
      */
-    private Configurator(Module source) throws HeadlessException
-    {
-        this();
-        if (source.getModuleType() == ModuleType.SOURCE_MODULE) {
-
-            this.sourceModules.add(source);
-            //traverseConnectedModules(null, this.sourceModules.get(0));
-        }
-    }
+//    private Configurator(Module source) throws HeadlessException
+//    {
+//        this();
+//        if (source.getModuleType() == ModuleType.SOURCE_MODULE) {
+//
+//            this.sourceModules.add(source);
+//            //traverseConnectedModules(null, this.sourceModules.get(0));
+//        }
+//    }
 
     /**
      * 
@@ -416,16 +415,22 @@ public class Configurator extends JFrame implements Observer
      */
     public void update(Observable o, Object arg)
     {
-        assert (arg != null);
-
+       
         /* if the ModuleRegistry is sending the event, a module-instance has been added or removed
          * or a module class has been installed
          */
         if (o instanceof ModuleRegistry) {
-
+            
+            
             // a module has been added or removed
             if (arg instanceof Module && (!(arg instanceof GuiEventWriter))) {
 
+                if (this.guiEventWriter == null)
+                {
+                    this.guiEventWriter = new GuiEventWriter();
+                }
+
+                
                 Module module = (Module) arg;
 
                 if(moduleGraph.containsModuleCell(module.getId()))
@@ -474,66 +479,66 @@ public class Configurator extends JFrame implements Observer
                 }
             }
         }
-        else {
-            if (arg instanceof SocketServer) {
-                SocketServer seso = (SocketServer) arg;
+//        else {
+//            if (arg instanceof SocketServer) {
+//                SocketServer seso = (SocketServer) arg;
+//
+//                int activeSensors = seso.getSensorCount();
+//
+//                String text = "Active Sensors: " + activeSensors;
+//
+//                JLabel lbl = (JLabel) statusBar.getComponent(4);
+//
+//                lbl.setText(text);
+//
+//                String[] address;
+//
+//                if ((address = seso.getAddress()) != null) {
+//                    text = "Listening on: " + address[0] + ":" + address[1];
+//
+//                    lbl = (JLabel) statusBar.getComponent(0);
+//
+//                    lbl.setText(text);
+//                }
+//
+//                if (activeSensors > 0) {
+//                    pnlSensors.remove(sensorGraph);
+//
+//                    sensorGraph = new SensorGraph();
+//
+//                    pnlSensors.add(sensorGraph);
+//
+//                    InetAddress[] addresses = seso.getSensorAddresses();
+//
+//                    String[] sensorNames = seso.getSensorNames();
+//
+//                    for (int i = 0; i < activeSensors; i++) {
+//                        SensorCell sc;
+//
+//                        if (sensorNames[i] == null) {
+//                            sc = new SensorCell(
+//                                    this,
+//                                    "Unknown Sensor at" + addresses[i].toString());
+//                        }
+//                        else {
+//                            sc = new SensorCell(
+//                                    this,
+//                                    sensorNames[i] + "-Sensor \nat: " + addresses[i].toString());
+//                        }
+//
+//                        sensorGraph.addSensorCell(sc);
+//                    }
+//
+//                }
+//                else if (activeSensors == 0) {
+//                    pnlSensors.remove(sensorGraph);
+//
+//                    sensorGraph = new SensorGraph();
+//
+//                    pnlSensors.add(sensorGraph);
+//                }
 
-                int activeSensors = seso.getSensorCount();
-
-                String text = "Active Sensors: " + activeSensors;
-
-                JLabel lbl = (JLabel) statusBar.getComponent(4);
-
-                lbl.setText(text);
-
-                String[] address;
-
-                if ((address = seso.getAddress()) != null) {
-                    text = "Listening on: " + address[0] + ":" + address[1];
-
-                    lbl = (JLabel) statusBar.getComponent(0);
-
-                    lbl.setText(text);
-                }
-
-                if (activeSensors > 0) {
-                    pnlSensors.remove(sensorGraph);
-
-                    sensorGraph = new SensorGraph();
-
-                    pnlSensors.add(sensorGraph);
-
-                    InetAddress[] addresses = seso.getSensorAddresses();
-
-                    String[] sensorNames = seso.getSensorNames();
-
-                    for (int i = 0; i < activeSensors; i++) {
-                        SensorCell sc;
-
-                        if (sensorNames[i] == null) {
-                            sc = new SensorCell(
-                                    this,
-                                    "Unknown Sensor at" + addresses[i].toString());
-                        }
-                        else {
-                            sc = new SensorCell(
-                                    this,
-                                    sensorNames[i] + "-Sensor \nat: " + addresses[i].toString());
-                        }
-
-                        sensorGraph.addSensorCell(sc);
-                    }
-
-                }
-                else if (activeSensors == 0) {
-                    pnlSensors.remove(sensorGraph);
-
-                    sensorGraph = new SensorGraph();
-
-                    pnlSensors.add(sensorGraph);
-                }
-
-            }
+            //}
             else if (arg instanceof ModuleGraph) {
                 this.selectedModuleCellId = moduleGraph.getSelectedModuleCellId();
 
@@ -550,7 +555,7 @@ public class Configurator extends JFrame implements Observer
             
         }
       
-    }
+    //}
 
     /**
      *  
@@ -674,6 +679,11 @@ public class Configurator extends JFrame implements Observer
        
        theInstance = null;
         
+    }
+
+    public GuiEventWriter getGuiEventWriter()
+    {
+        return this.guiEventWriter;
     }
 
 }

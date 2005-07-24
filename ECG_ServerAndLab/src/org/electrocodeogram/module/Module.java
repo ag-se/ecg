@@ -8,16 +8,15 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.electrocodeogram.core.Core;
-import org.electrocodeogram.core.ICore;
-import org.electrocodeogram.core.SensorShellWrapper;
 import org.electrocodeogram.event.IllegalEventParameterException;
 import org.electrocodeogram.event.ValidEventPacket;
-import org.electrocodeogram.module.annotator.EventProcessor;
-import org.electrocodeogram.ui.Configurator;
+import org.electrocodeogram.module.intermediate.EventProcessor;
+import org.electrocodeogram.module.registry.IllegalModuleIDException;
+import org.electrocodeogram.module.registry.UnknownModuleIDException;
 import org.electrocodeogram.ui.messages.GuiEventWriter;
 
 /**
- * This abstract class represents an ECG analysis module. A module is an entity able
+ * This abstract class represents an ECG module. A module is an entity able
  * of receiving events from modules it is connected to and sending events to modules
  * that are connected to it.
  * Additionaly a module can be implemented to modify the data of received events
@@ -66,7 +65,7 @@ public abstract class Module extends Observable implements Observer
 
     private String moduleDescription = null;
     
-    private ModuleType moduleType;
+    private ModuleType $moduleType;
 
     private static int count = 0;
 
@@ -82,15 +81,15 @@ public abstract class Module extends Observable implements Observer
 
     /**
      * This creates a new Module of the given module type and registers it with the ModuleRegistry.
-     * @param moduleTypePar Is the module type
+     * @param moduleType Is the module type
      */
-    public Module(ICore corePar, ModuleType moduleTypePar)
+    public Module(ModuleType moduleType)
     {
         this.id = ++count;
 
         this.name = this.getClass().getName();
 
-        this.moduleType = moduleTypePar;
+        this.$moduleType = moduleType;
 
         this.logger = Logger.getLogger(this.name);
 
@@ -98,13 +97,13 @@ public abstract class Module extends Observable implements Observer
 
         this.senderModuleMap = new HashMap<Integer, Module>();
 
-        corePar.getModuleRegistry().registerModuleInstance(this);
+        Core.getInstance().getModuleRegistry().registerModuleInstance(this);
 
         if (!(this instanceof GuiEventWriter)) {
 
-            addObserver(corePar.getConfigurator());
+            addObserver(Core.getInstance().getGui());
 
-            addObserver(corePar.getGuiEventWriter());
+            addObserver(Core.getInstance().getGui().getGuiEventWriter());
         }
         
         activate();
@@ -199,7 +198,7 @@ public abstract class Module extends Observable implements Observer
      */
     public ModuleType getModuleType()
     {
-        return this.moduleType;
+        return this.$moduleType;
     }
 
     /**
@@ -225,7 +224,7 @@ public abstract class Module extends Observable implements Observer
             try {
                 notifyObservers(new ValidEventPacket(this.getId(),
                         eventPacket.getTimeStamp(),
-                        eventPacket.getHsCommandName(),
+                        eventPacket.getSensorDataType(),
                         eventPacket.getArglist()));
             }
             catch (IllegalEventParameterException e) {
@@ -263,7 +262,7 @@ public abstract class Module extends Observable implements Observer
     public int connectReceiverModule(Module module) throws ModuleConnectionException
     {
 
-        if (this.moduleType == ModuleType.TARGET_MODULE) {
+        if (this.$moduleType == ModuleType.TARGET_MODULE) {
             throw new ModuleConnectionException(
                     "An diese Modul können Sie keine weiteren Module anhängen");
         }
@@ -383,20 +382,21 @@ public abstract class Module extends Observable implements Observer
             break;
         }
 
-        if (this instanceof EventProcessor) {
+        if (this instanceof EventProcessor) 
+        {
             EventProcessor eventProcessor = (EventProcessor) this;
 
-            int mode = eventProcessor.getProcessorMode();
+            
 
             text += "\nModus: \t";
 
-            switch (mode)
+            switch (eventProcessor.getProcessingMode())
             {
-            case EventProcessor.ANNOTATOR:
+            case ANNOTATOR:
                 text += "Annotation";
                 break;
 
-            case EventProcessor.FILTER:
+            case FILTER:
                 text += "Filterung";
                 break;
 
@@ -414,6 +414,10 @@ public abstract class Module extends Observable implements Observer
 
     }
 
+    /**
+     * This method is called hen the module is to be removed from the ECG Lab.
+     *
+     */
     public void remove()
     {
         if (this.senderModuleMap.size() != 0) {
@@ -460,7 +464,7 @@ public abstract class Module extends Observable implements Observer
      * This method sets the name of this module to the given name.
      * @param moduleName the new name for the module. 
      */
-    protected void setName(String moduleName)
+    public void setName(String moduleName)
     {
         this.name = moduleName;
 
@@ -474,7 +478,7 @@ public abstract class Module extends Observable implements Observer
      */
     public boolean isModuleType(ModuleType moduleTypePar)
     {
-        if (this.moduleType == moduleTypePar) {
+        if (this.$moduleType == moduleTypePar) {
             return true;
         }
        
@@ -482,7 +486,11 @@ public abstract class Module extends Observable implements Observer
         
     }
 
-    protected void setDescription(String description)
+    /**
+     * Sets the description of the module to the given string.
+     * @param description Is the description string of the module
+     */
+    public void setDescription(String description)
     {
         this.moduleDescription = description;
         

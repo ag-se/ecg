@@ -1,10 +1,4 @@
-/*
- * Created on 05.05.2005
- *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
- */
-package org.electrocodeogram.module;
+package org.electrocodeogram.module.registry;
 
 /**
  * @author 7oas7er
@@ -16,6 +10,11 @@ public class ModuleInstantiationException extends Exception
 {
 
     
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 4209402497277710920L;
+
     /**
      * 
      */

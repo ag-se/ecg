@@ -15,7 +15,7 @@ import javax.swing.BorderFactory;
 
 import org.electrocodeogram.module.Module;
 import org.electrocodeogram.module.Module.ModuleType;
-import org.electrocodeogram.ui.Configurator;
+import org.electrocodeogram.ui.Gui;
 import org.jgraph.graph.DefaultEdge;
 import org.jgraph.graph.DefaultGraphCell;
 import org.jgraph.graph.DefaultPort;
@@ -34,7 +34,7 @@ public class ModuleCell extends DefaultGraphCell
      * @uml.property name="root"
      * @uml.associationEnd multiplicity="(0 1)"
      */
-    private Configurator root = null;
+    private Gui root = null;
     
     private int id = -1;
     
@@ -110,7 +110,7 @@ public class ModuleCell extends DefaultGraphCell
         return name;
     }
     
-    public Configurator getUIRoot()
+    public Gui getUIRoot()
     {
         return root;
     }

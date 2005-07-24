@@ -20,10 +20,10 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.electrocodeogram.core.Core;
-import org.electrocodeogram.core.SensorShellWrapper;
-import org.electrocodeogram.module.IllegalModuleIDException;
-import org.electrocodeogram.module.ModuleRegistry;
-import org.electrocodeogram.module.UnknownModuleIDException;
+import org.electrocodeogram.module.registry.IllegalModuleIDException;
+import org.electrocodeogram.module.registry.ModuleRegistry;
+import org.electrocodeogram.module.registry.UnknownModuleIDException;
+import org.electrocodeogram.msdt.EventValidator;
 
 /**
  * @author 7oas7er
@@ -98,7 +98,7 @@ public class MessagesFrame extends JFrame implements MessagesTarget
 
         this.getContentPane().add(pnlMessages);
 
-        Core.getInstance().getGuiEventWriter().setTarget(this);
+        Core.getInstance().getGui().getGuiEventWriter().setTarget(this);
     }
 
     public void setSelectedModul(int moduleId)

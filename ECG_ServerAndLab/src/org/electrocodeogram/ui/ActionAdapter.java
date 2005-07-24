@@ -10,12 +10,12 @@ import java.awt.event.ActionListener;
 import javax.swing.JOptionPane;
 
 import org.electrocodeogram.core.Core;
-import org.electrocodeogram.core.SensorShellWrapper;
-import org.electrocodeogram.module.IllegalModuleIDException;
 import org.electrocodeogram.module.ModuleConnectionException;
-import org.electrocodeogram.module.ModuleInstantiationException;
-import org.electrocodeogram.module.ModuleRegistry;
-import org.electrocodeogram.module.UnknownModuleIDException;
+import org.electrocodeogram.module.registry.IllegalModuleIDException;
+import org.electrocodeogram.module.registry.ModuleInstantiationException;
+import org.electrocodeogram.module.registry.ModuleRegistry;
+import org.electrocodeogram.module.registry.UnknownModuleIDException;
+import org.electrocodeogram.msdt.EventValidator;
 
 /**
  * @author 7oas7er *  * TODO To change the template for this generated type comment go to * Window - Preferences - Java - Code Style - Code Templates
@@ -34,7 +34,7 @@ public class ActionAdapter implements ActionListener
      * @param selectedModuleCellId
      * @param moduleName
      */
-    public ActionAdapter(Configurator configurator, int moduleClassId, String moduleName)
+    public ActionAdapter(Gui configurator, int moduleClassId, String moduleName)
     {
         
         this.moduleName = moduleName;

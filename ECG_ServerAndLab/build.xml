@@ -22,6 +22,8 @@
 		
 		<property name="ECGLab.jar" value="${jardir}/ECGLab.jar" />
 		
+		<property name="ECG_SocketSourceModuleDir" value="${basedir}/../ECG_SocketSourceModule/lib/ecg" />
+		
 		<property name="packages" value="org.electrocodeogram" /> 
 	</target>
 	
@@ -32,8 +34,6 @@
 		<javac destdir="${builddir}" srcdir="${srcdir}" deprecation="true" source="1.5" debug="on">
 			
 			<classpath>
-				
-			
 				
 				<pathelement location="lib/hackystat/sensorshell.jar" />
 				<pathelement location="lib/ecg/event.jar" />
@@ -80,6 +80,18 @@
 			<fileset file="${ECGLab.jar}" />
 			
 		</copy>
+		
+		<copy todir="${applicationdir}/modules">
+
+					<fileset dir="${moduledir}" />
+					
+				</copy>
+		
+		<copy todir="${ECG_SocketSourceModuleDir}">
+
+					<fileset file="${ECGLab.jar}" />
+					
+				</copy>
 			
 		<copy todir="${applicationdir}/lib">
 

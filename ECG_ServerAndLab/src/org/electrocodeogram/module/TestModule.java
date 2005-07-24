@@ -15,7 +15,7 @@ public class TestModule extends Module
      */
     public TestModule()
     {
-        super(Core.getInstance(),ModuleType.INTERMEDIATE_MODULE);
+        super(ModuleType.INTERMEDIATE_MODULE);
     }
 
     /**

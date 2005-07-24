@@ -1,4 +1,4 @@
-package org.electrocodeogram.module;
+package org.electrocodeogram.module.registry;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -22,9 +22,9 @@ public class ModuleClassLoader extends java.lang.ClassLoader
     private Logger logger = null;
     
     /**
-     * This creates theModuleClassLoader and sets the given ClassLoader to be the parent
+     * This creates the ModuleClassLoader and sets the given ClassLoader to be the parent
      * ClassLoader oh the ModulClassLoader in the ClassLoader hierarchy.
-     * @param cl
+     * @param cl Is the parent ClassLoader
      */
     public ModuleClassLoader(ClassLoader cl)
     {
@@ -40,7 +40,9 @@ public class ModuleClassLoader extends java.lang.ClassLoader
         
         File classFile = new File(classFilePath);
         
-        assert(classFile.exists() && classFile.isFile());
+        assert(classFile.exists());
+        
+        assert(classFile.isFile());
         
         FileInputStream fis = null;
             

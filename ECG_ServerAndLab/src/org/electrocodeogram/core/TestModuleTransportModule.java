@@ -36,9 +36,9 @@ public class TestModuleTransportModule extends Module
      */
     public TestModuleTransportModule()
     {
-        super(Core.getInstance(),ModuleType.SOURCE_MODULE);
+        super(ModuleType.SOURCE_MODULE);
 
-        this.root = Core.getInstance().getSensorSource();
+        //this.root = Core.getInstance().getSensorSource();
         
         removeConnectedModules(this.root);
     }
@@ -186,7 +186,7 @@ public class TestModuleTransportModule extends Module
         
         this.packetCount  = packetCountPar;
         
-        Core.getInstance().getSensorShellWrapper().doCommand(packet.getTimeStamp(), packet.getHsCommandName(), packet.getArglist());
+        //Core.getInstance().getSensorShellWrapper().doCommand(packet.getTimeStamp(), packet.getHsCommandName(), packet.getArglist());
     }
 
     /**
@@ -208,39 +208,39 @@ public class TestModuleTransportModule extends Module
     {
         boolean equals = false;
         
-        if (eventPacket.getTimeStamp().equals(this.testPacket.getTimeStamp()) && eventPacket.getHsCommandName().equals(this.testPacket.getHsCommandName())) {
-            if (eventPacket.getArglist().size() == this.testPacket.getArglist().size()) {
-                int size = this.testPacket.getArglist().size();
-
-                for (int i = 0; i < size; i++) {
-                    String testString = (String) this.testPacket.getArglist().get(i);
-
-                    String receivedString = (String) eventPacket.getArglist().get(i);
-
-                    if (testString.equals(receivedString)) {
-                        
-                        equals = true;
-                    }
-                    else
-                    {
-                        equals = false;
-                    }
-                }
-                if(equals)
-                {
-                    this.receivedCount++;
-                    
-                    if(this.receivedCount == this.packetCount)
-                    {
-                        this.result = true;
-                    }
-                    else
-                    {
-                        this.result = false;
-                    }
-                }
-            }
-        }
+//        if (eventPacket.getTimeStamp().equals(this.testPacket.getTimeStamp()) && eventPacket.getHsCommandName().equals(this.testPacket.getHsCommandName())) {
+//            if (eventPacket.getArglist().size() == this.testPacket.getArglist().size()) {
+//                int size = this.testPacket.getArglist().size();
+//
+//                for (int i = 0; i < size; i++) {
+//                    String testString = (String) this.testPacket.getArglist().get(i);
+//
+//                    String receivedString = (String) eventPacket.getArglist().get(i);
+//
+//                    if (testString.equals(receivedString)) {
+//                        
+//                        equals = true;
+//                    }
+//                    else
+//                    {
+//                        equals = false;
+//                    }
+//                }
+//                if(equals)
+//                {
+//                    this.receivedCount++;
+//                    
+//                    if(this.receivedCount == this.packetCount)
+//                    {
+//                        this.result = true;
+//                    }
+//                    else
+//                    {
+//                        this.result = false;
+//                    }
+//                }
+//            }
+//        }
 
     }
 
