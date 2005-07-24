@@ -48,9 +48,9 @@ public class SendingThread extends Thread
      */
     protected Socket socketToServer = null;
 
-    private InetAddress host = null;
+    private InetAddress $host = null;
 
-    private int port = -1;
+    private int $port = -1;
 
     /**
      * If a connection attempt fails this tells, when the next connection attempt shall occur. 
@@ -59,17 +59,17 @@ public class SendingThread extends Thread
 
     private boolean runningFlag = false;
 
-    private SendingThread(InetAddress hostPar, int portPar)
+    private SendingThread(InetAddress host, int port)
     {
 
         this();
 
         // assert parameter value are legal
-        assert (hostPar != null && portPar > 0 && portPar < 65565);
+        assert (host != null && port > 0 && port < 65565);
 
-        this.host = hostPar;
+        this.$host = host;
 
-        this.port = portPar;
+        this.$port = port;
     }
 
     //  This is a private constructor only used internally
@@ -96,13 +96,13 @@ public class SendingThread extends Thread
 
             theInstance.start();
         }
-        else if (theInstance.host == null || theInstance.port == -1) {
+        else if (theInstance.$host == null || theInstance.$port == -1) {
             if (host == null || port < 0 || port > 65565) {
                 throw new IllegalHostOrPortException();
             }
-            theInstance.host = host;
+            theInstance.$host = host;
 
-            theInstance.port = port;
+            theInstance.$port = port;
 
             theInstance.start();
         }
@@ -155,7 +155,7 @@ public class SendingThread extends Thread
         try {
 
             // open a new socket
-            this.socketToServer = new Socket(this.host, this.port);
+            this.socketToServer = new Socket(this.$host, this.$port);
 
             // create a stream upon the socket
             this.oos = new ObjectOutputStream(
@@ -164,7 +164,7 @@ public class SendingThread extends Thread
         }
         catch (IOException e) {
 
-            System.err.println("Unable to connect to the ECG Server at " + this.host.toString() + ":" + this.port + " \nNext attempt in " + this.connectionDelay / 1000 + " seconds.");
+            System.err.println("Unable to connect to the ECG Server at " + this.$host.toString() + ":" + this.$port + " \nNext attempt in " + this.connectionDelay / 1000 + " seconds.");
 
             try {
 

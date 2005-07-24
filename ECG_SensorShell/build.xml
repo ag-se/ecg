@@ -15,7 +15,7 @@
 		
 		<property name="ECG ConnectionTestDir" value="${basedir}/../ECG_ConnectionTests/lib" />
 		
-		<property name="ECG LabDir" value="${basedir}/../ElectroCodeoGram/lib/ecg" />
+		<property name="ECG LabDir" value="${basedir}/../ECG_ServerAndLab/lib/ecg" />
 		
 		<property name="ECG EclipseSensorDir" value="${basedir}/../ECG_EclipseSensor/lib" />
 		

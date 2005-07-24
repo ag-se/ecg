@@ -12,7 +12,6 @@ import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.electrocodeogram.client.ECG_SensorProperties;
 import org.electrocodeogram.client.IllegalHostOrPortException;
 import org.electrocodeogram.client.SendingThread;
 import org.electrocodeogram.event.EventPacket;
@@ -49,7 +48,7 @@ public class SensorShell
      * This is a reference to the SensorProperties object, that contains the information of
      * the "sensor.properties" file. The file is used to configure all sensors in the system.
      */
-    private ECG_SensorProperties properties = null;
+    private SensorProperties $properties = null;
 
     private Logger logger = null;
 
@@ -61,26 +60,26 @@ public class SensorShell
 
     private String delimiter = "#";
 
-    private boolean interactive;
+    private boolean $interactive;
 
-    private String toolName;
+    private String $toolName;
 
     /**
      * This creates a ECG SensorShell instance with the given properties.
-     * @param propertiesPar The properties to configure the ECG SensorShell
-     * @param interactivePar Is "true" if the SensorShell is run as a process and "false" if it is
+     * @param properties The properties to configure the ECG SensorShell
+     * @param interactive Is "true" if the SensorShell is run as a process and "false" if it is
      * instantiated to a SensorShell object.
-     * @param toolNamePar If the SensorShell is run as a process, this tells the name of the environment
+     * @param toolName If the SensorShell is run as a process, this tells the name of the environment
      * that the sensors are running in.
      */
-    public SensorShell(@SuppressWarnings("unused") SensorProperties propertiesPar, boolean interactivePar, String toolNamePar)
+    public SensorShell(SensorProperties properties, boolean interactive, String toolName)
     {
 
-        this.properties = new ECG_SensorProperties();
+        this.$properties = properties;
 
-        this.interactive = interactivePar;
+        this.$interactive = interactive;
 
-        this.toolName = toolNamePar;
+        this.$toolName = toolName;
 
         this.logger = Logger.getLogger("ECG_SensorShell");
 
@@ -113,7 +112,7 @@ public class SensorShell
 
         try {
 
-            sendingThread = SendingThread.getInstance(this.properties.getECGServerAddress(), this.properties.getECGServerPort());
+            sendingThread = SendingThread.getInstance(this.$properties.getECGServerAddress(), this.$properties.getECGServerPort());
         }
         catch (IllegalHostOrPortException e) {
 
@@ -151,7 +150,7 @@ public class SensorShell
      */
     public SensorProperties getSensorProperties()
     {
-        return this.properties;
+        return this.$properties;
     }
 
     /**
@@ -178,7 +177,7 @@ public class SensorShell
 
         this.logger.info(line);
 
-        if (this.interactive) {
+        if (this.$interactive) {
             System.out.print(line);
         }
     }

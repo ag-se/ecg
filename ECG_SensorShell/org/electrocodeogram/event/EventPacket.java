@@ -13,11 +13,11 @@ public class EventPacket implements Serializable
 
     protected int sourceId = -1;
 
-    protected Date timeStamp = null;
+    protected Date $timeStamp = null;
 
-    protected String sensorDataType = null;
+    protected String $sensorDataType = null;
 
-    protected List argList = null;
+    protected List $argList = null;
 
     public static final String HS_COMMAND_PREFIX = "HS_COMMAND:";
 
@@ -68,20 +68,20 @@ public class EventPacket implements Serializable
     /**
      * This creates a new EventPacket object
      * @param id The module source ID identifies where the EventPacket comes from
-     * @param timeStampPar The timeStamp tells when the event was recorded
-     * @param sensorDataTypePar The HackyStat SensorDataType of the event
-     * @param argListPar The argList of parameters containing all the relevant event data
+     * @param timeStamp The timeStamp tells when the event was recorded
+     * @param sensorDataType The HackyStat SensorDataType of the event
+     * @param argList The argList of parameters containing all the relevant event data
      */
-    public EventPacket(int id, Date timeStampPar, String sensorDataTypePar, List argListPar)
+    public EventPacket(int id, Date timeStamp, String sensorDataType, List argList)
     {
 
         this.sourceId = id;
 
-        this.timeStamp = timeStampPar;
+        this.$timeStamp = timeStamp;
 
-        this.sensorDataType = sensorDataTypePar;
+        this.$sensorDataType = sensorDataType;
 
-        this.argList = argListPar;
+        this.$argList = argList;
 
     }
 
@@ -100,7 +100,7 @@ public class EventPacket implements Serializable
      */
     public Date getTimeStamp()
     {
-        return this.timeStamp;
+        return this.$timeStamp;
     }
 
     /**
@@ -109,7 +109,7 @@ public class EventPacket implements Serializable
      */
     public String getSensorDataType()
     {
-        return this.sensorDataType;
+        return this.$sensorDataType;
     }
 
     /**
@@ -118,8 +118,8 @@ public class EventPacket implements Serializable
      */
     public String getMicroSensorDataType()
     {
-        for (int i = 0; i < this.argList.size(); i++) {
-            String s = (String) this.argList.get(i);
+        for (int i = 0; i < this.$argList.size(); i++) {
+            String s = (String) this.$argList.get(i);
 
             if (s == null) {
                 return null;
@@ -139,7 +139,7 @@ public class EventPacket implements Serializable
      */
     public List getArglist()
     {
-        return this.argList;
+        return this.$argList;
     }
 
     /**

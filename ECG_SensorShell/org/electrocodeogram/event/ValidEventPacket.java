@@ -17,16 +17,16 @@ public class ValidEventPacket extends EventPacket
     /**
      * This creates a new EventPacket object
      * @param id The module source ID identifies where the EventPacket comes from
-     * @param timeStampPar The timeStamp tells when the event was recorded
-     * @param sensorDataTypePar The HackyStat SensorDataType of the event
-     * @param argListPar The argList of parameters containing all the relevant event data
+     * @param timeStamp The timeStamp tells when the event was recorded
+     * @param sensorDataType The HackyStat SensorDataType of the event
+     * @param argList The argList of parameters containing all the relevant event data
      * @throws IllegalEventParameterException If the given parameters are not conforming to the syntactical MPE rules
      */
-    public ValidEventPacket(int id, Date timeStampPar, String sensorDataTypePar, List argListPar) throws IllegalEventParameterException
+    public ValidEventPacket(int id, Date timeStamp, String sensorDataType, List argList) throws IllegalEventParameterException
     {
-        super(id, timeStampPar, sensorDataTypePar, argListPar);
+        super(id, timeStamp, sensorDataType, argList);
 
-        if (!isSyntacticallyCorrect(timeStampPar, sensorDataTypePar, argListPar)) {
+        if (!isSyntacticallyCorrect(timeStamp, sensorDataType, argList)) {
             throw new IllegalEventParameterException();
         }
 
@@ -34,7 +34,7 @@ public class ValidEventPacket extends EventPacket
             throw new IllegalEventParameterException();
         }
 
-        assert (isSyntacticallyCorrect(this.timeStamp, this.sensorDataType, this.argList));
+        assert (isSyntacticallyCorrect(this.$timeStamp, this.$sensorDataType, this.$argList));
 
         assert (this.sourceId >= 0);
 
