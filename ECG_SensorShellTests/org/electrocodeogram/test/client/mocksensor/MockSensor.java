@@ -48,7 +48,7 @@ public class MockSensor
     {
         this.sendingTime = new Date();
         
-        return this.shell.doCommand(eventPacket.getTimeStamp(), eventPacket.getHsCommandName(), eventPacket.getArglist());
+        return this.shell.doCommand(eventPacket.getTimeStamp(), eventPacket.getSensorDataType(), eventPacket.getArglist());
     }
 
     public Date getSendingTime()
