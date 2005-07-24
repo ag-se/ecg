@@ -18,40 +18,40 @@ public class ServerTestSuite
     {
         TestSuite suite = new TestSuite("Test for the server side of the ECG");
         
-        int testCCount = 100;
-        
-        for(int i=0;i<testCCount;i++)
-        {
-            suite.addTest(new ServersideTests("testInvalidEventIsNotAcceptedTimeStampIsNull",i));
-        }
-        
-        int testDCount = 100;
-        
-        for(int i=0;i<testDCount;i++)
-        {
-            suite.addTest(new ServersideTests("testInvalidEventIsNotAcceptedCommandNameIsNull",i));
-        }
-        
-        int testECount = 100;
-        
-        for(int i=0;i<testECount;i++)
-        {
-            suite.addTest(new ServersideTests("testInvalidEventIsNotAcceptedArgListIsNull",i));
-        }
-        
-        int testFCount = 100;
-        
-        for(int i=0;i<testFCount;i++)
-        {
-            suite.addTest(new ServersideTests("testInvalidEventIsNotAcceptedArgListIsEmpty",i));
-        }
-        
-        int testGCount = 100;
-        
-        for(int i=0;i<testGCount;i++)
-        {
-            suite.addTest(new ServersideTests("testInvalidEventIsNotAcceptedArgListIsNotOfTypeString",i));
-        }
+//        int testCCount = 100;
+//        
+//        for(int i=0;i<testCCount;i++)
+//        {
+//            suite.addTest(new ServersideTests("testInvalidEventIsNotAcceptedTimeStampIsNull",i));
+//        }
+//        
+//        int testDCount = 100;
+//        
+//        for(int i=0;i<testDCount;i++)
+//        {
+//            suite.addTest(new ServersideTests("testInvalidEventIsNotAcceptedCommandNameIsNull",i));
+//        }
+//        
+//        int testECount = 100;
+//        
+//        for(int i=0;i<testECount;i++)
+//        {
+//            suite.addTest(new ServersideTests("testInvalidEventIsNotAcceptedArgListIsNull",i));
+//        }
+//        
+//        int testFCount = 100;
+//        
+//        for(int i=0;i<testFCount;i++)
+//        {
+//            suite.addTest(new ServersideTests("testInvalidEventIsNotAcceptedArgListIsEmpty",i));
+//        }
+//        
+//        int testGCount = 100;
+//        
+//        for(int i=0;i<testGCount;i++)
+//        {
+//            suite.addTest(new ServersideTests("testInvalidEventIsNotAcceptedArgListIsNotOfTypeString",i));
+//        }
         
         int testHCount = 100;
         

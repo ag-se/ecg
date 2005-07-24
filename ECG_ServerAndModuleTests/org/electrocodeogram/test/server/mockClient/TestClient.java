@@ -1,7 +1,9 @@
 package org.electrocodeogram.test.server.mockClient;
 
-import org.electrocodeogram.event.EventPacket;
-import org.hackystat.kernel.shell.SensorShell;
+
+import org.electrocodeogram.event.ValidEventPacket;
+import org.electrocodeogram.msdt.EventValidator;
+
 
 /**
  * This is the ECG TestSensor used for automated JUnit tests. It is capable of
@@ -17,13 +19,13 @@ public class TestClient
      * Instead of sending an event from the ECG clientside to the ECG server, an event can also
      * be passed directly into the ECG server's receiving component. This method does exactly this for
      * testing purposes.
-     * @param shellPar Is the SensorShell object that shall receive the event data
+     * @param validator the EventValidator to test
      * @param eventPacket Is the EventPacket object carrieng the event data
      * @return "true" if the event data is valid and "false" if not.
      */
-    public boolean passEventData(SensorShell shellPar, EventPacket eventPacket)
+    public boolean passEventData(EventValidator validator, ValidEventPacket eventPacket)
     {
-        return shellPar.doCommand(eventPacket.getTimeStamp(),eventPacket.getHsCommandName(),eventPacket.getArglist());
+        return validator.validate(eventPacket);
     }
 
 
