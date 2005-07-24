@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="ECG SocketSourceModule" default="deploy" basedir=".">
+	
+	<target name="init">
+
+		<property name="ECG LabDir" value="${basedir}/../ECG_ServerAndLab" />
+		
+		<property name="moduledir" value="${ECG LabDir}/modules" />
+		
+		<property name="builddir" value="${basedir}/build" />
+		
+		<property name="srcdir" value="${basedir}/src/" />
+		
+		
+		<property name="javadocdir" value="${basedir}/doc" />
+		
+		<property name="packages" value="org.electrocodeogram" /> 
+	</target>
+	
+	<target name="build" depends="init">
+		
+		<mkdir dir="${builddir}" />
+
+		<echo>${ECG LabDir}</echo>
+		
+		<javac destdir="${builddir}" srcdir="${srcdir}" deprecation="true" source="1.5" debug="on">
+			
+			<classpath>
+				
+				<pathelement location="lib/ecg/event.jar" />
+				
+				<pathelement location="lib/ecg/ECGLab.jar" />
+				
+				<pathelement location="lib/hackystat/sensorshell.jar" />
+			</classpath>
+
+		</javac>
+		
+	</target>
+
+	<target name="javadoc" depends="init">
+		
+			<mkdir dir="${javadocdir}" />
+			
+			<javadoc sourcepath="${srcdir}" destdir="${javadocdir}" packagenames="org.*">
+				
+			</javadoc>
+			
+	</target>
+	
+	<target name="deploy" depends="build">
+	
+		<mkdir dir="${moduledir}/ECG_SocketSourceModule"/>
+			
+		<copy todir="${moduledir}/ECG_SocketSourceModule">
+
+			<fileset dir="${builddir}" />
+			<fileset dir="${basedir}"><filename name="module.properties"/></fileset>
+			
+		</copy>
+			
+		
+	</target>
+	
+</project>
+
