@@ -77,7 +77,7 @@ public class EventPacket implements Serializable
 
         this.sourceId = id;
 
-        this.$timeStamp = timeStamp;
+        this.$timeStamp = new Date(timeStamp.getTime());
 
         this.$sensorDataType = sensorDataType;
 
@@ -100,7 +100,9 @@ public class EventPacket implements Serializable
      */
     public Date getTimeStamp()
     {
-        return this.$timeStamp;
+        Date toReturn = new Date(this.$timeStamp.getTime());
+        
+        return toReturn;
     }
 
     /**
@@ -167,15 +169,18 @@ public class EventPacket implements Serializable
     @Override
     public String toString()
     {
-        String string = new String();
+        String string = "";
 
         string += "SourceID: " + this.getSourceId() + ", SDT: " + this.getSensorDataType() + ", MSDT: " + this.getMicroSensorDataType();
 
+        StringBuffer stringBuffer= new StringBuffer();
+        
         for (int i = 0; i < this.getArglist().size(); i++) {
-            string += ", ";
-            string += (String) this.getArglist().get(i);
+            stringBuffer.append(" ,");
+
+            stringBuffer.append((String) this.getArglist().get(i));
         }
 
-        return string;
+        return string + stringBuffer.toString();
     }
 }

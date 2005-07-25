@@ -40,16 +40,20 @@ public class ClientsideTests extends TestCase
     }
 
     @Override
-    protected void setUp() throws IOException
+    protected void setUp() throws Exception
     {
+        super.setUp();
+        
         this.testSensor = new MockSensor();
 
         this.eventGenerator = new EventGenerator();
     }
 
     @Override
-    protected void tearDown()
+    protected void tearDown() throws Exception
     {
+        super.tearDown();
+        
         this.testSensor = null;
 
         this.eventGenerator = null;

@@ -233,6 +233,8 @@ public class ConnectionTests extends TestCase
         toProcess.println("quit");
 
         toProcess.flush();
+        
+        toProcess.close();
     }
 
     /**
@@ -240,7 +242,7 @@ public class ConnectionTests extends TestCase
      * out all input to the console. It is used for getting the ECG Server & Lab
      * process' output.
      */
-    private class ConsoleReader extends Thread
+    private static class ConsoleReader extends Thread
     {
         private InputStream fromProcess = null;
 
@@ -294,7 +296,7 @@ public class ConnectionTests extends TestCase
      * Lab process.
      * 
      */
-    private class ConsoleWriter extends Thread
+    private static class ConsoleWriter extends Thread
     {
         OutputStream toProcess;
 

@@ -263,7 +263,7 @@ public class SensorShell
             String inputString = shell.readLine();
 
             // Quit if necessary.
-            if (inputString.equalsIgnoreCase("quit")) {
+            if (inputString != null && inputString.equalsIgnoreCase("quit")) {
                 shell.quit();
 
                 return;

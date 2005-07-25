@@ -262,7 +262,7 @@ public class SendingThread extends Thread
     /**
      * This class represents a queue with FIFO characteristic for buffering incoming EventPackets.
      */
-    private class EventPacketQueue extends ArrayList<ValidEventPacket>
+    private static class EventPacketQueue extends ArrayList<ValidEventPacket>
     {
         private static final long serialVersionUID = -7457045862890074109L;
 
@@ -328,7 +328,7 @@ public class SendingThread extends Thread
      * but an EventPacket is to be removed.
      *
      */
-    private class EventPacketQueueUnderflowException extends Exception
+    private static class EventPacketQueueUnderflowException extends Exception
     {
         private static final long serialVersionUID = 870916601241806158L;
 
