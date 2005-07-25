@@ -137,7 +137,7 @@ public class ReliabilityTests extends TestCase
             {
                 assertEquals(getMockSensorShellWrapper().getReceivedEventPacket().getTimeStamp(), getTestPacket().getTimeStamp());
 
-                assertEquals(getMockSensorShellWrapper().getReceivedEventPacket().getHsCommandName(), getTestPacket().getHsCommandName());
+                assertEquals(getMockSensorShellWrapper().getReceivedEventPacket().getSensorDataType(), getTestPacket().getSensorDataType());
 
                 assertEquals(getMockSensorShellWrapper().getReceivedEventPacket().getArglist().size(), getTestPacket().getArglist().size());
 

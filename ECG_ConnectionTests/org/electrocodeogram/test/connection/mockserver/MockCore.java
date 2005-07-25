@@ -1,10 +1,10 @@
 package org.electrocodeogram.test.connection.mockserver;
 
 import org.electrocodeogram.core.ICore;
-import org.electrocodeogram.core.SensorShellWrapper;
-import org.electrocodeogram.module.ModuleRegistry;
+import org.electrocodeogram.module.registry.ModuleRegistry;
+import org.electrocodeogram.msdt.IEventValidator;
 import org.electrocodeogram.msdt.MsdtManager;
-import org.electrocodeogram.ui.Configurator;
+import org.electrocodeogram.ui.Gui;
 import org.electrocodeogram.ui.messages.GuiEventWriter;
 
 public class MockCore implements ICore
@@ -31,12 +31,12 @@ public class MockCore implements ICore
 		return null;
 	}
 
-	public SensorShellWrapper getSensorShellWrapper() {
+	public IEventValidator getSensorShellWrapper() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public Configurator getConfigurator() {
+	public Gui getConfigurator() {
 		// TODO Auto-generated method stub
 		return null;
 	}

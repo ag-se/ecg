@@ -1,6 +1,5 @@
 package org.electrocodeogram.test.connection.mocksensor;
 
-import org.electrocodeogram.module.source.SocketServer;
 import org.electrocodeogram.test.client.mocksensor.MockSensor;
 import org.electrocodeogram.test.connection.mockserver.MockSensorshellWrapper;
 
