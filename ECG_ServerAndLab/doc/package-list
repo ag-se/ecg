@@ -1,0 +1,10 @@
+org.electrocodeogram.core
+org.electrocodeogram.module
+org.electrocodeogram.module.annotator
+org.electrocodeogram.module.source
+org.electrocodeogram.module.writer
+org.electrocodeogram.msdt
+org.electrocodeogram.ui
+org.electrocodeogram.ui.messages
+org.electrocodeogram.ui.modules
+org.electrocodeogram.ui.sensors

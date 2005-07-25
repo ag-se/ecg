@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="ECG Lab" default="deploy" basedir=".">
+	
+	<target name="init">
+		
+		<property name="libdir" value="${basedir}/lib" />
+		
+		<property name="moduledir" value="${basedir}/modules" />
+		
+		<property name="msdtdir" value="${basedir}/msdt" />
+		
+		<property name="applicationdir" value="${basedir}/application" />
+		
+		<property name="builddir" value="${basedir}/build" />
+		
+		<property name="srcdir" value="${basedir}/src/" />
+		
+		<property name="jardir" value="${basedir}/jar" />
+		
+		<property name="javadocdir" value="${basedir}/doc" />
+		
+		<property name="ECGLab.jar" value="${jardir}/ECGLab.jar" />
+		
+		<property name="ECG_SocketSourceModuleDir" value="${basedir}/../ECG_SocketSourceModule/lib/ecg" />
+		
+		<property name="packages" value="org.electrocodeogram" /> 
+	</target>
+	
+	<target name="build" depends="init">
+		
+		<mkdir dir="${builddir}" />
+		
+		<javac destdir="${builddir}" srcdir="${srcdir}" deprecation="true" source="1.5" debug="on">
+			
+			<classpath>
+				
+				<pathelement location="lib/hackystat/sensorshell.jar" />
+				<pathelement location="lib/ecg/event.jar" />
+				<pathelement location="lib/misc/componentset.jar" />
+				<pathelement location="lib/misc/jgraph.jar" />
+				<pathelement location="lib/misc/jgraphaddons.jar" />					
+				<pathelement location="lib/misc/OfficeLnFs.jar" />
+				
+			</classpath>
+
+		</javac>
+		
+	</target>
+
+	<target name="javadoc" depends="init">
+		
+			<mkdir dir="${javadocdir}" />
+			
+			<javadoc sourcepath="${srcdir}" destdir="${javadocdir}" packagenames="org.*">
+				
+			</javadoc>
+			
+	</target>
+	
+	<target name="jar" depends="build">
+
+		<mkdir dir="${jardir}" />
+		
+		<jar manifest="manifest.txt" compress="true" duplicate="fail" jarfile="${ECGLab.jar}" basedir="${builddir}" />
+		
+		<delete dir="${builddir}" />
+		
+	</target>
+	
+	<target name="deploy" depends="jar">
+	
+		<mkdir dir="${applicationdir}" />
+		<mkdir dir="${applicationdir}/lib" />
+		<mkdir dir="${applicationdir}/modules" />
+		<mkdir dir="${applicationdir}/msdt" />
+			
+		<copy todir="${applicationdir}">
+
+			<fileset file="${ECGLab.jar}" />
+			
+		</copy>
+		
+		<copy todir="${applicationdir}/modules">
+
+					<fileset dir="${moduledir}" />
+					
+				</copy>
+		
+		<copy todir="${ECG_SocketSourceModuleDir}">
+
+					<fileset file="${ECGLab.jar}" />
+					
+				</copy>
+			
+		<copy todir="${applicationdir}/lib">
+
+			<fileset dir="${libdir}" />
+			
+		</copy>
+
+		<copy todir="${applicationdir}/msdt">
+
+			<fileset dir="${msdtdir}" />
+					
+		</copy>
+		
+	</target>
+
+	
+	
+</project>
+

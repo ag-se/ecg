@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry sourcepath="/hackyKernel" kind="lib" path="lib/hackystat/sensorshell.jar"/>
+	<classpathentry kind="lib" path="lib/misc/componentset.jar"/>
+	<classpathentry kind="lib" path="lib/misc/jgraph.jar"/>
+	<classpathentry kind="lib" path="lib/misc/jgraphaddons.jar"/>
+	<classpathentry kind="lib" path="lib/misc/OfficeLnFs.jar"/>
+	<classpathentry kind="lib" path="lib/ecg/event.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

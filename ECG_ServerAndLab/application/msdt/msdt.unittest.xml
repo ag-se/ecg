@@ -1,0 +1,17 @@
+<microsensordatatypes>
+  <microsensordatatype name="UnitTest"
+                  enabled="true"
+                  wrapper="org.hackystat.stdext.unittest.sdt.UnitTest"
+                  shellcommand="org.hackystat.stdext.unittest.sdt.UnitTestShellCommand"
+                  docstring="Represents the invocation of a unit test and its result."
+                  docfile="doc.sdt.unittest.html"
+                  version="1.0.0"
+                  contact="Philip Johnson (johnson@hawaii.edu)">
+    <entryattribute name="testCaseName" />
+    <entryattribute name="testName" />
+    <entryattribute name="elapsedTime" />
+    <entryattribute name="failureString" />
+    <entryattribute name="errorString" />
+  </microsensordatatype>
+</microsensordatatypes>
+
