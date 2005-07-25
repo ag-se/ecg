@@ -1,7 +1,0 @@
-<microsensordatatypes>
-  <microsensordatatype name="Window"
-                  enabled="true"
-                  docstring="Repräsentiert ein Ereignis des Hauptfensters, wie z.B. das Öffen oder das Minimieren."
-                  contact="Frank Schlesinger">
-  </microsensordatatype>
-</microsensordatatypes>
