@@ -1,0 +1,12 @@
+<microsensordatatypes>
+  <microsensordatatype name="Window opened"
+                  enabled="true"
+                  docstring="Repräsentiert das Ereignis des Öffnens des Hauptfensters einer Anwendung."
+                  contact="Frank Schlesinger (Frank@Schlesinger.com">
+                  
+                  <entryattribute type="java.lang.String" name="username" />
+                  <entryattribute type="java.lang.String" name="projectname" />
+                  <entryattribute type="java.lang.String" name="windowname" />
+                  
+  </microsensordatatype>
+</microsensordatatypes>
