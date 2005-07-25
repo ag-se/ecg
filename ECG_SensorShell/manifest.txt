@@ -1,3 +1,0 @@
-Manifest-Version: 1.0
-Main-Class: org.hackystat.kernel.shell.SensorShell
-Class-Path: lib/hackystat/sensorshell.jar
