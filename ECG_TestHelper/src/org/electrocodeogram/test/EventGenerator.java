@@ -23,7 +23,7 @@ import org.electrocodeogram.event.ValidEventPacket;
 public class EventGenerator
 {
 
-    private final String filename = "pseudorandom.strings";
+    private static final String filename = "pseudorandom.strings";
 
     private BufferedReader br = null;
 
@@ -38,7 +38,7 @@ public class EventGenerator
      */
     public enum SensorDataType {
         ACTIVITY, BUFFTRANS, BUILD, CLI, COMMIT, COVERAGE, DEPENDENCY, FILEMETRIC, ISSUE, PERF, REVIEWACTIVITY, REVIEWISSUE, UNITTEST
-    };
+    }
 
     /**
      * This creates the EventGenerator and initializes the randomString Array
@@ -49,7 +49,7 @@ public class EventGenerator
     {
 
         File file = new File(
-                ".." + File.separator + "ECG_TestHelper" + File.separator + this.filename);
+                ".." + File.separator + "ECG_TestHelper" + File.separator + filename);
 
         if (!file.exists()) {
             file.createNewFile();
@@ -113,17 +113,17 @@ public class EventGenerator
         return createValidArglist(createNonDeterministicPayloadStringArray(argListLength, argListEntrySize));
 
     }
-    
+
     /**
      * This method creates and returns a single EventPacket.
      * The data stored in the EventPacket is allowed to be syntactically invalid
      * in respect to the event data rules. So this method is used for testing purposes. 
      * 
      * @param syntValidDate
-     *            Shall the timestamp be syntacticallly vaild?
+     *            Shall the timestamp be syntactically valid?
      * @param syntValidCommandName
-     *            Shall the commmandName be syntacticallly vaild?
-     * @param line Is the linenumber of the String to use as the commandName from the "pseudorandom.strings" file
+     *            Shall the commmandName be syntactically valid?
+     * @param line Is the line number of the String to use as the commandName from the "pseudorandom.strings" file
      * @param argListNotNull
      *            Shall the argList be not null?
      * @param argListOfString
@@ -133,7 +133,7 @@ public class EventGenerator
      * @param argListEntrySize
      *            The size of each list element
      * @return An EventPacket of the desired kind
-     * @throws NoTestDataException If a pseudorandom String is requested by a line number that is not available or if the requested String size is to higher then available
+     * @throws NoTestDataException If a pseudo-random String is requested by a line number that is not available or if the requested String size is to higher then available
      */
     public EventPacket createEventPacket(boolean syntValidDate, boolean syntValidCommandName, int line, boolean argListNotNull, boolean argListOfString, int argListLength, int argListEntrySize) throws NoTestDataException
     {
@@ -156,10 +156,10 @@ public class EventGenerator
      * is thrown.
      * 
      * @param syntValidDate
-     *            Shall the timestamp be syntacticallly vaild?
+     *            Shall the timestamp be syntactically valid?
      * @param syntValidCommandName
-     *            Shall the commmandName be syntacticallly vaild?
-     * @param line Is the linenumber of the String to use as the commandName from the "pseudorandom.strings" file
+     *            Shall the commmandName be syntactically valid?
+     * @param line Is the line number of the String to use as the commandName from the "pseudorandom.strings" file
      * @param argListNotNull
      *            Shall the argList be not null?
      * @param argListOfString
@@ -170,7 +170,7 @@ public class EventGenerator
      *            The size of each list element
      * @return An EventPacket of the desired kind
      * @throws IllegalEventParameterException This is thrown if the passes parameter data does not conform to the syntax rules of event data.
-     * @throws NoTestDataException If a pseudorandom String is requested by a line number that is not available or if the requested String size is to higher then available
+     * @throws NoTestDataException If a pseudo-random String is requested by a line number that is not available or if the requested String size is to higher then available
      */
     public ValidEventPacket createValidEventPacket(boolean syntValidDate, boolean syntValidCommandName, int line, boolean argListNotNull, boolean argListOfString, int argListLength, int argListEntrySize) throws IllegalEventParameterException, NoTestDataException
     {
@@ -184,32 +184,37 @@ public class EventGenerator
         return eventPacket;
     }
 
+    /**
+     * This method creates and returns a ValidEventPacket with a payload of the given size.
+     * @param size Is the size of the payload.
+     * @return The event with the payload
+     * @throws IllegalEventParameterException This is thrown if the passes parameter data does not conform to the syntax rules of event data.
+     * @throws NoTestDataException If a pseudo-random String is requested by a line number that is not available or if the requested String size is to higher then available
+     */
     public ValidEventPacket createPayloadEventPacket(int size) throws IllegalEventParameterException, NoTestDataException
     {
         ValidEventPacket eventPacket = null;
-        eventPacket = new ValidEventPacket(
-                0,
-                createDate(true),
+        eventPacket = new ValidEventPacket(0, createDate(true),
                 createCommandName(true, 0),
                 createNonDeterministicArgList(10, size / 10));
 
         return eventPacket;
     }
-    
+
     /**
      * This method creates and returns a valid HackyStat SensorDataType event.
      * @param type Is the SensorDataType to create
-     * @param line Is the linenumber of the String to use as the commandName from the "pseudorandom.strings" file
+     * @param line Is the line number of the String to use as the commandName from the "pseudorandom.strings" file
      * @return A valid HackyStat event.
-     * @throws NoTestDataException If a pseudorandom String is requested by a line number that is not available or if the requested String size is to higher then available
+     * @throws NoTestDataException If a pseudo-random String is requested by a line number that is not available or if the requested String size is to higher then available
      */
     public ValidEventPacket createHackyStatEventPacket(SensorDataType type, int line) throws NoTestDataException
     {
-        
+
         if (line < 0 || line > this.lineCount) {
             throw new NoTestDataException();
         }
-        
+
         ValidEventPacket eventPacket = null;
 
         String[] args = null;
@@ -218,7 +223,7 @@ public class EventGenerator
         {
         case ACTIVITY:
 
-            args = new String[] { "add", this.randomStrings[line]};
+            args = new String[] { "add", this.randomStrings[line] };
 
             try {
                 eventPacket = new ValidEventPacket(0, createDate(true),
@@ -232,7 +237,7 @@ public class EventGenerator
 
         case BUFFTRANS:
 
-            args = new String[] { "add", this.randomStrings[line], this.randomStrings[line], this.randomStrings[line]};
+            args = new String[] { "add", this.randomStrings[line], this.randomStrings[line], this.randomStrings[line] };
 
             try {
                 eventPacket = new ValidEventPacket(0, createDate(true),
@@ -241,6 +246,8 @@ public class EventGenerator
             catch (IllegalEventParameterException e) {
                 e.printStackTrace();
             }
+
+            break;
 
         case BUILD:
 
@@ -267,6 +274,8 @@ public class EventGenerator
             catch (IllegalEventParameterException e) {
                 e.printStackTrace();
             }
+
+            break;
 
         case COMMIT:
 
@@ -322,7 +331,7 @@ public class EventGenerator
      * 
      * @param payload
      *            The String[] that builds the payload for the argList
-     * @return The argList for use in a syntactically valid eventPacket
+     * @return The argList for use in a syntactically valid EventPacket
      */
     private List createValidArglist(String[] payload)
     {
@@ -346,7 +355,7 @@ public class EventGenerator
     }
 
     /**
-     * This methods creates a String[] of pseudorandom payload
+     * This methods creates a String[] of pseudo-random payload
      * by reading in the file "pseudorandom.strings".
      * 
      * @param arraySize
@@ -354,8 +363,8 @@ public class EventGenerator
      * @param stringSize
      *            The size of each String element
      * @return
-     *            An Arrray of random Strings
-     * @throws NoTestDataException If a pseudorandom String is requested by a line number that is not available or if the requested String size is to higher then available 
+     *            An Array of random Strings
+     * @throws NoTestDataException If a pseudo-random String is requested by a line number that is not available or if the requested String size is to higher then available 
      */
     private String[] createDeterministicPayloadStringArray(int arraySize, int stringSize) throws NoTestDataException
     {
@@ -404,7 +413,7 @@ public class EventGenerator
 
         return payloadStringArray;
     }
-    
+
     /**
      * This methods creates and returns a random String of the given element
      * count. It is used to generate the file "pseudorandom.strings".
@@ -418,7 +427,7 @@ public class EventGenerator
 
         Random random = new Random();
 
-        String string = new String();
+        String string = "";
 
         for (int i = 0; i < stringSize; i++) {
             int rand = random.nextInt();
