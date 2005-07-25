@@ -28,7 +28,7 @@ public class SocketServerThread extends Thread
     
     protected ObjectInputStream objectInputStream = null;
     
-    private SocketServer $sensorServer = null;
+    private ISocketServer $sensorServer = null;
 
     protected String sensorName = null;
     
@@ -65,7 +65,7 @@ public class SocketServerThread extends Thread
      * @param socketToSensor The socket to the ECG sensor
      * @throws IOException If the creation of the ObjectInputStream fails
      */
-    public SocketServerThread(SocketServer sensorServer, SourceModule module, Socket socketToSensor) throws IOException
+    public SocketServerThread(ISocketServer sensorServer, SourceModule module, Socket socketToSensor) throws IOException
     {
         super();
         
@@ -140,7 +140,7 @@ public class SocketServerThread extends Thread
                     /* If the event data contains the "setTool" String, which is giving the name of the application
                      * the sensor runs in, this String is used as the sensor name.
                      */
-                    if(e.getSensorDataType().equals(new String("Activity")) && e.getArglist().get(0).equals(new String("setTool")))
+                    if(e.getSensorDataType().equals("Activity") && e.getArglist().get(0).equals("setTool"))
                     {
                         String tmpSensorName;
                         

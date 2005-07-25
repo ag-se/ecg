@@ -15,7 +15,9 @@ package org.electrocodeogram.module.source;
         @Override
         public void startReader(SourceModule sourceModule)
         {
-            new SocketServer(sourceModule);
+            SocketServer socketServer = new SocketServer(sourceModule);
+            
+            socketServer.start();
             
         }
 

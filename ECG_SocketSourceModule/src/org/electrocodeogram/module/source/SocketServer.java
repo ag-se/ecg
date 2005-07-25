@@ -17,7 +17,7 @@ import java.util.logging.Logger;
  * All running ServerThreads are managed in a threadpool.
  *
  */
-public class SocketServer extends Thread
+public class SocketServer extends Thread implements ISocketServer
 {
     
     protected Logger logger = null;
@@ -49,8 +49,7 @@ public class SocketServer extends Thread
         this.serverThreadPool = new HashMap<Integer,SocketServerThread>();
      
         this.logger = Logger.getLogger("ECG Server");
-        
-        this.start();
+
     }
     
     /**
