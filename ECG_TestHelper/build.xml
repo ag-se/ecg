@@ -71,6 +71,8 @@
 	<!-- Build the ECG TestHelper component. -->
 	<target name="build" depends="prepare">
 	
+		<echo message="Building the ECG TestHelper component..."/>
+		
 		<javac
 			destdir="${build.classes}"
 			srcdir="${src.dir}"
@@ -87,6 +89,8 @@
 	<!-- Package the ECG TestHelper component into two JARs. -->
 	<target name="jar" depends="build">
 
+		<echo message="Packaging the ECG TestHelper component into testHelper.jar"/>
+		
 			<jar
 				compress="true"
 				duplicate="fail"
@@ -115,7 +119,7 @@
 	<!-- Delete class files built during previous builds. Leave directories. -->
 	<target name="clean">
 		
-		<delete>
+		<delete failonerror="no">
 			<fileset dir="${build.classes}" includes="**/*.class"/>
 		</delete>
 		
@@ -132,6 +136,9 @@
 	
 	<!-- Deploy the ECG TestHelper component. -->
 	<target name="deploy" depends="jar">
+		
+		<echo message="Deploying testHelper.jar"/>
+				
 		
 		<!-- Create the distribuition directories -->
 		<mkdir dir="${dist.dir}"/>
@@ -152,6 +159,21 @@
 		
 		</copy>
 	
+		<!-- Copy the JARs to the other projects -->
+		<copy todir="../ECG_SensorShell/lib/ecg">
+				
+			<fileset dir="${build.lib}" includes="testHelper.jar" />
+				
+		</copy>
+		
+		
+		<!-- Copy the JARs to the other projects -->
+		<copy todir="../ECG_ServerAndLab/lib/ecg">
+						
+			<fileset dir="${build.lib}" includes="testHelper.jar" />
+						
+		</copy>
+		
 	</target>
 	
 </project>
