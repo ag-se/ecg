@@ -1,0 +1,13 @@
+<microsensordatatypes>
+  <microsensordatatype name="Focus changed"
+                  enabled="true"
+                  docstring="Repräsentiert das Ereignis des Eintretens in ein bestimmtes Bearbeitungsfeld der Anwendung."
+                  contact="Frank Schlesinger (Frank@Schlesinger.com">
+                  
+                  <entryattribute type="java.lang.String" name="username" />
+                  <entryattribute type="java.lang.String" name="projectname" />
+                  <entryattribute type="java.lang.String" name="fieldname" />
+	              <entryattribute type="java.lang.Boolean" name="isEditor" />
+	              
+  </microsensordatatype>
+</microsensordatatypes>
