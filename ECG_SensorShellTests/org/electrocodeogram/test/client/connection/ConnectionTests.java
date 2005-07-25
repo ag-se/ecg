@@ -19,9 +19,9 @@ import org.electrocodeogram.test.client.mocksensor.MockSensor;
 import utmj.threaded.RetriedAssert;
 
 /**
- * Test to validate the behaviour of connection attemps to the ECG server and
+ * Test to validate the behaviour of connection attempts to the ECG server and
  * tests that validate how the SendingThread deals with failing and succeeding
- * connection attemps are collected in this class.
+ * connection attempts are collected in this class.
  * 
  */
 public class ConnectionTests extends TestCase
@@ -78,13 +78,13 @@ public class ConnectionTests extends TestCase
 
     /**
      * Testcase CO1 according to the document TESTPLAN Version 1.0 or higher. The
-     * SendingThread is expected to continously initiate connection attemps to
+     * SendingThread is expected to continuously initiate connection attempts to
      * the ECG server when its buffer contains any EventPackets to submit. This
-     * connection attemps are only interrupted by the set connection delay. This
-     * testcase is succesfsull if the count of initiated connection attemps
+     * connection attempts are only interrupted by the set connection delay. This
+     * testcase is successfsul if the count of initiated connection attempts
      * increases by one after each connection delay period.
-     * @throws InterruptedException If this Thread is interruptedduring its sleeping period
-     * @throws NoTestDataException If a pseudorandom String is requested by a line number that is not available or if the requested String size is to higher then available
+     * @throws InterruptedException If this Thread is interrupted during its sleeping period
+     * @throws NoTestDataException If a pseudo-random String is requested by a line number that is not available or if the requested String size is to higher then available
      * 
      */
     public void testConnectionTrialsAreIncreasing() throws InterruptedException, NoTestDataException
@@ -109,10 +109,10 @@ public class ConnectionTests extends TestCase
 
     /**
      * Testcase CO2 according to the document TESTPLAN Version 1.0 or higher.
-     * During a connnection delay the Sendingthread is "sleeping". This testcase
-     * is succesfull if the SendingThread is still able to receive new
-     * EventPackets durong its "sleeping" state.
-     * @throws NoTestDataException If a pseudorandom String is requested by a line number that is not available or if the requested String size is to higher then available
+     * During a connection delay the SendingThread is "sleeping". This testcase
+     * is successful if the SendingThread is still able to receive new
+     * EventPackets during its "sleeping" state.
+     * @throws NoTestDataException If a pseudo-random String is requested by a line number that is not available or if the requested String size is to higher then available
      * 
      */
     public void testDelayedSendingThreadAcceptsNewEvents() throws NoTestDataException
@@ -218,7 +218,7 @@ public class ConnectionTests extends TestCase
     }
 
     /*
-     * This methos sends a single 'quit' String to the standard inpuzt of the
+     * This method sends a single 'quit' String to the standard input of the
      * running ECG Server & Lab process and causes it to quit.
      */
     private void stopECGServer()
@@ -236,7 +236,7 @@ public class ConnectionTests extends TestCase
     }
 
     /**
-     * The ConsoleReader Thread continously reads from an InputStream and prints
+     * The ConsoleReader Thread continuously reads from an InputStream and prints
      * out all input to the console. It is used for getting the ECG Server & Lab
      * process' output.
      */
@@ -245,23 +245,23 @@ public class ConnectionTests extends TestCase
         private InputStream fromProcess = null;
 
         // either stdError or stdOut
-        private String type = null;
+        private String $type = null;
 
         /**
-         * The construcot creates the ConsoeReader and associates it with an
+         * The constructor creates the ConsoleReader and associates it with an
          * actual InputString to read from. It also sets the outputprefix to the
          * String 'type' + ">".
          * 
-         * @param inputStreamPar
+         * @param inputStream
          *            is the InputStream to read from
-         * @param typePar
+         * @param type
          *            is the type of the according OutputStream. Either stdError
          *            or stdOut
          */
-        public ConsoleReader(InputStream inputStreamPar, String typePar)
+        public ConsoleReader(InputStream inputStream, String type)
         {
-            this.fromProcess = inputStreamPar;
-            this.type = typePar;
+            this.fromProcess = inputStream;
+            this.$type = type;
         }
 
         /**
@@ -280,7 +280,7 @@ public class ConnectionTests extends TestCase
 
                 while ((line = br.readLine()) != null)
 
-                    System.out.println(this.type + ">" + line);
+                    System.out.println(this.$type + ">" + line);
             }
             catch (IOException e) {
                 e.printStackTrace();
@@ -289,7 +289,7 @@ public class ConnectionTests extends TestCase
     }
 
     /**
-     * This Thread continously reads input from stdIn and writes it out to the
+     * This Thread continuously reads input from stdIn and writes it out to the
      * given OutputStream. It is used for sending commands to the ECG Server &
      * Lab process.
      * 
@@ -300,14 +300,14 @@ public class ConnectionTests extends TestCase
 
         /**
          * The constructor creates a ConsoleWriter and associates it with an
-         * actual OutputStrean.
+         * actual OutputStream.
          * 
-         * @param outputStreamPar
+         * @param outputStream
          *            is the OutputStream to write to
          */
-        public ConsoleWriter(OutputStream outputStreamPar)
+        public ConsoleWriter(OutputStream outputStream)
         {
-            this.toProcess = outputStreamPar;
+            this.toProcess = outputStream;
         }
 
         /**

@@ -40,9 +40,9 @@ public class MockSensor
      * 
      * @param eventPacket
      *            The EventPacket to pass
-     * @return The result as given by the ECG Sensorshell. "true" means the
+     * @return The result as given by the ECG SensorShell. "true" means the
      *         EventPacket is syntactically valid and accepted. "false" means
-     *         the eventPacket is syntactically invalid and not acccepted.
+     *         the EventPacket is syntactically invalid and not accepted.
      */
     public boolean sendEvent(EventPacket eventPacket)
     {
