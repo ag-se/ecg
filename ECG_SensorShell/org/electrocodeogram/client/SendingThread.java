@@ -268,12 +268,12 @@ public class SendingThread extends Thread
 
         /**
          * This method add a single EventPacket to the tail of the queue.
-         * @param packetPar The EventPacket to queue
+         * @param packet The EventPacket to queue
          * @return "true if cuing succeeded and "false" otherwise
          */
-        public boolean addToTail(ValidEventPacket packetPar)
+        public boolean addToTail(ValidEventPacket packet)
         {
-            return this.add(packetPar);
+            return this.add(packet);
         }
 
         /**

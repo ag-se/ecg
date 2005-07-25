@@ -15,7 +15,7 @@ public class SendingThreadTest
     private SendingThread sendingThread = null;
     
     /**
-     * Thie creates a new SendingThreadTest object.
+     * This creates a new SendingThreadTest object.
      *
      */
     public SendingThreadTest()
@@ -35,7 +35,7 @@ public class SendingThreadTest
     }
     
     /**
-     * This method tests wether the size of the EventPacketQueue in the SendingThread is equal to the given size. 
+     * This method tests whether the size of the EventPacketQueue in the SendingThread is equal to the given size. 
      * @param size The size to test against
      * @return "true", if the size is equal and "false" if not
      */
@@ -53,8 +53,8 @@ public class SendingThreadTest
     }
  
     /**
-     * This method tests wether the state beeing connected of the SendingThread is equal to the state within a period of given connection trials. 
-     * @param connected The state to etst against
+     * This method tests whether the state being connected of the SendingThread is equal to the state within a period of given connection trials. 
+     * @param connected The state to test against
      * @param trials The number of trials to reach that state
      * @return "true", if the state is equal and "false" if not
      */
@@ -80,9 +80,9 @@ public class SendingThreadTest
     }
     
     /**
-     * This method tests wether the tailmost EventPacket of the EventPacketQueue in the SendingThread is equal to the given EventPacket.
+     * This method tests whether the tail-most EventPacket of the EventPacketQueue in the SendingThread is equal to the given EventPacket.
      * @param eventPacket The EventPacket to test against
-     * @return "true" if it is equal nad "false" if not
+     * @return "true" if it is equal and "false" if not
      */
     public boolean testLastElement(EventPacket eventPacket)
     {

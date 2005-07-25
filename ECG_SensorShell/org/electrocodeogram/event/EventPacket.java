@@ -86,7 +86,7 @@ public class EventPacket implements Serializable
     }
 
     /**
-     * This methis returns the ID that identifies the source module of this EventPacket object.
+     * This method returns the ID that identifies the source module of this EventPacket object.
      * @return The ID of the source module
      */
     public int getSourceId()
@@ -145,13 +145,13 @@ public class EventPacket implements Serializable
     /**
      * This method checks the syntactically correctness of an EventPacket.
      * @param timeStamp The timeStamp tells when the event was recorded
-     * @param commandNamePar The HackyStat The HackyStat SensorDataType of the event
+     * @param commandName The HackyStat The HackyStat SensorDataType of the event
      * @param argList The argList of parameters containing all the relevant event data
-     * @return "true" if the eventPacket is syntactically correct nad "false" if not
+     * @return "true" if the EventPacket is syntactically correct and "false" if not
      */
-    public static boolean isSyntacticallyCorrect(Date timeStamp, String commandNamePar, List argList)
+    public static boolean isSyntacticallyCorrect(Date timeStamp, String commandName, List argList)
     {
-        if (timeStamp == null || commandNamePar == null || argList == null || argList.isEmpty() || !(argList.get(0) instanceof String)) {
+        if (timeStamp == null || commandName == null || argList == null || argList.isEmpty() || !(argList.get(0) instanceof String)) {
             return false;
         }
 
