@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Buildfile for the ECG SensorShell component -->
+
+<project name="ElectroCodeoGram" default="all" basedir=".">
+	
+	<!-- Calls the ant script of the ECG SensorShell component to clean it -->
+	<target name="CleanAll ECG SensorShell">
+		
+		<echo message="########################"/>
+		<echo message="CLEANING ECG SENSORSHELL"/>
+		<echo message="########################"/>
+		
+		<ant dir="../ECG_SensorShell" target="cleanall" />
+		
+	</target>
+	
+	<!-- Calls the ant script of the ECG TestHelper component to clean it -->
+		<target name="CleanAll ECG TestHelper">
+			
+			<echo message="########################"/>
+			<echo message="CLEANING ECG TESTHELPER"/>
+			<echo message="########################"/>
+			
+			<ant dir="../ECG_TestHelper" target="cleanall" />
+			
+		</target>
+		
+	<!-- Calls the ant script of the ECG ServerAndLab component to clean it -->
+			<target name="CleanAll ECG ServerAndLab">
+				
+				<echo message="#########################"/>
+				<echo message="CLEANING ECG SERVERANDLAB"/>
+				<echo message="#########################"/>
+				
+				<ant dir="../ECG_ServerAndLab" target="cleanall" />
+				
+			</target>
+		
+	<!-- Calls the ant script of the ECG SocketSourceModule to clean it -->
+			<target name="CleanAll ECG SocketSourceModule">
+				
+				<echo message="###############################"/>
+				<echo message="CLEANING ECG SOCKETSOURCEMODULE"/>
+				<echo message="###############################"/>
+				
+				<ant dir="../ECG_SocketSourceModule" target="cleanall" />
+				
+			</target>
+	
+	<!-- Cleans all ECG components -->
+	<target name="cleanAll" depends="CleanAll ECG SensorShell,CleanAll ECG TestHelper,CleanAll ECG ServerAndLab,CleanAll ECG SocketSourceModule" /> 
+	
+	
+	<!-- Calls the ant script of the ECG SensorShell component to build it -->
+	<target name="Build ECG SensorShell Event">
+
+		<echo message="##############################"/>
+		<echo message="BUILDING ECG SENSORSHELL EVENT"/>
+		<echo message="##############################"/>
+
+		
+		<ant dir="../ECG_SensorShell" target="deployEvent" />
+		
+	</target>
+	
+	<!-- Calls the ant script of the ECG TestHelper component to build it -->
+		<target name="Build ECG TestHelper">
+
+			<echo message="########################"/>
+			<echo message="BUILDING ECG TESTHELPER"/>
+			<echo message="########################"/>
+
+			
+			<ant dir="../ECG_TestHelper" target="all" />
+			
+		</target>
+	
+	<!-- Calls the ant script of the ECG SensorShell component to build it -->
+		<target name="Build ECG SensorShell Shell">
+
+			<echo message="##############################"/>
+			<echo message="BUILDING ECG SENSORSHELL SHELL"/>
+			<echo message="##############################"/>
+
+			
+			<ant dir="../ECG_SensorShell" target="deployShell" />
+			
+		</target>
+	
+
+	<!-- Calls the ant script of the ECG ServerAndLab Module-API to build it -->
+			<target name="Build ECG ServerAndLab Module-API">
+
+				<echo message="#######################"/>
+				<echo message="BUILDING ECG MODULE-API"/>
+				<echo message="#######################"/>
+
+				
+				<ant dir="../ECG_ServerAndLab" target="deployModuleApi" />
+				
+			</target>
+	
+	
+	<!-- Calls the ant script of the ECG SocketSourceModule to build it -->
+				<target name="Build ECG SocketSourceModule">
+
+					<echo message="###############################"/>
+					<echo message="BUILDING ECG SOCKETSOURCEMODULE"/>
+					<echo message="###############################"/>
+					
+					<ant dir="../ECG_SocketSourceModule" target="deploy" />
+					
+				</target>
+	
+
+	<!-- Calls the ant script of the ECG ServerAndLab to assemble the application -->
+					<target name="Assemble ECG ServerAndLab">
+
+						<echo message="############################"/>
+						<echo message="ASSEMBLING ECG SSERVERANDLAB"/>
+						<echo message="############################"/>
+						
+						<ant dir="../ECG_ServerAndLab" target="Assemble ECGLab" />
+						
+					</target>
+
+	
+	<!-- Builds all ECG components -->
+	<target name="buildAll" depends="Build ECG SensorShell Event,Build ECG TestHelper, Build ECG SensorShell Shell,Build ECG ServerAndLab Module-API,Build ECG SocketSourceModule,Assemble ECG ServerAndLab"/>
+	
+	<!-- Invokes all ECG ant scripts -->
+	<target name="all" depends="cleanAll,buildAll">
+	
+	</target>
+	
+	
+</project>
+
