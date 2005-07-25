@@ -68,12 +68,14 @@
 		
 	</target>
 	
-	<!-- Build the ECG SensorShell component. -->
-	<target name="build" depends="prepare">
+	<!-- Build the ECG SensorShell component parts for the event.jar. -->
+	<target name="buildEvent" depends="prepare">
 	
+		<echo message="Building the event part of the ECG SensorShell component..."/>
+		
 		<javac
-			destdir="${build.dir}"
-			srcdir="${src.dir}"
+			destdir="${build.classes}"
+			srcdir="${src.dir}/org/electrocodeogram/event"
 			source="1.5"
 			debug="on"
 			deprecation="on">
@@ -84,29 +86,58 @@
 			
 	</target>
 	
-	<!-- Package the ECG SensorShell component into two JARs. -->
-	<target name="jar" depends="build">
+	<!-- Build the ECG SensorShell component for the sensorshell.jar. -->
+		<target name="buildShell" depends="prepare">
+		
+			<echo message="Building the shell part of the ECG SensorShell component..."/>
+			
+			<javac
+				destdir="${build.classes}"
+				srcdir="${src.dir}"
+				source="1.5"
+				debug="on"
+				deprecation="on"
+				excludes="org.electrocodeogram.test.*,org.hackystat.*">
+					
+					<classpath refid="classpath" />
 
-			<jar
-				compress="true"
-				duplicate="fail"
-				jarfile="${build.lib}/sensorshell.jar"
-				basedir="${build.classes}"
-				manifest="manifest.txt"/>
+			</javac>
+				
+		</target>
+	
+	<!-- Package the ECG SensorShell component's event parts into a JAR. -->
+	<target name="jarEvent" depends="buildEvent">
 
+		<echo message="Packaging the event part of the ECG SensorShell component into event.jar..."/>
+		
 			<jar
-				excludes="org/hackystat/"
+				excludes="org.hackystat.*,org.electrocodeogram.test.*"
 				compress="true"
 				duplicate="fail"
 				jarfile="${build.lib}/event.jar"
 				basedir="${build.classes}" />
 	</target>
 	
+	<!-- Package the ECG SensorShell component's shell parts into a JAR. -->
+		<target name="jarShell" depends="buildShell">
+
+			<echo message="Packaging the shell part of the ECG SensorShell component into sensorshell.jar..."/>
+			
+				<jar
+					excludes="org.hackystat.*"
+					compress="true"
+					duplicate="fail"
+					jarfile="${build.lib}/sensorshell.jar"
+					basedir="${build.classes}"
+					manifest="manifest.txt"/>
+
+	</target>
+	
 	<!-- This shall be the default target. -->
-	<target name="all" depends="deploy"/>
+	<target name="all" depends="deployEvent,deployShell"/>
 	
 	<!-- Generate the API documentation. -->
-	<target name="javadoc" depends="build">
+	<target name="javadoc">
 	
 		<javadoc
 			packagenames="org.*"
@@ -122,7 +153,7 @@
 	<!-- Delete class files built during previous builds. Leave directories. -->
 	<target name="clean">
 		
-		<delete>
+		<delete failonerror="no">
 			<fileset dir="${build.classes}" includes="**/*.class"/>
 		</delete>
 		
@@ -138,7 +169,9 @@
 	</target>
 	
 	<!-- Deploy the ECG SensorShell component. -->
-	<target name="deploy" depends="jar">
+	<target name="deployEvent" depends="jarEvent">
+		
+		<echo message="Deploying event.jar..."/>
 		
 		<!-- Create the distribuition directories -->
 		<mkdir dir="${dist.dir}"/>
@@ -148,7 +181,6 @@
 		<!-- Copy the libraries -->
 		<copy todir="${dist.dir}/lib">
 			
-			<fileset dir="${build.lib}" includes="sensorshell.jar" />
 			<fileset dir="${build.lib}" includes="event.jar" />
 			
 		</copy>
@@ -159,19 +191,41 @@
 			<fileset dir="${doc.dir}"/>
 		
 		</copy>
+		
+		<!-- Copy the JARs to the other projects -->
+		<copy todir="../ECG_TestHelper/lib/ecg">
+		
+			<fileset dir="${build.lib}" includes="event.jar" />
+		
+		</copy>
 	
 	</target>
 	
-	<!-- Run the JUnit tests -->
-	<target name="test" depends="build">
-		
-		<junit showoutput="on">
+	<!-- Deploy the ECG SensorShell component. -->
+		<target name="deployShell" depends="jarShell">
 			
-			<test name="org.electrocodegram.test.client.ClientTestSuite" />
+			<echo message="Deploying sensorshell.jar..."/>
 			
-		</junit>
+			<!-- Create the distribuition directories -->
+			<mkdir dir="${dist.dir}"/>
+			<mkdir dir="${dist.dir}/lib"/>
+			<mkdir dir="${dist.dir}/doc"/>
+			
+			<!-- Copy the libraries -->
+			<copy todir="${dist.dir}/lib">
+				
+				<fileset dir="${build.lib}" includes="sensorshell.jar" />
+				
+			</copy>
+			
+			<!-- Copy the documentation -->
+			<copy todir="${dist.dir}/doc">
+			
+				<fileset dir="${doc.dir}"/>
+			
+			</copy>
 		
-	</target>
-
+		</target>
+	
 </project>
 
