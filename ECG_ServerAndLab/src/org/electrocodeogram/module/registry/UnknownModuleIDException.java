@@ -1,35 +1,33 @@
 
 package org.electrocodeogram.module.registry;
 
+
 /**
- * @author 7oas7er
+ * This Exception is thrown when a request is made to a unknown module id.
  *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
- */
-public class UnknownModuleIDException extends Exception
+ */public class UnknownModuleIDException extends Exception
 {
 
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 5814851080758469529L;
-
-    /**
-     * @param string
-     */
-    public UnknownModuleIDException(String string)
+     /**
+      * This creates the Exception with the given message. 
+      * @param message
+      */
+    public UnknownModuleIDException(String message)
     {
-       super(string);
+        super(message);
     }
 
     /**
-     * 
+     * This creates the Exception. 
      */
     public UnknownModuleIDException()
     {
-       super();
+        super();
     }
+
+    private static final long serialVersionUID = 5814851080758469529L;
+
+
 
     
 }

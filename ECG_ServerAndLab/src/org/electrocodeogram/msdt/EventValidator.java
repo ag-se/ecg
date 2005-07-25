@@ -22,23 +22,23 @@ public class EventValidator
 
     private int processingID = 0;
 
-    private MsdtManager mSdtManager = null;
+    private MsdtManager $mSdtManager = null;
 
     private SensorShell shell;
 
     /**
-     * This creates a EventValidatr object.
+     * This creates a EventValidator object.
      * 
-     * @param mSdtManagerPar
+     * @param mSdtManager
      *            Is the MicroSensorDataType-Manager (MsdtManager) object that
-     *            maintains the MicroSensorDataType definitons.
+     *            maintains the MicroSensorDataType definitions.
      */
-    public EventValidator(MsdtManager mSdtManagerPar)
+    public EventValidator(MsdtManager mSdtManager)
     {
         this.shell = new SensorShell(new SensorProperties("", ""), false,
                 "ElectroCodeoGram");
 
-        this.mSdtManager = mSdtManagerPar;
+        this.$mSdtManager = mSdtManager;
 
         this.logger = Logger.getLogger("ECG Server");
 
@@ -110,13 +110,13 @@ public class EventValidator
 
         try {
 
-            if (this.mSdtManager == null) {
+            if (this.$mSdtManager == null) {
                 this.logger.log(Level.WARNING, this.processingID + ": Event data is not conforming to a ECG MicroSensorDataType. " + mSdtName);
 
                 return;
             }
 
-            microSensorDataType = this.mSdtManager.getMicroSensorDataType(mSdtName);
+            microSensorDataType = this.$mSdtManager.getMicroSensorDataType(mSdtName);
 
         }
         catch (MicroSensorDataTypeNotFoundException e) {

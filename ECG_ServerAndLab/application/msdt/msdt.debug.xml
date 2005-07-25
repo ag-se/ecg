@@ -1,0 +1,12 @@
+<microsensordatatypes>
+  <microsensordatatype name="Run"
+                  enabled="true"
+                  docstring="Repräsentiert das Ereignis des Debuggen eines Programms."
+                  contact="Frank Schlesinger (Frank@Schlesinger.com">
+                  
+                  <entryattribute type="java.lang.String" name="username" />
+                  <entryattribute type="java.lang.String" name="projectname" />
+                  <entryattribute type="java.lang.String" name="filename" />
+                  
+  </microsensordatatype>
+</microsensordatatypes>

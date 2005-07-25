@@ -4,7 +4,7 @@ package org.electrocodeogram.module.registry;
 import java.util.Properties;
 /**
  * This class is a representation for the description of module classes.
- * The description is used by ECG components to gather information aboaut the modules
+ * The description is used by ECG components to gather information about the modules
  * and their class objects.
  */
 public class ModuleDescriptor

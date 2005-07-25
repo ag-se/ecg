@@ -19,7 +19,7 @@ import org.electrocodeogram.ui.messages.GuiEventWriter;
  * This abstract class represents an ECG module. A module is an entity able
  * of receiving events from modules it is connected to and sending events to modules
  * that are connected to it.
- * Additionaly a module can be implemented to modify the data of received events
+ * Additionally a module can be implemented to modify the data of received events
  * and to generate new outgoing events.
  * There are three distinct module types defined:
  * Source modules are not able to be connected to other modules, but other (non-source)
@@ -27,7 +27,7 @@ import org.electrocodeogram.ui.messages.GuiEventWriter;
  * Intermediate modules are connectable to each other.
  * And target modules are only able to be connected to other modules, but no module
  * can be connected to them.
- * The connection degree, wich is the number of modules connected to another module, is
+ * The connection degree, which is the number of modules connected to another module, is
  * not limited by the implementation. 
  * Each module gets an unique integer id during its object creation.
  *
@@ -120,7 +120,7 @@ public abstract class Module extends Observable implements Observer
     }
 
     /**
-     * This method deactivates the module. The module might be allready deactivated.
+     * This method deactivates the module. The module might be already deactivated.
      *
      */
     public void deactivate()
@@ -134,7 +134,7 @@ public abstract class Module extends Observable implements Observer
     }
 
     /**
-     * This method activates the module. The module might be allready activated.
+     * This method activates the module. The module might be already activated.
      *
      */
     public void activate()
@@ -150,7 +150,7 @@ public abstract class Module extends Observable implements Observer
     /**
      * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
      * As this is the Observer's update method it is called whenever this module is
-     * notified of a change of state in an Observable this module is observating.
+     * notified of a change of state in an Observable this module is observing.
      * This mechanism is used in the module communication to transport events.
      * When a module is receiving an event its state has changed and it notifies all
      * connected modules and passes the event to them as a parameter.
@@ -177,7 +177,7 @@ public abstract class Module extends Observable implements Observer
     }
 
     /**
-     * This abstarct method is to be implemented by all actual moduls.
+     * This abstract method is to be implemented by all actual modules.
      * Its implementation tells what to do with a received event.
      * @param eventPacket Is the received event
      */
@@ -212,7 +212,7 @@ public abstract class Module extends Observable implements Observer
 
     /**
      * This method is inherited to all extending modules. It sends the given event to
-     * all connected modules. The sourceId attribute of the event is changed to thie id
+     * all connected modules. The sourceId attribute of the event is changed to the id
      * of this the sending module.
      * @param eventPacket Is the event to send
      */
@@ -235,7 +235,7 @@ public abstract class Module extends Observable implements Observer
 
                 e.printStackTrace();
 
-                this.logger.log(Level.SEVERE, "An unexpected exception has occured. Please report this at www.electrocodeogram.org");
+                this.logger.log(Level.SEVERE, "An unexpected exception has occurred. Please report this at www.electrocodeogram.org");
 
             }
             clearChanged();
@@ -244,7 +244,7 @@ public abstract class Module extends Observable implements Observer
 
  
     /**
-     * This methos returns the number of connected modules.
+     * This method returns the number of connected modules.
      * @return The number of connected modules
      */
     public int getReceivingModuleCount()
@@ -257,18 +257,18 @@ public abstract class Module extends Observable implements Observer
      * @param module Is the module that should be connected to this module.
      * @return The id of the connected module
      * @throws ModuleConnectionException If the given module could not be connected to this module.
-     * This happens if this module is a target module or if the given module is alllready connected to this module.
+     * This happens if this module is a target module or if the given module is already connected to this module.
      */
     public int connectReceiverModule(Module module) throws ModuleConnectionException
     {
 
         if (this.$moduleType == ModuleType.TARGET_MODULE) {
             throw new ModuleConnectionException(
-                    "An diese Modul können Sie keine weiteren Module anhängen");
+                    "You can not connect another module to this module.");
         }
         else if (this.receiverModuleMap.containsKey(new Integer(module.getId()))) {
             throw new ModuleConnectionException(
-                    "Diese Module sind bereits verbunden.");
+                    "These mdoules are connected already.");
         }
         else {
 
@@ -299,7 +299,7 @@ public abstract class Module extends Observable implements Observer
     }
 
     /**
-     * This method retuns an Array of all modules that are connected to this module.
+     * This method returns an Array of all modules that are connected to this module.
      * @return An Array of all modules that are connected to this module
      */
     public Module[] getReceivingModules()
@@ -358,7 +358,7 @@ public abstract class Module extends Observable implements Observer
     public abstract void setProperty(String currentPropertyName, Object propertyValue);
 
     /**
-     * This method collects detailed infomration about the module and returns them as a String.
+     * This method collects detailed information about the module and returns them as a String.
      * @return A String of detailed information about the module
      */
     public String getDetails()
@@ -473,12 +473,12 @@ public abstract class Module extends Observable implements Observer
     
     /**
      * This checks if the module is of the given ModuleType
-     * @param moduleTypePar
+     * @param moduleType
      * @return "true" If the module is of the given ModuleType and "false" if not
      */
-    public boolean isModuleType(ModuleType moduleTypePar)
+    public boolean isModuleType(ModuleType moduleType)
     {
-        if (this.$moduleType == moduleTypePar) {
+        if (this.$moduleType == moduleType) {
             return true;
         }
        

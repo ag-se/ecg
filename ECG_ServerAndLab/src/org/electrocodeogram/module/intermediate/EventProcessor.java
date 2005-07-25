@@ -156,7 +156,7 @@ public abstract class EventProcessor extends Module
     /**
      * @see org.electrocodeogram.module.Module#receiveEventPacket(org.electrocodeogram.event.ValidEventPacket)
      * In addition to its superclass method this method gets the analysis result events of the module
-     * and sends them accroding to the processing mode and annotation style of the module.
+     * and sends them according to the processing mode and annotation style of the module.
      */
     @Override
     public void receiveEventPacket(ValidEventPacket eventPacket)

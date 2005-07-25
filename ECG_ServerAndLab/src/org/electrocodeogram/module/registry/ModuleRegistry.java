@@ -14,7 +14,7 @@ import org.electrocodeogram.module.Module;
 
 /**
  * This is the central ModuleRegistry which maintains information about all
- * currently instanciated modules and all module class files in the module
+ * currently instantiated modules and all module class files in the module
  * directory from which module instances could be created at runtime.
  * 
  * During its creation
@@ -55,13 +55,13 @@ public class ModuleRegistry extends Observable
     }
 
     /**
-     * If the module directory is not knoen during ModuleRegistry creation
-     * this method can be used to set the mofule directory later.
-     * @param filePar This should be the module directory
+     * If the module directory is not known during ModuleRegistry creation
+     * this method can be used to set the module directory later.
+     * @param file This should be the module directory
      */
-    public void setFile(File filePar) {
+    public void setFile(File file) {
     	
-    	this.installedModules = new InstalledModules(filePar);
+    	this.installedModules = new InstalledModules(file);
     	
     	setChanged();
 
@@ -79,7 +79,7 @@ public class ModuleRegistry extends Observable
 
     /**
      * This method returns the IDs of all currently known module class files
-     * that are ready to be instanciated.
+     * that are ready to be instantiated.
      * 
      * @return The IDs of all currently known module class files
      */
@@ -213,7 +213,7 @@ public class ModuleRegistry extends Observable
             // get all filenames in it
             String[] moduleDirectories = moduleDirectory.list();
 
-            // assert no IO-Error has occured
+            // assert no IO-Error has occurred
             if (moduleDirectories == null) {
                 return;
             }
@@ -324,7 +324,7 @@ public class ModuleRegistry extends Observable
 
     /**
      * This method registers a module instance with the ModuleRegistry. If the module
-     * instance is allready registered with the ModuleRegistry nothing happens.
+     * instance is already registered with the ModuleRegistry nothing happens.
      * This method is automatically called whenever a new object of class Module
      * is created.
      * 
@@ -387,11 +387,11 @@ public class ModuleRegistry extends Observable
      * instance of it. It also gives the module instance the given name.
      * 
      * @param moduleClassId
-     *            Is the id of the module class to be instanciated
+     *            Is the id of the module class to be instantiated
      * @param moduleName
      *            Is the name that should be given to the new module object
      * @throws ModuleInstantiationException
-     *             If an exception occurs during the instanciation of the module
+     *             If an exception occurs during the instantiation of the module
      * @throws IllegalModuleIDException
      *             If the given moduleClassId has a value of < 1
      * @throws UnknownModuleIDException

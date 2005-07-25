@@ -23,7 +23,7 @@ public class ModuleClassLoader extends java.lang.ClassLoader
     
     /**
      * This creates the ModuleClassLoader and sets the given ClassLoader to be the parent
-     * ClassLoader oh the ModulClassLoader in the ClassLoader hierarchy.
+     * ClassLoader oh the ModuleClassLoader in the ClassLoader hierarchy.
      * @param cl Is the parent ClassLoader
      */
     public ModuleClassLoader(ClassLoader cl)
@@ -76,7 +76,7 @@ public class ModuleClassLoader extends java.lang.ClassLoader
             toReturn = this.defineClass(null,data,0,data.length);
                 
             
-            this.logger.log(Level.INFO,"Succesfully loaded module class: " + classFile.getName());
+            this.logger.log(Level.INFO,"Successfully loaded module class: " + classFile.getName());
             
             File moduleDirectory = classFile.getParentFile();
             
@@ -120,7 +120,7 @@ public class ModuleClassLoader extends java.lang.ClassLoader
                         
                         defineClass(null,data,0,data.length);
                         
-                        this.logger.log(Level.INFO,"Succesfully loaded additional class: " + file.getName() + " required by module " + classFile.getName());
+                        this.logger.log(Level.INFO,"Successfully loaded additional class: " + file.getName() + " required by module " + classFile.getName());
                     }
                     catch (IOException e) {
                         throw new ClassNotFoundException();

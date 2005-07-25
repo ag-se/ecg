@@ -5,8 +5,8 @@ import org.electrocodeogram.module.Module;
 
 
 /**
- * This abstract class shall be subclasssed by all target modules that
- * are indended to rite out the event data they receive.
+ * This abstract class shall be subclassed by all target modules that
+ * are intended to rite out the event data they receive.
  * The abstract method write is to be implemented to do the actual writing
  *
  */
@@ -25,7 +25,7 @@ public abstract class EventWriter extends Module
     
     /**
      * @see org.electrocodeogram.module.Module#receiveEventPacket(org.electrocodeogram.event.ValidEventPacket)
-     * In addition to its superclass method this methos writes out every event it
+     * In addition to its superclass method this method writes out every event it
      * receives, by calling the module's write method.
      */
     @Override
@@ -41,7 +41,7 @@ public abstract class EventWriter extends Module
     }
     
    /**
-    * This method is to be implemented to do the actual writng of incoming events. 
+    * This method is to be implemented to do the actual writing of incoming events. 
     * @param eventPacket Is the incoming event that is to be written out
     */
     public abstract void write(ValidEventPacket eventPacket);

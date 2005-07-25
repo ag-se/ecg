@@ -70,7 +70,7 @@ public class Core {
 	}
 
 	/**
-	 * This method return sthe singleton instance of the Core object,
+	 * This method returns the singleton instance of the Core object,
 	 * which is primarily used to get access to other ECG components.
 	 * @return The singleton instance of the Core object
 	 */
