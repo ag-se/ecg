@@ -125,6 +125,7 @@
 
 	</target>
 
+	
 
 	<!-- Builds all ECG components -->
 	<target name="buildAll" depends="Build ECG SensorShell Event,Build ECG TestHelper, Build ECG SensorShell Shell,Build ECG ServerAndLab Module-API,Build ECG SocketSourceModule,Assemble ECG ServerAndLab"/>
@@ -137,6 +138,8 @@
 		<tstamp />
 		
 		<zip zipfile="dist/ElectroCodeoGram${DSTAMP}${TSTAMP}.zip" basedir="../ECG_ServerAndLab/dist/application"/>
+		
+		<zip zipfile="dist/org.hackystat.stdext.sensor_6.4.117.3x.zip" basedir="../HackyStat EclipseSensor/"/>
 		
 	</target>
 	
