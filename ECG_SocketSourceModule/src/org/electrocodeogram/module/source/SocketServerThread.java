@@ -133,9 +133,17 @@ public class SocketServerThread extends Thread
             try {
                 
                 // This method call blocks until a serialized object could be received.
-                ValidEventPacket e = (ValidEventPacket) this.objectInputStream.readObject();
+                ValidEventPacket e = null;
                 
-                this.sourceModule.append(e);
+                
+                Object object = this.objectInputStream.readObject();
+                
+                e = (ValidEventPacket) object;
+                
+                if(e != null)
+                {
+                    this.sourceModule.append(e);
+                }
                 
                     /* If the event data contains the "setTool" String, which is giving the name of the application
                      * the sensor runs in, this String is used as the sensor name.
@@ -170,6 +178,10 @@ public class SocketServerThread extends Thread
             catch(ClassCastException e)
             {
                 // If something else then a ValidEventPacket is received, we don't care!
+            }
+            catch(Exception e)
+            {
+                e.printStackTrace();
             }
         }
         
