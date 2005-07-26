@@ -201,6 +201,18 @@
 			<fileset dir="${build.lib}" includes="event.jar" />
 
 		</copy>
+		
+		<copy todir="../ECG_ServerAndLab/lib/ecg">
+
+			<fileset dir="${build.lib}" includes="event.jar" />
+
+		</copy>
+		
+		<copy todir="../ECG_SocketSourceModule/lib/ecg">
+
+					<fileset dir="${build.lib}" includes="event.jar" />
+
+				</copy>
 
 	</target>
 
@@ -221,6 +233,19 @@
 
 		</copy>
 
+		<copy todir="../HackyStat EclipseSensor/">
+		
+			<fileset dir="${build.lib}" includes="sensorshell.jar" />
+			
+		</copy>
+
+		<copy todir="../hackyEclipse/">
+		
+			<fileset dir="${build.lib}" includes="sensorshell.jar" />
+			
+		</copy>
+
+		
 		<!-- Copy the documentation -->
 		<copy todir="${dist.dir}/doc">
 

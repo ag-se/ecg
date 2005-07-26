@@ -20,7 +20,7 @@ public class SendingThreadTest
      */
     public SendingThreadTest()
     {
-        this.sendingThread = SendingThread.getInstance();
+        //this.sendingThread = SendingThread.getInstance();
     }
     
     /**

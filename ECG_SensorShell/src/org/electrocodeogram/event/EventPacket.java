@@ -120,6 +120,10 @@ public class EventPacket implements Serializable
      */
     public String getMicroSensorDataType()
     {
+        if(this.$argList == null) {
+            return null;
+        }
+        
         for (int i = 0; i < this.$argList.size(); i++) {
             String s = (String) this.$argList.get(i);
 

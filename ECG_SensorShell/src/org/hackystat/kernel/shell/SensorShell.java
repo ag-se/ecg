@@ -23,13 +23,13 @@ import org.hackystat.kernel.admin.SensorProperties;
  * This class is the ECG SensorShell. It is named org.hackystat.kernel.shell.SensorShell
  * after the class provided by the HackyStat project (please visit www.hackystat.org for more information).
  * 
- * It's purpose is to be used by every ECG sensor recorded data and send it to the ECG Server & Lab.
- * So a sensor developer must not implement the functionality of sending data to the ECG server.
+ * It's purpose is to be used by every ECG sensor for recorded data to be sended to the ECG Server & Lab.
+ * So a sensor developer must not implement the functionality of sending data to the ECG server himself.
  * 
  * Because the ECG framework directly supports the usage of original HackyStat sensors
  * this class acts like the original HackyStat SensorShell class including the naming.
  * That means that every original HackyStat sensor is able to collect data for the ECG
- * framework by simply replacing the HackyStat's sensorshell.jar library ith the ECG sensorshell.jar.
+ * framework by simply replacing the HackyStat's sensorshell.jar library with the ECG sensorshell.jar.
  * 
  * Sensors are able to use this class in to different ways depending on the sensor programming
  * language. If the sensor is written in Java, this class can be instanciated to a SensorShell
@@ -63,6 +63,8 @@ public class SensorShell
     private boolean $interactive;
 
     private String $toolName;
+    
+    private SendingThread sendingThread = null;
 
     /**
      * This creates a ECG SensorShell instance with the given properties.
@@ -77,14 +79,27 @@ public class SensorShell
 
         this.$properties = properties;
 
-        this.$interactive = interactive;
-
         this.$toolName = toolName;
 
         this.logger = Logger.getLogger("ECG_SensorShell");
 
         this.bufferedReader = new BufferedReader(new InputStreamReader(
                 System.in));
+        
+        try {
+            
+            // Try to create the SendingThread ith the given ECG server address information 
+            this.sendingThread = new SendingThread(this.$properties.getECGServerAddress(), this.$properties.getECGServerPort());
+        }
+        catch (IllegalHostOrPortException e) {
+
+            this.logger.log(Level.SEVERE, "The ECG Server's address is invalid.\nPlease check the ECG_SERVER_ADDRESS and ECG_SERVER_PORT values in the file \".hackystat/sensor.properties\" in your home directory.");
+
+        }
+        catch (UnknownHostException e) {
+
+            this.logger.log(Level.SEVERE, "The ECG Server's address is invalid.\nPlease check the ECG_SERVER_ADDRESS and ECG_SERVER_PORT values in the file \".hackystat/sensor.properties\" in your home directory.");
+        }
     }
 
     /**
@@ -103,33 +118,10 @@ public class SensorShell
         if (!EventPacket.isSyntacticallyCorrect(timeStamp, sensorDataType, argList)) {
             return false;
         }
-
-        // assert parameters
-        assert (EventPacket.isSyntacticallyCorrect(timeStamp, sensorDataType, argList));
-
-        // get SendingThread
-        SendingThread sendingThread = null;
-
-        try {
-
-            sendingThread = SendingThread.getInstance(this.$properties.getECGServerAddress(), this.$properties.getECGServerPort());
-        }
-        catch (IllegalHostOrPortException e) {
-
-            this.logger.log(Level.SEVERE, "The ECG Server's address is invalid.\nPlease check the ECG_SERVER_ADDRESS and ECG_SERVER_PORT values in the file \".hackystat/sensor.properties\" in your home directory.");
-
-        }
-        catch (UnknownHostException e) {
-
-            this.logger.log(Level.SEVERE, "The ECG Server's address is invalid.\nPlease check the ECG_SERVER_ADDRESS and ECG_SERVER_PORT values in the file \".hackystat/sensor.properties\" in your home directory.");
-        }
-
-        // must not be "null"
-        assert (sendingThread != null);
-
+      
         // pass EventPacket to SendingThread
         try {
-            sendingThread.addEventPacket(new ValidEventPacket(0, timeStamp,
+            this.sendingThread.addEventPacket(new ValidEventPacket(0, timeStamp,
                     sensorDataType, argList));
         }
         catch (IllegalEventParameterException e) {
@@ -165,7 +157,6 @@ public class SensorShell
      * This method is not implemented and only declared for compatibility reasons.
      * @param str not used
      */
-
     public void println(@SuppressWarnings("unused")
     String str)
     {

@@ -34,10 +34,6 @@ public class ValidEventPacket extends EventPacket
             throw new IllegalEventParameterException();
         }
 
-        assert (isSyntacticallyCorrect(this.$timeStamp, this.$sensorDataType, this.$argList));
-
-        assert (this.sourceId >= 0);
-
     }
 
 }
