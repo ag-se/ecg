@@ -18,9 +18,9 @@ import java.util.logging.Level;
  */
 public class ModuleClassLoader extends java.lang.ClassLoader
 {
-   
+
     private Logger logger = null;
-    
+
     /**
      * This creates the ModuleClassLoader and sets the given ClassLoader to be the parent
      * ClassLoader oh the ModuleClassLoader in the ClassLoader hierarchy.
@@ -29,153 +29,101 @@ public class ModuleClassLoader extends java.lang.ClassLoader
     public ModuleClassLoader(ClassLoader cl)
     {
         super(cl);
-        
+
         this.logger = Logger.getLogger(this.getClass().getName());
     }
-    
+
     @Override
     protected Class<?> findClass(String classFilePath) throws ClassNotFoundException
     {
         Class<?> toReturn = null;
-        
+
         File classFile = new File(classFilePath);
-        
-        assert(classFile.exists());
-        
-        assert(classFile.isFile());
-        
+
+        assert (classFile.exists());
+
+        assert (classFile.isFile());
+
         FileInputStream fis = null;
-            
+
         try {
-        
             fis = new FileInputStream(classFile);
-        
-        }
-        
-        catch (FileNotFoundException e1) {
-        
-            throw new ClassNotFoundException();
+
+            byte[] data = new byte[(int) classFile.length()];
+
+            fis.read(data);
+
+            toReturn = this.defineClass(null, data, 0, data.length);
+
+            this.logger.log(Level.INFO, "Successfully loaded module class: " + classFile.getName());
+
+            File moduleDirectory = classFile.getParentFile();
+
+            assert (moduleDirectory.exists());
+
+            assert (moduleDirectory.isDirectory());
+
+            FilenameFilter filter = new FilenameFilter() {
+
+                public boolean accept(@SuppressWarnings("unused")
+                File dir, String name)
+                {
+                    if (name.endsWith(".class")) {
+                        return true;
+                    }
+
+                    return false;
+
+                }
+            };
+
+            String[] files = moduleDirectory.list(filter);
+
+            for (int i = 0; i < files.length; i++) {
+                File file = new File(
+                        moduleDirectory + File.separator + files[i]);
+
+                if (!file.equals(classFile)) {
+
+                    fis = new FileInputStream(file);
+
+                    data = new byte[(int) file.length()];
+
+                    fis.read(data);
+
+                    defineClass(null, data, 0, data.length);
+
+                    this.logger.log(Level.INFO, "Successfully loaded additional class: " + file.getName() + " required by module " + classFile.getName());
+
+                }
+            }
             
+            return toReturn;
+            
+        }
+        catch (FileNotFoundException e) {
+
+            this.logger.log(Level.WARNING, "Error while reading the module class file " + classFilePath);
+
+            throw new ClassNotFoundException(e.getMessage());
+
+        }
+        catch (IOException e) {
+            this.logger.log(Level.WARNING, "Error while reading the module class file " + classFilePath);
+
+            throw new ClassNotFoundException(e.getMessage());
+
         }
         finally
         {
-            try {
-                fis.close();
-            }
-            catch (IOException e) {
-                
-                this.logger.log(Level.WARNING,"Failed to close an InputStream. Details following:");
-                
-                e.printStackTrace();
-            }
+         try {
+            fis.close();
         }
+        catch (IOException e) {
            
-        byte[] data = new byte[(int)classFile.length()];
+            this.logger.log(Level.WARNING,"Error while closing the InputStream.");
             
-     
-            try {
-                fis.read(data);
-            }
-            catch (IOException e2) {
-
-                this.logger.log(Level.INFO,"IOException while reading module class: " + classFile.getName());
-                
-                return null;
-            }
-            finally
-            {
-                try {
-                    fis.close();
-                }
-                catch (IOException e) {
-                    
-                    this.logger.log(Level.WARNING,"Failed to close an InputStream. Details following:");
-                    
-                    e.printStackTrace();
-                }
-            }
-            
-            toReturn = this.defineClass(null,data,0,data.length);
-                
-            
-            this.logger.log(Level.INFO,"Successfully loaded module class: " + classFile.getName());
-            
-            File moduleDirectory = classFile.getParentFile();
-            
-            assert(moduleDirectory.exists());
-            
-            assert(moduleDirectory.isDirectory());
-            
-            FilenameFilter filter = new FilenameFilter() {
-                
-                public boolean accept(@SuppressWarnings("unused") File dir, String name)
-                {
-                    if(name.endsWith(".class"))
-                    {
-                        return true;
-                    }
-                   
-                    return false;
-                   
-                }
-            };
-            
-            String[] files = moduleDirectory.list(filter);
-            
-            for(int i=0;i<files.length;i++)
-            {
-                File file = new File(moduleDirectory + File.separator + files[i]);
-                
-                if(!file.equals(classFile))
-                {
-                    try {
-                        fis = new FileInputStream(file);
-                    }
-                    catch (FileNotFoundException e1) {
-                        throw new ClassNotFoundException();
-                    }
-                    finally
-                    {
-                        try {
-                            fis.close();
-                        }
-                        catch (IOException e) {
-                            
-                            this.logger.log(Level.WARNING,"Failed to close an InputStream. Details following:");
-                            
-                            e.printStackTrace();
-                        }
-                    }
-                  
-                    data = new byte[(int)file.length()];
-                    
-                    try {
-                        fis.read(data);
-                        
-                        defineClass(null,data,0,data.length);
-                        
-                        this.logger.log(Level.INFO,"Successfully loaded additional class: " + file.getName() + " required by module " + classFile.getName());
-                    }
-                    catch (IOException e) {
-                        throw new ClassNotFoundException();
-                    }
-                    finally
-                    {
-                        try {
-                            fis.close();
-                        }
-                        catch (IOException e) {
-                            
-                            this.logger.log(Level.WARNING,"Failed to close an InputStream. Details following:");
-                            
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            }
-                        
-            return toReturn;            
-        
-        
+        }   
+        }
     }
 }

@@ -8,6 +8,8 @@ import java.io.InputStreamReader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.swing.JFrame;
+
 import org.electrocodeogram.module.registry.ModuleRegistry;
 import org.electrocodeogram.msdt.MsdtManager;
 import org.electrocodeogram.ui.Gui;
@@ -38,7 +40,7 @@ public class Core implements ICore {
 		
 		this.logger = Logger.getLogger("Core");
 		
-		new Console();
+		Console console = new Console();
 		
 		try {
 			
@@ -51,10 +53,12 @@ public class Core implements ICore {
 		}
 		
         this.moduleRegistry = new ModuleRegistry();
-        
-        //this.gui = new Gui(this.moduleRegistry);
+     
+        this.gui = new Gui(this.moduleRegistry);
 		
 		theInstance = this;
+        
+        console.start();
 	}
 
 	private Core(File file) {
@@ -118,8 +122,6 @@ public class Core implements ICore {
 
 			this.bufferedReader = new BufferedReader(new InputStreamReader(
 					System.in));
-
-            this.start();
 		}
 
 		/**
