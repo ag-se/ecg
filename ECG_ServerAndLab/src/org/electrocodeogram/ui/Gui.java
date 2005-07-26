@@ -8,9 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
 import java.util.Observable;
-import java.util.Observer;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -41,47 +39,13 @@ import org.electrocodeogram.ui.sensors.SensorGraph;
 
 import com.zfqjava.swing.JStatusBar;
 
-/**
- * @author 7oas7er
- * 
- * TODO To change the template for this generated type comment go to Window -
- * Preferences - Java - Code Style - Code Templates
- */
-
-public class Gui extends JFrame implements Observer, IGui
+public class Gui extends JFrame implements IGui
 {
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = 1L;
-
-    /**
-     * 
-     * @uml.property name="theInstance"
-     * @uml.associationEnd multiplicity="(0 1)"
-     */
-    private static Gui theInstance = null;
-
+   
     private MessagesFrame frmMessages = null;
 
-    /**
-     * 
-     * @uml.property name="source"
-     * @uml.associationEnd multiplicity="(0 1)"
-     */
-    //private Configurator me = null;
-    private ArrayList sourceModules = new ArrayList();
-
-    private int FileWriterID = -1;
-
-    private int LogggerWriterID = -1;
-
-    /**
-     * 
-     * @uml.property name="moduleGraph"
-     * @uml.associationEnd multiplicity="(0 1)"
-     */
     private ModuleGraph moduleGraph = null;
 
     private SensorGraph sensorGraph = null;
@@ -111,34 +75,6 @@ public class Gui extends JFrame implements Observer, IGui
     private IGuiWriter guiEventWriter;
     
     private MenuManager menuManager = null;
-
-//    public static Configurator getInstance(Module source)
-//    {
-//        assert (source != null);
-//
-//        if (theInstance == null) {
-//            theInstance = new Configurator(source);
-//        }
-//        else {
-//
-//            if (source.getModuleType() == ModuleType.SOURCE_MODULE) {
-//                theInstance.sourceModules.add(source);
-//            }
-//
-//        }
-//        return theInstance;
-//    }
-
-//    /**
-//     * @return
-//     */
-//    public static Configurator getInstance()
-//    {
-//        if (theInstance == null) {
-//            theInstance = new Configurator();
-//        }
-//        return theInstance;
-//    }
 
     public Gui(ModuleRegistry moduleRegistry)
     {

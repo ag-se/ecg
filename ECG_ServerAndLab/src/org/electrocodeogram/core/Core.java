@@ -52,7 +52,7 @@ public class Core implements ICore {
 		
         this.moduleRegistry = new ModuleRegistry();
         
-        this.gui = new Gui(this.moduleRegistry);
+        //this.gui = new Gui(this.moduleRegistry);
 		
 		theInstance = this;
 	}
