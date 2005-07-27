@@ -125,24 +125,38 @@
 
 	</target>
 
-	
+
 
 	<!-- Builds all ECG components -->
 	<target name="buildAll" depends="Build ECG SensorShell Event,Build ECG TestHelper, Build ECG SensorShell Shell,Build ECG ServerAndLab Module-API,Build ECG SocketSourceModule,Assemble ECG ServerAndLab"/>
 
 	<!-- Package release -->
 	<target name="Package release" depends="cleanAll,buildAll">
-		
+
 		<mkdir dir="dist"/>
-		
+
+		<mkdir dir="dist/plugins"/>
+
+		<mkdir dir="dist/user.home"/>
+
 		<tstamp />
-		
+
+		<copy todir="dist/user.home">
+
+			<fileset dir="../sensor.properties/" includes="sensor.properties"/>
+
+		</copy>
+
 		<zip zipfile="dist/ElectroCodeoGram${DSTAMP}${TSTAMP}.zip" basedir="../ECG_ServerAndLab/dist/application"/>
-		
-		<zip zipfile="dist/org.hackystat.stdext.sensor_6.4.117.3x.zip" basedir="../HackyStat EclipseSensor/"/>
-		
+
+		<zip zipfile="dist/plugins/org.hackystat.stdext.sensor_6.4.117.3x.zip" basedir="../HackyStat EclipseSensor/"/>
+
+		<!-- <pde.exportPlugins destination="D:\UserDocuments\7oas7er\studium\Informatik\Diplomarbeit\Projektordner\ECG Build\dist" exportSource="false" exportType="directory" plugins="org.electrocodeogram.sensor.eclipse" source="1.5" target="1.5" useJARFormat="true"/> -->
+
+
+
 	</target>
-	
+
 	<!-- Invokes all ECG ant scripts -->
 	<target name="all" depends="Package release">
 
