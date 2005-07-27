@@ -104,7 +104,14 @@ public class ModuleClassLoader extends java.lang.ClassLoader
 
                     fis.read(data);
 
-                    defineClass(null, data, 0, data.length);
+                    try
+                    {
+                        defineClass(null, data, 0, data.length);
+                    }
+                    catch(LinkageError e)
+                    {
+                        this.logger.log(Level.INFO, "Linkage error: " + e.getMessage());
+                    }
 
                     this.logger.log(Level.INFO, "Successfully loaded additional class: " + file.getName() + " required by module " + classFile.getName());
 
