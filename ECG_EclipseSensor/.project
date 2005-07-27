@@ -3,7 +3,6 @@
 	<name>ECG_EclipseSensor</name>
 	<comment></comment>
 	<projects>
-		<project>Hackystat Kernel</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

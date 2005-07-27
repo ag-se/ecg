@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.electrocodeogram.sensor.eclipse;
 
 import java.util.Arrays;
@@ -16,7 +13,10 @@ import org.hackystat.stdext.sensor.eclipse.EclipseSensor;
 import org.hackystat.stdext.sensor.eclipse.EclipseSensorShell;
 
 /**
- *
+ * This is the ECG EclipseSensor.
+ * It uses the original HackyStat EclipseSensor and extends.
+ * So all original HackyStat events are recorded along with any newly
+ * introduced ECG events.
  */
 public class ECGEclipseSensor
 {
@@ -28,8 +28,6 @@ public class ECGEclipseSensor
     private boolean isEnabled = true;
 
     private EclipseSensorShell eclipseSensorShell;
-
-    private String username;;
     
     private ECGEclipseSensor()
     {
@@ -43,6 +41,10 @@ public class ECGEclipseSensor
         workspace.addResourceChangeListener(new ResourceChangeAdapter(), IResourceChangeEvent.POST_CHANGE);
     }
     
+    /**
+     * This return the singleton instance of the ECGEclipseSensor class.
+     * @return The singleton instance of the ECGEclipseSensor class
+     */
     public static ECGEclipseSensor getInstance()
     {
         if(theInstance == null)
@@ -53,6 +55,12 @@ public class ECGEclipseSensor
         return theInstance;
     }
  
+    /**
+     * This method takes the data of a recorded event and generates
+     * and sends a HackyStat Activity event with the given event data.
+     * @param microSensorDataType The name of the MicroSensorDataType of the event data
+     * @param data Additional data
+     */
     public void processActivity(String microSensorDataType, String data)
     {
         if (!this.isEnabled ) {
@@ -67,7 +75,7 @@ public class ECGEclipseSensor
     private class ResourceChangeAdapter implements IResourceChangeListener
     {
         /**
-         * Proivdes manipulation of IResourceChangeEvent instance due to implement
+         * Provides manipulation of IResourceChangeEvent instance due to implement
          * <code>IResourceChangeListener</code>. This method must not be called by client because it
          * is called by platform when resources are changed.
          * 
@@ -81,13 +89,11 @@ public class ECGEclipseSensor
 
             //debuglog("a resource has been changed");
 
-            IResourceDelta delta = event.getDelta();
+            IResourceDelta $delta = event.getDelta();
 
             IResourceDeltaVisitor visitor = new IResourceDeltaVisitor() {
 
-                private String activeProject;
-
-                public boolean visit(IResourceDelta delta) throws CoreException
+                public boolean visit(IResourceDelta delta)
                 {
 
                     int kind = delta.getKind();
@@ -174,13 +180,15 @@ public class ECGEclipseSensor
 
             };
 
-            try {
-                delta.accept(visitor);
-            }
-            catch (CoreException e) {
-
-            }
-
+           
+                try {
+                    $delta.accept(visitor);
+                }
+                catch (CoreException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+           
         }
     }
     
