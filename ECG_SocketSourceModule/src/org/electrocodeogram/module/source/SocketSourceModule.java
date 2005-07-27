@@ -1,9 +1,9 @@
 package org.electrocodeogram.module.source;
     /**
-     * 
-     * This nested class represents an event collector. It extends the class Module
-     * and is in fact the first module in the module hierarchy or the root module in
-     * the module tree of the ECG framework.
+     * This module receives event data from multiple client sensors.
+     * The communication is done over Sockets. Each new incoming
+     * communication request starts a new SocketServerThread which
+     * than receives the event data from the new client.
      *
      */
     public class SocketSourceModule extends SourceModule
@@ -26,7 +26,7 @@ package org.electrocodeogram.module.source;
          * @see org.electrocodeogram.module.Module#setProperty(java.lang.String, java.lang.Object)
          */
         @Override
-        public void setProperty(String currentPropertyName, Object propertyValue)
+        public void setProperty(@SuppressWarnings("unused") String currentPropertyName, @SuppressWarnings("unused") Object propertyValue)
         {
             // TODO Auto-generated method stub
             
