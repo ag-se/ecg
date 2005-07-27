@@ -30,7 +30,7 @@ public class MockSensor
     {
         this.properties = new SensorProperties("TestSensor");
 
-        this.shell = new SensorShell(this.properties, false);
+        this.shell = new SensorShell(this.properties, false,"");
     }
 
    

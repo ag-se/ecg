@@ -99,8 +99,7 @@
 				srcdir="${src.dir}"
 				source="1.5"
 				debug="on"
-				deprecation="on"
-				excludes="org.electrocodeogram.test.*,org.hackystat.*">
+				deprecation="on">
 
 			<classpath refid="classpath" />
 

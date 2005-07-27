@@ -71,7 +71,7 @@ public class SensorShell
      * @param interactive Is "true" if the SensorShell is run as a process and "false" if it is
      * instantiated to a SensorShell object.
      */
-    public SensorShell(SensorProperties properties, boolean interactive)
+    public SensorShell(SensorProperties properties, boolean interactive, String toolName)
     {
 
         this.$properties = properties;
@@ -232,7 +232,7 @@ public class SensorShell
 
         boolean interactive = true;
 
-        SensorShell shell = new SensorShell(sensorProperties, interactive);
+        SensorShell shell = new SensorShell(sensorProperties, interactive, "");
 
         while (true) {
 
