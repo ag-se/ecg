@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Buildfile for the ECG SocketSourceModule -->
+
+<project name="ECG SocketSourceModule" default="help" basedir=".">
+
+	<!-- Project-wide settings. All directories are relative to the -->
+	<!-- project root directory -->
+
+	<!-- Project directories -->
+	<property name="src.dir" value="src"/>
+
+	<property name="dist.dir" value="dist"/>
+
+	<property name="doc.dir" value="doc"/>
+
+	<property name="lib.dir" value="lib"/>
+
+	<property name="module.dir" value="modules"/>
+
+	<property name="msdt.dir" value="msdt"/>
+
+	<property name="bin.dir" value="bin"/>
+
+
+	<!-- Temporary build directory names -->
+	<property name="build.dir" value="build"/>
+
+	<property name="build.classes" value="${build.dir}/classes"/>
+
+	<property name="build.doc" value="${build.dir}/doc"/>
+
+	<property name="build.lib" value="${build.dir}/lib"/>
+
+	<!-- Classpath setting -->
+	<path id="classpath">
+		<fileset dir="${lib.dir}">
+			<include name="**/*.jar/"/>
+		</fileset>
+
+	</path>
+
+
+	<target name="help">
+		<echo message="Build the ServerAndLab component"/>
+		<echo message="Usage: ant [ant options] target1 [ target2 | target3 | ... ]"/>
+		<echo message=""/>
+		<echo message="Build the ECG SocketSourceModule"/>
+		<echo message="javadoc - Generate the API documentation."/>
+		<echo message="clean - Delete class files built during previous builds. Leave directories."/>
+		<echo message="cleanall - clean + Delete any created directories and their contents."/>
+		<echo message="deploy - build + Deploy the ECG SocketSourceModule."/>
+	</target>
+
+	<!-- Target to create the build directories prior to a compile target -->
+	<!-- The start time of the build is marked as well for the log -->
+	<target name="prepare">
+
+		<mkdir dir="${build.dir}"/>
+		<mkdir dir="${build.classes}"/>
+		<mkdir dir="${build.lib}"/>
+		<mkdir dir="${doc.dir}"/>
+
+		<tstamp />
+		<echo message="${TSTAMP}"/>
+
+	</target>
+
+	<!-- Build the ECG SocketSourceModule. -->
+	<target name="build" depends="prepare">
+
+		<echo message="Building the ECG SocketSourceModule..."/>
+
+		<javac
+			destdir="${build.classes}"
+			srcdir="${src.dir}"
+			source="1.5"
+			debug="on"
+			deprecation="on">
+
+			<classpath refid="classpath" />
+
+		</javac>
+
+	</target>
+
+
+	<!-- Generate the API documentation. -->
+	<target name="javadoc">
+
+		<javadoc
+			packagenames="org.*"
+			sourcepath="${src.dir}"
+			destdir="${doc.dir}">
+
+			<classpath refid="classpath"/>
+
+		</javadoc>
+
+	</target>
+
+	<!-- Delete class files built during previous builds. Leave directories. -->
+	<target name="clean">
+
+		<delete failonerror="no">
+			<fileset dir="${build.classes}" includes="**/*.class"/>
+		</delete>
+
+	</target>
+
+	<!-- Delete any created directories and their contents. -->
+	<target name="cleanall" depends="clean">
+
+		<delete dir="${build.dir}"/>
+		<delete dir="${dist.dir}"/>
+		<delete dir="${doc.dir}"/>
+
+	</target>
+
+	<!-- Deploy the ECG SocketSourceModule. -->
+	<target name="deploy" depends="build">
+
+		<echo message="Deploying SocketSourceModule..."/>
+
+		<!-- Create the distribuition directories -->
+		<mkdir dir="${dist.dir}"/>
+		<mkdir dir="${dist.dir}/ECG_SocketSourceModule"/>
+		<mkdir dir="${dist.dir}/doc"/>
+
+		<!-- Copy the libraries -->
+		<copy todir="${dist.dir}/ECG_SocketSourceModule">
+
+			<fileset dir="${build.classes}" />
+			<fileset dir="${basedir}" file="module.properties" />
+
+		</copy>
+
+		<!-- Copy the documentation -->
+		<copy todir="${dist.dir}/doc">
+
+			<fileset dir="${doc.dir}"/>
+
+		</copy>
+
+
+		<!-- Copy module into ECG ServerAndLab module directory -->
+		<mkdir dir="../ECG_ServerAndLab/modules/ECG_SocketSourceModule/"/>
+		
+		<copy todir="../ECG_ServerAndLab/modules/ECG_SocketSourceModule/">
+
+			<fileset dir="${dist.dir}/ECG_SocketSourceModule/"/>
+
+		</copy>
+	</target>
+
+</project>
+
