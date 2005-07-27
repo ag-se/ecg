@@ -34,7 +34,7 @@ public class Core implements ICore {
 	
     
     
-	private Core() {
+	protected Core() {
 		
 		this.logger = Logger.getLogger("Core");
 		

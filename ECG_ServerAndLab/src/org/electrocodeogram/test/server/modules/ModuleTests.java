@@ -2,7 +2,6 @@ package org.electrocodeogram.test.server.modules;
 
 import junit.framework.TestCase;
 
-import org.electrocodeogram.core.TestModuleTransportModule;
 import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.test.EventGenerator;
 import org.electrocodeogram.test.EventGenerator.SensorDataType;

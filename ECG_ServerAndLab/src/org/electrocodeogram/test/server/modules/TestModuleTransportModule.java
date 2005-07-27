@@ -1,10 +1,9 @@
-package org.electrocodeogram.core;
+package org.electrocodeogram.test.server.modules;
 
 import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.module.Module;
 import org.electrocodeogram.module.ModuleConnectionException;
 import org.electrocodeogram.module.TestModule;
-import org.electrocodeogram.test.server.modules.TestSourceModule;
 
 /**
  * This class is helper class for the ModuleTests. It provides methods to create

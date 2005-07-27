@@ -10,5 +10,6 @@
 	<classpathentry sourcepath="/ECG_SensorShell" kind="lib" path="lib/ecg/event.jar"/>
 	<classpathentry kind="var" path="JUNIT_HOME/junit.jar"/>
 	<classpathentry kind="lib" path="lib/ecg/testHelper.jar"/>
+	<classpathentry kind="lib" path="/ECG_SocketSourceModule/bin"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
