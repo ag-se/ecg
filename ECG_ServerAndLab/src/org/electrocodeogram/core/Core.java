@@ -9,7 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.electrocodeogram.module.registry.ModuleRegistry;
-import org.electrocodeogram.msdt.MsdtManager;
+import org.electrocodeogram.msdt.MsdtRegistry;
 import org.electrocodeogram.ui.Gui;
 import org.electrocodeogram.ui.IGui;
 
@@ -28,7 +28,7 @@ public class Core implements ICore {
 
 	private IGui gui = null;
 	
-	private MsdtManager mstdManager = null;
+	private MsdtRegistry mstdManager = null;
 
 	private Logger logger = null;
 	
@@ -42,7 +42,7 @@ public class Core implements ICore {
 		
 		try {
 			
-			this.mstdManager = new MsdtManager();
+			this.mstdManager = new MsdtRegistry();
 			
 		} catch (FileNotFoundException e) {
 			
@@ -87,7 +87,7 @@ public class Core implements ICore {
 	/**
      * @see org.electrocodeogram.core.ICore#getMsdtManager()
      */
-	public MsdtManager getMsdtManager()
+	public MsdtRegistry getMsdtManager()
 	{
 		return this.mstdManager;
 	}

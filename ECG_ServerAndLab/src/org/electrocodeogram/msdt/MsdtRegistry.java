@@ -2,7 +2,6 @@ package org.electrocodeogram.msdt;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -13,7 +12,13 @@ import javax.xml.validation.SchemaFactory;
 
 import org.xml.sax.SAXException;
 
-public class MsdtManager
+/**
+ * The MicroSensorDataType registry is a database for MicroSensorDataTypes.
+ * At the first creation of this object the application's "msdt" subdirectory
+ * is looked up for XML schema files. Each XML schema file is then parsed
+ * and and defines a MicroSensorDataType for the ECG. 
+ */
+public class MsdtRegistry
 {
 
     private HashMap<String,Schema> msdtSchemas = null;
@@ -22,7 +27,11 @@ public class MsdtManager
 
     private SchemaFactory schemaFactory = null;
 
-    public MsdtManager() throws FileNotFoundException
+    /**
+     * This creates the MsdtRegistry object. 
+     * @throws FileNotFoundException If the "msdt" subdirectory of the ECG application is not found.
+     */
+    public MsdtRegistry() throws FileNotFoundException
     {
 
         this.logger = Logger.getLogger("MstdManager");
@@ -36,7 +45,8 @@ public class MsdtManager
     }
 
     /**
-     * 
+     * This method parses the XML schema files and strores each XML schema in the
+     * MsdtRegitry's HashMap.
      */
     private void loadMDTDSchemas() throws FileNotFoundException
     {
@@ -93,8 +103,9 @@ public class MsdtManager
     }
 
     /**
-     * @param schemaName
-     * @return
+     * This method is used to get the XML schema object with the given name. 
+     * @param schemaName Is the name used as a key for the HashMap.
+     * @return The XML schema if any is found using the given key
      */
     public Schema getSchemaForName(String schemaName)
     {

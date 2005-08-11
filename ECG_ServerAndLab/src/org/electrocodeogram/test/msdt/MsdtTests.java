@@ -7,7 +7,7 @@ import junit.framework.TestCase;
 
 import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.msdt.EventValidator;
-import org.electrocodeogram.msdt.MsdtManager;
+import org.electrocodeogram.msdt.MsdtRegistry;
 import org.electrocodeogram.test.EventGenerator;
 import org.electrocodeogram.test.EventGenerator.MicroSensorDataType;
 
@@ -17,7 +17,7 @@ import org.electrocodeogram.test.EventGenerator.MicroSensorDataType;
 public class MsdtTests extends TestCase
 {
 
-    private MsdtManager msdtManager = null;
+    private MsdtRegistry msdtManager = null;
 
     private EventValidator eventValidator = null;
 
@@ -29,7 +29,7 @@ public class MsdtTests extends TestCase
     public MsdtTests()
     {
         try {
-            this.msdtManager = new MsdtManager();
+            this.msdtManager = new MsdtRegistry();
 
             this.eventGenerator = new EventGenerator();
         }

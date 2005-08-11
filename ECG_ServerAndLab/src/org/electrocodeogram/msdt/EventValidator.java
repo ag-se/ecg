@@ -29,7 +29,7 @@ public class EventValidator
 
     private int processingID = 0;
 
-    private MsdtManager $mSdtManager = null;
+    private MsdtRegistry $mSdtManager = null;
 
     private SensorShell shell;
     
@@ -45,7 +45,7 @@ public class EventValidator
      *            maintains the MicroSensorDataType XML schema definitions which are used
      *            to validate the MicroActivities against.
      */
-    public EventValidator(MsdtManager mSdtManager)
+    public EventValidator(MsdtRegistry mSdtManager)
     {
         this.shell = new SensorShell(new SensorProperties("", ""), false,
                 "ElectroCodeoGram");

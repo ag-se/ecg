@@ -4,7 +4,7 @@
 package org.electrocodeogram.core;
 
 import org.electrocodeogram.module.registry.ModuleRegistry;
-import org.electrocodeogram.msdt.MsdtManager;
+import org.electrocodeogram.msdt.MsdtRegistry;
 import org.electrocodeogram.ui.IGui;
 
 /**
@@ -17,7 +17,7 @@ public interface ICore
      * This method returns a reference to the MicroSensorDataType-Manager object. 
      * @return A reference to the MicroSensorDataType-Manager object
      */
-    public abstract MsdtManager getMsdtManager();
+    public abstract MsdtRegistry getMsdtManager();
 
     /**
      * This method returns a reference to the ModuleRegistry object. 
