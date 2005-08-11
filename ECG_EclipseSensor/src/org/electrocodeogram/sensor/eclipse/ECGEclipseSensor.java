@@ -2,6 +2,7 @@ package org.electrocodeogram.sensor.eclipse;
 
 import java.util.Arrays;
 
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
@@ -29,22 +30,32 @@ public class ECGEclipseSensor
 
     private EclipseSensorShell eclipseSensorShell;
     
+    private String $username = null;
+    
     private ECGEclipseSensor()
     {
       
         this.hackyEclipse = EclipseSensor.getInstance();
         
         this.eclipseSensorShell = this.hackyEclipse.getEclipseSensorShell();
+        
+        this.$username = System.getenv("username");
+        
+        if(this.$username == null || this.$username.equals(""))
+        {
+            this.$username = "n.a.";
+        }
       
         IWorkspace workspace = ResourcesPlugin.getWorkspace();
         
         workspace.addResourceChangeListener(new ResourceChangeAdapter(), IResourceChangeEvent.POST_CHANGE);
     }
+
+    String getUsername()
+    {
+        return this.$username;
+    }
     
-    /**
-     * This return the singleton instance of the ECGEclipseSensor class.
-     * @return The singleton instance of the ECGEclipseSensor class
-     */
     public static ECGEclipseSensor getInstance()
     {
         if(theInstance == null)
@@ -58,22 +69,22 @@ public class ECGEclipseSensor
     /**
      * This method takes the data of a recorded event and generates
      * and sends a HackyStat Activity event with the given event data.
-     * @param microSensorDataType The name of the MicroSensorDataType of the event data
      * @param data Additional data
      */
-    public void processActivity(String microSensorDataType, String data)
+    public void processActivity(String data)
     {
         if (!this.isEnabled ) {
             return;
         }
 
-        String[] args = { "add", microSensorDataType, data};
+        String[] args = { "add", "MicroActivity", data};
         
         this.eclipseSensorShell.doCommand("Activity", Arrays.asList(args));
     }
     
     private class ResourceChangeAdapter implements IResourceChangeListener
     {
+        
         /**
          * Provides manipulation of IResourceChangeEvent instance due to implement
          * <code>IResourceChangeListener</code>. This method must not be called by client because it
@@ -87,8 +98,6 @@ public class ECGEclipseSensor
             if (event.getType() != IResourceChangeEvent.POST_CHANGE)
                 return;
 
-            //debuglog("a resource has been changed");
-
             IResourceDelta $delta = event.getDelta();
 
             IResourceDeltaVisitor visitor = new IResourceDeltaVisitor() {
@@ -97,49 +106,45 @@ public class ECGEclipseSensor
                 {
 
                     int kind = delta.getKind();
+                    
                     int flags = delta.getFlags();
+                    
+                    String name = delta.getResource().getName();
 
                     switch (kind)
                     {
                     case IResourceDelta.ADDED:
 
-                        processActivity("Resource added ", delta.getResource().getName());
-
-                        if (flags == IResourceDelta.MOVED_FROM || flags == IResourceDelta.MOVED_TO) {
-                            //eventlog("it has been moved");
-                        }
+                        processActivity("<?xml version=\"1.0\"?><microActivity><commonData><username>"+getUsername()+"</username><projectname>bar</projectname></commonData><resource><activity>added</activity><resourcename>" + name + "</resourcename><resourcetype>"+ delta.getResource().getType() +"</resourcetype></resource></microActivity>");
 
                         break;
 
                     case IResourceDelta.REMOVED:
 
-                        processActivity("Resource removed ", delta.getResource().getName());
+                        processActivity("<?xml version=\"1.0\"?><microActivity><commonData><username>"+getUsername()+"</username><projectname>bar</projectname></commonData><resource><activity>removed</activity><resourcename>" + name + "</resourcename><resourcetype>"+ delta.getResource().getType() +"</resourcetype></resource></microActivity>");
 
-                        if (flags == IResourceDelta.MOVED_FROM || flags == IResourceDelta.MOVED_TO) {
-                            //eventlog("it has been moved");
-                        }
                         break;
 
                     case IResourceDelta.CHANGED:
 
-                        String name = delta.getResource().getName();
+                       
 
                         if (name != null)
 
-                            processActivity("Resource changed ", delta.getResource().getName());
+                            processActivity("<?xml version=\"1.0\"?><microActivity><commonData><username>"+getUsername()+"</username><projectname>bar</projectname></commonData><resource><activity>changed</activity><resourcename>" + name + "</resourcename><resourcetype>"+ delta.getResource().getType() +"</resourcetype></resource></microActivity>");
 
                         switch (flags)
                         {
                         case IResourceDelta.OPEN:
 
-//                          if(delta.getResource().getType() == IResource.PROJECT)
-//                          {
-//                              this.activeProject = delta.getResource().getName();
-//                          }
-                            
-                            processActivity("Resource opened or closed ", delta.getResource().getName());
+                          if(delta.getResource().getType() == IResource.PROJECT)
+                          {
+                              processActivity("<?xml version=\"1.0\"?><microActivity><commonData><username>"+getUsername()+"</username><projectname>bar</projectname></commonData><resource><activity>opened or closed</activity><resourcename>" + name + "</resourcename><resourcetype>"+ delta.getResource().getType() +"</resourcetype></resource></microActivity>");
+                                                            
+                              break;
 
-                            break;
+                          }
+                            
 
                         case IResourceDelta.CONTENT:
 
@@ -162,13 +167,11 @@ public class ECGEclipseSensor
                             break;
 
                         case IResourceDelta.REPLACED:
-
-                            processActivity("Resource replaced", delta.getResource().getName());
-
+                            
                             break;
 
                         default:
-                        //debuglog("a child resource must have been changed");
+                        
                         }
 
                         break;
