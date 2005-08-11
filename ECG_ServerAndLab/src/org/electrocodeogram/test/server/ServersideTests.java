@@ -45,6 +45,10 @@ public class ServersideTests extends TestCase
         super.setUp();
         
         this.validator = new EventValidator(null);
+        
+        this.validator.setAllowNonECGmSDTConformEvents(false);
+        
+        this.validator.setAllowNonECGmSDTConformEvents(true);
 
         this.testClient = new TestClient();
 

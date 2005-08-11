@@ -32,6 +32,10 @@ public class EventValidator
     private MsdtManager $mSdtManager = null;
 
     private SensorShell shell;
+    
+    private boolean allowNonHackyStatSDTConformEvents = false;
+    
+    private boolean allowNonECGmSDTConformEvents = false;
 
     /**
      * This creates a EventValidator object.
@@ -76,6 +80,8 @@ public class EventValidator
 
         this.logger.log(Level.INFO, this.processingID + ": Begin to process new event data at " + new Date().toString());
 
+        if(this.allowNonHackyStatSDTConformEvents) return true;
+            
         /*
          * Is the incoming event according to a HackyStat SensorDataType?
          */
@@ -87,6 +93,8 @@ public class EventValidator
 
             this.logger.log(Level.INFO, this.processingID + " : " + packet.toString());
 
+            if(this.allowNonECGmSDTConformEvents) return true;
+            
             if(isActivityEvent(packet))
             {
                 if(isMicroActivityEvent(packet))
@@ -112,9 +120,6 @@ public class EventValidator
     private boolean isMicroActivityEvent(ValidEventPacket packet)
     {
         if (packet == null)
-            return false;
-
-        if (!isActivityEvent(packet))
             return false;
 
         if (packet.getArglist().get(1).equals("MicroActivity")) {
@@ -180,10 +185,11 @@ public class EventValidator
             return false;
         }
 
-        SAXSource saxSource = new SAXSource(new InputSource(new StringReader(
-                microActivityString)));
-
         for (int i = 0; i < schemaNames.length; i++) {
+        
+            SAXSource saxSource = new SAXSource(new InputSource(new StringReader(
+                    microActivityString)));
+            
             Schema schema = this.$mSdtManager.getSchemaForName(schemaNames[i]);
 
             Validator validator = schema.newValidator();
@@ -214,6 +220,56 @@ public class EventValidator
         }
 
         return false;
+    }
+
+    
+    /**
+     * This method tells wheter event data that does not conform to
+     * a ECG MicroSensorDataType is allowed to pass validation or not.
+     * @return "true" if event data that does not conform to
+     * a ECG MicroSensorDataType is allowed and "false" if not
+     */
+    public boolean areNonECGmSDTConformEventsAllowed()
+    {
+        return this.allowNonECGmSDTConformEvents;
+    }
+    
+    /**
+     * This method is used to decalare whether event data that does not conform to
+     * a ECG MicroSensorDataType is allowed to pass validation.
+     * A value of "false" is ignored if the value for allowing non HackyStat conform
+     * event data is set to "true".
+     * @param allowNonECGmSDTConformEvents Is "true" if event data that does not conform to
+     * a ECG MicroSensorDataType is allowed and "false" if not
+     */
+
+    public void setAllowNonECGmSDTConformEvents(boolean allowNonECGmSDTConformEvents)
+    {
+        this.allowNonECGmSDTConformEvents = allowNonECGmSDTConformEvents;
+    }
+    
+    /**
+     * This method tells wheter event data that does not conform to
+     * a HackyStat SensorDataType is allowed to pass validation or not.
+     * @return "true" if event data that does not conform to
+     * a HackyStat SensorDataType is allowed and "false" if not
+     */
+
+    public boolean areNonHackyStatSDTConformEventsAllowed()
+    {
+        return this.allowNonHackyStatSDTConformEvents;
+    }
+    
+    /**
+     * This method is used to declare whether event data that does not conform to
+     * a HackyStat SensorDataType is allowed to pass validation.
+     * @param allowNonHackyStatSDTConformEvents Is "true" if event data that does not conform to
+     * a HackyStat SensorDataType is allowed and "false" if not
+     */
+
+    public void setAllowNonHackyStatSDTConformEvents(boolean allowNonHackyStatSDTConformEvents)
+    {
+        this.allowNonHackyStatSDTConformEvents = allowNonHackyStatSDTConformEvents;
     }
 
 }
