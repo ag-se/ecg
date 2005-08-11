@@ -179,7 +179,7 @@ public class EventPacket implements Serializable
     {
         String string = "";
 
-        string += "SourceID: " + this.getSourceId() + ", SDT: " + this.getSensorDataType() + ", MSDT: " + this.getMicroSensorDataType();
+        string += "SourceID: " + this.getSourceId() + ", SDT: " + this.getSensorDataType();
 
         StringBuffer stringBuffer = new StringBuffer();
 

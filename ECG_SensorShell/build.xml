@@ -251,6 +251,12 @@
 		</copy>
 
 		
+		<copy todir="../ECG_ConnectionTests/lib/ecg">
+						
+				<fileset dir="${build.lib}" includes="sensorshell.jar" />
+							
+		</copy>
+		
 		<!-- Copy the documentation -->
 		<copy todir="${dist.dir}/doc">
 
