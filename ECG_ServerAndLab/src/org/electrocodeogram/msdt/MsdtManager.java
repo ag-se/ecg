@@ -1,194 +1,107 @@
 package org.electrocodeogram.msdt;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.hackystat.kernel.sdt.SensorDataTypeException;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.input.SAXBuilder;
+import javax.xml.XMLConstants;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
 
-public class MsdtManager {
+import org.xml.sax.SAXException;
 
-	private Map<String,MicroSensorDataType> msdtMap = new HashMap<String,MicroSensorDataType>();
+public class MsdtManager
+{
 
-	private Logger logger = null;
+    private HashMap<String,Schema> msdtSchemas = null;
 
-	
+    private Logger logger = null;
 
-	public MsdtManager() throws FileNotFoundException {
+    private SchemaFactory schemaFactory = null;
 
-		this.logger = Logger.getLogger("MstdManager");
+    public MsdtManager() throws FileNotFoundException
+    {
 
-		loadMstdDefsFromResource();
-	
-	}
+        this.logger = Logger.getLogger("MstdManager");
 
-	private void loadMstdDefsFromResource() throws FileNotFoundException
-	{
+        this.msdtSchemas = new HashMap<String,Schema>();
 
-		String stdDefsDirPath = "msdt";
+        this.schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 
-		File stdDefsDir = new File(stdDefsDirPath);
-		
-		if(!stdDefsDir.exists() || !stdDefsDir.isDirectory())
-		{
-			throw new FileNotFoundException("Das Verzeichnis \"msdt\" exisitiert nicht oder ist kein Verzeichnis");
-		}
+        loadMDTDSchemas();
 
-		String[] defs = stdDefsDir.list();
+    }
 
-		if (defs != null)
-		{
-			for (int i = 0; i < defs.length; i++)
-			{
-				File defFile = new File(stdDefsDirPath + File.separator + defs[i]);
+    /**
+     * 
+     */
+    private void loadMDTDSchemas() throws FileNotFoundException
+    {
 
-				FileInputStream fis = null;
-				try {
-					fis = new FileInputStream(defFile);
-				} catch (FileNotFoundException e) {
-					
-					this.logger.log(Level.WARNING,"The file " + defFile.getName() + " could not be opened.");
-					
-					continue;
-				}
+        String stdDefsDirPath = "msdt";
 
-				this.logger.log(Level.INFO,"Lese mSDT Definition " + defFile.getName());
-				
-				processSdtStream(fis);
-			}
-		}
-		else
-		{
-			this.logger.log(Level.INFO,"Es wurden keine mSDT Definitionen gefunden.");
-		}
-		
-	}
+        File stdDefsDir = new File(stdDefsDirPath);
 
-	private void processSdtStream(InputStream sdtStream) {
-		try {
-			SAXBuilder builder = new SAXBuilder();
+        if (!stdDefsDir.exists() || !stdDefsDir.isDirectory()) {
+            throw new FileNotFoundException(
+                    "Das Verzeichnis \"msdt\" exisitiert nicht oder ist kein Verzeichnis");
+        }
 
-			Document doc = builder.build(sdtStream);
+        String[] defs = stdDefsDir.list();
 
-			Element microSensorDataTypes = doc.getRootElement();
-			
-			List msdtList = microSensorDataTypes.getChildren("microsensordatatype");
-			
-			for (Iterator i = msdtList.iterator(); i.hasNext();) {
-				
-				Element msdtElement = (Element) i.next();
-				
-				String msdtName = msdtElement.getAttributeValue("name");
-				
-				if (msdtName == null) {
-					throw new SensorDataTypeException("mSDT Definitionsfehler - Es wurde kein oder ein doppelter \"name\" gefunden. ");
-				}
+        if (defs != null) {
+            for (int i = 0; i < defs.length; i++) {
+                File defFile = new File(
+                        stdDefsDirPath + File.separator + defs[i]);
 
-				String enabled = msdtElement.getAttributeValue("enabled");
-				
-				if ((enabled != null) && ("false".equals(enabled))) {
-					
-					this.logger.log(Level.INFO,"Der mSDT ist deaktiviert: " + msdtName);
-					
-					return;
-				}
-				
-				// Process all of the attributes and return the new SDT if successful.
-				MicroSensorDataType msdt = processAttributes(msdtElement, msdtName);
-				
-				// Process the EntryAttribute specifications.
-				List entryAttributeList = msdtElement.getChildren("entryattribute");
-				
-				for (Iterator j = entryAttributeList.iterator(); j.hasNext();) {
-					
-					Element entryElement = (Element) j.next();
-					
-					processEntryAttribute(msdt, entryElement);
-				}
-				
-				this.msdtMap.put(msdtName, msdt);
-				
-				this.logger.log(Level.INFO,"Der mSDT ist registriert worden:     " + msdt.getName());
-			}
-		} catch (Exception e) {
-			this.logger.log(Level.SEVERE,"Wärend des Lesens des mSDT kam es zu einem Fehler. " + sdtStream + ":\n" + e);
-		}
-	}
-	
-	private MicroSensorDataType processAttributes(Element msdtElement, String msdtName) throws Exception {
-		
-	    // Get docstring, error if attribute missing.
-	    String docstring = msdtElement.getAttributeValue("docstring");
-	    
-	    if (docstring == null) {
-	      throw new SensorDataTypeException("mSDT Definitionsfehler - Es wurde kein oder ein doppelter \"docstring\" gefunden " + msdtName);
-	    }
-	    
-	    // DELETED VERSIONING INFO FROM SDT DEFINITION.
-	    // Get version, error if attribute missing.
-	    // String version = sdtElement.getAttributeValue("version");
-	    // if (version == null) {
-	    //   throw new SensorDataTypeException("Command definition error: missing version.");
-	    // }
-	    // Get contact, error if attribute missing.
-	    
-	    String contact = msdtElement.getAttributeValue("contact");
-	    if (contact == null) {
-	      throw new SensorDataTypeException("mSDT Definitionsfehler - Es wurde kein oder ein doppelter \"contact\" gefunden " + msdtName);
-	    }
-	    
-	    return new MicroSensorDataType(msdtName, docstring, contact);
-	  }
-	
-	 private boolean isClass(String className) {
-		    try {
-		      Class.forName(className);
-		      return true;
-		    }
-		    catch (ClassNotFoundException e) {
-		      return false;
-		    }
-		  }
-	
-	 private void processEntryAttribute(MicroSensorDataType msdt, Element entry) throws Exception {
-		 
-		    // Get and verify legal attribute name.
-		    String attributeName = entry.getAttributeValue("name");
-		    
-		    if (attributeName == null) {
-		      throw new SensorDataTypeException("mSDT Attribut-Definitionsfehler - Es wurde kein oder ein doppelter \"name\" gefunden ");
-		    }
-		    
-		    // Get and verify legal attribute type if supplied.
-		    String typeName = entry.getAttributeValue("type");
-		    
-		    if ((typeName != null) && !isClass(typeName)) {
-		      throw new SensorDataTypeException("mSDT Attribut-Definitionsfehler - Der Typ des Attributs ist ungültig " + typeName);
-		    }
-		    
-		    
-		    msdt.addAttribute(attributeName, typeName);
-		    
-		  }
+                Schema schema = null;
 
-	public MicroSensorDataType getMicroSensorDataType(String sdtName) throws MicroSensorDataTypeNotFoundException {
-	
-		if(!this.msdtMap.containsKey(sdtName))
-		{
-			throw new MicroSensorDataTypeNotFoundException();
-		}
-		
-		return this.msdtMap.get(sdtName);
-			
-	}
+                try {
+
+                    schema = this.schemaFactory.newSchema(defFile);
+
+                    this.msdtSchemas.put(defFile.getName(),schema);
+                    
+                    this.logger.log(Level.INFO, "Registered new MicroSensorDatyType " + defFile.getName());
+                }
+                catch (SAXException e) {
+
+                    this.logger.log(Level.WARNING, "Error while reading the XML schema file " + defFile.getName());
+                    
+                    this.logger.log(Level.WARNING, e.getMessage());
+
+                }
+
+            }
+        }
+        else {
+            this.logger.log(Level.INFO, "Es wurden keine mSDT Definitionen gefunden.");
+        }
+
+    }
+    
+    /**
+     * This method returns an Array of all currently registered MicroSensorDataType XMLSchema filenames. 
+     * @return An Array of all currently registered MicroSensorDataType XMLSchema filenames
+     */
+    public String[] getMstdSchemaNames()
+    {
+       return this.msdtSchemas.keySet().toArray(new String[0]);
+    }
+
+    /**
+     * @param schemaName
+     * @return
+     */
+    public Schema getSchemaForName(String schemaName)
+    {
+        if (schemaName == null) return null;
+        
+        if (!this.msdtSchemas.containsKey(schemaName)) return null;
+        
+        return this.msdtSchemas.get(schemaName);
+    }
 }

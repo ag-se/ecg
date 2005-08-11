@@ -1,14 +1,21 @@
 package org.electrocodeogram.msdt;
 
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.Date;
 import java.util.List;
-import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.xml.transform.sax.SAXSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.Validator;
 
 import org.electrocodeogram.event.ValidEventPacket;
 import org.hackystat.kernel.admin.SensorProperties;
 import org.hackystat.kernel.shell.SensorShell;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 /**
  * This class provides the functionality to verify that syntactically valid
@@ -31,7 +38,8 @@ public class EventValidator
      * 
      * @param mSdtManager
      *            Is the MicroSensorDataType-Manager (MsdtManager) object that
-     *            maintains the MicroSensorDataType definitions.
+     *            maintains the MicroSensorDataType XML schema definitions which are used
+     *            to validate the MicroActivities against.
      */
     public EventValidator(MsdtManager mSdtManager)
     {
@@ -46,7 +54,16 @@ public class EventValidator
 
     /**
      * This method checks if a given ValidEventPacket object complies to
-     * HackyStat and ECG standards.
+     * HackyStat and ECG standards. Checking is done in a sequence from
+     * the weakest condition to the strongest.
+     * First the event data is checked by the HackyStat SensorShell component
+     * for comliance to a HackyStat SensorDataType.
+     * If positive the event data is checked to be a HackyStat "Activity"
+     * event.
+     * If positive the event data is chekced to be an ECG "MicroActivity"
+     * event.
+     * At last the event data is checked for compliance to a ECG MicroSensorDataType.
+     * Only if the last stage checking is positive this method returns "true".
      * 
      * @param packet
      *            Is the ValidEventPacket object to check
@@ -59,108 +76,144 @@ public class EventValidator
 
         this.logger.log(Level.INFO, this.processingID + ": Begin to process new event data at " + new Date().toString());
 
-        // validate the incoming event data by using the HackyStat framework
-        boolean result = this.shell.doCommand(packet.getTimeStamp(), packet.getSensorDataType(), packet.getArglist());
+        /*
+         * Is the incoming event according to a HackyStat SensorDataType?
+         */
+        boolean isHackyStatSensorDataTypeConform = this.shell.doCommand(packet.getTimeStamp(), packet.getSensorDataType(), packet.getArglist());
 
-        if (result) {
+        if (isHackyStatSensorDataTypeConform) {
 
             this.logger.log(Level.INFO, this.processingID + ": Event data is conforming to a HackyStat SensorDataType and is processed.");
 
             this.logger.log(Level.INFO, this.processingID + " : " + packet.toString());
 
-            // List<String> newArgList = new ArrayList<String>(argList.size());
-
-            // Object[] entries = argList.toArray();
-            //
-            // for (int i = 0; i < entries.length; i++) {
-            // String entryString = (String) entries[i];
-            //
-            // if (commandName.equals("Activity") && i == 0) {
-            // entryString = "" + entryString;
-            //                     
-            // }
-            //
-            // newArgList.add(entryString);
-            // }
-            //
-            // isMsdt(newArgList);
-
-            return true;
+            if(isActivityEvent(packet))
+            {
+                if(isMicroActivityEvent(packet))
+                {
+                    if(isMicroSensorDataType(packet))
+                    {
+                        return true;
+                    }
+                }
+            }
+          
         }
 
-        this.logger.log(Level.INFO, this.processingID + ": Event data is not conforming to a HackyStat SensorDataType and is discarded.");
-
-        this.logger.log(Level.INFO, this.processingID + ":" + packet.toString());
-
+     
         return false;
     }
 
-    private void isMsdt(List<String> argList)
+    /**
+     * This method checks if an ValidEventPacket is containing a ECG "MicroActivity" event.
+     * @param packet Is the ValidEventPacket to check
+     * @return "true" if the packet is a "MicroActivity" event and "false" if not
+     */
+    private boolean isMicroActivityEvent(ValidEventPacket packet)
+    {
+        if (packet == null)
+            return false;
+
+        if (!isActivityEvent(packet))
+            return false;
+
+        if (packet.getArglist().get(1).equals("MicroActivity")) {
+            this.logger.log(Level.INFO, this.processingID + ": The event is a ECG \"MicroActivity\" event.");
+            return true;
+        }
+
+        this.logger.log(Level.INFO, this.processingID + ": The event is not a ECG \"MicroActivity\" event.");
+        return false;
+    }
+
+    /**
+     * This method checks if an ValidEventPacket is containing a HackyStat "Activity" event.
+     * @param packet Is the ValidEventPacket to check
+     * @return "true" if the packet is an "Activity" event and "false" if not
+     */
+    private boolean isActivityEvent(ValidEventPacket packet)
+    {
+        
+        if (packet == null) {
+            return false;
+        }
+
+        if (packet.getSensorDataType().equals("Activity")) {
+            this.logger.log(Level.INFO, this.processingID + ": The event is a HackyStat \"Activity\" event.");
+            return true;
+        }
+
+        this.logger.log(Level.INFO, this.processingID + ": The event is not a HackyStat \"Activity\" event.");
+        return false;
+    }
+
+    private boolean isMicroSensorDataType(ValidEventPacket packet)
     {
 
-        String mSdtName = argList.get(1);
+        List argList = packet.getArglist();
+        
+        String microActivityString = (String) argList.get(2);
 
-        if (mSdtName == null || mSdtName == "") {
-            this.logger.log(Level.WARNING, this.processingID + ": Event data is not a known ECG MicroSensorDataType: " + mSdtName);
+        if (microActivityString == null || microActivityString.equals("")) {
 
-            return;
+            this.logger.log(Level.INFO, this.processingID + ": No MicroActivity data found.");
+
+            this.logger.log(Level.INFO, this.processingID + ": Event data is not conforming to a HackyStat SensorDataType and is discarded.");
+
+            this.logger.log(Level.INFO, this.processingID + ":" + packet.toString());
+
+            
+            return false;
         }
 
-        MicroSensorDataType microSensorDataType = null;
+        String[] schemaNames = this.$mSdtManager.getMstdSchemaNames();
 
-        try {
+        if (schemaNames.length == 0) {
 
-            if (this.$mSdtManager == null) {
-                this.logger.log(Level.WARNING, this.processingID + ": Event data is not conforming to a ECG MicroSensorDataType. " + mSdtName);
+            this.logger.log(Level.INFO, this.processingID + ": No MicroSensorDataTypes are found.");
 
-                return;
+            this.logger.log(Level.INFO, this.processingID + ": Event data is not conforming to a HackyStat SensorDataType and is discarded.");
+
+            this.logger.log(Level.INFO, this.processingID + ":" + packet.toString());
+
+            
+            return false;
+        }
+
+        SAXSource saxSource = new SAXSource(new InputSource(new StringReader(
+                microActivityString)));
+
+        for (int i = 0; i < schemaNames.length; i++) {
+            Schema schema = this.$mSdtManager.getSchemaForName(schemaNames[i]);
+
+            Validator validator = schema.newValidator();
+
+            try {
+
+                this.logger.log(Level.INFO, "Validating MicroActivity against " + schemaNames[i] + " XML schema.");
+
+                validator.validate(saxSource);
+
+                this.logger.log(Level.INFO, "The MicroActivity is a valid " + schemaNames[i] + " event.");
+
+                return true;
+            }
+            catch (SAXException e) {
+
+                this.logger.log(Level.INFO, "The MicroActivity event is not a valid " + schemaNames[i] + " event.");
+
+                this.logger.log(Level.INFO, e.getMessage());
+
+            }
+            catch (IOException e) {
+
+                this.logger.log(Level.INFO, "The MicroActivity event could not been read.");
+
             }
 
-            microSensorDataType = this.$mSdtManager.getMicroSensorDataType(mSdtName);
-
-        }
-        catch (MicroSensorDataTypeNotFoundException e) {
-
-            this.logger.log(Level.WARNING, this.processingID + ": Event data is not conforming to a ECG MicroSensorDataType. " + mSdtName);
-
-            return;
         }
 
-        String[] entryAttriuteNames = microSensorDataType.getEntryAttributeNames();
-
-        String data = argList.get(2);
-
-        if (entryAttriuteNames == null && data != null) {
-            this.logger.log(Level.WARNING, this.processingID + ": Event data is not conforming to a ECG MicroSensorDataType. " + mSdtName);
-
-            return;
-        }
-
-        if (entryAttriuteNames == null && data == null) {
-            this.logger.log(Level.WARNING, this.processingID + ": Event data is not conforming to a ECG MicroSensorDataType. " + mSdtName);
-
-            return;
-        }
-
-        StringTokenizer tokenizer = new StringTokenizer(data, "#");
-
-        if(tokenizer == null)
-        {
-            this.logger.log(Level.WARNING, this.processingID + ": Event data is not conforming to a ECG MicroSensorDataType. " + mSdtName);
-
-            return;
-        }
-        
-        if (tokenizer.countTokens() != entryAttriuteNames.length) {
-            this.logger.log(Level.WARNING, this.processingID + ": Event data is not conforming to a ECG MicroSensorDataType. " + mSdtName);
-
-            return;
-        }
-
-        this.logger.log(Level.WARNING, this.processingID + ": Event data is conforming to the ECG MicroSensorDataType: " + microSensorDataType.getName());
-
-        return;
-
+        return false;
     }
 
 }

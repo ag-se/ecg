@@ -1,3 +1,3 @@
 Manifest-Version: 1.0
 Main-Class: org.electrocodeogram.core.Core
-Class-Path: lib/hackystat/sensorshell.jar lib/misc/componentset.jar lib/ecg/event.jar lib/misc/jgraph.jar lib/misc/jgraphaddons.jar lib/misc/OfficeLnFs.jar
+Class-Path: lib/hackystat/sensorshell.jar lib/misc/componentset.jar lib/ecg/event.jar lib/ecg/testHelper.jar lib/misc/jgraph.jar lib/misc/jgraphaddons.jar lib/misc/OfficeLnFs.jar

@@ -65,6 +65,7 @@ public class ModuleClassLoader extends java.lang.ClassLoader
             catch(LinkageError e)
             {
                 this.logger.log(Level.INFO, "Linkage error: " + e.getMessage());
+             
             }
             
 
@@ -137,7 +138,10 @@ public class ModuleClassLoader extends java.lang.ClassLoader
         finally
         {
          try {
-            fis.close();
+             if(fis != null)
+             {
+                 fis.close();
+             }
         }
         catch (IOException e) {
            

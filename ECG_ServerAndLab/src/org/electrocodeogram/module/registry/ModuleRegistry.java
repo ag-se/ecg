@@ -306,6 +306,8 @@ public class ModuleRegistry extends Observable
                         this.availableModuleClassesMap.put(new Integer(
                                 moduleClassId), moduleDescriptor);
                         
+                        getLogger().log(Level.INFO, "Registered new module class with id: " + moduleClassId + " "  + moduleDescriptor.getClazz().getName());
+                        
                         notifyOfNewModuleDecriptor(moduleDescriptor);
                         
                     }
