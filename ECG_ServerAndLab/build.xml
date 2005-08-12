@@ -238,12 +238,6 @@
 
 		</copy>
 
-		<copy todir="${dist.dir}/application/msdt/">
-
-			<fileset dir="${msdt.dir}"/>
-
-		</copy>
-
 		<copy todir="${dist.dir}/application/lib/">
 
 			<fileset dir="${lib.dir}"/>

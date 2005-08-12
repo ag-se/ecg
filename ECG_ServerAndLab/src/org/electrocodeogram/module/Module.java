@@ -549,6 +549,16 @@ public abstract class Module extends Observable implements Observer
             }
         }
         
+        for (MicroSensorDataType msdt : this.providedMsdt)
+        {
+            try {
+                Core.getInstance().getMsdtRegistry().deregisterMsdt(msdt);
+            }
+            catch (MicroSensorDataTypeRegisterException e) {
+                this.logger.log(Level.WARNING,e.getMessage());
+            }
+        }
+        
         try {
         	Core.getInstance().getModuleRegistry().deregisterModuleInstance(this.getId());
         }

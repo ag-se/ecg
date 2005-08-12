@@ -40,15 +40,7 @@ public class Core implements ICore {
 		
 		Console console = new Console();
 		
-		try {
-			
-			this.mstdManager = new MsdtRegistry();
-			
-		} catch (FileNotFoundException e) {
-			
-			this.logger.log(Level.SEVERE,e.getMessage());
-			
-		}
+		this.mstdManager = new MsdtRegistry();
 		
         this.moduleRegistry = new ModuleRegistry();
      

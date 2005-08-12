@@ -8,7 +8,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.transform.sax.SAXSource;
-import javax.xml.validation.Schema;
 import javax.xml.validation.Validator;
 
 import org.electrocodeogram.event.ValidEventPacket;
@@ -21,7 +20,6 @@ import org.xml.sax.SAXException;
  * This class provides the functionality to verify that syntactically valid
  * ValidEventPacket objects are according to HackyStat SensorDataTypes and to
  * ECG MicroSensorDataTypes.
- * 
  */
 public class EventValidator
 {
@@ -32,17 +30,17 @@ public class EventValidator
     private MsdtRegistry $mSdtManager = null;
 
     private SensorShell shell;
-    
-    private boolean allowNonHackyStatSDTConformEvents = false;
-    
-    private boolean allowNonECGmSDTConformEvents = false;
+
+    private boolean $allowNonHackyStatSDTConformEvents = false;
+
+    private boolean $allowNonECGmSDTConformEvents = false;
 
     /**
      * This creates a EventValidator object.
      * 
      * @param mSdtManager
      *            Is the MicroSensorDataType-Manager (MsdtManager) object that
-     *            maintains the MicroSensorDataType XML schema definitions which are used
+     *            keeps the MicroSensorDataType XML schema definitions which are used
      *            to validate the MicroActivities against.
      */
     public EventValidator(MsdtRegistry mSdtManager)
@@ -80,8 +78,9 @@ public class EventValidator
 
         this.logger.log(Level.INFO, this.processingID + ": Begin to process new event data at " + new Date().toString());
 
-        if(this.allowNonHackyStatSDTConformEvents) return true;
-            
+        if (this.$allowNonHackyStatSDTConformEvents)
+            return true;
+
         /*
          * Is the incoming event according to a HackyStat SensorDataType?
          */
@@ -93,22 +92,19 @@ public class EventValidator
 
             this.logger.log(Level.INFO, this.processingID + " : " + packet.toString());
 
-            if(this.allowNonECGmSDTConformEvents) return true;
-            
-            if(isActivityEvent(packet))
-            {
-                if(isMicroActivityEvent(packet))
-                {
-                    if(isMicroSensorDataType(packet))
-                    {
+            if (this.$allowNonECGmSDTConformEvents)
+                return true;
+
+            if (isActivityEvent(packet)) {
+                if (isMicroActivityEvent(packet)) {
+                    if (isMicroSensorDataType(packet)) {
                         return true;
                     }
                 }
             }
-          
+
         }
 
-     
         return false;
     }
 
@@ -138,7 +134,7 @@ public class EventValidator
      */
     private boolean isActivityEvent(ValidEventPacket packet)
     {
-        
+
         if (packet == null) {
             return false;
         }
@@ -156,7 +152,7 @@ public class EventValidator
     {
 
         List argList = packet.getArglist();
-        
+
         String microActivityString = (String) argList.get(2);
 
         if (microActivityString == null || microActivityString.equals("")) {
@@ -167,7 +163,6 @@ public class EventValidator
 
             this.logger.log(Level.INFO, this.processingID + ":" + packet.toString());
 
-            
             return false;
         }
 
@@ -181,15 +176,14 @@ public class EventValidator
 
             this.logger.log(Level.INFO, this.processingID + ":" + packet.toString());
 
-            
             return false;
         }
 
         for (int i = 0; i < microSensorDataTypes.length; i++) {
-        
-            SAXSource saxSource = new SAXSource(new InputSource(new StringReader(
-                    microActivityString)));
-           
+
+            SAXSource saxSource = new SAXSource(new InputSource(
+                    new StringReader(microActivityString)));
+
             Validator validator = microSensorDataTypes[i].getSchema().newValidator();
 
             try {
@@ -198,13 +192,13 @@ public class EventValidator
 
                 validator.validate(saxSource);
 
-                this.logger.log(Level.INFO, "The MicroActivity is a valid " + microSensorDataTypes[i].getName()  + " event.");
+                this.logger.log(Level.INFO, "The MicroActivity is a valid " + microSensorDataTypes[i].getName() + " event.");
 
                 return true;
             }
             catch (SAXException e) {
 
-                this.logger.log(Level.INFO, "The MicroActivity event is not a valid " + microSensorDataTypes[i].getName()  + " event.");
+                this.logger.log(Level.INFO, "The MicroActivity event is not a valid " + microSensorDataTypes[i].getName() + " event.");
 
                 this.logger.log(Level.INFO, e.getMessage());
 
@@ -220,7 +214,6 @@ public class EventValidator
         return false;
     }
 
-    
     /**
      * This method tells wheter event data that does not conform to
      * a ECG MicroSensorDataType is allowed to pass validation or not.
@@ -229,9 +222,9 @@ public class EventValidator
      */
     public boolean areNonECGmSDTConformEventsAllowed()
     {
-        return this.allowNonECGmSDTConformEvents;
+        return this.$allowNonECGmSDTConformEvents;
     }
-    
+
     /**
      * This method is used to decalare whether event data that does not conform to
      * a ECG MicroSensorDataType is allowed to pass validation.
@@ -240,12 +233,11 @@ public class EventValidator
      * @param allowNonECGmSDTConformEvents Is "true" if event data that does not conform to
      * a ECG MicroSensorDataType is allowed and "false" if not
      */
-
     public void setAllowNonECGmSDTConformEvents(boolean allowNonECGmSDTConformEvents)
     {
-        this.allowNonECGmSDTConformEvents = allowNonECGmSDTConformEvents;
+        this.$allowNonECGmSDTConformEvents = allowNonECGmSDTConformEvents;
     }
-    
+
     /**
      * This method tells wheter event data that does not conform to
      * a HackyStat SensorDataType is allowed to pass validation or not.
@@ -255,9 +247,9 @@ public class EventValidator
 
     public boolean areNonHackyStatSDTConformEventsAllowed()
     {
-        return this.allowNonHackyStatSDTConformEvents;
+        return this.$allowNonHackyStatSDTConformEvents;
     }
-    
+
     /**
      * This method is used to declare whether event data that does not conform to
      * a HackyStat SensorDataType is allowed to pass validation.
@@ -267,7 +259,7 @@ public class EventValidator
 
     public void setAllowNonHackyStatSDTConformEvents(boolean allowNonHackyStatSDTConformEvents)
     {
-        this.allowNonHackyStatSDTConformEvents = allowNonHackyStatSDTConformEvents;
+        this.$allowNonHackyStatSDTConformEvents = allowNonHackyStatSDTConformEvents;
     }
 
 }

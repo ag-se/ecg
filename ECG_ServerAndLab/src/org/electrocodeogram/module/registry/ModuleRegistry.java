@@ -306,7 +306,7 @@ public class ModuleRegistry extends Observable
                         this.availableModuleClassesMap.put(new Integer(
                                 moduleClassId), moduleDescriptor);
                         
-                        getLogger().log(Level.INFO, "Registered new module class with id: " + moduleClassId + " "  + moduleDescriptor.getClazz().getName());
+                        getLogger().log(Level.INFO, "Loaded additional module class with id: " + moduleClassId + " "  + moduleDescriptor.getClazz().getName());
                         
                         notifyOfNewModuleDecriptor(moduleDescriptor);
                         
@@ -344,7 +344,7 @@ public class ModuleRegistry extends Observable
 
         this.runningModules.runningModuleMap.put(new Integer(module.getId()), module);
 
-        
+        this.logger.log(Level.INFO,"Regestered module " + module.getName());
         
         setChanged();
 
@@ -459,6 +459,8 @@ public class ModuleRegistry extends Observable
         Module module = getModuleInstance(moduleId);
 
         this.runningModules.runningModuleMap.remove(new Integer(moduleId));
+        
+        this.logger.log(Level.INFO,"Deregestered module " + module.getName());
         
         setChanged();
 
