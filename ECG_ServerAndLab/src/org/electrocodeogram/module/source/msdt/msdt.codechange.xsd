@@ -21,7 +21,7 @@
 		<xs:complexType>
 	    	<xs:sequence>
 				<xs:element name="commonData" type="commonDataType"/>
-				<xs:element name="Codechange">
+				<xs:element name="codechange">
 					<xs:complexType>
 						<xs:sequence>
 							

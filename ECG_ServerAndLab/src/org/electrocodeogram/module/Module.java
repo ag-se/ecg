@@ -615,4 +615,8 @@ public abstract class Module extends Observable implements Observer
         
     }
 
+    public MicroSensorDataType[] getProvidedMicroSensorDataType()
+    {
+       return this.providedMsdt.toArray(new MicroSensorDataType[0]);
+    }
 }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry excluding="org/electrocodeogram/module/source/msdt/" kind="src" path="src"/>
+	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry sourcepath="/hackyKernel" kind="lib" path="lib/hackystat/sensorshell.jar"/>
 	<classpathentry kind="lib" path="lib/misc/componentset.jar"/>

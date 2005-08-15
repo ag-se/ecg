@@ -34,9 +34,13 @@
 											</xs:documentation>
 										</xs:annotation>
   									
-    										<xs:enumeration value="added"/>
+   										<xs:enumeration value="added"/>
 	 	   								<xs:enumeration value="removed"/>
 	 	   								<xs:enumeration value="changed"/>
+   										<xs:enumeration value="opened"/>
+   										<xs:enumeration value="closed"/>
+   										<xs:enumeration value="saved"/>
+   										
   									</xs:restriction>
 								</xs:simpleType>
 							</xs:element>

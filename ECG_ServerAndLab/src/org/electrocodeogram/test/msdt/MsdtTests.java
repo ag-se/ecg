@@ -1,12 +1,18 @@
 package org.electrocodeogram.test.msdt;
 
-import java.io.FileNotFoundException;
+import java.io.File;
 import java.io.IOException;
+import java.util.Properties;
 
 import junit.framework.TestCase;
 
 import org.electrocodeogram.event.ValidEventPacket;
+import org.electrocodeogram.module.Module;
+import org.electrocodeogram.module.registry.IllegalModuleIDException;
+import org.electrocodeogram.module.registry.ModuleRegistry;
+import org.electrocodeogram.module.registry.UnknownModuleIDException;
 import org.electrocodeogram.msdt.EventValidator;
+import org.electrocodeogram.msdt.MicroSensorDataTypeRegisterException;
 import org.electrocodeogram.msdt.MsdtRegistry;
 import org.electrocodeogram.test.EventGenerator;
 import org.electrocodeogram.test.EventGenerator.MicroSensorDataType;
@@ -23,32 +29,53 @@ public class MsdtTests extends TestCase
 
     private EventGenerator eventGenerator = null;
 
-    /**
-     * This creates the class and the needed MsdtManager and EventGenerator objects.
-     */
-    public MsdtTests()
-    {
-        try {
-            this.msdtManager = new MsdtRegistry();
-
-            this.eventGenerator = new EventGenerator();
-        }
-        catch (FileNotFoundException e) {
-
-            e.printStackTrace();
-        }
-        catch (IOException e) {
-
-            e.printStackTrace();
-        }
-    }
+    private ModuleRegistry moduleRegistry = null;
 
     /**
+     * @throws UnknownModuleIDException 
+     * @throws IllegalModuleIDException 
+     * @throws IllegalAccessException 
+     * @throws InstantiationException 
+     * @throws IOException 
+     * @throws MicroSensorDataTypeRegisterException 
      * @see junit.framework.TestCase#setUp()
      */
     @Override
-    protected void setUp()
+    protected void setUp() throws InstantiationException, IllegalAccessException, IllegalModuleIDException, UnknownModuleIDException, IOException, MicroSensorDataTypeRegisterException
     {
+
+        this.moduleRegistry = new ModuleRegistry(new File("modules"));
+
+        this.msdtManager = new MsdtRegistry();
+
+        this.eventGenerator = new EventGenerator();
+
+        Module module = null;
+
+        Integer[] ids = this.moduleRegistry.getAvailableModuleClassIds();
+        
+        for(Integer id : ids)
+        {
+            Properties moduleProperties = this.moduleRegistry.getModulePropertiesForId(id);
+            
+            if(moduleProperties.getProperty("MODULE_NAME").equals("SocketSourceModule"))
+            {
+                module = (Module) this.moduleRegistry.getModuleClassForId(id).newInstance();
+                
+                break;
+            }
+        }
+        
+        
+        
+        org.electrocodeogram.msdt.MicroSensorDataType[] msdts = module.getProvidedMicroSensorDataType();
+
+        for (org.electrocodeogram.msdt.MicroSensorDataType msdt : msdts) {
+
+            this.msdtManager.registerMsdt(msdt);
+
+        }
+
         this.eventValidator = new EventValidator(this.msdtManager);
 
         this.eventValidator.setAllowNonHackyStatSDTConformEvents(false);
@@ -63,6 +90,12 @@ public class MsdtTests extends TestCase
     protected void tearDown()
     {
         this.eventValidator = null;
+
+        this.eventGenerator = null;
+
+        this.moduleRegistry = null;
+
+        this.msdtManager = null;
     }
 
     /**

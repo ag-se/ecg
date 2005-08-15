@@ -188,7 +188,7 @@ public class EventValidator
 
             try {
 
-                this.logger.log(Level.INFO, "Validating MicroActivity against " + microSensorDataTypes[i].getName() + " XML schema.");
+                //this.logger.log(Level.INFO, "Validating MicroActivity against " + microSensorDataTypes[i].getName() + " XML schema.");
 
                 validator.validate(saxSource);
 
@@ -198,9 +198,9 @@ public class EventValidator
             }
             catch (SAXException e) {
 
-                this.logger.log(Level.INFO, "The MicroActivity event is not a valid " + microSensorDataTypes[i].getName() + " event.");
+                //this.logger.log(Level.INFO, "The MicroActivity event is not a valid " + microSensorDataTypes[i].getName() + " event.");
 
-                this.logger.log(Level.INFO, e.getMessage());
+                //this.logger.log(Level.INFO, e.getMessage());
 
             }
             catch (IOException e) {

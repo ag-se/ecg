@@ -21,7 +21,7 @@
 		<xs:complexType>
 	    	<xs:sequence>
 				<xs:element name="commonData" type="commonDataType"/>
-				<xs:element name="rundebug">
+				<xs:element name="run">
 					<xs:complexType>
 						<xs:attribute name="debug" type="xs:boolean"/>
 					</xs:complexType>			
