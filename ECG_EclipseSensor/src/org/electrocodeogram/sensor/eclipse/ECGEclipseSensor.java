@@ -477,6 +477,12 @@ public class ECGEclipseSensor
 
                 setActiveTextEditor((ITextEditor) part);
                 
+                IDocumentProvider provider =  getActiveTextEditor().getDocumentProvider();
+                
+                IDocument document = provider.getDocument(getActiveTextEditor().getEditorInput());
+
+                document.addDocumentListener(new DocumentListenerAdapter());
+                
                 processActivity("<?xml version=\"1.0\"?><microActivity><commonData><username>"+getUsername()+"</username><projectname>"+getProjectname()+"</projectname></commonData><editor><activity>activated</activity><editorname>" + part.getTitle() + "</editorname></editor></microActivity>");
             
             }

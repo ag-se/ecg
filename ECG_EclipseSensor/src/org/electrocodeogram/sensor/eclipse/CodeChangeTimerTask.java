@@ -36,7 +36,7 @@ public class CodeChangeTimerTask extends TimerTask
     {
         ECGEclipseSensor sensor = ECGEclipseSensor.getInstance();
 
-        sensor.processActivity("<?xml version=\"1.0\"?><microActivity><commonData><username>"+sensor.getUsername()+"</username><projectname>"+sensor.getProjectname()+"</projectname></commonData><codechange><document>"+this.$document.get()+"</document><documentname>"+this.$documentName+"</documentname></codechange></microActivity>");
+        sensor.processActivity("<?xml version=\"1.0\"?><microActivity><commonData><username>"+sensor.getUsername()+"</username><projectname>"+sensor.getProjectname()+"</projectname></commonData><codechange><document><![CDATA["+this.$document.get()+"]]></document><documentname>"+this.$documentName+"</documentname></codechange></microActivity>");
 
     }
 }
