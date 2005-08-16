@@ -45,8 +45,8 @@
 								</xs:simpleType>
 							</xs:element>
 							
-							<xs:element name="resourcename"/>
-							<xs:element name="resourcetype"/>
+							<xs:element name="resourcename" type="xs:token"/>
+							<xs:element name="resourcetype" type="xs:token"/>
 						</xs:sequence>
 					</xs:complexType>			
 				</xs:element>

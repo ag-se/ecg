@@ -43,7 +43,7 @@
 								</xs:simpleType>
 							</xs:element>
 							
-							<xs:element name="windowname"/>
+							<xs:element name="windowname" type="xs:token"/>
 						</xs:sequence>
 					</xs:complexType>			
 				</xs:element>

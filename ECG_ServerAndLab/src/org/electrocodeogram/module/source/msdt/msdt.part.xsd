@@ -43,7 +43,7 @@
 								</xs:simpleType>
 							</xs:element>
 							
-							<xs:element name="partname"/>
+							<xs:element name="partname" type="xs:token"/>
 						</xs:sequence>
 					</xs:complexType>			
 				</xs:element>

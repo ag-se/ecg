@@ -43,7 +43,7 @@
 								</xs:simpleType>
 							</xs:element>
 							
-							<xs:element name="editorname"/>
+							<xs:element name="editorname" type="xs:token"/>
 						</xs:sequence>
 					</xs:complexType>			
 				</xs:element>

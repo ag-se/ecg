@@ -119,11 +119,11 @@ public class EventValidator
             return false;
 
         if (packet.getArglist().get(1).equals("MicroActivity")) {
-            this.logger.log(Level.INFO, this.processingID + ": The event is a ECG \"MicroActivity\" event.");
+            this.logger.log(Level.INFO, this.processingID + ": The event is an ECG \"MicroActivity\" event.");
             return true;
         }
 
-        this.logger.log(Level.INFO, this.processingID + ": The event is not a ECG \"MicroActivity\" event.");
+        this.logger.log(Level.INFO, this.processingID + ": The event is not an ECG \"MicroActivity\" event.");
         return false;
     }
 
@@ -198,9 +198,9 @@ public class EventValidator
             }
             catch (SAXException e) {
 
-                //this.logger.log(Level.INFO, "The MicroActivity event is not a valid " + microSensorDataTypes[i].getName() + " event.");
+                this.logger.log(Level.INFO, "The MicroActivity event is not a valid " + microSensorDataTypes[i].getName() + " event.");
 
-                //this.logger.log(Level.INFO, e.getMessage());
+                this.logger.log(Level.INFO, e.getMessage());
 
             }
             catch (IOException e) {
@@ -211,6 +211,8 @@ public class EventValidator
 
         }
 
+        this.logger.log(Level.INFO, "The MicroActivity is not conforming to a known MicroSensorDataType.");
+        
         return false;
     }
 
