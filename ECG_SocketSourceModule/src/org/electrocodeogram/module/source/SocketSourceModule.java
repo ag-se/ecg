@@ -1,4 +1,6 @@
 package org.electrocodeogram.module.source;
+
+import org.electrocodeogram.module.ModulePropertyException;
     /**
      * This module receives event data from multiple client sensors.
      * The communication is done over Sockets. Each new incoming
@@ -9,27 +11,76 @@ package org.electrocodeogram.module.source;
     public class SocketSourceModule extends SourceModule
     {
 
+        private int port = -1;
+        
+        private SocketServer socketServer = null;
+        
+        /**
+         * @param moduleClassId
+         * @param name
+         */
+        public SocketSourceModule(int moduleClassId, String name)
+        {
+            super(moduleClassId, name);
+            
+            this.port = 22222;
+            
+            this.startReader(this);
+
+        }
+
+
         /**
          * @see org.electrocodeogram.module.source.SourceModule#startReader(org.electrocodeogram.module.source.SourceModule)
          */
         @Override
         public void startReader(SourceModule sourceModule)
         {
-            SocketServer socketServer = new SocketServer(sourceModule);
+            this.socketServer = new SocketServer(sourceModule,this.port);
             
-            socketServer.start();
+            this.socketServer.start();
             
         }
 
        
         /**
+         * @throws ModulePropertyException 
          * @see org.electrocodeogram.module.Module#setProperty(java.lang.String, java.lang.Object)
          */
         @Override
-        public void setProperty(@SuppressWarnings("unused") String currentPropertyName, @SuppressWarnings("unused") Object propertyValue)
+        public void setProperty(String propertyName, Object propertyValue) throws ModulePropertyException
         {
-            // TODO Auto-generated method stub
-            
+            if(propertyName.equals("port"))
+            {
+                if(propertyValue instanceof String)
+                {
+                    String propertyValueString = (String) propertyValue;
+                    
+                    try
+                    {
+                        int portValue = Integer.parseInt(propertyValueString);
+                        
+                        if(portValue > 1024 && portValue < 65536)
+                        {
+                            this.port = portValue;
+                            
+                            this.socketServer.shutDown();
+                            
+                            this.startReader(this);
+                            
+                        }
+                        
+                        throw new ModulePropertyException("The value for the port property must be a number greater than 1024 and less then 65536.");
+                         
+                    }
+                    catch(NumberFormatException e)
+                    {
+                        throw new ModulePropertyException("The value for the port property must be a number greater than 1024 and less then 65536.");
+                    }
+                }
+                
+                throw new ModulePropertyException("The value for the port property must be a number greater than 1024 and less then 65536.");
+            }
         }
     	
         

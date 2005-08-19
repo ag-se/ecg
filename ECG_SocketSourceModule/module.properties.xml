@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<module>
+	<name>
+		SocketSourceModule
+	</name>
+	<class>
+		org\\electrocodeogram\\module\\source\\SocketSourceModule
+	</class>
+	<description>
+		This module is listening on TCP port 22222 for incoming ECG Sensor events.
+	</description>
+	<properties>
+		<property>
+			<propertyName>
+				port
+			</propertyName>
+			<propertyType>
+				java.lang.Integer
+			</propertyType>
+			<propertyValue>
+				10557
+			</propertyValue>
+		</property>
+	</properties>
+</module>

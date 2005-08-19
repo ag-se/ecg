@@ -131,7 +131,7 @@
 		<copy todir="${dist.dir}/ECG_SocketSourceModule">
 
 			<fileset dir="${build.classes}" />
-			<fileset dir="${basedir}" file="module.properties" />
+			<fileset dir="${basedir}" file="module.properties.xml" />
 
 		</copy>
 

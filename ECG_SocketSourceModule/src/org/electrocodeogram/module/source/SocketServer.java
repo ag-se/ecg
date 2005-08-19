@@ -22,12 +22,7 @@ public class SocketServer extends Thread implements ISocketServer
     
     protected Logger logger = null;
     
-    // TODO : Make this configurable
-    
-    /**
-     * This is the TCP port to listen on
-     */
-    public static final int PORT = 22222;
+    private int $port = -1;
     
     protected boolean runningFlag = true;
     
@@ -42,8 +37,10 @@ public class SocketServer extends Thread implements ISocketServer
      * @param module Is the source module to which the received event data is passed
     
      */
-    public SocketServer(SourceModule module)
+    public SocketServer(SourceModule module, int port)
     {
+        this.$port = port;
+        
         this.sourceModule = module;
         
         this.serverThreadPool = new HashMap<Integer,SocketServerThread>();
@@ -102,7 +99,7 @@ public class SocketServer extends Thread implements ISocketServer
         String[] toReturn = null;
         
         try {
-            toReturn = new String[] {InetAddress.getLocalHost().toString(),new Integer(SocketServer.PORT).toString()};
+            toReturn = new String[] {InetAddress.getLocalHost().toString(),new Integer(this.$port).toString()};
         }
         catch (UnknownHostException e) {
             
@@ -125,14 +122,14 @@ public class SocketServer extends Thread implements ISocketServer
     {
         try {
 
-            this.serverSocket = new ServerSocket(PORT);
+            this.serverSocket = new ServerSocket(this.$port);
 
-            System.out.println("ECG Server is up and listening on port: " + PORT);
+            System.out.println("ECG Server is up and listening on port: " + this.$port);
             
         }
         catch (IOException e) {
             
-            this.logger.log(Level.SEVERE,"The ECG Server could not be started. (Maybe port " + PORT + " is in use?");
+            this.logger.log(Level.SEVERE,"The ECG Server could not be started. (Maybe port " + this.$port + " is in use?");
             
             this.runningFlag = false;
             
@@ -191,6 +188,8 @@ public class SocketServer extends Thread implements ISocketServer
      */
     public void shutDown()
     {
+        this.logger.log(Level.INFO,"Shutting down SocketServer at port: " + this.$port);
+        
         Object[] threadArray = this.serverThreadPool.values().toArray();
         
         for(Object threadObject : threadArray)
@@ -214,5 +213,6 @@ public class SocketServer extends Thread implements ISocketServer
             }
         }
         
+        this.logger.log(Level.INFO,"Shutdown complete");
     }
 }
