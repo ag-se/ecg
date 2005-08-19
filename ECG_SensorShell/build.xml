@@ -209,9 +209,15 @@
 		
 		<copy todir="../ECG_SocketSourceModule/lib/ecg">
 
-					<fileset dir="${build.lib}" includes="event.jar" />
+				<fileset dir="${build.lib}" includes="event.jar" />
 
-				</copy>
+		</copy>
+		
+		<copy todir="../ECG_FileSystemTargetModule/lib/ecg">
+
+				<fileset dir="${build.lib}" includes="event.jar" />
+
+		</copy>
 
 	</target>
 
