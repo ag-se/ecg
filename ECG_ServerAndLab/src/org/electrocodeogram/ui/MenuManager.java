@@ -9,6 +9,7 @@ package org.electrocodeogram.ui;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.Properties;
 
 import javax.swing.JFileChooser;
@@ -403,7 +404,7 @@ public class MenuManager
                         break;
                     case JFileChooser.APPROVE_OPTION:
                         
-                        propertyValue = fileChooser.getSelectedFile().getAbsolutePath();
+                        propertyValue = new File(fileChooser.getSelectedFile().getAbsolutePath());
                         
                         break;
                     }
