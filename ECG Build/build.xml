@@ -47,9 +47,20 @@
 		<ant dir="../ECG_SocketSourceModule" target="cleanall" />
 
 	</target>
+	
+	<!-- Calls the ant script of the ECG FileSystemTargetModule to clean it -->
+		<target name="CleanAll ECG FileSystemTargetModule">
+
+			<echo message="###################################"/>
+			<echo message="CLEANING ECG FILESYSTEMTARGETMODULE"/>
+			<echo message="###################################"/>
+
+			<ant dir="../ECG_FileSystemTargetModule" target="cleanall" />
+
+		</target>
 
 	<!-- Cleans all ECG components -->
-	<target name="cleanAll" depends="CleanAll ECG SensorShell,CleanAll ECG TestHelper,CleanAll ECG ServerAndLab,CleanAll ECG SocketSourceModule" />
+	<target name="cleanAll" depends="CleanAll ECG SensorShell,CleanAll ECG TestHelper,CleanAll ECG ServerAndLab,CleanAll ECG SocketSourceModule, CleanAll ECG FileSystemTargetModule" />
 
 
 	<!-- Calls the ant script of the ECG SensorShell component to build it -->
@@ -112,7 +123,28 @@
 		<ant dir="../ECG_SocketSourceModule" target="deploy" />
 
 	</target>
+	
+	<!-- Calls the ant script of the ECG FileSystemTargetModule to build it -->
+		<target name="Build ECG FileSystemTargetModule">
 
+			<echo message="###################################"/>
+			<echo message="BUILDING ECG FILESYSTEMTARGETMODULE"/>
+			<echo message="###################################"/>
+
+			<ant dir="../ECG_FileSystemTargetModule" target="deploy" />
+
+		</target>
+
+	<!-- Calls the ant script of the ECG SocketEchoSourceModule to build it -->
+	<target name="Build ECG SocketEchoSourceModule">
+
+		<echo message="###################################"/>
+		<echo message="BUILDING ECG SOCKETECHOSOURCEMODULE"/>
+		<echo message="###################################"/>
+
+		<ant dir="../ECG_SocketEchoSourceModule" target="deploy" />
+
+	</target>
 
 	<!-- Calls the ant script of the ECG ServerAndLab to assemble the application -->
 	<target name="Assemble ECG ServerAndLab">
@@ -128,7 +160,7 @@
 
 
 	<!-- Builds all ECG components -->
-	<target name="buildAll" depends="Build ECG SensorShell Event,Build ECG TestHelper, Build ECG SensorShell Shell,Build ECG ServerAndLab Module-API,Build ECG SocketSourceModule,Assemble ECG ServerAndLab"/>
+	<target name="buildAll" depends="Build ECG SensorShell Event,Build ECG TestHelper, Build ECG SensorShell Shell,Build ECG ServerAndLab Module-API,Build ECG SocketSourceModule, Build ECG FileSystemTargetModule, Assemble ECG ServerAndLab"/>
 
 	<!-- Package release -->
 	<target name="Package release" depends="cleanAll,buildAll">
