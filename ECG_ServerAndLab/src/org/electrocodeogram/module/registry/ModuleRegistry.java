@@ -321,7 +321,7 @@ public class ModuleRegistry extends Observable
                     parser.setFeature("http://apache.org/xml/features/validation/dynamic", true);
 
                     // parse the property file against the "module.properties.xsd XML schema
-                    parser.setProperty("http://apache.org/xml/properties/schema/external-noNamespaceSchemaLocation", "module.properties.xsd");
+                    parser.setProperty("http://apache.org/xml/properties/schema/external-noNamespaceSchemaLocation", "lib/ecg/module.properties.xsd");
 
                 }
                 catch (SAXNotRecognizedException e1) {
@@ -380,11 +380,11 @@ public class ModuleRegistry extends Observable
                 if (properties != null) {
 
                     NodeList propertyList = document.getElementsByTagName("property");
-
-                    moduleProperties = new ModuleProperty[propertyList.getLength()];
                     
                     if (propertyList != null)
                     {
+                        moduleProperties = new ModuleProperty[propertyList.getLength()];
+                        
                         for (int j = 0; j < propertyList.getLength(); j++)
                         {
                             Node propertyNode = propertyList.item(j);
@@ -393,7 +393,7 @@ public class ModuleRegistry extends Observable
                             
                             Node modulePropertyNameNode = propertyNodeChildNodes.item(1);
                             
-                            if(!modulePropertyNameNode.getNodeName().equals("propertyName"))
+                            if(modulePropertyNameNode != null && !modulePropertyNameNode.getNodeName().equals("propertyName"))
                             {
                                 getLogger().log(Level.WARNING, "Error parsing module property file " + modulePropertyFileString);
 
@@ -402,7 +402,7 @@ public class ModuleRegistry extends Observable
                             
                             Node modulePropertyTypeNode = propertyNodeChildNodes.item(3);
                             
-                            if(!modulePropertyTypeNode.getNodeName().equals("propertyType"))
+                            if(modulePropertyTypeNode != null && !modulePropertyTypeNode.getNodeName().equals("propertyType"))
                             {
                                 getLogger().log(Level.WARNING, "Error parsing module property file " + modulePropertyFileString);
 
@@ -411,7 +411,7 @@ public class ModuleRegistry extends Observable
                             
                             Node modulePropertyValueNode = propertyNodeChildNodes.item(5);
                             
-                            if(!modulePropertyValueNode.getNodeName().equals("propertyValue"))
+                            if(modulePropertyValueNode != null && !modulePropertyValueNode.getNodeName().equals("propertyValue"))
                             {
                                 getLogger().log(Level.WARNING, "Error parsing module property file " + modulePropertyFileString);
 
@@ -477,6 +477,12 @@ public class ModuleRegistry extends Observable
 
                     moduleClass = this.moduleClassLoader.loadClass(fQmoduleClassString);
 
+                    if(moduleClass == null)
+                    {
+                        // something went wrong during class loading
+                        continue;
+                    }
+                    
                     int moduleClassId = this.id++;
 
                     // make a new ModuleDescriptor for this module class nad

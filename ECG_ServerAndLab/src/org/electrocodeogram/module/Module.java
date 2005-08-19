@@ -402,7 +402,7 @@ public abstract class Module extends Observable implements Observer
      * @param currentPropertyName
      * @param propertyValue
      */
-    public abstract void setProperty(String currentPropertyName, Object propertyValue);
+    public abstract void setProperty(String currentPropertyName, Object propertyValue) throws ModulePropertyException;
 
     /**
      * This method collects detailed information about the module and returns them as a String.
@@ -563,22 +563,9 @@ public abstract class Module extends Observable implements Observer
     private void loadPredefinedSourceMsdt() throws FileNotFoundException
     {
 
-        //URL moduleDir = this.getClass().getResource(".");
-        
         String msdtSubDirString = "msdt";
-        
-//        if(moduleDir == null)
-//        {
-//            System.out.println("Resource nicht gefunden!");
-//        }
-        
-        System.out.println("!!! Bin im " + new File(".").getAbsolutePath() + " Verzeichnis.");
-        
-        //String moduleDirString = moduleDir.getFile();
-        
+
         File msdtDir = new File(msdtSubDirString);
-        
-        
         
         if (!msdtDir.exists() || !msdtDir.isDirectory()) {
             throw new FileNotFoundException(

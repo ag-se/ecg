@@ -3,6 +3,7 @@ package org.electrocodeogram.test.server.modules;
 import junit.framework.TestCase;
 
 import org.electrocodeogram.event.ValidEventPacket;
+import org.electrocodeogram.msdt.MicroSensorDataType;
 import org.electrocodeogram.test.EventGenerator;
 import org.electrocodeogram.test.EventGenerator.SensorDataType;
 
@@ -56,7 +57,7 @@ public class ModuleTests extends TestCase
     public void testEventTransportInHundredNodeModuleList() throws Exception
     {
 
-        ValidEventPacket eventPacket = this.eventGenerator.createHackyStatEventPacket(SensorDataType.ACTIVITY,0);
+        ValidEventPacket eventPacket = this.eventGenerator.createECGEventPacket(org.electrocodeogram.test.EventGenerator.MicroSensorDataType.CODECHANGE);
 
         this.testModuleTransport.makeModuleList(100);
 
@@ -82,7 +83,7 @@ public class ModuleTests extends TestCase
     public void testEventTransportInFifteenNodeModuleTree() throws Exception
     {
 
-        ValidEventPacket eventPacket = this.eventGenerator.createHackyStatEventPacket(SensorDataType.ACTIVITY,0);
+        ValidEventPacket eventPacket = this.eventGenerator.createECGEventPacket(org.electrocodeogram.test.EventGenerator.MicroSensorDataType.CODECHANGE);
 
         this.testModuleTransport.makeModuleBinTree();
 

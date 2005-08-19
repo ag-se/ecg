@@ -155,21 +155,12 @@ public class ModuleGraph extends JGraph
 			                    
 			                    selectedModuleCellId = mc.getId();
 			                    
-                                int moduleClassId;
                                 
-                                try {
-                                    moduleClassId = Core.getInstance().getModuleRegistry().getModuleInstance(selectedModuleCellId).getClassId();
+                                
+                               
                                     
-                                    getGui().getMenuManager().showModuleMenu(moduleClassId,me,e.getPoint().x,e.getPoint().y);
-                                }
-                                catch (IllegalModuleIDException e1) {
-                                    // TODO Auto-generated catch block
-                                    e1.printStackTrace();
-                                }
-                                catch (UnknownModuleIDException e1) {
-                                    // TODO Auto-generated catch block
-                                    e1.printStackTrace();
-                                }
+                                    getGui().getMenuManager().showModuleMenu(selectedModuleCellId,me,e.getPoint().x,e.getPoint().y);
+                              
                                 
 			                    
 			                }

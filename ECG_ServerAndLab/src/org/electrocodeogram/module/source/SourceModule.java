@@ -30,8 +30,6 @@ public abstract class SourceModule extends Module
         
         this.eventValidator = new EventValidator(Core.getInstance().getMsdtRegistry());
         
-        this.startReader(this);
-        
     }
     
     /**

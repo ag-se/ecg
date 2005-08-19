@@ -1,19 +1,11 @@
 package org.electrocodeogram.test.msdt;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.Properties;
 
 import junit.framework.TestCase;
 
 import org.electrocodeogram.event.ValidEventPacket;
-import org.electrocodeogram.module.Module;
-import org.electrocodeogram.module.registry.IllegalModuleIDException;
-import org.electrocodeogram.module.registry.ModuleRegistry;
-import org.electrocodeogram.module.registry.UnknownModuleIDException;
 import org.electrocodeogram.msdt.EventValidator;
-import org.electrocodeogram.msdt.MSDTIsNullException;
-import org.electrocodeogram.msdt.MsdtRegistry;
 import org.electrocodeogram.test.EventGenerator;
 import org.electrocodeogram.test.EventGenerator.MicroSensorDataType;
 
@@ -23,64 +15,26 @@ import org.electrocodeogram.test.EventGenerator.MicroSensorDataType;
 public class MsdtTests extends TestCase
 {
 
-    private MsdtRegistry msdtManager = null;
+    private MockMsdtRegistry mockMsdtRegistry = null;
 
     private EventValidator eventValidator = null;
 
     private EventGenerator eventGenerator = null;
 
-    private ModuleRegistry moduleRegistry = null;
-
     /**
-     * @throws UnknownModuleIDException 
-     * @throws IllegalModuleIDException 
-     * @throws IllegalAccessException 
-     * @throws InstantiationException 
      * @throws IOException 
-     * @throws MSDTIsNullException 
      * @see junit.framework.TestCase#setUp()
      */
     @Override
-    protected void setUp() throws InstantiationException, IllegalAccessException, IllegalModuleIDException, UnknownModuleIDException, IOException, MSDTIsNullException
+    protected void setUp() throws  IOException
     {
 
-        this.moduleRegistry = new ModuleRegistry(new File("modules"));
-
-        this.msdtManager = new MsdtRegistry();
-
         this.eventGenerator = new EventGenerator();
-
-        Module module = null;
-
-        Integer[] ids = this.moduleRegistry.getAvailableModuleClassIds();
         
-        for(Integer id : ids)
-        {
-            Properties moduleProperties = this.moduleRegistry.getModuleClassProperties(id);
-            
-            if(moduleProperties.getProperty("MODULE_NAME").equals("SocketSourceModule"))
-            {
-                module = (Module) this.moduleRegistry.getModuleClassForId(id).newInstance();
-                
-                break;
-            }
-        }
+        this.mockMsdtRegistry = new MockMsdtRegistry();
+       
+        this.eventValidator = new EventValidator(this.mockMsdtRegistry);
         
-        
-        
-        org.electrocodeogram.msdt.MicroSensorDataType[] msdts = module.getProvidedMicroSensorDataType();
-
-        for (org.electrocodeogram.msdt.MicroSensorDataType msdt : msdts) {
-
-            //this.msdtManager.requestMsdtRegistration(msdt);
-
-        }
-
-        this.eventValidator = new EventValidator(this.msdtManager);
-
-        this.eventValidator.setAllowNonHackyStatSDTConformEvents(false);
-
-        this.eventValidator.setAllowNonECGmSDTConformEvents(false);
     }
 
     /**
@@ -93,9 +47,7 @@ public class MsdtTests extends TestCase
 
         this.eventGenerator = null;
 
-        this.moduleRegistry = null;
-
-        this.msdtManager = null;
+        this.mockMsdtRegistry = null;
     }
 
     /**

@@ -1,6 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
+	<xs:annotation>
+		<xs:documentation>
+			This XML schema defines the structure of a module property file. Each module
+			must provide a file called "module.properties.xml" which is an instance of
+			this XMl schema.
+			Each module must have a name value, a value that is the full qualified path to the
+			module's root class and a description text.
+			Each module can additionally have properties declared. A module property is 
+			made user setable by the ECG at runtime.
+			For each provided module property an property name and a property type must be given.
+			The property type has to be a valid full qualified Java class, like "java.lang.Integer".
+			A module property can also have a default value.
+		</xs:documentation>
+	</xs:annotation>
+	
 	<xs:element name="module">
 		<xs:complexType>
 	    	<xs:sequence>

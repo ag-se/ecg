@@ -20,6 +20,7 @@ import javax.swing.JPopupMenu;
 import org.electrocodeogram.core.Core;
 import org.electrocodeogram.module.Module;
 import org.electrocodeogram.module.ModuleConnectionException;
+import org.electrocodeogram.module.ModulePropertyException;
 import org.electrocodeogram.module.Module.ModuleType;
 import org.electrocodeogram.module.intermediate.IIntermediateModule;
 import org.electrocodeogram.module.intermediate.IntermediateModule;
@@ -197,7 +198,7 @@ public class MenuManager
     }
 
  
-    public void showModuleMenu(int moduleClassId, Component c, int x, int y)
+    public void showModuleMenu(int moduleId, Component c, int x, int y)
     {
         modulePopupMenu = new ModulePopupMenu();
         
@@ -208,7 +209,7 @@ public class MenuManager
         modulePopupMenu.addSeparator();
         
         try {
-            if(!Core.getInstance().getModuleRegistry().getModuleInstance(moduleClassId).isModuleType(ModuleType.TARGET_MODULE))
+            if(!Core.getInstance().getModuleRegistry().getModuleInstance(moduleId).isModuleType(ModuleType.TARGET_MODULE))
             {
                 modulePopupMenu.add(mniModuleConnectTo);
             }
@@ -231,7 +232,7 @@ public class MenuManager
         
         
         try {
-            if(Core.getInstance().getModuleRegistry().getModuleInstance(moduleClassId).isModuleType(ModuleType.INTERMEDIATE_MODULE))
+            if(Core.getInstance().getModuleRegistry().getModuleInstance(moduleId).isModuleType(ModuleType.INTERMEDIATE_MODULE))
             {
                 modulePopupMenu.addSeparator();
                 
@@ -252,6 +253,9 @@ public class MenuManager
        
         ModuleProperty[] moduleProperties = null;
         try {
+            
+            int moduleClassId = Core.getInstance().getModuleRegistry().getModuleInstance(moduleId).getClassId();
+            
             moduleProperties = Core.getInstance().getModuleRegistry().getModuleClassProperties(moduleClassId);
         }
         catch (IllegalModuleIDException e1) {
@@ -274,7 +278,7 @@ public class MenuManager
                     
                         JMenuItem menuItem = new JMenuItem(propertyName);
                       
-                        menuItem.addActionListener(new PropertyActionAdapter($gui,moduleClassId,propertyType,propertyName));                    
+                        menuItem.addActionListener(new PropertyActionAdapter($gui,moduleId,propertyType,propertyName));                    
                         
                         modulePopupMenu.add(menuItem);
                     
@@ -381,6 +385,10 @@ public class MenuManager
                 {
                    propertyValue = JOptionPane.showInputDialog($gui,"Geben Sie den neuen Wert ein","",JOptionPane.QUESTION_MESSAGE);
                 }
+                else if(propertyType.equals(Class.forName("java.lang.Integer")))
+                {
+                    propertyValue = JOptionPane.showInputDialog($gui,"Geben Sie den neuen Wert ein","",JOptionPane.QUESTION_MESSAGE);
+                }
                 else if(propertyType.equals(Class.forName("java.io.File")))
                 {
                     JFileChooser fileChooser = new JFileChooser();
@@ -400,10 +408,18 @@ public class MenuManager
                         break;
                     }
                 }
-           
-                //assert(propertyValue != null);
                 
-                Core.getInstance().getModuleRegistry().getModuleInstance(moduleId).setProperty(propertyName,propertyValue);
+                if(propertyValue == null)
+                {
+                    return;
+                }
+           
+                try {
+                    Core.getInstance().getModuleRegistry().getModuleInstance(moduleId).setProperty(propertyName,propertyValue);
+                }
+                catch (ModulePropertyException e1) {
+                    JOptionPane.showMessageDialog($gui,e1.getMessage(),"Error setting property",JOptionPane.ERROR_MESSAGE);
+                }
             
             }
             catch (ClassNotFoundException e1) {

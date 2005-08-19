@@ -213,6 +213,12 @@
 			<fileset dir="${build.lib}" includes="moduleapi.jar" />
 
 		</copy>
+		
+		<copy todir="../ECG_FileSystemTargetModule/lib/ecg/">
+
+					<fileset dir="${build.lib}" includes="moduleapi.jar" />
+
+				</copy>
 
 	</target>
 

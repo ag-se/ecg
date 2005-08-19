@@ -45,9 +45,19 @@ public class ModuleClassLoader extends java.lang.ClassLoader
 
         File classFile = new File(classFilePath);
 
-        assert (classFile.exists());
+        if(!classFile.exists())
+        {
+            this.logger.log(Level.SEVERE,"The class file can not be found: " + classFilePath);
+            
+            return null;
+        }
 
-        assert (classFile.isFile());
+        if(!classFile.isFile())
+        {
+            this.logger.log(Level.SEVERE,"The class file is not a simple file: " + classFilePath);
+            
+            return null;
+        }
 
         FileInputStream fis = null;
 
