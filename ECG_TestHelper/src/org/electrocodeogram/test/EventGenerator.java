@@ -17,8 +17,8 @@ import org.electrocodeogram.event.IllegalEventParameterException;
 import org.electrocodeogram.event.ValidEventPacket;
 
 /**
- * This class is a test data generator. It provides methods to create
- * many types of valid and invalid event data.
+ * This class is a test data generator. It provides methods to create many types
+ * of valid and invalid event data.
  */
 public class EventGenerator
 {
@@ -40,10 +40,17 @@ public class EventGenerator
         ACTIVITY, BUFFTRANS, BUILD, CLI, COMMIT, COVERAGE, DEPENDENCY, FILEMETRIC, ISSUE, PERF, REVIEWACTIVITY, REVIEWISSUE, UNITTEST
     }
 
+    public enum MicroSensorDataType {
+        RESOURCEADDED, RESOURCEREMOVED, RESOURCECHANGED, RESOURCEACTIVITYUNKNOWN, CODECHANGE, WINDOWOPENED, WINDOWCLOSED, WINDOWACTIVATED, WINDOWDEACTIVATED, WINDOWACTIVITYUNKNOWN, PARTOPENED, PARTCLOSED, PARTACTIVATED, PARTDEACTIVATED, PARTACTIVITYUNKNOWN,RUNDEBUGNODEBUG, RUNDEBUGWITHDEBUG, RUNDEBUGWITHILLEGALDEBUG, EDITOROPENED, EDITORCLOSED, EDITORACTIVATED, EDITORDEACTIVATED, EDITORACTIVITYUNKNOWN
+    }
+
     /**
-     * This creates the EventGenerator and initializes the randomString Array
-     * by reading in the "pseudorandom.strings" file.
-     * @throws IOException If initialization of the Reader or the reading of the file fails
+     * This creates the EventGenerator and initializes the randomString Array by
+     * reading in the "pseudorandom.strings" file.
+     * 
+     * @throws IOException
+     *             If initialization of the Reader or the reading of the file
+     *             fails
      */
     public EventGenerator() throws IOException
     {
@@ -60,7 +67,7 @@ public class EventGenerator
         int i = 0;
 
         while (i < this.lineCount && (this.randomStrings[i++] = this.br.readLine()) != null) {
-            // do nothing  
+            // do nothing
         }
 
         this.br.close();
@@ -93,7 +100,7 @@ public class EventGenerator
 
     }
 
-    //  create a syntactically valid or invalid argList of given size
+    // create a syntactically valid or invalid argList of given size
     private List createDeterministicArgList(boolean argListNotNull, boolean argListOfString, int argListLength, int argListEntrySize) throws NoTestDataException
     {
         if (!argListNotNull) {
@@ -115,15 +122,17 @@ public class EventGenerator
     }
 
     /**
-     * This method creates and returns a single EventPacket.
-     * The data stored in the EventPacket is allowed to be syntactically invalid
-     * in respect to the event data rules. So this method is used for testing purposes. 
+     * This method creates and returns a single EventPacket. The data stored in
+     * the EventPacket is allowed to be syntactically invalid in respect to the
+     * event data rules. So this method is used for testing purposes.
      * 
      * @param syntValidDate
      *            Shall the timestamp be syntactically valid?
      * @param syntValidCommandName
      *            Shall the commmandName be syntactically valid?
-     * @param line Is the line number of the String to use as the commandName from the "pseudorandom.strings" file
+     * @param line
+     *            Is the line number of the String to use as the commandName
+     *            from the "pseudorandom.strings" file
      * @param argListNotNull
      *            Shall the argList be not null?
      * @param argListOfString
@@ -133,7 +142,10 @@ public class EventGenerator
      * @param argListEntrySize
      *            The size of each list element
      * @return An EventPacket of the desired kind
-     * @throws NoTestDataException If a pseudo-random String is requested by a line number that is not available or if the requested String size is to higher then available
+     * @throws NoTestDataException
+     *             If a pseudo-random String is requested by a line number that
+     *             is not available or if the requested String size is to higher
+     *             then available
      */
     public EventPacket createEventPacket(boolean syntValidDate, boolean syntValidCommandName, int line, boolean argListNotNull, boolean argListOfString, int argListLength, int argListEntrySize) throws NoTestDataException
     {
@@ -148,18 +160,19 @@ public class EventGenerator
     }
 
     /**
-     * This method creates and returns a single ValidEventPacket.
-     * If this method returns the ValidEventPacket it is assured that
-     * this object carries syntactically valid event data in it.
-     * If this method is not able to create an ValidEventPacket from
-     * the given event data parameters, am IllegalEventParameterException
-     * is thrown.
+     * This method creates and returns a single ValidEventPacket. If this method
+     * returns the ValidEventPacket it is assured that this object carries
+     * syntactically valid event data in it. If this method is not able to
+     * create an ValidEventPacket from the given event data parameters, am
+     * IllegalEventParameterException is thrown.
      * 
      * @param syntValidDate
      *            Shall the timestamp be syntactically valid?
      * @param syntValidCommandName
      *            Shall the commmandName be syntactically valid?
-     * @param line Is the line number of the String to use as the commandName from the "pseudorandom.strings" file
+     * @param line
+     *            Is the line number of the String to use as the commandName
+     *            from the "pseudorandom.strings" file
      * @param argListNotNull
      *            Shall the argList be not null?
      * @param argListOfString
@@ -169,8 +182,13 @@ public class EventGenerator
      * @param argListEntrySize
      *            The size of each list element
      * @return An EventPacket of the desired kind
-     * @throws IllegalEventParameterException This is thrown if the passes parameter data does not conform to the syntax rules of event data.
-     * @throws NoTestDataException If a pseudo-random String is requested by a line number that is not available or if the requested String size is to higher then available
+     * @throws IllegalEventParameterException
+     *             This is thrown if the passes parameter data does not conform
+     *             to the syntax rules of event data.
+     * @throws NoTestDataException
+     *             If a pseudo-random String is requested by a line number that
+     *             is not available or if the requested String size is to higher
+     *             then available
      */
     public ValidEventPacket createValidEventPacket(boolean syntValidDate, boolean syntValidCommandName, int line, boolean argListNotNull, boolean argListOfString, int argListLength, int argListEntrySize) throws IllegalEventParameterException, NoTestDataException
     {
@@ -185,11 +203,19 @@ public class EventGenerator
     }
 
     /**
-     * This method creates and returns a ValidEventPacket with a payload of the given size.
-     * @param size Is the size of the payload.
+     * This method creates and returns a ValidEventPacket with a payload of the
+     * given size.
+     * 
+     * @param size
+     *            Is the size of the payload.
      * @return The event with the payload
-     * @throws IllegalEventParameterException This is thrown if the passes parameter data does not conform to the syntax rules of event data.
-     * @throws NoTestDataException If a pseudo-random String is requested by a line number that is not available or if the requested String size is to higher then available
+     * @throws IllegalEventParameterException
+     *             This is thrown if the passes parameter data does not conform
+     *             to the syntax rules of event data.
+     * @throws NoTestDataException
+     *             If a pseudo-random String is requested by a line number that
+     *             is not available or if the requested String size is to higher
+     *             then available
      */
     public ValidEventPacket createPayloadEventPacket(int size) throws IllegalEventParameterException, NoTestDataException
     {
@@ -203,10 +229,17 @@ public class EventGenerator
 
     /**
      * This method creates and returns a valid HackyStat SensorDataType event.
-     * @param type Is the SensorDataType to create
-     * @param line Is the line number of the String to use as the commandName from the "pseudorandom.strings" file
+     * 
+     * @param type
+     *            Is the SensorDataType to create
+     * @param line
+     *            Is the line number of the String to use as the commandName
+     *            from the "pseudorandom.strings" file
      * @return A valid HackyStat event.
-     * @throws NoTestDataException If a pseudo-random String is requested by a line number that is not available or if the requested String size is to higher then available
+     * @throws NoTestDataException
+     *             If a pseudo-random String is requested by a line number that
+     *             is not available or if the requested String size is to higher
+     *             then available
      */
     public ValidEventPacket createHackyStatEventPacket(SensorDataType type, int line) throws NoTestDataException
     {
@@ -326,6 +359,396 @@ public class EventGenerator
     }
 
     /**
+     * This method creates and returns a valid ECG MicroSensorDataType event.
+     * 
+     * @param type
+     *            Is the MicroSensorDataType to create
+     * @return A valid ECG event.
+     */
+    public ValidEventPacket createECGEventPacket(MicroSensorDataType type)
+    {
+
+        ValidEventPacket eventPacket = null;
+
+        String[] args = null;
+
+        String activity = null;
+        
+        switch (type)
+        {
+        case RESOURCEADDED:
+
+            activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><resource><activity>added</activity><resourcename>testResourceName</resourcename><resourcetype>testResourceType</resourcetype></resource></microActivity>";
+
+            args = new String[] { "add", "MicroActivity", activity };
+
+            try {
+                eventPacket = new ValidEventPacket(0, createDate(true),
+                        "Activity", Arrays.asList(args));
+            }
+            catch (IllegalEventParameterException e) {
+                e.printStackTrace();
+            }
+
+            break;
+
+        case RESOURCEREMOVED:
+
+            activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><resource><activity>removed</activity><resourcename>testResourceName</resourcename><resourcetype>testResourceType</resourcetype></resource></microActivity>";
+
+            args = new String[] { "add", "MicroActivity", activity };
+
+            try {
+                eventPacket = new ValidEventPacket(0, createDate(true),
+                        "Activity", Arrays.asList(args));
+            }
+            catch (IllegalEventParameterException e) {
+                e.printStackTrace();
+            }
+
+            break;
+
+        case RESOURCECHANGED:
+
+            activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><resource><activity>changed</activity><resourcename>testResourceName</resourcename><resourcetype>testResourceType</resourcetype></resource></microActivity>";
+
+            args = new String[] { "add", "MicroActivity", activity };
+
+            try {
+                eventPacket = new ValidEventPacket(0, createDate(true),
+                        "Activity", Arrays.asList(args));
+            }
+            catch (IllegalEventParameterException e) {
+                e.printStackTrace();
+            }
+
+            break;
+
+        case RESOURCEACTIVITYUNKNOWN:
+
+            activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><resource><activity>unknownTestActivity</activity><resourcename>testResourceName</resourcename><resourcetype>testResourceType</resourcetype></resource></microActivity>";
+
+            args = new String[] { "add", "MicroActivity", activity };
+
+            try {
+                eventPacket = new ValidEventPacket(0, createDate(true),
+                        "Activity", Arrays.asList(args));
+            }
+            catch (IllegalEventParameterException e) {
+                e.printStackTrace();
+            }
+
+            break;
+
+        case CODECHANGE:
+
+            activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><codechange><document>testDocument</document><documentname>testDocumentName</documentname></codechange></microActivity>";
+
+            args = new String[] { "add", "MicroActivity", activity };
+
+            try {
+                eventPacket = new ValidEventPacket(0, createDate(true),
+                        "Activity", Arrays.asList(args));
+            }
+            catch (IllegalEventParameterException e) {
+                e.printStackTrace();
+            }
+
+            break;
+
+        case EDITOROPENED:
+
+            activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><editor><activity>opened</activity><editorname>testEditorName</editorname></editor></microActivity>";
+
+            args = new String[] { "add", "MicroActivity", activity };
+
+            try {
+                eventPacket = new ValidEventPacket(0, createDate(true),
+                        "Activity", Arrays.asList(args));
+            }
+            catch (IllegalEventParameterException e) {
+                e.printStackTrace();
+            }
+
+            break;
+
+        case EDITORCLOSED:
+
+            activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><editor><activity>closed</activity><editorname>testEditorName</editorname></editor></microActivity>";
+
+            args = new String[] { "add", "MicroActivity", activity };
+
+            try {
+                eventPacket = new ValidEventPacket(0, createDate(true),
+                        "Activity", Arrays.asList(args));
+            }
+            catch (IllegalEventParameterException e) {
+                e.printStackTrace();
+            }
+            break;
+
+        case EDITORACTIVATED:
+
+            activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><editor><activity>activated</activity><editorname>testEditorName</editorname></editor></microActivity>";
+
+            args = new String[] { "add", "MicroActivity", activity };
+
+            try {
+                eventPacket = new ValidEventPacket(0, createDate(true),
+                        "Activity", Arrays.asList(args));
+            }
+            catch (IllegalEventParameterException e) {
+                e.printStackTrace();
+            }
+
+            break;
+
+        case EDITORDEACTIVATED:
+
+            activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><editor><activity>deactivated</activity><editorname>testEditorName</editorname></editor></microActivity>";
+
+            args = new String[] { "add", "MicroActivity", activity };
+
+            try {
+                eventPacket = new ValidEventPacket(0, createDate(true),
+                        "Activity", Arrays.asList(args));
+            }
+            catch (IllegalEventParameterException e) {
+                e.printStackTrace();
+            }
+
+            break;
+
+        case EDITORACTIVITYUNKNOWN:
+
+            activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><editor><activity>unknownTestActivity</activity><editorname>testEditorName</editorname></editor></microActivity>";
+
+            args = new String[] { "add", "MicroActivity", activity };
+
+            try {
+                eventPacket = new ValidEventPacket(0, createDate(true),
+                        "Activity", Arrays.asList(args));
+            }
+            catch (IllegalEventParameterException e) {
+                e.printStackTrace();
+            }
+
+            break;
+
+            
+        case PARTOPENED:
+
+            activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><part><activity>opened</activity><partname>testPartName</partname></part></microActivity>";
+
+            args = new String[] { "add", "MicroActivity", activity };
+
+            try {
+                eventPacket = new ValidEventPacket(0, createDate(true),
+                        "Activity", Arrays.asList(args));
+            }
+            catch (IllegalEventParameterException e) {
+                e.printStackTrace();
+            }
+
+            break;
+
+        case PARTCLOSED:
+
+            activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><part><activity>closed</activity><partname>testPartName</partname></part></microActivity>";
+
+            args = new String[] { "add", "MicroActivity", activity };
+
+            try {
+                eventPacket = new ValidEventPacket(0, createDate(true),
+                        "Activity", Arrays.asList(args));
+            }
+            catch (IllegalEventParameterException e) {
+                e.printStackTrace();
+            }
+            break;
+
+        case PARTACTIVATED:
+
+            activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><part><activity>activated</activity><partname>testPartName</partname></part></microActivity>";
+
+            args = new String[] { "add", "MicroActivity", activity };
+
+            try {
+                eventPacket = new ValidEventPacket(0, createDate(true),
+                        "Activity", Arrays.asList(args));
+            }
+            catch (IllegalEventParameterException e) {
+                e.printStackTrace();
+            }
+
+            break;
+
+        case PARTDEACTIVATED:
+
+            activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><part><activity>deactivated</activity><partname>testPartName</partname></part></microActivity>";
+
+            args = new String[] { "add", "MicroActivity", activity };
+
+            try {
+                eventPacket = new ValidEventPacket(0, createDate(true),
+                        "Activity", Arrays.asList(args));
+            }
+            catch (IllegalEventParameterException e) {
+                e.printStackTrace();
+            }
+
+            break;
+
+        case PARTACTIVITYUNKNOWN:
+
+            activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><part><activity>unknownTestActivity</activity><partname>testPartName</partname></part></microActivity>";
+
+            args = new String[] { "add", "MicroActivity", activity };
+
+            try {
+                eventPacket = new ValidEventPacket(0, createDate(true),
+                        "Activity", Arrays.asList(args));
+            }
+            catch (IllegalEventParameterException e) {
+                e.printStackTrace();
+            }
+
+            break;
+            
+        case RUNDEBUGNODEBUG:
+
+            activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><run debug=\"false\"></run></microActivity>";
+
+            args = new String[] { "add", "MicroActivity", activity };
+
+            try {
+                eventPacket = new ValidEventPacket(0, createDate(true),
+                        "Activity", Arrays.asList(args));
+            }
+            catch (IllegalEventParameterException e) {
+                e.printStackTrace();
+            }
+
+            break;
+
+        case RUNDEBUGWITHDEBUG:
+
+            activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><run debug=\"true\"></run></microActivity>";
+
+            args = new String[] { "add", "MicroActivity", activity };
+
+            try {
+                eventPacket = new ValidEventPacket(0, createDate(true),
+                        "Activity", Arrays.asList(args));
+            }
+            catch (IllegalEventParameterException e) {
+                e.printStackTrace();
+            }
+
+            break;
+            
+        case RUNDEBUGWITHILLEGALDEBUG:
+
+            activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><run debug=\"illegalTestValue\"></run></microActivity>";
+
+            args = new String[] { "add", "MicroActivity", activity };
+
+            try {
+                eventPacket = new ValidEventPacket(0, createDate(true),
+                        "Activity", Arrays.asList(args));
+            }
+            catch (IllegalEventParameterException e) {
+                e.printStackTrace();
+            }
+
+            break;
+
+        case WINDOWOPENED:
+
+            activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><window><activity>opened</activity><windowname>testWindowName</windowname></window></microActivity>";
+
+            args = new String[] { "add", "MicroActivity", activity };
+
+            try {
+                eventPacket = new ValidEventPacket(0, createDate(true),
+                        "Activity", Arrays.asList(args));
+            }
+            catch (IllegalEventParameterException e) {
+                e.printStackTrace();
+            }
+
+            break;
+
+        case WINDOWCLOSED:
+
+            activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><window><activity>closed</activity><windowname>testWindowName</windowname></window></microActivity>";
+
+            args = new String[] { "add", "MicroActivity", activity };
+
+            try {
+                eventPacket = new ValidEventPacket(0, createDate(true),
+                        "Activity", Arrays.asList(args));
+            }
+            catch (IllegalEventParameterException e) {
+                e.printStackTrace();
+            }
+            break;
+
+        case WINDOWACTIVATED:
+
+            activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><window><activity>activated</activity><windowname>testWindowName</windowname></window></microActivity>";
+
+            args = new String[] { "add", "MicroActivity", activity };
+
+            try {
+                eventPacket = new ValidEventPacket(0, createDate(true),
+                        "Activity", Arrays.asList(args));
+            }
+            catch (IllegalEventParameterException e) {
+                e.printStackTrace();
+            }
+
+            break;
+
+        case WINDOWDEACTIVATED:
+
+            activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><window><activity>deactivated</activity><windowname>testWindowName</windowname></window></microActivity>";
+
+            args = new String[] { "add", "MicroActivity", activity };
+
+            try {
+                eventPacket = new ValidEventPacket(0, createDate(true),
+                        "Activity", Arrays.asList(args));
+            }
+            catch (IllegalEventParameterException e) {
+                e.printStackTrace();
+            }
+
+            break;
+            
+        case WINDOWACTIVITYUNKNOWN:
+
+            activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><window><activity>unknownTestActivity</activity><windowname>testWindowName</windowname></window></microActivity>";
+
+            args = new String[] { "add", "MicroActivity", activity };
+
+            try {
+                eventPacket = new ValidEventPacket(0, createDate(true),
+                        "Activity", Arrays.asList(args));
+            }
+            catch (IllegalEventParameterException e) {
+                e.printStackTrace();
+            }
+
+            break;
+            
+        default:
+            break;
+        }
+        return eventPacket;
+    }
+
+    /**
      * Given a String[] this method returns a syntactically valid List of it
      * with "add" and "testdata" being the first to entries.
      * 
@@ -355,16 +778,18 @@ public class EventGenerator
     }
 
     /**
-     * This methods creates a String[] of pseudo-random payload
-     * by reading in the file "pseudorandom.strings".
+     * This methods creates a String[] of pseudo-random payload by reading in
+     * the file "pseudorandom.strings".
      * 
      * @param arraySize
      *            The size of the String[]
      * @param stringSize
      *            The size of each String element
-     * @return
-     *            An Array of random Strings
-     * @throws NoTestDataException If a pseudo-random String is requested by a line number that is not available or if the requested String size is to higher then available 
+     * @return An Array of random Strings
+     * @throws NoTestDataException
+     *             If a pseudo-random String is requested by a line number that
+     *             is not available or if the requested String size is to higher
+     *             then available
      */
     private String[] createDeterministicPayloadStringArray(int arraySize, int stringSize) throws NoTestDataException
     {
@@ -445,13 +870,15 @@ public class EventGenerator
     }
 
     /**
-     * Calling this method causes it to generate a file with randomized
-     * Strings to be used in the testcases through the ECG framework testing.
-     * @throws IOException If writing the file fails
+     * Calling this method causes it to generate a file with randomized Strings
+     * to be used in the testcases through the ECG framework testing.
+     * 
+     * @throws IOException
+     *             If writing the file fails
      */
     public void generateRandomStringFile() throws IOException
     {
-        BufferedWriter bw = new BufferedWriter(new FileWriter(this.filename));
+        BufferedWriter bw = new BufferedWriter(new FileWriter(EventGenerator.filename));
 
         for (int i = 0; i < this.lineCount; i++) {
             bw.write(this.createRandomString(this.lineLength) + "\n");
