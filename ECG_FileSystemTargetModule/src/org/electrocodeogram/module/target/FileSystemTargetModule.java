@@ -16,11 +16,11 @@ import org.electrocodeogram.module.target.TargetModule;
 public class FileSystemTargetModule extends TargetModule
 {
 
-    private String outputFileName = null;
+    private String outputFileName;
 
-    private File outputFile = null;
+    private File outputFile;
 
-    private PrintWriter writer = null;
+    private PrintWriter writer;
 
     /**
      * @param arg0
@@ -30,6 +30,71 @@ public class FileSystemTargetModule extends TargetModule
     {
         super(arg0, arg1);
 
+
+    }
+
+    /**
+     * @see org.electrocodeogram.module.target.TargetModule#write(org.electrocodeogram.event.ValidEventPacket)
+     */
+    @Override
+    public void write(ValidEventPacket arg0)
+    {
+
+        this.writer.println(arg0.toString());
+
+        this.writer.flush();
+
+    }
+
+    /**
+     * @param propertyName 
+     * @param propertyValue 
+     * @throws ModulePropertyException 
+     * 
+     */
+    @Override
+    public void setProperty(String propertyName, Object propertyValue) throws ModulePropertyException
+    {
+        if (!propertyName.equals("Output File")) {
+            throw new ModulePropertyException(
+            "The module does not support a property with the given name: " + propertyName);
+            
+        }
+
+        if (!(propertyValue instanceof File)) {
+            throw new ModulePropertyException(
+                    "The module only support a property of type: \"java.io.File\".");
+        }
+
+        File propertyValueFile = (File) propertyValue;
+
+        this.outputFile = propertyValueFile;
+
+        this.writer.close();
+
+        try {
+            this.writer = new PrintWriter(new FileWriter(this.outputFile));
+        }
+        catch (IOException e) {
+
+            System.out.println("C");
+            throw new ModulePropertyException(
+                    "The file could not be opened for writing.");
+        }
+
+    }
+    
+    public void analyseCoreNotification()
+    {
+        
+    }
+
+    /**
+     * @see org.electrocodeogram.module.Module#initialize()
+     */
+    @Override
+    public void initialize()
+    {
         String homeDir = System.getProperty("user.home");
 
         if (homeDir == null) {
@@ -50,54 +115,6 @@ public class FileSystemTargetModule extends TargetModule
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-    }
-
-    /**
-     * @see org.electrocodeogram.module.target.TargetModule#write(org.electrocodeogram.event.ValidEventPacket)
-     */
-    @Override
-    public void write(ValidEventPacket arg0)
-    {
-
-        this.writer.println(arg0.toString());
-
-        this.writer.flush();
-
-    }
-
-    /**
-     * @throws ModulePropertyException 
-     * 
-     */
-    public void setProperty(String propertyName, Object propertyValue) throws ModulePropertyException
-    {
-        if (!propertyName.equals("Output File")) {
-            System.out.println("A");
-
-            return;
-        }
-
-        if (!(propertyValue instanceof File)) {
-            System.out.println("B");
-
-            return;
-        }
-
-        File propertyValueFile = (File) propertyValue;
-
-        this.outputFile = propertyValueFile;
-
-        this.writer.close();
-
-        try {
-            this.writer = new PrintWriter(new FileWriter(this.outputFile));
-        }
-        catch (IOException e) {
-
-            System.out.println("C");
-            throw new ModulePropertyException(
-                    "The file could not be opened for writing.");
-        }
-
+        
     }
 }
