@@ -58,9 +58,31 @@
 			<ant dir="../ECG_FileSystemTargetModule" target="cleanall" />
 
 		</target>
+	
+	<!-- Calls the ant script of the ECG FileSystemSourceModule to clean it -->
+			<target name="CleanAll ECG FileSystemSourceModule">
+
+				<echo message="###################################"/>
+				<echo message="CLEANING ECG FILESYSTEMSOURCEMODULE"/>
+				<echo message="###################################"/>
+
+				<ant dir="../ECG_FileSystemSourceModule" target="cleanall" />
+
+			</target>
+	
+	<!-- Calls the ant script of the ECG MSDTFilterIntermediateModule to clean it -->
+			<target name="CleanAll ECG MSDTFilterIntermediateModule">
+
+				<echo message="#########################################"/>
+				<echo message="CLEANING ECG MSDTFILTERINTERMEDIATEMODULE"/>
+				<echo message="#########################################"/>
+
+				<ant dir="../ECG_MSDTFilterIntermediateModule" target="cleanall" />
+
+			</target>
 
 	<!-- Cleans all ECG components -->
-	<target name="cleanAll" depends="CleanAll ECG SensorShell,CleanAll ECG TestHelper,CleanAll ECG ServerAndLab,CleanAll ECG SocketSourceModule, CleanAll ECG FileSystemTargetModule" />
+	<target name="cleanAll" depends="CleanAll ECG SensorShell,CleanAll ECG TestHelper,CleanAll ECG ServerAndLab,CleanAll ECG SocketSourceModule, CleanAll ECG FileSystemTargetModule, CleanAll ECG FileSystemSourceModule, CleanAll ECG MSDTFilterIntermediateModule" />
 
 
 	<!-- Calls the ant script of the ECG SensorShell component to build it -->
@@ -134,6 +156,28 @@
 			<ant dir="../ECG_FileSystemTargetModule" target="deploy" />
 
 		</target>
+	
+	<!-- Calls the ant script of the ECG FileSystemSourceModule to build it -->
+			<target name="Build ECG FileSystemSourceModule">
+
+				<echo message="###################################"/>
+				<echo message="BUILDING ECG FILESYSTEMSOURCEMODULE"/>
+				<echo message="###################################"/>
+
+				<ant dir="../ECG_FileSystemSourceModule" target="deploy" />
+
+			</target>
+	
+	<!-- Calls the ant script of the ECG MSDTFilterIntermediateModule to build it -->
+			<target name="Build ECG MSDTFilterIntermediateModule">
+
+				<echo message="#########################################"/>
+				<echo message="BUILDING ECG MSDTFILTERINTERMEDIATEMODULE"/>
+				<echo message="#########################################"/>
+
+				<ant dir="../ECG_MSDTFilterIntermediateModule" target="deploy" />
+
+			</target>
 
 	<!-- Calls the ant script of the ECG SocketEchoSourceModule to build it -->
 	<target name="Build ECG SocketEchoSourceModule">
@@ -160,7 +204,7 @@
 
 
 	<!-- Builds all ECG components -->
-	<target name="buildAll" depends="Build ECG SensorShell Event,Build ECG TestHelper, Build ECG SensorShell Shell,Build ECG ServerAndLab Module-API,Build ECG SocketSourceModule, Build ECG FileSystemTargetModule, Assemble ECG ServerAndLab"/>
+	<target name="buildAll" depends="Build ECG SensorShell Event,Build ECG TestHelper, Build ECG SensorShell Shell,Build ECG ServerAndLab Module-API,Build ECG SocketSourceModule, Build ECG FileSystemTargetModule, Build ECG FileSystemSourceModule, Build ECG MSDTFilterIntermediateModule, Assemble ECG ServerAndLab"/>
 
 	<!-- Package release -->
 	<target name="Package release" depends="cleanAll,buildAll">
