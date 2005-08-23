@@ -1,6 +1,7 @@
 package org.electrocodeogram.event;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -18,52 +19,22 @@ public class EventPacket implements Serializable
     private String $sensorDataType = null;
 
     private List $argList = null;
-
-    public static final String HS_COMMAND_PREFIX = "HS_COMMAND:";
-
-    public static final String HS_TYPE_PREFIX = "HS_ACTIVITY_TYPE:";
-
-    public static final String ECG_TYPE_PREFIX = "mSDT:";
-
-    //  begin: this will go into the MPE managment soon
-
-    public static final String ECG_TYPE_WINDOW_DEACTIVATED = "Window deactivated";
-
-    public static final String ECG_TYPE_WINDOW_ACTIVATED = "Window activated";
-
-    public static final String ECG_TYPE_WINDOW_OPENED = "Window opened";
-
-    public static final String ECG_TYPE_WINDOW_CLOSED = "Window closed";
-
-    public static final String ECG_TYPE_EDITOR_ACTIVATED = "Editor activated";
-
-    public static final String ECG_TYPE_EDITOR_DEACTIVATED = "Editor deactivated";
-
-    public static final String ECG_TYPE_PART_ACTIVATED = "Part activated";
-
-    public static final String ECG_TYPE_PART_DEACTIVATED = "Part deactivated";
-
-    public static final String ECG_TYPE_EDITOR_OPENED = "Editor opened";
-
-    public static final String ECG_TYPE_EDITOR_CLOSED = "Editor closed";
-
-    public static final String ECG_TYPE_PART_OPENED = "Part opened";
-
-    public static final String ECG_TYPE_PART_CLOSED = "Part closed";
-
-    public static final String ECG_TYPE_CODECHANGE = "Codechange";
-
-    public static final String ECG_TYPE_OPEN_FILE = "File opened";
-
-    public static final String ECG_TYPE_BREAKPOINT_SET = "Breakpoint set";
-
-    public static final String ECG_TYPE_BREAKPOINT_UNSET = "Breakpoint unset";
-
-    public static final String ECG_TYPE_RUN = "Run";
-
-    public static final String ECG_TYPE_DEBUG = "Debug";
-
-    // end
+    
+    /**
+     * This String constant is used to separate the components of the string representation of this event.
+     */
+    public static String EVENT_SEPARATOR = "#"; 
+    
+    /**
+     * This String separates the argList entrys in teh string representation of this event.
+     */
+    public static String ARGLIST_SEPARATOR = ";";
+    
+    /**
+     * This is the pattern used to format the timeStamp Date values. The pattern symbols are
+     * accroding to the java.text.DataFormatSymbols class.
+     */
+    public static String DATE_FORMAT_PATTERN = "E M FF HH:mm:ss z yyyy";
 
     /**
      * This creates a new EventPacket object
@@ -119,31 +90,6 @@ public class EventPacket implements Serializable
     }
 
     /**
-     * This method returns the ECG MicroSensorDataType which is contained in the argList of this EventPacket.
-     * @return The ECG MicroSensorDataType
-     */
-    public String getMicroSensorDataType()
-    {
-        if (this.$argList == null) {
-            return null;
-        }
-
-        for (int i = 0; i < this.$argList.size(); i++) {
-            String s = (String) this.$argList.get(i);
-
-            if (s == null) {
-                return null;
-            }
-
-            if (s.startsWith(ECG_TYPE_PREFIX)) {
-                return s.substring(ECG_TYPE_PREFIX.length());
-            }
-        }
-
-        return null;
-    }
-
-    /**
      * This method returns the argList of the EventPacket
      * @return The argList as a List
      */
@@ -179,12 +125,18 @@ public class EventPacket implements Serializable
     {
         String string = "";
 
-        string += "SourceID: " + this.getSourceId() + ", SDT: " + this.getSensorDataType();
+        SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT_PATTERN);
+        
+        String dateString = dateFormat.format(this.getTimeStamp());
+        
+        string += dateString + "#";
+        
+        string += this.getSensorDataType() + "#";
 
         StringBuffer stringBuffer = new StringBuffer();
 
         for (int i = 0; i < this.getArglist().size(); i++) {
-            stringBuffer.append(" ,");
+            stringBuffer.append(";");
 
             stringBuffer.append((String) this.getArglist().get(i));
         }
