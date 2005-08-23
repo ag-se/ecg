@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.electrocodeogram.core.Core;
 import org.electrocodeogram.module.Module;
 
 /**
@@ -84,6 +85,8 @@ public class MsdtRegistry
             
             this.logger.log(Level.INFO, "Registered additonal Module with a known MicroSensorDatyType " + knownMsdt.getName());
             
+            Core.getInstance().fireStateChange();
+            
             return knownMsdt;
             
         }
@@ -93,6 +96,8 @@ public class MsdtRegistry
         this.registeredMsdt.put(msdt.getName(), msdt);
         
         this.logger.log(Level.INFO, "Registered a new MicroSensorDatyType " + msdt.getName());
+        
+        Core.getInstance().fireStateChange();
         
         return msdt;
        
@@ -124,5 +129,7 @@ public class MsdtRegistry
         this.registeredMsdt.remove(msdt.getName());
 
         this.logger.log(Level.INFO, "Deregistered MicroSensorDatyType " + msdt.getName());
+        
+        Core.getInstance().fireStateChange();
     }
 }

@@ -40,4 +40,24 @@ public class TestSourceModule extends SourceModule
         
     }
 
+    /**
+     * @see org.electrocodeogram.module.Module#analyseCoreNotification()
+     */
+    @Override
+    public void analyseCoreNotification()
+    {
+//      Not used
+        
+    }
+
+    /**
+     * @see org.electrocodeogram.module.Module#initialize()
+     */
+    @Override
+    public void initialize()
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
 }

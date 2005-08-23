@@ -1,5 +1,6 @@
 package org.electrocodeogram.test.server.modules;
 
+import org.electrocodeogram.event.TypedValidEventPacket;
 import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.module.Module;
 import org.electrocodeogram.module.ModuleConnectionException;
@@ -18,17 +19,17 @@ import org.electrocodeogram.module.TestModule;
 public class TestModuleTransportModule extends Module
 {
 
-    private Module last = null;
+    private Module last;
 
-    private ValidEventPacket testPacket = null;
+    private ValidEventPacket testPacket;
 
-    private boolean result = false;
+    private boolean result;
 
-    private int packetCount = -1;
+    private int packetCount;
 
-    private int receivedCount = 0;
+    private int receivedCount;
 
-    private TestSourceModule root = null;
+    private TestSourceModule root;
 
     /**
      * This creates the class as a module. 
@@ -38,9 +39,7 @@ public class TestModuleTransportModule extends Module
     {
         super(ModuleType.SOURCE_MODULE,-1,"TestModuleTransportModule");
 
-        this.root = new TestSourceModule();
-
-        removeConnectedModules(this.root);
+       
     }
 
     private void removeConnectedModules(Module node)
@@ -201,7 +200,7 @@ public class TestModuleTransportModule extends Module
      * the result.
      */
     @Override
-    public void receiveEventPacket(ValidEventPacket eventPacket)
+    public void receiveEventPacket(TypedValidEventPacket eventPacket)
     {
         if (this.testPacket.equals(eventPacket)) {
             this.receivedCount++;
@@ -224,5 +223,27 @@ public class TestModuleTransportModule extends Module
     Object propertyValue)
     {
         // not needed
+    }
+
+    /**
+     * @see org.electrocodeogram.module.Module#analyseCoreNotification()
+     */
+    @Override
+    public void analyseCoreNotification()
+    {
+        // not needed
+        
+    }
+
+    /**
+     * @see org.electrocodeogram.module.Module#initialize()
+     */
+    @Override
+    public void initialize()
+    {
+        this.root = new TestSourceModule();
+
+        removeConnectedModules(this.root);
+        
     }
 }

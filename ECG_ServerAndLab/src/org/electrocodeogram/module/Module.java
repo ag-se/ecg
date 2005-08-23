@@ -15,7 +15,9 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
 import org.electrocodeogram.core.Core;
+import org.electrocodeogram.core.ICore;
 import org.electrocodeogram.event.IllegalEventParameterException;
+import org.electrocodeogram.event.TypedValidEventPacket;
 import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.module.intermediate.IIntermediateModule;
 import org.electrocodeogram.module.registry.IllegalModuleIDException;
@@ -131,12 +133,6 @@ public abstract class Module extends Observable implements Observer
                 this.logger.log(Level.SEVERE,"The directory for the predefined MicroSensorDataTypes can not be found.");
             }
         }
-//        try {
-//            this.loadMSTDSchemas();
-//        }
-//        catch (FileNotFoundException e) {
-//            this.logger.log(Level.WARNING,e.getMessage());
-//        }
         
         Core.getInstance().getModuleRegistry().registerModuleInstance(this);
         
@@ -148,6 +144,8 @@ public abstract class Module extends Observable implements Observer
         }
         
         activate();
+        
+        initialize();
 
     }
     
@@ -197,34 +195,49 @@ public abstract class Module extends Observable implements Observer
      * This mechanism is used in the module communication to transport events.
      * When a module is receiving an event its state has changed and it notifies all
      * connected modules and passes the event to them as a parameter.
+     * Additonally this update method is also invoked by a notification from the
+     * system core because of a statechange of the system.
+     * This gives the module the chance to react on statechanges of the system. 
      */
-    public final void update(Observable module, Object event)
+    public final void update(Observable object, Object data)
     {
-        if (!(module instanceof Module)) {
-            return;
+        if ((object instanceof Module))
+        {
+            analyseModuleNotification(object, data);
+        }
+        else if(object instanceof ICore)
+        {
+            analyseCoreNotification();
         }
 
-        analyseNotification(module, event);
     }
 
-    private void analyseNotification(Observable module, Object event)
+    private void analyseModuleNotification(Observable module, Object event)
     {
         assert (module instanceof Module);
 
-        if (event instanceof ValidEventPacket) {
+        if (event instanceof TypedValidEventPacket) {
 
-            ValidEventPacket eventPacket = (ValidEventPacket) event;
+            TypedValidEventPacket eventPacket = (TypedValidEventPacket) event;
 
             receiveEventPacket(eventPacket);
         }
     }
+    
+    /**
+     * This method is called whenever this module gets a notification of
+     * a statechange form the sytem core.
+     * It is left to the actual module implementation to react on such an event.
+     *
+     */
+    public abstract void analyseCoreNotification();
 
     /**
      * This abstract method is to be implemented by all actual modules.
      * Its implementation tells what to do with a received event.
      * @param eventPacket Is the received event
      */
-    protected abstract void receiveEventPacket(ValidEventPacket eventPacket);
+    protected abstract void receiveEventPacket(TypedValidEventPacket eventPacket);
 
     /**
      * This method returns the unique id of this module.
@@ -259,16 +272,16 @@ public abstract class Module extends Observable implements Observer
      * of this the sending module.
      * @param eventPacket Is the event to send
      */
-    protected final void sendEventPacket(ValidEventPacket eventPacket)
+    protected final void sendEventPacket(TypedValidEventPacket eventPacket)
     {
         if (this.activeFlag && (eventPacket != null)) {
             setChanged();
 
             try {
-                notifyObservers(new ValidEventPacket(this.getId(),
+                notifyObservers(new TypedValidEventPacket(this.getId(),
                         eventPacket.getTimeStamp(),
                         eventPacket.getSensorDataType(),
-                        eventPacket.getArglist()));
+                        eventPacket.getArglist(),eventPacket.getMicroSensorDataType()));
             }
             catch (IllegalEventParameterException e) {
 
@@ -642,4 +655,11 @@ public abstract class Module extends Observable implements Observer
     {
         return this.$moduleClassId;
     }
+    
+    /**
+     * This method initializes the actual module. It must be implementes by all module
+     * subclasses.
+     *
+     */
+    public abstract void initialize();
 }

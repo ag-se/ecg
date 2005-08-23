@@ -5,6 +5,8 @@ package org.electrocodeogram.ui;
 
 import java.util.Observer;
 
+import javax.swing.JFrame;
+
 import org.electrocodeogram.ui.messages.IGuiWriter;
 
 /**
@@ -13,6 +15,8 @@ import org.electrocodeogram.ui.messages.IGuiWriter;
 public interface IGui extends Observer
 {
 
+    public JFrame getRootFrame();
+    
     public int getSelectedModuleCellId();
 
     /**

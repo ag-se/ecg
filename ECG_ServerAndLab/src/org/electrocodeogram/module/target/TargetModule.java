@@ -1,5 +1,6 @@
 package org.electrocodeogram.module.target;
 
+import org.electrocodeogram.event.TypedValidEventPacket;
 import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.module.Module;
 
@@ -31,7 +32,7 @@ public abstract class TargetModule extends Module
      * receives, by calling the module's write method.
      */
     @Override
-    public void receiveEventPacket(ValidEventPacket eventPacket)
+    public void receiveEventPacket(TypedValidEventPacket eventPacket)
     {
         setChanged();
         
@@ -48,4 +49,9 @@ public abstract class TargetModule extends Module
     */
     public abstract void write(ValidEventPacket eventPacket);
 
+    /**
+     * @see org.electrocodeogram.module.Module#initialize()
+     */
+    @Override
+    public abstract void initialize();
 }

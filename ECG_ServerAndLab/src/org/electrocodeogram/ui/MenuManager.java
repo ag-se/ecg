@@ -276,10 +276,11 @@ public class MenuManager
                     
                     Class propertyType = moduleProperties[i].getType();
                 
+                    Object propertyValue = moduleProperties[i].getValue();
                     
                         JMenuItem menuItem = new JMenuItem(propertyName);
                       
-                        menuItem.addActionListener(new PropertyActionAdapter($gui,moduleId,propertyType,propertyName));                    
+                        menuItem.addActionListener(new PropertyActionAdapter($gui,moduleId,propertyType,propertyName,propertyValue));                    
                         
                         modulePopupMenu.add(menuItem);
                     
@@ -356,25 +357,29 @@ public class MenuManager
     private static class PropertyActionAdapter implements ActionListener
     {
 
-        private int moduleId = -1;
+        private int $moduleId = -1;
         
-        private String propertyName = "";
+        private String $propertyName = "";
         
-        private Object propertyValue = null;
+        private Object $propertyResult = null;
         
-        private Class propertyType = null;
+        private Object $propertyValue = null;
+        
+        private Class $propertyType = null;
         
         private Gui $gui = null;
         
-        public PropertyActionAdapter(Gui gui, int moduleId, Class propertyType, String propertyName)
+        public PropertyActionAdapter(Gui gui, int moduleId, Class propertyType, String propertyName, Object propertyValue)
         {
             this.$gui = gui;
             
-            this.moduleId = moduleId;
+            this.$moduleId = moduleId;
             
-            this.propertyName = propertyName;
+            this.$propertyName = propertyName;
             
-            this.propertyType = propertyType;
+            this.$propertyType = propertyType;
+            
+            this.$propertyValue = propertyValue;
             
         }
         
@@ -382,15 +387,15 @@ public class MenuManager
         {
             try {
              
-                if(propertyType.equals(Class.forName("java.lang.String")))
+                if($propertyType.equals(Class.forName("java.lang.String")))
                 {
-                   propertyValue = JOptionPane.showInputDialog($gui,"Geben Sie den neuen Wert ein","",JOptionPane.QUESTION_MESSAGE);
+                   $propertyResult = JOptionPane.showInputDialog($gui,"Geben Sie den neuen Wert ein","",JOptionPane.QUESTION_MESSAGE);
                 }
-                else if(propertyType.equals(Class.forName("java.lang.Integer")))
+                else if($propertyType.equals(Class.forName("java.lang.Integer")))
                 {
-                    propertyValue = JOptionPane.showInputDialog($gui,"Geben Sie den neuen Wert ein","",JOptionPane.QUESTION_MESSAGE);
+                    $propertyResult = JOptionPane.showInputDialog($gui,"Geben Sie den neuen Wert ein","",JOptionPane.QUESTION_MESSAGE);
                 }
-                else if(propertyType.equals(Class.forName("java.io.File")))
+                else if($propertyType.equals(Class.forName("java.io.File")))
                 {
                     JFileChooser fileChooser = new JFileChooser();
                     
@@ -404,19 +409,22 @@ public class MenuManager
                         break;
                     case JFileChooser.APPROVE_OPTION:
                         
-                        propertyValue = new File(fileChooser.getSelectedFile().getAbsolutePath());
+                        $propertyResult = new File(fileChooser.getSelectedFile().getAbsolutePath());
                         
                         break;
                     }
                 }
-                
-                if(propertyValue == null)
+                else if($propertyType.equals(Class.forName("java.lang.reflect.Method")))
+                {
+                   $propertyResult = $propertyValue;
+                }
+                if($propertyResult == null)
                 {
                     return;
                 }
            
                 try {
-                    Core.getInstance().getModuleRegistry().getModuleInstance(moduleId).setProperty(propertyName,propertyValue);
+                    Core.getInstance().getModuleRegistry().getModuleInstance($moduleId).setProperty($propertyName,$propertyResult);
                 }
                 catch (ModulePropertyException e1) {
                     JOptionPane.showMessageDialog($gui,e1.getMessage(),"Error setting property",JOptionPane.ERROR_MESSAGE);
@@ -500,10 +508,11 @@ public class MenuManager
 	                
 	                Class propertyType = moduleProperties[i].getType();
 	            
+                    Object propertyValue = moduleProperties[i].getValue();
 	                
                         JMenuItem menuItem = new JMenuItem(propertyName);
 	                  
-	                    menuItem.addActionListener(new PropertyActionAdapter($gui,id,propertyType,propertyName));                    
+	                    menuItem.addActionListener(new PropertyActionAdapter($gui,id,propertyType,propertyName,propertyValue));                    
 	                    
 	                    menu.add(menuItem);
 	                

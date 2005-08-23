@@ -627,4 +627,12 @@ public class Gui extends JFrame implements IGui
         return this.menuManager;
     }
 
+    /* (non-Javadoc)
+     * @see org.electrocodeogram.ui.IGui#getRootFrame()
+     */
+    public JFrame getRootFrame()
+    {
+       return this;
+    }
+
 }

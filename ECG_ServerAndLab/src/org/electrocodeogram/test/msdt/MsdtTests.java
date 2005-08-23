@@ -60,7 +60,7 @@ public class MsdtTests extends TestCase
     {
         ValidEventPacket packet = this.eventGenerator.createECGEventPacket(MicroSensorDataType.RESOURCEADDED);
 
-        assertTrue(this.eventValidator.validate(packet));
+        assertNotNull(this.eventValidator.validate(packet));
 
     }
 
@@ -74,7 +74,7 @@ public class MsdtTests extends TestCase
     {
         ValidEventPacket packet = this.eventGenerator.createECGEventPacket(MicroSensorDataType.RESOURCEREMOVED);
 
-        assertTrue(this.eventValidator.validate(packet));
+        assertNotNull(this.eventValidator.validate(packet));
 
     }
 
@@ -88,7 +88,7 @@ public class MsdtTests extends TestCase
     {
         ValidEventPacket packet = this.eventGenerator.createECGEventPacket(MicroSensorDataType.RESOURCECHANGED);
 
-        assertTrue(this.eventValidator.validate(packet));
+        assertNotNull(this.eventValidator.validate(packet));
 
     }
 
@@ -102,7 +102,7 @@ public class MsdtTests extends TestCase
     {
         ValidEventPacket packet = this.eventGenerator.createECGEventPacket(MicroSensorDataType.RESOURCEACTIVITYUNKNOWN);
 
-        assertFalse(this.eventValidator.validate(packet));
+        assertNull(this.eventValidator.validate(packet));
 
     }
 
@@ -116,7 +116,7 @@ public class MsdtTests extends TestCase
     {
         ValidEventPacket packet = this.eventGenerator.createECGEventPacket(MicroSensorDataType.CODECHANGE);
 
-        assertTrue(this.eventValidator.validate(packet));
+        assertNotNull(this.eventValidator.validate(packet));
 
     }
 
@@ -130,7 +130,7 @@ public class MsdtTests extends TestCase
     {
         ValidEventPacket packet = this.eventGenerator.createECGEventPacket(MicroSensorDataType.EDITORCLOSED);
 
-        assertTrue(this.eventValidator.validate(packet));
+        assertNotNull(this.eventValidator.validate(packet));
 
     }
 
@@ -144,7 +144,7 @@ public class MsdtTests extends TestCase
     {
         ValidEventPacket packet = this.eventGenerator.createECGEventPacket(MicroSensorDataType.EDITORACTIVATED);
 
-        assertTrue(this.eventValidator.validate(packet));
+        assertNotNull(this.eventValidator.validate(packet));
 
     }
 
@@ -158,7 +158,7 @@ public class MsdtTests extends TestCase
     {
         ValidEventPacket packet = this.eventGenerator.createECGEventPacket(MicroSensorDataType.EDITORDEACTIVATED);
 
-        assertTrue(this.eventValidator.validate(packet));
+        assertNotNull(this.eventValidator.validate(packet));
 
     }
 
@@ -172,7 +172,7 @@ public class MsdtTests extends TestCase
     {
         ValidEventPacket packet = this.eventGenerator.createECGEventPacket(MicroSensorDataType.EDITOROPENED);
 
-        assertTrue(this.eventValidator.validate(packet));
+        assertNotNull(this.eventValidator.validate(packet));
 
     }
 
@@ -186,7 +186,7 @@ public class MsdtTests extends TestCase
     {
         ValidEventPacket packet = this.eventGenerator.createECGEventPacket(MicroSensorDataType.EDITORACTIVITYUNKNOWN);
 
-        assertFalse(this.eventValidator.validate(packet));
+        assertNull(this.eventValidator.validate(packet));
 
     }
 
@@ -200,7 +200,7 @@ public class MsdtTests extends TestCase
     {
         ValidEventPacket packet = this.eventGenerator.createECGEventPacket(MicroSensorDataType.PARTCLOSED);
 
-        assertTrue(this.eventValidator.validate(packet));
+        assertNotNull(this.eventValidator.validate(packet));
 
     }
 
@@ -214,7 +214,7 @@ public class MsdtTests extends TestCase
     {
         ValidEventPacket packet = this.eventGenerator.createECGEventPacket(MicroSensorDataType.PARTACTIVATED);
 
-        assertTrue(this.eventValidator.validate(packet));
+        assertNotNull(this.eventValidator.validate(packet));
 
     }
 
@@ -228,7 +228,7 @@ public class MsdtTests extends TestCase
     {
         ValidEventPacket packet = this.eventGenerator.createECGEventPacket(MicroSensorDataType.PARTDEACTIVATED);
 
-        assertTrue(this.eventValidator.validate(packet));
+        assertNotNull(this.eventValidator.validate(packet));
 
     }
 
@@ -242,7 +242,7 @@ public class MsdtTests extends TestCase
     {
         ValidEventPacket packet = this.eventGenerator.createECGEventPacket(MicroSensorDataType.PARTOPENED);
 
-        assertTrue(this.eventValidator.validate(packet));
+        assertNotNull(this.eventValidator.validate(packet));
 
     }
 
@@ -256,7 +256,7 @@ public class MsdtTests extends TestCase
     {
         ValidEventPacket packet = this.eventGenerator.createECGEventPacket(MicroSensorDataType.PARTACTIVITYUNKNOWN);
 
-        assertFalse(this.eventValidator.validate(packet));
+        assertNull(this.eventValidator.validate(packet));
 
     }
 
@@ -270,7 +270,7 @@ public class MsdtTests extends TestCase
     {
         ValidEventPacket packet = this.eventGenerator.createECGEventPacket(MicroSensorDataType.RUNDEBUGNODEBUG);
 
-        assertTrue(this.eventValidator.validate(packet));
+        assertNotNull(this.eventValidator.validate(packet));
 
     }
 
@@ -284,7 +284,7 @@ public class MsdtTests extends TestCase
     {
         ValidEventPacket packet = this.eventGenerator.createECGEventPacket(MicroSensorDataType.RUNDEBUGWITHDEBUG);
 
-        assertTrue(this.eventValidator.validate(packet));
+        assertNotNull(this.eventValidator.validate(packet));
 
     }
 
@@ -298,7 +298,7 @@ public class MsdtTests extends TestCase
     {
         ValidEventPacket packet = this.eventGenerator.createECGEventPacket(MicroSensorDataType.RUNDEBUGWITHILLEGALDEBUG);
 
-        assertFalse(this.eventValidator.validate(packet));
+        assertNull(this.eventValidator.validate(packet));
 
     }
 
@@ -312,7 +312,7 @@ public class MsdtTests extends TestCase
     {
         ValidEventPacket packet = this.eventGenerator.createECGEventPacket(MicroSensorDataType.WINDOWCLOSED);
 
-        assertTrue(this.eventValidator.validate(packet));
+        assertNotNull(this.eventValidator.validate(packet));
 
     }
 
@@ -326,7 +326,7 @@ public class MsdtTests extends TestCase
     {
         ValidEventPacket packet = this.eventGenerator.createECGEventPacket(MicroSensorDataType.WINDOWACTIVATED);
 
-        assertTrue(this.eventValidator.validate(packet));
+        assertNotNull(this.eventValidator.validate(packet));
 
     }
 
@@ -340,7 +340,7 @@ public class MsdtTests extends TestCase
     {
         ValidEventPacket packet = this.eventGenerator.createECGEventPacket(MicroSensorDataType.WINDOWDEACTIVATED);
 
-        assertTrue(this.eventValidator.validate(packet));
+        assertNotNull(this.eventValidator.validate(packet));
 
     }
 
@@ -354,7 +354,7 @@ public class MsdtTests extends TestCase
     {
         ValidEventPacket packet = this.eventGenerator.createECGEventPacket(MicroSensorDataType.WINDOWOPENED);
 
-        assertTrue(this.eventValidator.validate(packet));
+        assertNotNull(this.eventValidator.validate(packet));
 
     }
 
@@ -368,7 +368,7 @@ public class MsdtTests extends TestCase
     {
         ValidEventPacket packet = this.eventGenerator.createECGEventPacket(MicroSensorDataType.WINDOWACTIVITYUNKNOWN);
 
-        assertFalse(this.eventValidator.validate(packet));
+        assertNull(this.eventValidator.validate(packet));
 
     }
 

@@ -12,6 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.xerces.parsers.DOMParser;
+import org.electrocodeogram.core.Core;
 import org.electrocodeogram.module.Module;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -532,8 +533,10 @@ public class ModuleRegistry extends Observable
 
         this.runningModules.runningModuleMap.put(new Integer(module.getId()), module);
 
-        this.logger.log(Level.INFO, "Regestered module " + module.getName());
+        this.logger.log(Level.INFO, "Registered module " + module.getName());
 
+        Core.getInstance().addObserver(module);
+        
         setChanged();
 
         notifyObservers(module);
@@ -645,6 +648,8 @@ public class ModuleRegistry extends Observable
         this.runningModules.runningModuleMap.remove(new Integer(moduleId));
 
         this.logger.log(Level.INFO, "Deregestered module " + module.getName());
+
+        Core.getInstance().deleteObserver(module);
 
         setChanged();
 

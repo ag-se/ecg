@@ -1,5 +1,6 @@
 package org.electrocodeogram.module.intermediate;
 
+import org.electrocodeogram.event.TypedValidEventPacket;
 import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.module.Module;
 
@@ -52,53 +53,20 @@ public abstract class IntermediateModule extends Module implements IIntermediate
     private AnnotationStyle $annotationStyle;
 
     /**
-     * This creates a new IntermediateModule with the given processing mode annotation style and separator.
-     * @param moduleClassId Is the id of the module class as registered with the ModuleRegistry
-     * @param name The name given to this moduule instance
-     * @param processingMode Sets the processing mode of the module 
-     * @param annotationStyle Sets the annotation style of the module
-     * @param separator Sets the separator string to the given value
-     */
-    public IntermediateModule(int moduleClassId, String name, IntermediateModule.ProcessingMode processingMode, IntermediateModule.AnnotationStyle annotationStyle, String separator)
-    {
-        super(ModuleType.INTERMEDIATE_MODULE, moduleClassId, name);
-
-        this.$processingMode = processingMode;
-
-        this.$annotationStyle = annotationStyle;
-
-        this.$separator = separator;
-    }
-
-    /**
-     * This creates a new IntermediateModule in the annotation processing mode and the given annotation style and separator.
-     * @param annotationStyle Sets the annotation style of the module
-     * @param moduleClassId Is the id of the module class as registered with the ModuleRegistry
-     * @param name The name given to this moduule instance
-     * @param separator Sets the separator string to the given value
-     */
-    public IntermediateModule(int moduleClassId, String name, IntermediateModule.AnnotationStyle annotationStyle, String separator)
-    {
-        super(ModuleType.INTERMEDIATE_MODULE, moduleClassId, name);
-
-        this.$processingMode = ProcessingMode.ANNOTATOR;
-
-        this.$annotationStyle = annotationStyle;
-
-        this.$separator = separator;
-    }
-
-    /**
      * This creates a new IntermediateModule with the given processing mode.
      * @param moduleClassId Is the id of the module class as registered with the ModuleRegistry
      * @param name The name given to this moduule instance
-     * @param processingMode Sets the processing mode of the module 
      */
-    public IntermediateModule(int moduleClassId, String name, IntermediateModule.ProcessingMode processingMode)
+    public IntermediateModule(int moduleClassId, String name)
     {
         super(ModuleType.INTERMEDIATE_MODULE, moduleClassId, name);
-
-        this.$processingMode = processingMode;
+        
+        this.$processingMode = ProcessingMode.ANNOTATOR;
+        
+        this.$annotationStyle = AnnotationStyle.POST_ANNOTATION;
+        
+        initialize();
+       
     }
 
     /**
@@ -161,11 +129,11 @@ public abstract class IntermediateModule extends Module implements IIntermediate
      * and sends them according to the processing mode and annotation style of the module.
      */
     @Override
-    public void receiveEventPacket(ValidEventPacket eventPacket)
+    public void receiveEventPacket(TypedValidEventPacket eventPacket)
     {
 
         if (this.$processingMode == ProcessingMode.ANNOTATOR) {
-            ValidEventPacket resultPacket = getAnalysisResult(eventPacket);
+            TypedValidEventPacket resultPacket = getAnalysisResult(eventPacket);
 
             if (this.$annotationStyle == AnnotationStyle.PRE_ANNOTATION) {
                 sendEventPacket(resultPacket);
@@ -177,13 +145,13 @@ public abstract class IntermediateModule extends Module implements IIntermediate
             }
         }
         else {
-            ValidEventPacket resultPacket = getAnalysisResult(eventPacket);
+            TypedValidEventPacket resultPacket = getAnalysisResult(eventPacket);
 
             sendEventPacket(resultPacket);
         }
     }
 
-    private ValidEventPacket getAnalysisResult(ValidEventPacket eventPacket)
+    private TypedValidEventPacket getAnalysisResult(TypedValidEventPacket eventPacket)
     {
         return analyse(eventPacket);
     }
@@ -195,6 +163,11 @@ public abstract class IntermediateModule extends Module implements IIntermediate
      * @param eventPacket Is the original incoming event data
      * @return The data of an event that is a result of the analysis
      */
-    public abstract ValidEventPacket analyse(ValidEventPacket eventPacket);
-
+    public abstract TypedValidEventPacket analyse(TypedValidEventPacket eventPacket);
+   
+    /**
+     * @see org.electrocodeogram.module.Module#initialize()
+     */
+    @Override
+    public abstract void initialize();
 }

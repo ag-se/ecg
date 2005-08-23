@@ -1,6 +1,7 @@
 package org.electrocodeogram.test.server.mockClient;
 
 
+import org.electrocodeogram.event.TypedValidEventPacket;
 import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.msdt.EventValidator;
 
@@ -23,7 +24,7 @@ public class TestClient
      * @param eventPacket Is the EventPacket object carrieng the event data
      * @return "true" if the event data is valid and "false" if not.
      */
-    public boolean passEventData(EventValidator validator, ValidEventPacket eventPacket)
+    public TypedValidEventPacket passEventData(EventValidator validator, ValidEventPacket eventPacket)
     {
         return validator.validate(eventPacket);
     }

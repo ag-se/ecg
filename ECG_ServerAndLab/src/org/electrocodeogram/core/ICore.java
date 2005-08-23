@@ -3,6 +3,8 @@
  */
 package org.electrocodeogram.core;
 
+import java.util.Observer;
+
 import org.electrocodeogram.module.registry.ModuleRegistry;
 import org.electrocodeogram.msdt.MsdtRegistry;
 import org.electrocodeogram.ui.IGui;
@@ -13,6 +15,10 @@ import org.electrocodeogram.ui.IGui;
 public interface ICore
 {
 
+    public abstract void addObserver(Observer o);
+    
+    public abstract void deleteObserver(Observer o); 
+    
     /**
      * This method returns a reference to the MicroSensorDataType-Manager object. 
      * @return A reference to the MicroSensorDataType-Manager object
@@ -36,5 +42,5 @@ public interface ICore
      */
     public abstract void quit();
 
-    
+    public abstract void fireStateChange();
 }

@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Observable;
 
 import org.electrocodeogram.module.registry.ModuleRegistry;
 import org.electrocodeogram.msdt.MsdtRegistry;
@@ -17,7 +18,7 @@ import org.electrocodeogram.ui.IGui;
  * It is implemented as a singleton class that gives centralized access to
  * all components.
  */
-public class Core implements ICore {
+public class Core extends Observable implements ICore{
 
 	private static ICore theInstance = null;
 
@@ -171,4 +172,13 @@ public class Core implements ICore {
 		return this.gui;
 	}
 
+    public void fireStateChange()
+    {
+        this.setChanged();
+        
+        this.notifyObservers();
+        
+        this.clearChanged();
+        
+    }
 }

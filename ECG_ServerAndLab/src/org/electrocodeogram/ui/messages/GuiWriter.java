@@ -21,7 +21,7 @@ import org.electrocodeogram.module.target.TargetModule;
 public class GuiWriter extends TargetModule implements IGuiWriter
 {
 
-    private MessagesTarget target = null;
+    private MessagesTarget target;
     
 //    /**
 //     * @param name
@@ -125,8 +125,22 @@ public class GuiWriter extends TargetModule implements IGuiWriter
 	}
 
     /* (non-Javadoc)
-     * @see org.electrocodeogram.module.Module#receiveEventPacket(org.electrocodeogram.EventPacket)
+     * @see org.electrocodeogram.module.Module#analyseCoreNotification()
      */
+    @Override
+    public void analyseCoreNotification()
+    {
+        // TODO Auto-generated method stub
+        
+    }
 
-
+    /**
+     * @see org.electrocodeogram.module.Module#initialize()
+     */
+    @Override
+    public void initialize()
+    {
+        // TODO Auto-generated method stub
+        
+    }
 }

@@ -1,5 +1,6 @@
 package org.electrocodeogram.module;
 
+import org.electrocodeogram.event.TypedValidEventPacket;
 import org.electrocodeogram.event.ValidEventPacket;
 
 /**
@@ -22,7 +23,7 @@ public class TestModule extends Module
      * This receiving method just sends the received event.
      */
     @Override
-    public void receiveEventPacket(ValidEventPacket eventPacket)
+    public void receiveEventPacket(TypedValidEventPacket eventPacket)
     {
         sendEventPacket(eventPacket);
         
@@ -35,6 +36,26 @@ public class TestModule extends Module
     public void setProperty(@SuppressWarnings("unused") String currentPropertyName, @SuppressWarnings({"unused","unused"}) Object propertyValue)
     {
         // not needed
+        
+    }
+
+    /**
+     * @see org.electrocodeogram.module.Module#analyseCoreNotification()
+     */
+    @Override
+    public void analyseCoreNotification()
+    {
+//      not needed
+        
+    }
+
+    /* (non-Javadoc)
+     * @see org.electrocodeogram.module.Module#initialize()
+     */
+    @Override
+    public void initialize()
+    {
+        // TODO Auto-generated method stub
         
     }
 

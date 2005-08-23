@@ -2,9 +2,12 @@
 package org.electrocodeogram.module.source;
 
 import org.electrocodeogram.core.Core;
+import org.electrocodeogram.event.TypedValidEventPacket;
 import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.module.Module;
 import org.electrocodeogram.msdt.EventValidator;
+
+import com.sun.org.apache.xerces.internal.impl.dv.xs.TypeValidator;
 
 /**
  * This is the abstract class SourceModule that shall be subclassed
@@ -53,9 +56,11 @@ public abstract class SourceModule extends Module
      */
     public void append(ValidEventPacket eventPacket)
     {
-        if(this.eventValidator.validate(eventPacket))
+        TypedValidEventPacket typedValidEventPacket = this.eventValidator.validate(eventPacket);
+        
+        if(typedValidEventPacket != null)
         {
-            sendEventPacket(eventPacket);
+            sendEventPacket(typedValidEventPacket);
         }
     }
     
@@ -64,10 +69,14 @@ public abstract class SourceModule extends Module
      * @param eventPacket not used
      */
     @Override
-    public void receiveEventPacket(@SuppressWarnings("unused") ValidEventPacket eventPacket)
+    public void receiveEventPacket(@SuppressWarnings("unused") TypedValidEventPacket eventPacket)
     {
         return;
     }
     
-   
+    /**
+     * @see org.electrocodeogram.module.Module#initialize()
+     */
+    @Override
+    public abstract void initialize();
 }
