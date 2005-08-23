@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<module>
+	<name>
+		MSDTFilterIntermediateModule
+	</name>
+	<class>
+		org\\electrocodeogram\\module\\intermediate\\MSDTFilterIntermediateModule
+	</class>
+	<description>
+		This module can be used to filter out events of certain MicroSensorDataTypes.
+	</description>
+	<properties>
+		<property>
+			<propertyName>Configure Filter</propertyName>
+			<propertyType>java.lang.reflect.Method</propertyType>
+			<propertyValue>configureFilter</propertyValue>
+		</property>
+	</properties>
+</module>
