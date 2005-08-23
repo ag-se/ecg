@@ -124,7 +124,7 @@ public class SocketServer extends Thread implements ISocketServer
 
             this.serverSocket = new ServerSocket(this.$port);
 
-            System.out.println("ECG Server is up and listening on port: " + this.$port);
+            this.logger.log(Level.INFO,"ECG Server is up and listening on port: " + this.$port);
             
         }
         catch (IOException e) {

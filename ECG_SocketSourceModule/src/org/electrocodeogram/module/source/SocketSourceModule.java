@@ -1,5 +1,7 @@
 package org.electrocodeogram.module.source;
 
+import java.util.Observable;
+
 import org.electrocodeogram.module.ModulePropertyException;
     /**
      * This module receives event data from multiple client sensors.
@@ -11,9 +13,9 @@ import org.electrocodeogram.module.ModulePropertyException;
     public class SocketSourceModule extends SourceModule
     {
 
-        private int port = -1;
+        private int port;
         
-        private SocketServer socketServer = null;
+        private SocketServer socketServer;
         
         /**
          * @param moduleClassId
@@ -23,10 +25,6 @@ import org.electrocodeogram.module.ModulePropertyException;
         {
             super(moduleClassId, name);
             
-            this.port = 22222;
-            
-            this.startReader(this);
-
         }
 
 
@@ -82,6 +80,24 @@ import org.electrocodeogram.module.ModulePropertyException;
                 throw new ModulePropertyException("The value for the port property must be a number greater than 1024 and less then 65536.");
             }
         }
+
+
+       public void analyseCoreNotification()
+       {
+           
+       }
+
+
+    /**
+     * @see org.electrocodeogram.module.Module#initialize()
+     */
+    @Override
+    public void initialize()
+    {
+        this.port = 22222;
+        
+        this.startReader(this);
+    }
     	
         
     }
