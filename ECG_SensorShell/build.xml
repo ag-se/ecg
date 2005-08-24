@@ -230,6 +230,12 @@
 				<fileset dir="${build.lib}" includes="event.jar" />
 
 		</copy>
+		
+		<copy todir="../ECG_CodechangeDifferIntermediateModule/lib/ecg">
+
+				<fileset dir="${build.lib}" includes="event.jar" />
+
+		</copy>
 
 	</target>
 

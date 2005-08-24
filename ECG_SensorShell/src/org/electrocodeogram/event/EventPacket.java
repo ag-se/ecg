@@ -20,21 +20,9 @@ public class EventPacket implements Serializable
 
     private List $argList = null;
     
-    /**
-     * This String constant is used to separate the components of the string representation of this event.
-     */
-    public static String EVENT_SEPARATOR = "#"; 
+
     
-    /**
-     * This String separates the argList entrys in teh string representation of this event.
-     */
-    public static String ARGLIST_SEPARATOR = ";";
-    
-    /**
-     * This is the pattern used to format the timeStamp Date values. The pattern symbols are
-     * accroding to the java.text.DataFormatSymbols class.
-     */
-    public static String DATE_FORMAT_PATTERN = "E M FF HH:mm:ss z yyyy";
+   
 
     /**
      * This creates a new EventPacket object
@@ -125,7 +113,7 @@ public class EventPacket implements Serializable
     {
         String string = "";
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT_PATTERN);
+        SimpleDateFormat dateFormat = new SimpleDateFormat(ValidEventPacket.DATE_FORMAT_PATTERN);
         
         String dateString = dateFormat.format(this.getTimeStamp());
         
