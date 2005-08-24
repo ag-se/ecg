@@ -39,7 +39,7 @@ public class GuiWriter extends TargetModule implements IGuiWriter
     
     public GuiWriter()
     {
-        super(-1,"GuiWriter");
+        super("org.electrocodeogram.ui.messages.GuiWriter","GuiWriter");
     }
 
 //    public static GuiEventWriter getInstance(MessagesTarget target)

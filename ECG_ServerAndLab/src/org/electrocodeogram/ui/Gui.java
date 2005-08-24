@@ -26,10 +26,11 @@ import javax.swing.border.TitledBorder;
 
 import org.electrocodeogram.core.Core;
 import org.electrocodeogram.module.Module;
-import org.electrocodeogram.module.registry.IllegalModuleIDException;
+
 import org.electrocodeogram.module.registry.ModuleDescriptor;
+import org.electrocodeogram.module.registry.ModuleInstanceException;
 import org.electrocodeogram.module.registry.ModuleRegistry;
-import org.electrocodeogram.module.registry.UnknownModuleIDException;
+
 import org.electrocodeogram.ui.messages.GuiWriter;
 import org.electrocodeogram.ui.messages.IGuiWriter;
 import org.electrocodeogram.ui.messages.MessagesFrame;
@@ -153,18 +154,15 @@ public class Gui extends JFrame implements IGui
             public void actionPerformed(ActionEvent e)
             {
 
-                try {
-                	Core.getInstance().getModuleRegistry().getModuleInstance(1).deactivate();
-                }
-                catch (IllegalModuleIDException e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
-                }
-                catch (UnknownModuleIDException e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
-                }
-
+               
+                	try {
+                        Core.getInstance().getModuleRegistry().getModuleInstance(1).deactivate();
+                    }
+                    catch (ModuleInstanceException e1) {
+                        // TODO Auto-generated catch block
+                        e1.printStackTrace();
+                    }
+               
             }
         });
 
@@ -174,17 +172,15 @@ public class Gui extends JFrame implements IGui
             public void actionPerformed(ActionEvent e)
             {
 
-                try {
-                	Core.getInstance().getModuleRegistry().getModuleInstance(1).activate();
-                }
-                catch (IllegalModuleIDException e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
-                }
-                catch (UnknownModuleIDException e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
-                }
+               
+                	try {
+                        Core.getInstance().getModuleRegistry().getModuleInstance(1).activate();
+                    }
+                    catch (ModuleInstanceException e1) {
+                        // TODO Auto-generated catch block
+                        e1.printStackTrace();
+                    }
+               
 
             }
         });
@@ -393,7 +389,7 @@ public class Gui extends JFrame implements IGui
 
                 String moduleName = moduleDescriptor.getName();
                 
-                int moduleClassId = moduleDescriptor.getId();
+                String moduleClassId = moduleDescriptor.getId();
 
                 JButton btnModule = new JButton(moduleName);
 
@@ -555,17 +551,15 @@ public class Gui extends JFrame implements IGui
         if (id != -1) {
 
             String text = "";
-            try {
-                text = Core.getInstance().getModuleRegistry().getModuleInstance(id).getDetails();
-            }
-            catch (IllegalModuleIDException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            catch (UnknownModuleIDException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+           
+                try {
+                    text = Core.getInstance().getModuleRegistry().getModuleInstance(id).getDetails();
+                }
+                catch (ModuleInstanceException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            
 
             JOptionPane.showMessageDialog(this, text, "Moduleigenschaften", JOptionPane.INFORMATION_MESSAGE);
         }

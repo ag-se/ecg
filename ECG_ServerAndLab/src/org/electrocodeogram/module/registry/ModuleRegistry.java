@@ -14,6 +14,8 @@ import java.util.logging.Logger;
 import org.apache.xerces.parsers.DOMParser;
 import org.electrocodeogram.core.Core;
 import org.electrocodeogram.module.Module;
+import org.electrocodeogram.msdt.MicroSensorDataType;
+import org.electrocodeogram.msdt.MicroSensorDataTypeException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -86,6 +88,8 @@ public class ModuleRegistry extends Observable
 
         try {
             this.installedModules = new InstalledModules(file);
+            
+            this.installedModules.initialize();
 
             setChanged();
 
@@ -132,60 +136,21 @@ public class ModuleRegistry extends Observable
      * 
      * @param moduleClassId
      * @return The class object
-     * @throws IllegalModuleIDException
-     *             If the given moduleClassId has a value of < 1
-     * @throws UnknownModuleIDException
-     *             If a module class with the given id could not be found
+     * @throws ModuleClassException 
      */
-    public Class getModuleClassForId(int moduleClassId) throws IllegalModuleIDException, UnknownModuleIDException
+    public Class getModuleClassForId(String moduleClassId) throws ModuleClassException
     {
-        if (!(moduleClassId > 0)) {
-            throw new IllegalModuleIDException();
+        if (moduleClassId == null || moduleClassId.equals("")) {
+            throw new ModuleClassException("The module id is empty.");
         }
 
-        if (!this.installedModules.availableModuleClassesMap.containsKey(new Integer(
-                moduleClassId))) {
-            throw new UnknownModuleIDException();
+        if (!this.installedModules.availableModuleClassesMap.containsKey(moduleClassId)) {
+            throw new ModuleClassException("The module id " + moduleClassId + " is unknown.");
         }
 
-        ModuleDescriptor moduleDescriptor = this.installedModules.availableModuleClassesMap.get(new Integer(
-                moduleClassId));
+        ModuleDescriptor moduleDescriptor = this.installedModules.availableModuleClassesMap.get(moduleClassId);
 
         return moduleDescriptor.getClazz();
-    }
-
-    /**
-     * This method returns the module properties of the module class with the
-     * given moduleClassId.
-     * 
-     * @param moduleClassId
-     * @return The module properties as declared in the "module.properties" file
-     *         of the module as an Array of ModuleProperty objects
-     * @throws IllegalModuleIDException
-     *             If the given moduleClassId has a value of < 1
-     * @throws UnknownModuleIDException
-     *             If a module class with the given id could not be found
-     */
-    public ModuleProperty[] getModuleClassProperties(int moduleClassId) throws IllegalModuleIDException, UnknownModuleIDException
-    {
-        if (!(moduleClassId > 0)) {
-            throw new IllegalModuleIDException();
-        }
-
-        if (this.installedModules == null) {
-            return null;
-        }
-
-        if (!this.installedModules.availableModuleClassesMap.containsKey(new Integer(
-                moduleClassId))) {
-            throw new UnknownModuleIDException();
-        }
-
-        ModuleDescriptor moduleDescriptor = this.installedModules.availableModuleClassesMap.get(new Integer(
-                moduleClassId));
-
-        return moduleDescriptor.getProperties();
-
     }
 
     void notifyOfNewModuleDecriptor(ModuleDescriptor moduleDescriptor)
@@ -208,19 +173,22 @@ public class ModuleRegistry extends Observable
 
         private static final String MODULE_PROPERTY_FILE = "module.properties.xml";
 
-        HashMap<Integer, ModuleDescriptor> availableModuleClassesMap = null;
+        HashMap<String, ModuleDescriptor> availableModuleClassesMap = null;
 
         private int id = 1;
 
         private ModuleClassLoader moduleClassLoader = null;
+        
+        private File $moduleDirectory;
 
         private InstalledModules(File moduleDirectory) throws ModuleClassLoaderInitializationException
         {
-            this.availableModuleClassesMap = new HashMap<Integer, ModuleDescriptor>();
+            this.availableModuleClassesMap = new HashMap<String, ModuleDescriptor>();
 
             this.moduleClassLoader = getModuleClassLoader();
 
-            initialize(moduleDirectory);
+            this.$moduleDirectory = moduleDirectory;
+            
         }
 
         private ModuleClassLoader getModuleClassLoader()
@@ -233,22 +201,22 @@ public class ModuleRegistry extends Observable
             return new ModuleClassLoader(currentClassLoader);
         }
 
-        private void initialize(File moduleDirectory) throws ModuleClassLoaderInitializationException
+        public void initialize() throws ModuleClassLoaderInitializationException
         {
             // is the parameter not null?
-            if (moduleDirectory == null) {
+            if (this.$moduleDirectory == null) {
                 throw new ModuleClassLoaderInitializationException(
                         "The provided module directory path is \"null\".");
             }
 
             // does the file exist and is it a directory?
-            if (!moduleDirectory.exists() || !moduleDirectory.isDirectory()) {
+            if (!this.$moduleDirectory.exists() || !this.$moduleDirectory.isDirectory()) {
                 throw new ModuleClassLoaderInitializationException(
                         "The module directory does not exist or is not a directory.");
             }
 
             // get all filenames in it
-            String[] moduleDirectories = moduleDirectory.list();
+            String[] moduleDirectories = this.$moduleDirectory.list();
 
             // assert no IO-Error has occurred
             if (moduleDirectories == null) {
@@ -266,9 +234,9 @@ public class ModuleRegistry extends Observable
 
             assert (length > 0);
 
-            for (int i = 0; i < length; i++) {
+            nextmodule: for (int i = 0; i < length; i++) {
 
-                String currentModuleDirectoryPath = moduleDirectory + File.separator + moduleDirectories[i];
+                String currentModuleDirectoryPath = this.$moduleDirectory + File.separator + moduleDirectories[i];
 
                 File currentModuleDirectory = new File(
                         currentModuleDirectoryPath);
@@ -290,7 +258,7 @@ public class ModuleRegistry extends Observable
 
                     getLogger().log(Level.WARNING, "The module property file does not exist or is not a file: " + modulePropertyFileString);
 
-                    continue;
+                    continue nextmodule;
 
                 }
 
@@ -350,7 +318,7 @@ public class ModuleRegistry extends Observable
 
                     getLogger().log(Level.WARNING, e2.getMessage());
 
-                    continue;
+                    continue nextmodule;
                 }
                 catch (IOException e2) {
 
@@ -358,10 +326,22 @@ public class ModuleRegistry extends Observable
 
                     getLogger().log(Level.WARNING, e2.getMessage());
 
-                    continue;
+                    continue nextmodule;
                 }
 
                 // get the node values
+                Node moduleIdNode = document.getElementsByTagName("id").item(0);
+
+                String moduleId = moduleIdNode.getFirstChild().getNodeValue();
+                
+                Node moduleProviderNameNode = document.getElementsByTagName("provider-name").item(0);
+
+                String moduleProviderName = moduleProviderNameNode.getFirstChild().getNodeValue();
+                
+                Node moduleVersionNode = document.getElementsByTagName("version").item(0);
+
+                String moduleVersion = moduleVersionNode.getFirstChild().getNodeValue();
+                
                 Node moduleNameNode = document.getElementsByTagName("name").item(0);
 
                 String moduleName = moduleNameNode.getFirstChild().getNodeValue();
@@ -377,94 +357,157 @@ public class ModuleRegistry extends Observable
                 Node properties = document.getElementsByTagName("properties").item(0);
 
                 ModuleProperty[] moduleProperties = null;
-                
+
                 if (properties != null) {
 
                     NodeList propertyList = document.getElementsByTagName("property");
-                    
-                    if (propertyList != null)
-                    {
+
+                    if (propertyList != null) {
                         moduleProperties = new ModuleProperty[propertyList.getLength()];
-                        
-                        for (int j = 0; j < propertyList.getLength(); j++)
-                        {
+
+                        for (int j = 0; j < propertyList.getLength(); j++) {
                             Node propertyNode = propertyList.item(j);
-                            
+
                             NodeList propertyNodeChildNodes = propertyNode.getChildNodes();
-                            
+
                             Node modulePropertyNameNode = propertyNodeChildNodes.item(1);
-                            
-                            if(modulePropertyNameNode != null && !modulePropertyNameNode.getNodeName().equals("propertyName"))
-                            {
+
+                            if (modulePropertyNameNode != null && !modulePropertyNameNode.getNodeName().equals("propertyName")) {
                                 getLogger().log(Level.WARNING, "Error parsing module property file " + modulePropertyFileString);
 
-                                continue;
+                                continue nextmodule;
                             }
-                            
+
                             Node modulePropertyTypeNode = propertyNodeChildNodes.item(3);
-                            
-                            if(modulePropertyTypeNode != null && !modulePropertyTypeNode.getNodeName().equals("propertyType"))
-                            {
+
+                            if (modulePropertyTypeNode != null && !modulePropertyTypeNode.getNodeName().equals("propertyType")) {
                                 getLogger().log(Level.WARNING, "Error parsing module property file " + modulePropertyFileString);
 
-                                continue;
+                                continue nextmodule;
                             }
-                            
+
                             Node modulePropertyValueNode = propertyNodeChildNodes.item(5);
-                            
-                            if(modulePropertyValueNode != null && !modulePropertyValueNode.getNodeName().equals("propertyValue"))
-                            {
+
+                            if (modulePropertyValueNode != null && !modulePropertyValueNode.getNodeName().equals("propertyValue")) {
                                 getLogger().log(Level.WARNING, "Error parsing module property file " + modulePropertyFileString);
 
-                                continue;
+                                continue nextmodule;
                             }
-                            
+
                             String modulePropertyName = modulePropertyNameNode.getFirstChild().getNodeValue();
 
                             if (modulePropertyName == null || modulePropertyName.equals("")) {
                                 getLogger().log(Level.WARNING, "Error parsing module property file " + modulePropertyFileString);
 
-                                continue;
+                                continue nextmodule;
                             }
 
-                            
                             String modulePropertyType = modulePropertyTypeNode.getFirstChild().getNodeValue();
 
                             if (modulePropertyType == null || modulePropertyType.equals("")) {
                                 getLogger().log(Level.WARNING, "Error parsing module property file " + modulePropertyFileString);
 
-                                continue;
+                                continue nextmodule;
                             }
-                            
+
                             Class type = null;
                             try {
                                 type = Class.forName(modulePropertyType);
                             }
                             catch (ClassNotFoundException e) {
-                                
+
                                 getLogger().log(Level.WARNING, "The property type is not a full qualified Java class name.");
-                                
+
                                 getLogger().log(Level.WARNING, "Property type: " + modulePropertyType + " in module property file: " + modulePropertyFileString);
-                                
-                                continue;
+
+                                continue nextmodule;
                             }
-                            
+
                             String modulePropertyValue = null;
-                            
-                            if(modulePropertyValueNode != null)
-                            {
+
+                            if (modulePropertyValueNode != null) {
                                 modulePropertyValue = modulePropertyValueNode.getFirstChild().getNodeValue();
-    
+
                                 if (modulePropertyValue == null || modulePropertyValue.equals("")) {
                                     getLogger().log(Level.WARNING, "Error parsing module property file " + modulePropertyFileString);
-    
-                                    continue;
+
+                                    continue nextmodule;
                                 }
                             }
-                            
-                            moduleProperties[j] = new ModuleProperty(modulePropertyName,modulePropertyValue,type);
-                            
-                            
+
+                            moduleProperties[j] = new ModuleProperty(
+                                    modulePropertyName, modulePropertyValue,
+                                    type);
+
+                        }
+                    }
+
+                }
+
+                Node microSensorDataTypesNode = document.getElementsByTagName("microsensordatatypes").item(0);
+
+                MicroSensorDataType[] microSensorDataTypes = null;
+
+                if (microSensorDataTypesNode != null) {
+
+                    NodeList msdtList = document.getElementsByTagName("microsensordatatype");
+
+                    if (msdtList != null) {
+                        microSensorDataTypes = new MicroSensorDataType[msdtList.getLength()];
+
+                        for (int j = 0; j < msdtList.getLength(); j++) {
+                            Node msdtNode = msdtList.item(j);
+
+                            NodeList msdtNodeChildNodes = msdtNode.getChildNodes();
+
+                            Node msdtNameNode = msdtNodeChildNodes.item(1);
+
+                            if (msdtNameNode != null && !msdtNameNode.getNodeName().equals("msdtName")) {
+                                getLogger().log(Level.WARNING, "Error parsing module property file " + modulePropertyFileString);
+
+                                continue nextmodule;
+                            }
+
+                            Node msdtFileNode = msdtNodeChildNodes.item(3);
+
+                            if (msdtFileNode != null && !msdtFileNode.getNodeName().equals("msdtFile")) {
+                                getLogger().log(Level.WARNING, "Error parsing module property file " + modulePropertyFileString);
+
+                                continue nextmodule;
+                            }
+
+                            String msdtName = msdtNameNode.getFirstChild().getNodeValue();
+
+                            if (msdtName == null || msdtName.equals("")) {
+                                getLogger().log(Level.WARNING, "Error parsing module property file " + modulePropertyFileString);
+
+                                continue nextmodule;
+                            }
+
+                            String msdtFileString = msdtFileNode.getFirstChild().getNodeValue();
+
+                            if (msdtFileString == null || msdtFileString.equals("")) {
+                                getLogger().log(Level.WARNING, "Error parsing module property file " + modulePropertyFileString);
+
+                                continue nextmodule;
+                            }
+
+                            File msdtFile = new File(
+                                    currentModuleDirectoryPath + File.separator + msdtFileString);
+
+                            try {
+                                microSensorDataTypes[j] = Core.getInstance().getMsdtRegistry().parseMicroSensorDataType(msdtFile);
+                            }
+                            catch (MicroSensorDataTypeException e) {
+
+                                getLogger().log(Level.WARNING, "Error parsing module property file " + modulePropertyFileString);
+
+                                getLogger().log(Level.WARNING, e.getMessage());
+
+                                continue nextmodule;
+
+                            }
+
                         }
                     }
 
@@ -476,27 +519,33 @@ public class ModuleRegistry extends Observable
 
                 try {
 
-                    moduleClass = this.moduleClassLoader.loadClass(fQmoduleClassString);
+                    this.moduleClassLoader.addModuleClassPath(currentModuleDirectoryPath);
 
-                    if(moduleClass == null)
-                    {
+                    moduleClass = this.moduleClassLoader.loadClass(moduleClassName);
+
+                    if (moduleClass == null) {
                         // something went wrong during class loading
-                        continue;
+                        continue nextmodule;
+                    }
+
+                    if(this.availableModuleClassesMap.containsKey(moduleId))
+                    {
+                        getLogger().log(Level.SEVERE, "A module eith the id " + moduleId + " is allready loaded.");
+
+                        continue nextmodule;
                     }
                     
-                    int moduleClassId = this.id++;
-
                     // make a new ModuleDescriptor for this module class nad
                     //assign it the unique id
                     ModuleDescriptor moduleDescriptor = new ModuleDescriptor(
-                            moduleClassId, moduleName, moduleClass,
-                            moduleDescription, moduleProperties);
+                            moduleId, moduleName, moduleProviderName, moduleVersion, moduleClass,
+                            moduleDescription, moduleProperties,
+                            microSensorDataTypes);
 
                     // put the ModuleDescriptor into the HashMap
-                    this.availableModuleClassesMap.put(new Integer(
-                            moduleClassId), moduleDescriptor);
+                    this.availableModuleClassesMap.put(moduleId, moduleDescriptor);
 
-                    getLogger().log(Level.INFO, "Loaded additional module class with id: " + moduleClassId + " " + moduleDescriptor.getClazz().getName());
+                    getLogger().log(Level.INFO, "Loaded additional module class with id: " + moduleId + " " + moduleDescriptor.getClazz().getName());
 
                     notifyOfNewModuleDecriptor(moduleDescriptor);
 
@@ -504,6 +553,8 @@ public class ModuleRegistry extends Observable
                 catch (ClassNotFoundException e) {
 
                     getLogger().log(Level.SEVERE, "Unable to load the module " + moduleName + " because the class " + fQmoduleClassString + " is not found.\nProceeding with next module if any.");
+
+                    continue nextmodule;
                 }
 
             }
@@ -536,7 +587,7 @@ public class ModuleRegistry extends Observable
         this.logger.log(Level.INFO, "Registered module " + module.getName());
 
         Core.getInstance().addObserver(module);
-        
+
         setChanged();
 
         notifyObservers(module);
@@ -551,22 +602,19 @@ public class ModuleRegistry extends Observable
      * @param moduleId
      *            Is the id of the module instance to return
      * @return The desired module instance
-     * @throws IllegalModuleIDException
-     *             If the given moduleClassId has a value of < 1
-     * @throws UnknownModuleIDException
-     *             If a module class with the given id could not be found
+     * @throws ModuleInstanceException 
      */
-    public Module getModuleInstance(int moduleId) throws IllegalModuleIDException, UnknownModuleIDException
+    public Module getModuleInstance(int moduleId) throws ModuleInstanceException
     {
         if (!(moduleId > 0)) {
-            throw new IllegalModuleIDException();
+            throw new ModuleInstanceException("The module id is invalid.");
         }
 
         assert (moduleId > 0);
 
         if (!(this.runningModules.runningModuleMap.containsKey(new Integer(
                 moduleId)))) {
-            throw new UnknownModuleIDException();
+            throw new ModuleInstanceException("The module id is unknown.");
         }
 
         return this.runningModules.runningModuleMap.get(new Integer(moduleId));
@@ -582,26 +630,21 @@ public class ModuleRegistry extends Observable
      *            Is the name that should be given to the new module object
      * @throws ModuleInstantiationException
      *             If an exception occurs during the instantiation of the module
-     * @throws IllegalModuleIDException
-     *             If the given moduleClassId has a value of < 1
-     * @throws UnknownModuleIDException
-     *             If a module class with the given id could not be found
+     * @throws ModuleClassException 
      */
-    public void createModuleInstance(int moduleClassId, String moduleName) throws ModuleInstantiationException, IllegalModuleIDException, UnknownModuleIDException
+    public void createModuleInstance(String moduleClassId, String moduleName) throws ModuleInstantiationException, ModuleClassException
     {
-        if (!(moduleClassId > 0)) {
-            throw new IllegalModuleIDException();
+        if (moduleClassId == null || moduleClassId.equals("")) {
+            throw new ModuleClassException("The module id is empty.");
         }
-
-        assert (moduleClassId > 0);
-
+       
         Class moduleClass = getModuleClassForId(moduleClassId);
 
         try {
 
             Constructor[] constructors = moduleClass.getConstructors();
 
-            Object[] args = new Object[] { new Integer(moduleClassId), moduleName };
+            Object[] args = new Object[] {moduleClassId, moduleName };
 
             constructors[0].newInstance(args);
 
@@ -629,16 +672,13 @@ public class ModuleRegistry extends Observable
      * 
      * @param moduleId
      *            Is the id of the module to deregister.
-     * @throws IllegalModuleIDException
-     *             If the given moduleClassId has a value of < 1
-     * @throws UnknownModuleIDException
-     *             If a module class with the given id could not be found
+     * @throws ModuleInstanceException 
      * 
      */
-    public void deregisterModuleInstance(int moduleId) throws UnknownModuleIDException, IllegalModuleIDException
+    public void deregisterModuleInstance(int moduleId) throws ModuleInstanceException
     {
         if (!(moduleId > 0)) {
-            throw new IllegalModuleIDException();
+            throw new ModuleInstanceException("The module id is invalid.");
         }
 
         assert (moduleId > 0);
@@ -660,34 +700,22 @@ public class ModuleRegistry extends Observable
     }
 
     /**
-     * This method returns the description of the module class with the given
-     * id. The description is given by the module developer in the module's
-     * "module.property" file.
-     * 
-     * @param moduleClassId
-     *            Is the id of the module class to get the description of
-     * @return The description about the module class
-     * @throws IllegalModuleIDException
-     *             If the given moduleClassId has a value of < 1
-     * @throws UnknownModuleIDException
-     *             If a module class with the given id could not be found
+     * @param i
+     * @return
+     * @throws ModuleClassException 
      */
-    public String getModuleClassDescription(int moduleClassId) throws IllegalModuleIDException, UnknownModuleIDException
+    public ModuleDescriptor getModuleDescriptor(String moduleClassId) throws ModuleClassException
     {
-
-        if(!(moduleClassId > 0))
-        {
-            throw new IllegalModuleIDException();
-        }
-        
-        if(!this.installedModules.availableModuleClassesMap.containsKey(new Integer(moduleClassId)))
-        {
-            throw new UnknownModuleIDException();
+        if (moduleClassId == null || moduleClassId.equals("")) {
+            throw new ModuleClassException("The module id is empty.");
         }
 
-        ModuleDescriptor moduleDescriptor = this.installedModules.availableModuleClassesMap.get(new Integer(moduleClassId));
-        
-        return moduleDescriptor.getDescription();
+        if (!this.installedModules.availableModuleClassesMap.containsKey(moduleClassId)) {
+            throw new ModuleClassException("The module id is unknown.");
+        }
+
+        return this.installedModules.availableModuleClassesMap.get(moduleClassId);
+
     }
 
 }

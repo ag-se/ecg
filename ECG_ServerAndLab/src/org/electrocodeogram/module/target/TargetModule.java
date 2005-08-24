@@ -20,7 +20,7 @@ public abstract class TargetModule extends Module
  * @param name Is the name given to this module
     *
     */
-    public TargetModule(int moduleClassId, String name)
+    public TargetModule(String moduleClassId, String name)
     {
         super(ModuleType.TARGET_MODULE,moduleClassId,name);
     }

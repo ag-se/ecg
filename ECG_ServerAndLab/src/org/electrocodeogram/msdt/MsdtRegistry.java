@@ -1,11 +1,18 @@
 package org.electrocodeogram.msdt;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.xml.XMLConstants;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+
 import org.electrocodeogram.core.Core;
 import org.electrocodeogram.module.Module;
+import org.xml.sax.SAXException;
 
 /**
  * The MicroSensorDataType registry is a database for MicroSensorDataTypes.
@@ -22,10 +29,13 @@ public class MsdtRegistry
 
     private HashMap<String, MicroSensorDataType> registeredMsdt = null;
 
+    private HashMap<String, MicroSensorDataType> predefinedMsdt = null;
+
     private Logger logger = null;
 
     /**
      * This creates the MsdtRegistry object.
+     * @throws FileNotFoundException 
      */
     public MsdtRegistry()
     {
@@ -33,6 +43,79 @@ public class MsdtRegistry
         this.logger = Logger.getLogger("MstdManager");
 
         this.registeredMsdt = new HashMap<String, MicroSensorDataType>();
+
+        this.predefinedMsdt = new HashMap<String, MicroSensorDataType>();
+
+        try {
+            loadPredefinedSourceMsdt();
+        }
+        catch (FileNotFoundException e) {
+
+            this.logger.log(Level.WARNING, e.getMessage());
+
+        }
+
+    }
+
+    /**
+     * This method parses the XML schema files and strores each XML schema in the
+     * MsdtRegitry's HashMap.
+     */
+    private void loadPredefinedSourceMsdt() throws FileNotFoundException
+    {
+
+        String msdtSubDirString = "msdt";
+
+        File msdtDir = new File(msdtSubDirString);
+
+        if (!msdtDir.exists() || !msdtDir.isDirectory()) {
+            throw new FileNotFoundException(
+                    "The MicroSensorDataType \"msdt\" subdirectory can not be found.");
+        }
+
+        String[] defs = msdtDir.list();
+
+        if (defs != null) {
+            for (int i = 0; i < defs.length; i++) {
+                File defFile = new File(
+                        msdtDir.getAbsolutePath() + File.separator + defs[i]);
+
+                SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+
+                Schema schema = null;
+
+                try {
+
+                    schema = schemaFactory.newSchema(defFile);
+
+                    MicroSensorDataType microSensorDataType = new MicroSensorDataType(
+                            defFile.getName(), schema);
+
+                    this.logger.log(Level.INFO, "Loaded additional MicroSensorDatyType " + defFile.getName());
+
+                    this.predefinedMsdt.put(microSensorDataType.getName(), microSensorDataType);
+
+                }
+                catch (SAXException e) {
+
+                    this.logger.log(Level.WARNING, "Error while reading the XML schema file " + defFile.getName());
+
+                    this.logger.log(Level.WARNING, e.getMessage());
+
+                }
+                catch (IllegalMicroSensorDataTypeNameException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                catch (IllegalMicroSensorDataTypeSchemaException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+        }
+        else {
+            this.logger.log(Level.INFO, "No msdt data is found.");
+        }
 
     }
 
@@ -72,36 +155,34 @@ public class MsdtRegistry
                     "The given MicroSensorDataType is \"null\".");
         }
 
-        if (providingModule == null)
-        {
-            throw new ModuleIsNullException("the given Module is of value \"null\"");
+        if (providingModule == null) {
+            throw new ModuleIsNullException(
+                    "the given Module is of value \"null\"");
         }
-        
-        if (this.registeredMsdt.containsKey(msdt.getName()))
-        {
+
+        if (this.registeredMsdt.containsKey(msdt.getName())) {
             MicroSensorDataType knownMsdt = this.registeredMsdt.get(msdt.getName());
-            
+
             knownMsdt.addProvidingModule(providingModule);
-            
+
             this.logger.log(Level.INFO, "Registered additonal Module with a known MicroSensorDatyType " + knownMsdt.getName());
-            
+
             Core.getInstance().fireStateChange();
-            
+
             return knownMsdt;
-            
+
         }
-      
+
         msdt.addProvidingModule(providingModule);
-        
+
         this.registeredMsdt.put(msdt.getName(), msdt);
-        
+
         this.logger.log(Level.INFO, "Registered a new MicroSensorDatyType " + msdt.getName());
-        
+
         Core.getInstance().fireStateChange();
-        
+
         return msdt;
-       
-        
+
     }
 
     /**
@@ -129,7 +210,64 @@ public class MsdtRegistry
         this.registeredMsdt.remove(msdt.getName());
 
         this.logger.log(Level.INFO, "Deregistered MicroSensorDatyType " + msdt.getName());
-        
+
         Core.getInstance().fireStateChange();
+    }
+
+    /**
+     * @return
+     */
+    public MicroSensorDataType[] getPredefinedMicroSensorDataTypes()
+    {
+        return this.predefinedMsdt.values().toArray(new MicroSensorDataType[0]);
+    }
+
+    /**
+     * @param file
+     * @return
+     * @throws MicroSensorDataTypeException 
+     */
+    public MicroSensorDataType parseMicroSensorDataType(File defFile) throws MicroSensorDataTypeException
+    {
+        if(!defFile.exists())
+        {
+            throw new MicroSensorDataTypeException("Error while loading MSDT:\nThe schema file " + defFile.getAbsolutePath() + " does not exist.");
+        }
+        
+        if(!defFile.isFile())
+        {
+            throw new MicroSensorDataTypeException("Error while loading MSDT:\nThe schema file " + defFile.getAbsolutePath() + " is not a plain file.");
+        }
+        
+        SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+
+        Schema schema = null;
+
+        try {
+
+            schema = schemaFactory.newSchema(defFile);
+
+            MicroSensorDataType microSensorDataType = new MicroSensorDataType(
+                    defFile.getName(), schema);
+
+            this.logger.log(Level.INFO, "Loaded additional MicroSensorDatyType " + defFile.getName());
+
+            return microSensorDataType;
+
+        }
+        catch (SAXException e) {
+
+            throw new MicroSensorDataTypeException("Error while reading the XML schema file " + defFile.getName() +"\n" + e.getMessage());
+        }
+        catch (IllegalMicroSensorDataTypeNameException e) {
+            
+            throw new MicroSensorDataTypeException("Error while reading the XML schema file " + defFile.getName() +"\n" + e.getMessage());
+            
+        }
+        catch (IllegalMicroSensorDataTypeSchemaException e) {
+            
+            throw new MicroSensorDataTypeException("Error while reading the XML schema file " + defFile.getName() +"\n" + e.getMessage());
+            
+        }
     }
 }

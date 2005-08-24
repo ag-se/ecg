@@ -27,7 +27,7 @@ public abstract class SourceModule extends Module
      * @param moduleClassId Is the id of the module's class as defined in the ModuleRegistry
      * @param name Is the name given to this module instance
      */
-    public SourceModule(int moduleClassId, String name)
+    public SourceModule(String moduleClassId, String name)
     {
         super(ModuleType.SOURCE_MODULE,moduleClassId,name);
         

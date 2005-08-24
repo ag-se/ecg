@@ -57,7 +57,7 @@ public abstract class IntermediateModule extends Module implements IIntermediate
      * @param moduleClassId Is the id of the module class as registered with the ModuleRegistry
      * @param name The name given to this moduule instance
      */
-    public IntermediateModule(int moduleClassId, String name)
+    public IntermediateModule(String moduleClassId, String name)
     {
         super(ModuleType.INTERMEDIATE_MODULE, moduleClassId, name);
         

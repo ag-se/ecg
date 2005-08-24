@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.StringTokenizer;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
@@ -20,6 +22,8 @@ public class ModuleClassLoader extends java.lang.ClassLoader
 {
 
     private Logger logger = null;
+
+    private ArrayList<String> $moduleClassPaths;
 
     /**
      * This creates the ModuleClassLoader and sets the given ClassLoader to be the parent
@@ -39,125 +43,106 @@ public class ModuleClassLoader extends java.lang.ClassLoader
      * This method loads classes from the given path to the file system.
      */
     @Override
-    protected Class<?> findClass(String classFilePath) throws ClassNotFoundException
+    protected Class<?> findClass(String className)
     {
         Class<?> toReturn = null;
 
-        File classFile = new File(classFilePath);
+        if (this.$moduleClassPaths == null) {
+            this.logger.log(Level.SEVERE, "No module class paths defined.");
 
-        if(!classFile.exists())
-        {
-            this.logger.log(Level.SEVERE,"The class file can not be found: " + classFilePath);
-            
             return null;
         }
 
-        if(!classFile.isFile())
-        {
-            this.logger.log(Level.SEVERE,"The class file is not a simple file: " + classFilePath);
-            
+        String normalizedClassName = getNormalizedClassName(className);
+
+        if (normalizedClassName == null) {
+            this.logger.log(Level.SEVERE, "Class path is invalid: " + className);
+
             return null;
         }
 
-        FileInputStream fis = null;
+        for (String moduleClassPath : this.$moduleClassPaths) {
 
-        try {
-            fis = new FileInputStream(classFile);
+            String pathToModuleClass = moduleClassPath + normalizedClassName + ".class";
 
-            byte[] data = new byte[(int) classFile.length()];
+            File classFile = new File(pathToModuleClass);
 
-            fis.read(data);
-
-            try
-            {
-                toReturn = this.defineClass(null, data, 0, data.length);
+            if (!classFile.exists()) {
+                
+                continue;
             }
-            catch(LinkageError e)
-            {
-                this.logger.log(Level.INFO, "Linkage error: " + e.getMessage());
-             
+
+            if (!classFile.isFile()) {
+                
+                continue;
             }
-            
 
-            this.logger.log(Level.INFO, "Successfully loaded module class: " + classFile.getName());
+            FileInputStream fis = null;
 
-            File moduleDirectory = classFile.getParentFile();
+            try {
+                fis = new FileInputStream(classFile);
 
-            assert (moduleDirectory.exists());
+                byte[] data = new byte[(int) classFile.length()];
 
-            assert (moduleDirectory.isDirectory());
+                fis.read(data);
 
-            FilenameFilter filter = new FilenameFilter() {
+                try {
+                    toReturn = this.defineClass(null, data, 0, data.length);
 
-                public boolean accept(@SuppressWarnings("unused")
-                File dir, String name)
-                {
-                    if (name.endsWith(".class")) {
-                        return true;
-                    }
-
-                    return false;
+                    break;
 
                 }
-            };
-
-            String[] files = moduleDirectory.list(filter);
-
-            for (int i = 0; i < files.length; i++) {
-                File file = new File(
-                        moduleDirectory + File.separator + files[i]);
-
-                if (!file.equals(classFile)) {
-
-                    fis = new FileInputStream(file);
-
-                    data = new byte[(int) file.length()];
-
-                    fis.read(data);
-
-                    try
-                    {
-                        defineClass(null, data, 0, data.length);
-                    }
-                    catch(LinkageError e)
-                    {
-                        this.logger.log(Level.INFO, "Linkage error: " + e.getMessage());
-                    }
-
-                    this.logger.log(Level.INFO, "Successfully loaded additional class: " + file.getName() + " required by module " + classFile.getName());
+                catch (LinkageError e) {
+                    this.logger.log(Level.INFO, "Linkage error: " + e.getMessage());
 
                 }
+
+                this.logger.log(Level.INFO, "Successfully loaded module class: " + classFile.getName());
+
             }
-            
-            return toReturn;
-            
+            catch (IOException e) {
+
+                this.logger.log(Level.WARNING, "Error while loading module class: " + className);
+
+            }
         }
-        catch (FileNotFoundException e) {
 
-            this.logger.log(Level.WARNING, "Error while reading the module class file " + classFilePath);
-
-            throw new ClassNotFoundException(e.getMessage());
-
-        }
-        catch (IOException e) {
-            this.logger.log(Level.WARNING, "Error while reading the module class file " + classFilePath);
-
-            throw new ClassNotFoundException(e.getMessage());
-
-        }
-        finally
+        if(toReturn == null)
         {
-         try {
-             if(fis != null)
-             {
-                 fis.close();
-             }
+            this.logger.log(Level.WARNING, "The desired class could not be found: " + className);
         }
-        catch (IOException e) {
-           
-            this.logger.log(Level.WARNING,"Error while closing the InputStream.");
-            
-        }   
+        
+        return toReturn;
+    }
+
+    /**
+     * @param className
+     * @return
+     */
+    private String getNormalizedClassName(String className)
+    {
+        StringTokenizer stringTokenizer = new StringTokenizer(className, ".");
+
+        String normalizedClassName = "";
+
+        while (stringTokenizer.hasMoreTokens()) {
+            normalizedClassName += File.separator + stringTokenizer.nextToken();
+
         }
+
+        return normalizedClassName;
+    }
+
+    /**
+     * @param currentModuleDirectoryPath
+     */
+    public void addModuleClassPath(String moduleClassPath)
+    {
+        if (this.$moduleClassPaths == null) {
+            this.$moduleClassPaths = new ArrayList<String>();
+        }
+
+        this.$moduleClassPaths.add(moduleClassPath);
+
     }
 }

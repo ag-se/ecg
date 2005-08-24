@@ -18,9 +18,10 @@ import javax.swing.border.LineBorder;
 import org.electrocodeogram.core.Core;
 import org.electrocodeogram.module.Module;
 import org.electrocodeogram.module.ModuleConnectionException;
-import org.electrocodeogram.module.registry.IllegalModuleIDException;
+
+import org.electrocodeogram.module.registry.ModuleInstanceException;
 import org.electrocodeogram.module.registry.ModuleRegistry;
-import org.electrocodeogram.module.registry.UnknownModuleIDException;
+
 import org.electrocodeogram.msdt.EventValidator;
 import org.electrocodeogram.ui.Gui;
 import org.electrocodeogram.ui.MenuManager;
@@ -112,23 +113,19 @@ public class ModuleGraph extends JGraph
 			                    {
 			                        try {
                                         
-			                            try {
+			                           
 			                            	Core.getInstance().getModuleRegistry().getModuleInstance(Core.getInstance().getGui().getSourceModule()).connectReceiverModule(Core.getInstance().getModuleRegistry().getModuleInstance(selectedModuleCellId));
-                                        }
-                                        catch (IllegalModuleIDException e1) {
-                                            // TODO Auto-generated catch block
-                                            e1.printStackTrace();
-                                        }
-                                        catch (UnknownModuleIDException e1) {
-                                            // TODO Auto-generated catch block
-                                            e1.printStackTrace();
-                                        }
+                                        
                                         
                                         Core.getInstance().getGui().exitModuleConnectionMode();
                                     }
                                     catch (ModuleConnectionException e1) {
                                         
                                         JOptionPane.showMessageDialog(getGui(),e1.getMessage(), "Ungültige Modulverbindung",JOptionPane.ERROR_MESSAGE);
+                                    }
+                                    catch (ModuleInstanceException e2) {
+                                        // TODO Auto-generated catch block
+                                        e2.printStackTrace();
                                     }
 			                    }
 			                }

@@ -158,6 +158,7 @@
 		<delete dir="${build.dir}"/>
 		<delete dir="${dist.dir}"/>
 		<delete dir="${doc.dir}"/>
+		<delete dir="${module.dir}"/>
 
 	</target>
 
@@ -223,8 +224,20 @@
 			<fileset dir="${build.lib}" includes="moduleapi.jar" />
 
 		</copy>
+		
+		<copy todir="../ECG_FileSystemSourceModule/lib/ecg/">
+
+					<fileset dir="${build.lib}" includes="moduleapi.jar" />
+
+				</copy>
 
 		<copy todir="../ECG_MSDTFilterIntermediateModule/lib/ecg/">
+
+			<fileset dir="${build.lib}" includes="moduleapi.jar" />
+
+		</copy>
+		
+		<copy todir="../ECG_CodechangeDifferIntermediateModule/lib/ecg/">
 
 			<fileset dir="${build.lib}" includes="moduleapi.jar" />
 

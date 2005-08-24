@@ -20,9 +20,10 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.electrocodeogram.core.Core;
-import org.electrocodeogram.module.registry.IllegalModuleIDException;
+
+import org.electrocodeogram.module.registry.ModuleInstanceException;
 import org.electrocodeogram.module.registry.ModuleRegistry;
-import org.electrocodeogram.module.registry.UnknownModuleIDException;
+
 import org.electrocodeogram.msdt.EventValidator;
 
 /**
@@ -109,17 +110,15 @@ public class MessagesFrame extends JFrame implements MessagesTarget
         }
         else
         {
-            try {
-                this.titledBorder.setTitle(MODULE_SELECTED + Core.getInstance().getModuleRegistry().getModuleInstance(moduleId).getName());
-            }
-            catch (IllegalModuleIDException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            catch (UnknownModuleIDException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+            
+                try {
+                    this.titledBorder.setTitle(MODULE_SELECTED + Core.getInstance().getModuleRegistry().getModuleInstance(moduleId).getName());
+                }
+                catch (ModuleInstanceException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+           
         }
         repaint();
     }

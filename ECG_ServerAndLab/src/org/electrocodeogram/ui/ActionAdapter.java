@@ -8,9 +8,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import org.electrocodeogram.core.Core;
-import org.electrocodeogram.module.registry.IllegalModuleIDException;
+
+import org.electrocodeogram.module.registry.ModuleClassException;
 import org.electrocodeogram.module.registry.ModuleInstantiationException;
-import org.electrocodeogram.module.registry.UnknownModuleIDException;
+
 
 /**
  * @author 7oas7er *  * TODO To change the template for this generated type comment go to * Window - Preferences - Java - Code Style - Code Templates
@@ -20,12 +21,12 @@ public class ActionAdapter implements ActionListener
 {
 
     
-    private String $moduleName = null;
+    private String $moduleName;
     
-    private int moduleClassId = -1;
+    private String moduleClassId;
     
   
-    public ActionAdapter(int moduleClassId, String moduleName)
+    public ActionAdapter(String moduleClassId, String moduleName)
     {
         
         this.$moduleName = moduleName;
@@ -51,21 +52,20 @@ public class ActionAdapter implements ActionListener
 //       
 //      }
         
-        try {
-        	Core.getInstance().getModuleRegistry().createModuleInstance(moduleClassId,$moduleName);
-        }
-        catch (ModuleInstantiationException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        }
-        catch (IllegalModuleIDException e2) {
-            // TODO Auto-generated catch block
-            e2.printStackTrace();
-        }
-        catch (UnknownModuleIDException e3) {
-            // TODO Auto-generated catch block
-            e3.printStackTrace();
-        }
+        
+        	try {
+                Core.getInstance().getModuleRegistry().createModuleInstance(moduleClassId,$moduleName);
+            }
+            catch (ModuleInstantiationException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+            catch (ModuleClassException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+        
+  
         
     }
 

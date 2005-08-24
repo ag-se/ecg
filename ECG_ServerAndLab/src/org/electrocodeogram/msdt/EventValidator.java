@@ -221,9 +221,7 @@ public class EventValidator
             }
             catch (SAXException e) {
 
-                this.logger.log(Level.INFO, "The MicroActivity event is not a valid " + microSensorDataTypes[i].getName() + " event.");
-
-                this.logger.log(Level.INFO, e.getMessage());
+               // ignore this
 
             }
             catch (IOException e) {

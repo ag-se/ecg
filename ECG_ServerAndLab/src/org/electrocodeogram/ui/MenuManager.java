@@ -7,6 +7,7 @@
 package org.electrocodeogram.ui;
 
 import java.awt.Component;
+import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -25,9 +26,12 @@ import org.electrocodeogram.module.ModulePropertyException;
 import org.electrocodeogram.module.Module.ModuleType;
 import org.electrocodeogram.module.intermediate.IIntermediateModule;
 import org.electrocodeogram.module.intermediate.IntermediateModule;
-import org.electrocodeogram.module.registry.IllegalModuleIDException;
+
+import org.electrocodeogram.module.registry.ModuleClassException;
+import org.electrocodeogram.module.registry.ModuleDescriptor;
+import org.electrocodeogram.module.registry.ModuleInstanceException;
 import org.electrocodeogram.module.registry.ModuleProperty;
-import org.electrocodeogram.module.registry.UnknownModuleIDException;
+
 
 
 /**
@@ -71,17 +75,15 @@ public class MenuManager
 
             public void actionPerformed(ActionEvent e)
             {
-                try {
-                	Core.getInstance().getModuleRegistry().getModuleInstance(Core.getInstance().getGui().getSelectedModuleCellId()).remove();
-                }
-                catch (UnknownModuleIDException e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
-                }
-                catch (IllegalModuleIDException e2) {
-                    // TODO Auto-generated catch block
-                    e2.printStackTrace();
-                }
+               
+                	try {
+                        Core.getInstance().getModuleRegistry().getModuleInstance(Core.getInstance().getGui().getSelectedModuleCellId()).remove();
+                    }
+                    catch (ModuleInstanceException e1) {
+                        // TODO Auto-generated catch block
+                        e1.printStackTrace();
+                    }
+               
                 
             }});
         
@@ -96,17 +98,15 @@ public class MenuManager
 
             public void actionPerformed(ActionEvent e)
             {
-               try {
-            	   Core.getInstance().getModuleRegistry().getModuleInstance(Core.getInstance().getGui().getSelectedModuleCellId()).deactivate();
-            }
-            catch (IllegalModuleIDException e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
-            }
-            catch (UnknownModuleIDException e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
-            }
+               
+            	   try {
+                    Core.getInstance().getModuleRegistry().getModuleInstance(Core.getInstance().getGui().getSelectedModuleCellId()).deactivate();
+                }
+                catch (ModuleInstanceException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
+           
                 
             }});
         
@@ -114,17 +114,15 @@ public class MenuManager
 
             public void actionPerformed(ActionEvent e)
             {
-               try {
-            	   Core.getInstance().getModuleRegistry().getModuleInstance(Core.getInstance().getGui().getSelectedModuleCellId()).activate();
-            }
-            catch (IllegalModuleIDException e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
-            }
-            catch (UnknownModuleIDException e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
-            }
+             
+            	   try {
+                    Core.getInstance().getModuleRegistry().getModuleInstance(Core.getInstance().getGui().getSelectedModuleCellId()).activate();
+                }
+                catch (ModuleInstanceException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
+           
                 
             }});
         
@@ -141,17 +139,15 @@ public class MenuManager
             public void actionPerformed(ActionEvent e)
             {
                 Module module = null;
-                try {
-                	Core.getInstance().getModuleRegistry().getModuleInstance(Core.getInstance().getGui().getSelectedModuleCellId());
-                }
-                catch (IllegalModuleIDException e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
-                }
-                catch (UnknownModuleIDException e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
-                }
+                
+                	try {
+                        Core.getInstance().getModuleRegistry().getModuleInstance(Core.getInstance().getGui().getSelectedModuleCellId());
+                    }
+                    catch (ModuleInstanceException e1) {
+                        // TODO Auto-generated catch block
+                        e1.printStackTrace();
+                    }
+              
                 if (module instanceof IntermediateModule)
                 {
                     IntermediateModule eventProcessor = (IntermediateModule) module;
@@ -175,17 +171,15 @@ public class MenuManager
             public void actionPerformed(ActionEvent e)
             {
                 Module module = null;
-                try {
-                	Core.getInstance().getModuleRegistry().getModuleInstance(Core.getInstance().getGui().getSelectedModuleCellId());
-                }
-                catch (IllegalModuleIDException e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
-                }
-                catch (UnknownModuleIDException e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
-                }
+                
+                	try {
+                        Core.getInstance().getModuleRegistry().getModuleInstance(Core.getInstance().getGui().getSelectedModuleCellId());
+                    }
+                    catch (ModuleInstanceException e1) {
+                        // TODO Auto-generated catch block
+                        e1.printStackTrace();
+                    }
+               
                 if (module instanceof IntermediateModule)
                 {
                     IntermediateModule eventProcessor = (IntermediateModule) module;
@@ -209,20 +203,18 @@ public class MenuManager
         
         modulePopupMenu.addSeparator();
         
-        try {
-            if(!Core.getInstance().getModuleRegistry().getModuleInstance(moduleId).isModuleType(ModuleType.TARGET_MODULE))
-            {
-                modulePopupMenu.add(mniModuleConnectTo);
+        
+            try {
+                if(!Core.getInstance().getModuleRegistry().getModuleInstance(moduleId).isModuleType(ModuleType.TARGET_MODULE))
+                {
+                    modulePopupMenu.add(mniModuleConnectTo);
+                }
             }
-        }
-        catch (IllegalModuleIDException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        }
-        catch (UnknownModuleIDException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        }
+            catch (ModuleInstanceException e2) {
+                // TODO Auto-generated catch block
+                e2.printStackTrace();
+            }
+       
                 
         modulePopupMenu.add(mniModuleRemove);
         
@@ -232,41 +224,47 @@ public class MenuManager
         
         
         
-        try {
-            if(Core.getInstance().getModuleRegistry().getModuleInstance(moduleId).isModuleType(ModuleType.INTERMEDIATE_MODULE))
-            {
-                modulePopupMenu.addSeparator();
-                
-                modulePopupMenu.add(mniMakeAnnotator);
-                
-                modulePopupMenu.add(mniMakeFilter);
+       
+            try {
+                if(Core.getInstance().getModuleRegistry().getModuleInstance(moduleId).isModuleType(ModuleType.INTERMEDIATE_MODULE))
+                {
+                    modulePopupMenu.addSeparator();
+                    
+                    modulePopupMenu.add(mniMakeAnnotator);
+                    
+                    modulePopupMenu.add(mniMakeFilter);
+                }
             }
-        }
-        catch (IllegalModuleIDException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        }
-        catch (UnknownModuleIDException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        }
+            catch (ModuleInstanceException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+       
         
        
         ModuleProperty[] moduleProperties = null;
-        try {
+        
             
-            int moduleClassId = Core.getInstance().getModuleRegistry().getModuleInstance(moduleId).getClassId();
+            String moduleClassId = null;
+            try {
+                moduleClassId = Core.getInstance().getModuleRegistry().getModuleInstance(moduleId).getClassId();
+            }
+            catch (ModuleInstanceException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
             
-            moduleProperties = Core.getInstance().getModuleRegistry().getModuleClassProperties(moduleClassId);
-        }
-        catch (IllegalModuleIDException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        }
-        catch (UnknownModuleIDException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        }
+            ModuleDescriptor moduleDescriptor = null;
+            try {
+                moduleDescriptor = Core.getInstance().getModuleRegistry().getModuleDescriptor(moduleClassId);
+            }
+            catch (ModuleClassException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            
+            moduleProperties = moduleDescriptor.getProperties();
+      
         
         if(moduleProperties != null)
         {
@@ -334,21 +332,19 @@ public class MenuManager
          */
         public void actionPerformed(ActionEvent e)
         {
-            try {
-            	Core.getInstance().getModuleRegistry().getModuleInstance(parentId).connectReceiverModule(Core.getInstance().getModuleRegistry().getModuleInstance(childId));
-            }
-            catch (UnknownModuleIDException e1) {
-              
-                // only occurs because this event is fired twice internaly
-            }
-            catch (ModuleConnectionException e2) {
-                // TODO Auto-generated catch block
-                e2.printStackTrace();
-            }
-            catch (IllegalModuleIDException e3) {
-                // TODO Auto-generated catch block
-                e3.printStackTrace();
-            }
+           
+            	try {
+                    Core.getInstance().getModuleRegistry().getModuleInstance(parentId).connectReceiverModule(Core.getInstance().getModuleRegistry().getModuleInstance(childId));
+                }
+                catch (ModuleConnectionException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
+                catch (ModuleInstanceException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
+           
             
         }
         
@@ -357,17 +353,17 @@ public class MenuManager
     private static class PropertyActionAdapter implements ActionListener
     {
 
-        private int $moduleId = -1;
+        private int $moduleId;
         
-        private String $propertyName = "";
+        private String $propertyName;
         
-        private Object $propertyResult = null;
+        private Object $propertyResult;
         
-        private Object $propertyValue = null;
+        private Object $propertyValue;
         
-        private Class $propertyType = null;
+        private Class $propertyType;
         
-        private Gui $gui = null;
+        private Gui $gui;
         
         public PropertyActionAdapter(Gui gui, int moduleId, Class propertyType, String propertyName, Object propertyValue)
         {
@@ -385,38 +381,48 @@ public class MenuManager
         
         public void actionPerformed(ActionEvent e)
         {
-            try {
+           
              
-                if($propertyType.equals(Class.forName("java.lang.String")))
-                {
-                   $propertyResult = JOptionPane.showInputDialog($gui,"Geben Sie den neuen Wert ein","",JOptionPane.QUESTION_MESSAGE);
-                }
-                else if($propertyType.equals(Class.forName("java.lang.Integer")))
-                {
-                    $propertyResult = JOptionPane.showInputDialog($gui,"Geben Sie den neuen Wert ein","",JOptionPane.QUESTION_MESSAGE);
-                }
-                else if($propertyType.equals(Class.forName("java.io.File")))
-                {
-                    JFileChooser fileChooser = new JFileChooser();
-                    
-                    int result = fileChooser.showOpenDialog($gui);
-                    
-                    switch(result)
+                try {
+                    if($propertyType.equals(Class.forName("java.lang.String")))
                     {
-                    case JFileChooser.CANCEL_OPTION:
-                        break;
-                    case JFileChooser.ERROR_OPTION:
-                        break;
-                    case JFileChooser.APPROVE_OPTION:
+                       $propertyResult = JOptionPane.showInputDialog($gui,"Geben Sie den neuen Wert ein","",JOptionPane.QUESTION_MESSAGE);
+                    }
+                    else if($propertyType.equals(Class.forName("java.lang.Integer")))
+                    {
+                        $propertyResult = JOptionPane.showInputDialog($gui,"Geben Sie den neuen Wert ein","",JOptionPane.QUESTION_MESSAGE);
+                    }
+                    else if($propertyType.equals(Class.forName("java.io.File")))
+                    {
+                        JFileChooser fileChooser = new JFileChooser();
                         
-                        $propertyResult = new File(fileChooser.getSelectedFile().getAbsolutePath());
+                        int result = fileChooser.showOpenDialog($gui);
                         
-                        break;
+                        switch(result)
+                        {
+                        case JFileChooser.CANCEL_OPTION:
+                            break;
+                        case JFileChooser.ERROR_OPTION:
+                            break;
+                        case JFileChooser.APPROVE_OPTION:
+                            
+                            $propertyResult = new File(fileChooser.getSelectedFile().getAbsolutePath());
+                            
+                            break;
+                        }
+                    }
+                    else if($propertyType.equals(Class.forName("java.lang.reflect.Method")))
+                    {
+                       $propertyResult = $propertyValue;
                     }
                 }
-                else if($propertyType.equals(Class.forName("java.lang.reflect.Method")))
-                {
-                   $propertyResult = $propertyValue;
+                catch (HeadlessException e2) {
+                    // TODO Auto-generated catch block
+                    e2.printStackTrace();
+                }
+                catch (ClassNotFoundException e2) {
+                    // TODO Auto-generated catch block
+                    e2.printStackTrace();
                 }
                 if($propertyResult == null)
                 {
@@ -429,20 +435,12 @@ public class MenuManager
                 catch (ModulePropertyException e1) {
                     JOptionPane.showMessageDialog($gui,e1.getMessage(),"Error setting property",JOptionPane.ERROR_MESSAGE);
                 }
+                catch (ModuleInstanceException e2) {
+                    // TODO Auto-generated catch block
+                    e2.printStackTrace();
+                }
             
-            }
-            catch (ClassNotFoundException e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
-            }
-            catch (IllegalModuleIDException e2) {
-                // TODO Auto-generated catch block
-                e2.printStackTrace();
-            }
-            catch (UnknownModuleIDException e3) {
-                // TODO Auto-generated catch block
-                e3.printStackTrace();
-            }
+           
         }
         
           
@@ -488,17 +486,27 @@ public class MenuManager
         menu.add(mniModuleRemove);
                 
         ModuleProperty[] moduleProperties = null;
-        try {
-            moduleProperties = Core.getInstance().getModuleRegistry().getModuleClassProperties(id);
-        }
-        catch (IllegalModuleIDException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        }
-        catch (UnknownModuleIDException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        }
+        
+            String moduleId = null;
+            try {
+                moduleId = Core.getInstance().getModuleRegistry().getModuleInstance(id).getClassId();
+            }
+            catch (ModuleInstanceException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        
+            ModuleDescriptor moduleDescriptor = null;
+            try {
+                moduleDescriptor = Core.getInstance().getModuleRegistry().getModuleDescriptor(moduleId);
+            }
+            catch (ModuleClassException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            
+            moduleProperties = moduleDescriptor.getProperties();
+       
         
         if(moduleProperties != null)
         {

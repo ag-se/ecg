@@ -13,7 +13,15 @@ import org.electrocodeogram.msdt.MicroSensorDataType;
  */
 public class TypedValidEventPacket extends ValidEventPacket
 {
+    /**
+     * This constant integer value is the location of the HackyStat ActivityType value in the event's argList.
+     */
+    public static int ACTIVITY_TYPE_INDEX = 1;
     
+    /**
+     * This constant integer value gives the location of the MicroActivity in the event's argList.
+     */
+    public static int MICROACTIVITY_INDEX = 2;
    
     private static final long serialVersionUID = -2907957495470756557L;
    

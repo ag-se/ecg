@@ -15,7 +15,7 @@ public class TestModule extends Module
      */
     public TestModule()
     {
-        super(ModuleType.INTERMEDIATE_MODULE,-1,"TestModule");
+        super(ModuleType.INTERMEDIATE_MODULE,"org.electrocodeogram.module.TestModule","TestModule");
     }
 
     /**

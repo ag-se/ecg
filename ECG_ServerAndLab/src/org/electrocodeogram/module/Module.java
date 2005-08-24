@@ -20,14 +20,16 @@ import org.electrocodeogram.event.IllegalEventParameterException;
 import org.electrocodeogram.event.TypedValidEventPacket;
 import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.module.intermediate.IIntermediateModule;
-import org.electrocodeogram.module.registry.IllegalModuleIDException;
-import org.electrocodeogram.module.registry.UnknownModuleIDException;
+import org.electrocodeogram.module.registry.ModuleClassException;
+import org.electrocodeogram.module.registry.ModuleDescriptor;
+import org.electrocodeogram.module.registry.ModuleInstanceException;
 import org.electrocodeogram.module.source.SourceModule;
 import org.electrocodeogram.msdt.IllegalMicroSensorDataTypeNameException;
 import org.electrocodeogram.msdt.IllegalMicroSensorDataTypeSchemaException;
 import org.electrocodeogram.msdt.MSDTIsNullException;
 import org.electrocodeogram.msdt.MicroSensorDataType;
 import org.electrocodeogram.msdt.ModuleIsNullException;
+import org.electrocodeogram.ui.messages.GuiWriter;
 import org.electrocodeogram.ui.messages.IGuiWriter;
 import org.xml.sax.SAXException;
 
@@ -54,7 +56,7 @@ public abstract class Module extends Observable implements Observer
     /**
      * This is the Logger instance.
      */
-    protected Logger logger = null;
+    protected Logger logger;
 
     /**
      * These values are indicating the type of the module.
@@ -81,24 +83,24 @@ public abstract class Module extends Observable implements Observer
          */
         TARGET_MODULE
     }
-    
+
     private ModuleType $moduleType;
 
-    private static int count = 0;
+    private static int count;
 
-    private int id = 0;
+    private int id;
 
-    private String name = null;
+    private String name;
 
-    private HashMap<Integer, Module> receiverModuleMap = null;
+    private HashMap<Integer, Module> receiverModuleMap;
 
-    private HashMap<Integer, Module> senderModuleMap = null;
-    
-    private ArrayList<MicroSensorDataType> providedMsdt = null; 
-    
-    private boolean activeFlag = false;
+    private HashMap<Integer, Module> senderModuleMap;
 
-    private int $moduleClassId = -1;
+    private ArrayList<MicroSensorDataType> providedMsdt;
+
+    private boolean activeFlag;
+
+    private String $moduleClassId;
 
     /**
      * This creates a new Module of the given module type, module class id ans module name and registers it with the ModuleRegistry.
@@ -106,14 +108,14 @@ public abstract class Module extends Observable implements Observer
      * @param moduleClassId Is the unique id of this module's class as registered with the ModuleRegistry
      * @param moduleName Is the name to give to this module instance
      */
-    public Module(ModuleType moduleType, int moduleClassId, String moduleName)
+    public Module(ModuleType moduleType, String moduleClassId, String moduleName)
     {
         this.id = ++count;
 
         this.name = moduleName;
 
-        this.$moduleClassId  = moduleClassId;
-        
+        this.$moduleClassId = moduleClassId;
+
         this.$moduleType = moduleType;
 
         this.logger = Logger.getLogger(this.name);
@@ -121,35 +123,80 @@ public abstract class Module extends Observable implements Observer
         this.receiverModuleMap = new HashMap<Integer, Module>();
 
         this.senderModuleMap = new HashMap<Integer, Module>();
-        
+
         this.providedMsdt = new ArrayList<MicroSensorDataType>();
 
-        if (this instanceof SourceModule)
-        {
-            try {
-                this.loadPredefinedSourceMsdt();
+        if (this instanceof SourceModule) {
+
+            MicroSensorDataType[] msdts = Core.getInstance().getMsdtRegistry().getPredefinedMicroSensorDataTypes();
+
+            for (MicroSensorDataType msdt : msdts) {
+                try {
+                    Core.getInstance().getMsdtRegistry().requestMsdtRegistration(msdt, this);
+
+                    this.providedMsdt.add(msdt);
+                }
+                catch (MSDTIsNullException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                catch (ModuleIsNullException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+
             }
-            catch (FileNotFoundException e) {
-                this.logger.log(Level.SEVERE,"The directory for the predefined MicroSensorDataTypes can not be found.");
+
+        }
+
+        if (!(this instanceof GuiWriter)) {
+            try {
+
+                ModuleDescriptor moduleDescriptor = null;
+                try {
+                    moduleDescriptor = Core.getInstance().getModuleRegistry().getModuleDescriptor(this.$moduleClassId);
+                }
+                catch (ModuleClassException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+
+                MicroSensorDataType[] microSensorDataTypes = moduleDescriptor.getMicroSensorDataTypes();
+
+                if (microSensorDataTypes != null) {
+
+                    for (MicroSensorDataType msdt : microSensorDataTypes) {
+                        this.providedMsdt.add(msdt);
+
+                        Core.getInstance().getMsdtRegistry().requestMsdtRegistration(msdt, this);
+                    }
+                }
+
+            }
+            catch (MSDTIsNullException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            catch (ModuleIsNullException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
             }
         }
-        
+
         Core.getInstance().getModuleRegistry().registerModuleInstance(this);
-        
+
         if (!(this instanceof IGuiWriter)) {
 
             addObserver(Core.getInstance().getGui());
 
             addObserver(Core.getInstance().getGui().getGuiEventWriter());
         }
-        
+
         activate();
-        
+
         initialize();
 
     }
-    
-   
 
     /**
      * This method returns "true" if the module is active and "false" if not.
@@ -201,12 +248,10 @@ public abstract class Module extends Observable implements Observer
      */
     public final void update(Observable object, Object data)
     {
-        if ((object instanceof Module))
-        {
+        if ((object instanceof Module)) {
             analyseModuleNotification(object, data);
         }
-        else if(object instanceof ICore)
-        {
+        else if (object instanceof ICore) {
             analyseCoreNotification();
         }
 
@@ -223,7 +268,7 @@ public abstract class Module extends Observable implements Observer
             receiveEventPacket(eventPacket);
         }
     }
-    
+
     /**
      * This method is called whenever this module gets a notification of
      * a statechange form the sytem core.
@@ -281,7 +326,8 @@ public abstract class Module extends Observable implements Observer
                 notifyObservers(new TypedValidEventPacket(this.getId(),
                         eventPacket.getTimeStamp(),
                         eventPacket.getSensorDataType(),
-                        eventPacket.getArglist(),eventPacket.getMicroSensorDataType()));
+                        eventPacket.getArglist(),
+                        eventPacket.getMicroSensorDataType()));
             }
             catch (IllegalEventParameterException e) {
 
@@ -298,7 +344,6 @@ public abstract class Module extends Observable implements Observer
         }
     }
 
- 
     /**
      * This method returns the number of connected modules.
      * @return The number of connected modules
@@ -376,17 +421,16 @@ public abstract class Module extends Observable implements Observer
     /**
      * This method disconnects a connected module.
      * @param module The module to disconnect
-     * @throws UnknownModuleIDException If the given module is not connected to this module
+     * @throws ModuleInstanceException 
      */
-    public void disconnectReceiverModule(Module module) throws UnknownModuleIDException
+    public void disconnectReceiverModule(Module module) throws ModuleInstanceException
     {
-        if(module == null)
-        {
+        if (module == null) {
             return;
         }
-        
+
         if (!this.receiverModuleMap.containsKey(new Integer(module.getId()))) {
-            throw new UnknownModuleIDException(
+            throw new ModuleInstanceException(
                     "The given module id " + this.id + " is unknown.");
         }
 
@@ -398,7 +442,6 @@ public abstract class Module extends Observable implements Observer
 
     }
 
-    
     /**
      * @see java.lang.Object#toString()
      * This implementation of the toString method returns the module-name.
@@ -409,7 +452,6 @@ public abstract class Module extends Observable implements Observer
         return this.name;
 
     }
-
 
     /**
      * @param currentPropertyName
@@ -426,7 +468,7 @@ public abstract class Module extends Observable implements Observer
         String text = "Name: \t" + getName() + "\nID: \t " + getId() + "\nTyp: \t";
 
         ModuleType type = getModuleType();
-        
+
         switch (type)
         {
         case SOURCE_MODULE:
@@ -442,11 +484,8 @@ public abstract class Module extends Observable implements Observer
             break;
         }
 
-        if (this instanceof IIntermediateModule) 
-        {
+        if (this instanceof IIntermediateModule) {
             IIntermediateModule eventProcessor = (IIntermediateModule) this;
-
-            
 
             text += "\nModus: \t";
 
@@ -464,23 +503,23 @@ public abstract class Module extends Observable implements Observer
         }
 
         String moduleDescription;
+
+        ModuleDescriptor moduleDescriptor = null;
         try {
-            moduleDescription = Core.getInstance().getModuleRegistry().getModuleClassDescription(this.$moduleClassId);
-            
-            if (moduleDescription != null) {
-                text += "\nBeschreibung: \t";
-
-                text += moduleDescription;
-
-            }
+            moduleDescriptor = Core.getInstance().getModuleRegistry().getModuleDescriptor(this.$moduleClassId);
         }
-        catch (IllegalModuleIDException e) {
+        catch (ModuleClassException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        catch (UnknownModuleIDException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+
+        moduleDescription = moduleDescriptor.getDescription();
+
+        if (moduleDescription != null) {
+            text += "\nBeschreibung: \t";
+
+            text += moduleDescription;
+
         }
 
         return text;
@@ -498,23 +537,20 @@ public abstract class Module extends Observable implements Observer
             Module[] parentModules = getSendingModules();
 
             for (int i = 0; i < parentModules.length; i++) {
-                
+
                 Module module = parentModules[i];
 
                 try {
                     module.disconnectReceiverModule(this);
                 }
-                catch (UnknownModuleIDException e) {
-                    
+                catch (ModuleInstanceException e) {
+                    // TODO Auto-generated catch block
                     e.printStackTrace();
-
-                    this.logger.log(Level.SEVERE, "An unexpected exception has occured. Please report this at www.electrocodeogram.org");
                 }
             }
         }
-        
-        for (MicroSensorDataType msdt : this.providedMsdt)
-        {
+
+        for (MicroSensorDataType msdt : this.providedMsdt) {
             try {
                 msdt.removeProvidingModule(this);
             }
@@ -523,28 +559,17 @@ public abstract class Module extends Observable implements Observer
                 e.printStackTrace();
             }
         }
-        
+
         try {
-        	Core.getInstance().getModuleRegistry().deregisterModuleInstance(this.getId());
+            Core.getInstance().getModuleRegistry().deregisterModuleInstance(this.getId());
         }
-        catch (UnknownModuleIDException e) {
-            
+        catch (ModuleInstanceException e) {
+            // TODO Auto-generated catch block
             e.printStackTrace();
-            
-            this.logger.log(Level.SEVERE, "An unexpected exception has occured. Please report this at www.electrocodeogram.org");
-
         }
-        catch (IllegalModuleIDException e) {
 
-            e.printStackTrace();
-
-            this.logger.log(Level.SEVERE, "An unexpected exception has occured. Please report this at www.electrocodeogram.org");
-
-        }
-       
     }
 
-   
     /**
      * This checks if the module is of the given ModuleType
      * @param moduleType
@@ -555,107 +580,30 @@ public abstract class Module extends Observable implements Observer
         if (this.$moduleType == moduleType) {
             return true;
         }
-       
+
         return false;
-        
+
     }
-  
+
     /**
      * This method returns the MicroSensorDataTypes that are provided by this module.
      * @return The MicroSensorDataTypes that are provided by this module
      */
     public MicroSensorDataType[] getProvidedMicroSensorDataType()
     {
-       return this.providedMsdt.toArray(new MicroSensorDataType[0]);
+        return this.providedMsdt.toArray(new MicroSensorDataType[0]);
     }
-    
-    /**
-     * This method parses the XML schema files and strores each XML schema in the
-     * MsdtRegitry's HashMap.
-     */
-    private void loadPredefinedSourceMsdt() throws FileNotFoundException
-    {
-
-        String msdtSubDirString = "msdt";
-
-        File msdtDir = new File(msdtSubDirString);
-        
-        if (!msdtDir.exists() || !msdtDir.isDirectory()) {
-            throw new FileNotFoundException(
-                    "The MicroSensorDataType \"msdt\" subdirectory can not be found. Assuming that no msdt are defined by module " + this.getName());
-        }
-
-        String[] defs = msdtDir.list();
-
-        if (defs != null) {
-            for (int i = 0; i < defs.length; i++) {
-                File defFile = new File(
-                        msdtDir.getAbsolutePath() + File.separator + defs[i]);
-
-                SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-                
-                Schema schema = null;
-                
-                try {
-
-                    schema = schemaFactory.newSchema(defFile);
-                    
-                    MicroSensorDataType microSensorDataType = new MicroSensorDataType(defFile.getName(),schema); 
-                    
-                    this.logger.log(Level.INFO, "Module " + this.getName() + " loaded additional MicroSensorDatyType " + defFile.getName());
-                    
-                    try {
-                        MicroSensorDataType registeredMsdt = Core.getInstance().getMsdtRegistry().requestMsdtRegistration(microSensorDataType,this);
-                        
-                        this.providedMsdt.add(registeredMsdt);
-                    }
-                    catch (ModuleIsNullException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-                    
-                    
-                }
-                catch (SAXException e) {
-
-                    this.logger.log(Level.WARNING, "Error while reading the XML schema file " + defFile.getName());
-                    
-                    this.logger.log(Level.WARNING, e.getMessage());
-
-                }
-                catch (IllegalMicroSensorDataTypeNameException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-                catch (IllegalMicroSensorDataTypeSchemaException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-                catch (MSDTIsNullException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-
-            }
-        }
-        else {
-            this.logger.log(Level.INFO, "No msdt data is found.");
-        }
-
-    }
-
-
 
     /**
      * This method returns the unique id of the module's class as
      * registered with the ModuleRegistry.
      * @return The unique id of the module's class
      */
-    public int getClassId()
+    public String getClassId()
     {
         return this.$moduleClassId;
     }
-    
+
     /**
      * This method initializes the actual module. It must be implementes by all module
      * subclasses.

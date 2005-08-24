@@ -17,7 +17,7 @@ public class TestSourceModule extends SourceModule
 
     public TestSourceModule()
     {
-        super(-1, "TestSourceModule");
+        super("org.electrocodeogram.test.server.modules.TestSourceModule", "TestSourceModule");
     }
 
     /**

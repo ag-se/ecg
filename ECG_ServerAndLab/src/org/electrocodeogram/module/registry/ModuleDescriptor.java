@@ -1,5 +1,7 @@
 package org.electrocodeogram.module.registry;
 
+import org.electrocodeogram.msdt.MicroSensorDataType;
+
 
 /**
  * This class is a representation for the description of module classes.
@@ -9,13 +11,19 @@ package org.electrocodeogram.module.registry;
 public class ModuleDescriptor
 {
 
-    private int $id = -1;
+    private String $id;
 
-    private String $name = null;
+    private String $name;
 
-    private Class $clazz = null;
+    private String $provider_name;
+    
+    private String $version;
+    
+    private Class $clazz;
 
-    private ModuleProperty[] $moduleProperties = null;
+    private ModuleProperty[] $moduleProperties;
+    
+    private MicroSensorDataType[] $microSensorDataTypes;
 
     private String $description;
 
@@ -26,19 +34,26 @@ public class ModuleDescriptor
      * @param clazz This is the module class object
      * @param moduleDescription Is a String describing the module 
      * @param moduleProperties Is an Array of ModuleProperty objects, each defining a property of this module
+     * @param microSensorDataTypes 
      
      */
-    public ModuleDescriptor(int id, String name, Class clazz, String moduleDescription, ModuleProperty[] moduleProperties)
+    public ModuleDescriptor(String id, String name, String provider_name, String version, Class clazz, String moduleDescription, ModuleProperty[] moduleProperties, MicroSensorDataType[] microSensorDataTypes)
     {
         this.$id = id;
-
+        
         this.$moduleProperties = moduleProperties;
 
         this.$name = name;
+        
+        this.$provider_name = provider_name;
+        
+        this.$version = version;
 
         this.$clazz = clazz;
 
         this.$description = moduleDescription;
+        
+        this.$microSensorDataTypes = microSensorDataTypes;
 
     }
 
@@ -82,8 +97,13 @@ public class ModuleDescriptor
      * This method returns the module class' id.
      * @return The module class' id
      */
-    public int getId()
+    public String getId()
     {
         return this.$id;
+    }
+    
+    public MicroSensorDataType[] getMicroSensorDataTypes()
+    {
+        return this.$microSensorDataTypes;
     }
 }

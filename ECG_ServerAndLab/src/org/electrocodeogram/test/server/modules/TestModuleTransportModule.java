@@ -37,7 +37,7 @@ public class TestModuleTransportModule extends Module
      */
     public TestModuleTransportModule()
     {
-        super(ModuleType.SOURCE_MODULE,-1,"TestModuleTransportModule");
+        super(ModuleType.SOURCE_MODULE,"org.electrocodeogram.test.server.modules.TestModuleTransportModule","TestModuleTransportModule");
 
        
     }
