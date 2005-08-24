@@ -32,7 +32,7 @@ public class FileSystemSourceModule extends SourceModule
      * @param arg0
      * @param arg1
      */
-    public FileSystemSourceModule(int arg0, String arg1)
+    public FileSystemSourceModule(String arg0, String arg1)
     {
         super(arg0, arg1);
 
@@ -114,7 +114,7 @@ public class FileSystemSourceModule extends SourceModule
             {
                 lineNumber++;
                 
-                eventTokenizer = new StringTokenizer(line,EventPacket.EVENT_SEPARATOR);
+                eventTokenizer = new StringTokenizer(line,ValidEventPacket.EVENT_SEPARATOR);
                 
                 if(eventTokenizer.countTokens() != 3)
                 {
@@ -174,7 +174,7 @@ public class FileSystemSourceModule extends SourceModule
                     continue;
                 }
                 
-                StringTokenizer argListTokenizer = new StringTokenizer(argListString,EventPacket.ARGLIST_SEPARATOR);
+                StringTokenizer argListTokenizer = new StringTokenizer(argListString,ValidEventPacket.ARGLIST_SEPARATOR);
                 
                 String[] argListStringArray = new String[argListTokenizer.countTokens()];
                 
