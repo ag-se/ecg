@@ -21,7 +21,7 @@ import org.electrocodeogram.module.ModulePropertyException;
          * @param moduleClassId
          * @param name
          */
-        public SocketSourceModule(int moduleClassId, String name)
+        public SocketSourceModule(String moduleClassId, String name)
         {
             super(moduleClassId, name);
             
