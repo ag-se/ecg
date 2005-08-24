@@ -1,10 +1,19 @@
 <?xml version="1.0"?>
 <module>
+	<id>
+		org.electrocodeogram.module.intermediate.FileSystemTargetModule
+	</id>
+	<provider-name>
+		Frank Schlesinger (Frank@Schlesinger.com)
+	</provider-name>
+	<version>
+		0.6
+	</version>
 	<name>
-		FileSystemTargetModule
+		File Writer
 	</name>
 	<class>
-		org\\electrocodeogram\\module\\target\\FileSystemTargetModule
+		org.electrocodeogram.module.target.FileSystemTargetModule
 	</class>
 	<description>
 		This module is able to write incoming event data into the file system.

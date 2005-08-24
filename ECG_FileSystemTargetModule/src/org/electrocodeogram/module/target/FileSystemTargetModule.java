@@ -26,7 +26,7 @@ public class FileSystemTargetModule extends TargetModule
      * @param arg0
      * @param arg1
      */
-    public FileSystemTargetModule(int arg0, String arg1)
+    public FileSystemTargetModule(String arg0, String arg1)
     {
         super(arg0, arg1);
 
