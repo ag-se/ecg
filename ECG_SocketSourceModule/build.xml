@@ -144,9 +144,9 @@
 
 
 		<!-- Copy module into ECG ServerAndLab module directory -->
-		<mkdir dir="../ECG_ServerAndLab/modules/ECG_SocketSourceModule/"/>
+		<mkdir dir="../ECG_Lab/modules/ECG_SocketSourceModule/"/>
 		
-		<copy todir="../ECG_ServerAndLab/modules/ECG_SocketSourceModule/">
+		<copy todir="../ECG_Lab/modules/ECG_SocketSourceModule/">
 
 			<fileset dir="${dist.dir}/ECG_SocketSourceModule/"/>
 
