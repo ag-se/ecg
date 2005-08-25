@@ -143,9 +143,9 @@
 
 
 		<!-- Copy module into ECG MSDTFilterIntermediateModule module directory -->
-		<mkdir dir="../ECG_ServerAndLab/modules/ECG_MSDTFilterIntermediateModule/"/>
+		<mkdir dir="../ECG_Lab/modules/ECG_MSDTFilterIntermediateModule/"/>
 		
-		<copy todir="../ECG_ServerAndLab/modules/ECG_MSDTFilterIntermediateModule/">
+		<copy todir="../ECG_Lab/modules/ECG_MSDTFilterIntermediateModule/">
 
 			<fileset dir="${dist.dir}/ECG_MSDTFilterIntermediateModule/"/>
 

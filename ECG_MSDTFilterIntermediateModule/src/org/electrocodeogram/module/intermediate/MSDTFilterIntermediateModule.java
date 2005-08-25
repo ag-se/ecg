@@ -15,9 +15,11 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import org.electrocodeogram.core.Core;
 import org.electrocodeogram.event.TypedValidEventPacket;
 import org.electrocodeogram.msdt.MicroSensorDataType;
+import org.electrocodeogram.system.SystemRoot;
+
+
 
 /**
  *
@@ -97,7 +99,7 @@ public class MSDTFilterIntermediateModule extends IntermediateModule
     {
         this.msdtFilterMap = new HashMap<MicroSensorDataType,Boolean>();
         
-        MicroSensorDataType[] msdts = Core.getInstance().getMsdtRegistry().getMicroSensorDataTypes();
+        MicroSensorDataType[] msdts = SystemRoot.getModuleInstance().getModuleMsdtRegistry().getMicroSensorDataTypes();
         
         for(MicroSensorDataType msdt : msdts)
         {
@@ -133,14 +135,14 @@ public class MSDTFilterIntermediateModule extends IntermediateModule
     {
         if(this.msdtFilterMap.size() == 0)
         {
-            JOptionPane.showMessageDialog(Core.getInstance().getGui().getRootFrame(),"There are no MicroSensorDataTypes loaded yet. Please add at least one SourceModule to load the core MicroSensorDataTypes.","Configure Filter Message",JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(SystemRoot.getModuleInstance().getRootFrame(),"There are no MicroSensorDataTypes loaded yet. Please add at least one SourceModule to load the core MicroSensorDataTypes.","Configure Filter Message",JOptionPane.INFORMATION_MESSAGE);
             
             return;
         }
         
         initializeCheckBoxes();
         
-        this.dlgFilterConfiguration = new JDialog(Core.getInstance().getGui().getRootFrame(),"Configure Filter");
+        this.dlgFilterConfiguration = new JDialog(SystemRoot.getModuleInstance().getRootFrame(),"Configure Filter");
         
         this.pnlCheckBoxes = createMainPanel();
         
