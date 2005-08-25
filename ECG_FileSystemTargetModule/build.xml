@@ -143,9 +143,9 @@
 
 
 		<!-- Copy module into ECG FileSystemTargetModule module directory -->
-		<mkdir dir="../ECG_ServerAndLab/modules/ECG_FileSystemTargetModule/"/>
+		<mkdir dir="../ECG_Lab/modules/ECG_FileSystemTargetModule/"/>
 		
-		<copy todir="../ECG_ServerAndLab/modules/ECG_FileSystemTargetModule/">
+		<copy todir="../ECG_Lab/modules/ECG_FileSystemTargetModule/">
 
 			<fileset dir="${dist.dir}/ECG_FileSystemTargetModule/"/>
 
