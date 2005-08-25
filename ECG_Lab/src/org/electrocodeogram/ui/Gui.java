@@ -25,8 +25,8 @@ import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
 import org.electrocodeogram.module.Module;
+import org.electrocodeogram.module.ModuleDescriptor;
 
-import org.electrocodeogram.module.registry.ModuleDescriptor;
 import org.electrocodeogram.module.registry.ModuleInstanceException;
 import org.electrocodeogram.module.registry.ModuleRegistry;
 

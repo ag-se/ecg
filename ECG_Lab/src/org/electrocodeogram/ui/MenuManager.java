@@ -21,15 +21,15 @@ import javax.swing.JPopupMenu;
 
 import org.electrocodeogram.module.Module;
 import org.electrocodeogram.module.ModuleConnectionException;
+import org.electrocodeogram.module.ModuleDescriptor;
+import org.electrocodeogram.module.ModuleProperty;
 import org.electrocodeogram.module.ModulePropertyException;
 import org.electrocodeogram.module.Module.ModuleType;
 import org.electrocodeogram.module.intermediate.IIntermediateModule;
 import org.electrocodeogram.module.intermediate.IntermediateModule;
 
 import org.electrocodeogram.module.registry.ModuleClassException;
-import org.electrocodeogram.module.registry.ModuleDescriptor;
 import org.electrocodeogram.module.registry.ModuleInstanceException;
-import org.electrocodeogram.module.registry.ModuleProperty;
 import org.electrocodeogram.system.SystemRoot;
 
 

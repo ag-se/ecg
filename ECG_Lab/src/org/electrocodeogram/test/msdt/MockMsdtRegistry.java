@@ -9,12 +9,11 @@ import javax.xml.XMLConstants;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
-import org.electrocodeogram.module.TestModule;
-import org.electrocodeogram.msdt.IllegalMicroSensorDataTypeNameException;
-import org.electrocodeogram.msdt.IllegalMicroSensorDataTypeSchemaException;
 import org.electrocodeogram.msdt.MicroSensorDataType;
+import org.electrocodeogram.msdt.MicroSensorDataTypeException;
 import org.electrocodeogram.msdt.registry.MicroSensorDataTypeRegistrationException;
 import org.electrocodeogram.msdt.registry.MsdtRegistry;
+import org.electrocodeogram.test.module.TestModule;
 import org.xml.sax.SAXException;
 
 /**
@@ -100,14 +99,12 @@ public class MockMsdtRegistry extends MsdtRegistry
                     this.logger.log(Level.WARNING, e.getMessage());
 
                 }
-                catch (IllegalMicroSensorDataTypeNameException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-                catch (IllegalMicroSensorDataTypeSchemaException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
+				catch (MicroSensorDataTypeException e)
+				{
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+               
                
             }
         }

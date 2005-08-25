@@ -1,8 +1,8 @@
 package org.electrocodeogram.moduleapi.module.registry;
 
 import org.electrocodeogram.module.Module;
+import org.electrocodeogram.module.ModuleDescriptor;
 import org.electrocodeogram.module.registry.ModuleClassException;
-import org.electrocodeogram.module.registry.ModuleDescriptor;
 import org.electrocodeogram.module.registry.ModuleInstanceException;
 
 /**

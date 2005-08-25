@@ -12,8 +12,6 @@ import javax.xml.validation.SchemaFactory;
 
 import org.electrocodeogram.module.Module;
 import org.electrocodeogram.moduleapi.msdt.registry.IModuleMsdtRegistry;
-import org.electrocodeogram.msdt.IllegalMicroSensorDataTypeNameException;
-import org.electrocodeogram.msdt.IllegalMicroSensorDataTypeSchemaException;
 import org.electrocodeogram.msdt.MicroSensorDataType;
 import org.electrocodeogram.msdt.MicroSensorDataTypeException;
 import org.electrocodeogram.system.SystemRoot;
@@ -114,16 +112,12 @@ public class MsdtRegistry implements ISystemMsdtRegistry, IModuleMsdtRegistry
 					this.logger.log(Level.WARNING, e.getMessage());
 
 				}
-				catch (IllegalMicroSensorDataTypeNameException e)
+				catch (MicroSensorDataTypeException e)
 				{
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				catch (IllegalMicroSensorDataTypeSchemaException e)
-				{
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				
 			}
 		}
 		else
@@ -258,19 +252,6 @@ public class MsdtRegistry implements ISystemMsdtRegistry, IModuleMsdtRegistry
 			throw new MicroSensorDataTypeException(
 					"Error while reading the XML schema file " + defFile.getName() + "\n" + e.getMessage());
 		}
-		catch (IllegalMicroSensorDataTypeNameException e)
-		{
-
-			throw new MicroSensorDataTypeException(
-					"Error while reading the XML schema file " + defFile.getName() + "\n" + e.getMessage());
-
-		}
-		catch (IllegalMicroSensorDataTypeSchemaException e)
-		{
-
-			throw new MicroSensorDataTypeException(
-					"Error while reading the XML schema file " + defFile.getName() + "\n" + e.getMessage());
-
-		}
+		
 	}
 }

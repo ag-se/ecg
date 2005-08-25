@@ -1,7 +1,7 @@
-package org.electrocodeogram.module;
+package org.electrocodeogram.test.module;
 
 import org.electrocodeogram.event.TypedValidEventPacket;
-import org.electrocodeogram.event.ValidEventPacket;
+import org.electrocodeogram.module.Module;
 
 /**
  * This is a simple test module. every event that is received is immediatly send.
@@ -18,9 +18,9 @@ public class TestModule extends Module
         super(ModuleType.INTERMEDIATE_MODULE,"org.electrocodeogram.module.TestModule","TestModule");
     }
 
+    
     /**
-     * @see org.electrocodeogram.module.Module#receiveEventPacket(org.electrocodeogram.event.ValidEventPacket)
-     * This receiving method just sends the received event.
+     * @see org.electrocodeogram.module.Module#receiveEventPacket(org.electrocodeogram.event.TypedValidEventPacket)
      */
     @Override
     public void receiveEventPacket(TypedValidEventPacket eventPacket)

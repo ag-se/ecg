@@ -2,13 +2,11 @@ package org.electrocodeogram.module.loader;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
-import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * The ModuleClassLoader is able to load classes directly from a
@@ -21,128 +19,137 @@ import java.util.logging.Level;
 public class ModuleClassLoader extends java.lang.ClassLoader
 {
 
-    private Logger logger = null;
+	private Logger logger = null;
 
-    private ArrayList<String> $moduleClassPaths;
+	private ArrayList<String> $moduleClassPaths;
 
-    /**
-     * This creates the ModuleClassLoader and sets the given ClassLoader to be the parent
-     * ClassLoader oh the ModuleClassLoader in the ClassLoader hierarchy.
-     * @param cl Is the parent ClassLoader
-     */
-    public ModuleClassLoader(ClassLoader cl)
-    {
-        super(cl);
+	/**
+	 * This creates the ModuleClassLoader and sets the given ClassLoader to be the parent
+	 * ClassLoader oh the ModuleClassLoader in the ClassLoader hierarchy.
+	 * @param cl Is the parent ClassLoader
+	 */
+	public ModuleClassLoader(ClassLoader cl)
+	{
+		super(cl);
 
-        this.logger = Logger.getLogger(this.getClass().getName());
-    }
+		this.logger = Logger.getLogger(this.getClass().getName());
+	}
 
-    /**
-     * @see java.lang.ClassLoader#findClass(java.lang.String)
-     * 
-     * This method loads classes from the given path to the file system.
-     */
-    @Override
-    protected Class<?> findClass(String className)
-    {
-        Class<?> toReturn = null;
+	/**
+	 * @see java.lang.ClassLoader#findClass(java.lang.String)
+	 * 
+	 * This method loads classes from the given path to the file system.
+	 */
+	@Override
+	protected Class<?> findClass(String className)
+	{
+		Class<?> toReturn = null;
 
-        if (this.$moduleClassPaths == null) {
-            this.logger.log(Level.SEVERE, "No module class paths defined.");
+		if (this.$moduleClassPaths == null)
+		{
+			this.logger.log(Level.SEVERE, "No module class paths defined.");
 
-            return null;
-        }
+			return null;
+		}
 
-        String normalizedClassName = getNormalizedClassName(className);
+		String normalizedClassName = getNormalizedClassName(className);
 
-        if (normalizedClassName == null) {
-            this.logger.log(Level.SEVERE, "Class path is invalid: " + className);
+		if (normalizedClassName == null)
+		{
+			this.logger.log(Level.SEVERE, "Class path is invalid: " + className);
 
-            return null;
-        }
+			return null;
+		}
 
-        for (String moduleClassPath : this.$moduleClassPaths) {
+		for (String moduleClassPath : this.$moduleClassPaths)
+		{
 
-            String pathToModuleClass = moduleClassPath + normalizedClassName + ".class";
+			String pathToModuleClass = moduleClassPath + normalizedClassName + ".class";
 
-            File classFile = new File(pathToModuleClass);
+			File classFile = new File(pathToModuleClass);
 
-            if (!classFile.exists()) {
-                
-                continue;
-            }
+			if (!classFile.exists())
+			{
 
-            if (!classFile.isFile()) {
-                
-                continue;
-            }
+				continue;
+			}
 
-            FileInputStream fis = null;
+			if (!classFile.isFile())
+			{
 
-            try {
-                fis = new FileInputStream(classFile);
+				continue;
+			}
 
-                byte[] data = new byte[(int) classFile.length()];
+			FileInputStream fis = null;
 
-                fis.read(data);
+			try
+			{
+				fis = new FileInputStream(classFile);
 
-                try {
-                    toReturn = this.defineClass(null, data, 0, data.length);
+				byte[] data = new byte[(int) classFile.length()];
 
-                    break;
+				fis.read(data);
 
-                }
-                catch (LinkageError e) {
-                    this.logger.log(Level.INFO, "Linkage error: " + e.getMessage());
+				try
+				{
+					toReturn = this.defineClass(null, data, 0, data.length);
 
-                }
+					break;
 
-                this.logger.log(Level.INFO, "Successfully loaded module class: " + classFile.getName());
+				}
+				catch (LinkageError e)
+				{
+					this.logger.log(Level.INFO, "Linkage error: " + e.getMessage());
 
-            }
-            catch (IOException e) {
+				}
 
-                this.logger.log(Level.WARNING, "Error while loading module class: " + className);
+				this.logger.log(Level.INFO, "Successfully loaded module class: " + classFile.getName());
 
-            }
-        }
+			}
+			catch (IOException e)
+			{
 
-        if(toReturn == null)
-        {
-            this.logger.log(Level.WARNING, "The desired class could not be found: " + className);
-        }
-        
-        return toReturn;
-    }
+				this.logger.log(Level.WARNING, "Error while loading module class: " + className);
 
-    /**
-     * @param className
-     * @return
-     */
-    private String getNormalizedClassName(String className)
-    {
-        StringTokenizer stringTokenizer = new StringTokenizer(className, ".");
+			}
+		}
 
-        String normalizedClassName = "";
+		if (toReturn == null)
+		{
+			this.logger.log(Level.WARNING, "The desired class could not be found: " + className);
+		}
 
-        while (stringTokenizer.hasMoreTokens()) {
-            normalizedClassName += File.separator + stringTokenizer.nextToken();
+		return toReturn;
+	}
 
-        }
+	private String getNormalizedClassName(String className)
+	{
+		StringTokenizer stringTokenizer = new StringTokenizer(className, ".");
 
-        return normalizedClassName;
-    }
+		String normalizedClassName = "";
 
-    /**
-     * @param currentModuleDirectoryPath
-     */
-    public void addModuleClassPath(String moduleClassPath)
-    {
-        if (this.$moduleClassPaths == null) {
-            this.$moduleClassPaths = new ArrayList<String>();
-        }
+		while (stringTokenizer.hasMoreTokens())
+		{
+			normalizedClassName += File.separator + stringTokenizer.nextToken();
 
-        this.$moduleClassPaths.add(moduleClassPath);
+		}
 
-    }
+		return normalizedClassName;
+	}
+
+	/**
+	 * This method is used by the ModuleRegistry to add another module path
+	 * to the list of knon module paths.
+	 * @param moduleClassPath Is the new module path
+	 */
+	public void addModuleClassPath(String moduleClassPath)
+	{
+		if (this.$moduleClassPaths == null)
+		{
+			this.$moduleClassPaths = new ArrayList<String>();
+		}
+
+		this.$moduleClassPaths.add(moduleClassPath);
+
+	}
 }

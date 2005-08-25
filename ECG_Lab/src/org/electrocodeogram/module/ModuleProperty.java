@@ -1,5 +1,5 @@
 
-package org.electrocodeogram.module.registry;
+package org.electrocodeogram.module;
 
 /**
  * A ModuleProperty is a property of a module that is changeable by the user during

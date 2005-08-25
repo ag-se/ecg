@@ -1,12 +1,12 @@
-package org.electrocodeogram.module.registry;
+package org.electrocodeogram.module;
 
 import org.electrocodeogram.msdt.MicroSensorDataType;
 
 
 /**
  * This class is a representation for the description of module classes.
- * The description is used by ECG components to gather information about the modules
- * and their class objects.
+ * The description is used by ECG components to gather information about an
+ * available module class.
  */
 public class ModuleDescriptor
 {
@@ -31,6 +31,8 @@ public class ModuleDescriptor
      * This creates a new ModuleDescriptor with the given values.
      * @param id This is the unique id of the module class as defined in the ModuleRegistry
      * @param name This is the name of the module
+     * @param provider_name This is the name of the module provider
+     * @param version Is the version of the module
      * @param clazz This is the module class object
      * @param moduleDescription Is a String describing the module 
      * @param moduleProperties Is an Array of ModuleProperty objects, each defining a property of this module
@@ -94,16 +96,40 @@ public class ModuleDescriptor
     }
 
     /**
-     * This method returns the module class' id.
-     * @return The module class' id
+     * This method returns the unique String id of this module
+     * @return The unique String id of this module
      */
     public String getId()
     {
         return this.$id;
     }
     
+    /**
+     * This method returns the MicroSensorDataTypes that are provided by this module as an Array
+     * @return The MicroSensorDataTypes that are provided by this module
+     */
     public MicroSensorDataType[] getMicroSensorDataTypes()
     {
         return this.$microSensorDataTypes;
     }
+
+	
+    /**
+     * This method returns the module provider name.
+     * @return The module provider name
+     */
+    public String getProvider_name()
+	{
+		return this.$provider_name;
+	}
+    
+    /**
+     * This method returns the module version.
+     * @return The module version
+     */
+
+	public String getVersion()
+	{
+		return this.$version;
+	}
 }

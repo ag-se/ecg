@@ -13,6 +13,8 @@ import java.util.logging.Logger;
 
 import org.apache.xerces.parsers.DOMParser;
 import org.electrocodeogram.module.Module;
+import org.electrocodeogram.module.ModuleDescriptor;
+import org.electrocodeogram.module.ModuleProperty;
 import org.electrocodeogram.module.loader.ModuleClassLoader;
 import org.electrocodeogram.module.loader.ModuleClassLoaderInitializationException;
 import org.electrocodeogram.moduleapi.module.registry.IModuleModuleRegistry;

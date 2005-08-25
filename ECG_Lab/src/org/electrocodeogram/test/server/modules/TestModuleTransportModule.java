@@ -4,7 +4,7 @@ import org.electrocodeogram.event.TypedValidEventPacket;
 import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.module.Module;
 import org.electrocodeogram.module.ModuleConnectionException;
-import org.electrocodeogram.module.TestModule;
+import org.electrocodeogram.test.module.TestModule;
 
 /**
  * This class is helper class for the ModuleTests. It provides methods to create

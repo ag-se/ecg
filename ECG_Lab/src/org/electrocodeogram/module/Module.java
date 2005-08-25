@@ -12,7 +12,6 @@ import org.electrocodeogram.event.IllegalEventParameterException;
 import org.electrocodeogram.event.TypedValidEventPacket;
 import org.electrocodeogram.module.intermediate.IIntermediateModule;
 import org.electrocodeogram.module.registry.ModuleClassException;
-import org.electrocodeogram.module.registry.ModuleDescriptor;
 import org.electrocodeogram.module.registry.ModuleInstanceException;
 import org.electrocodeogram.module.source.SourceModule;
 import org.electrocodeogram.msdt.MicroSensorDataType;

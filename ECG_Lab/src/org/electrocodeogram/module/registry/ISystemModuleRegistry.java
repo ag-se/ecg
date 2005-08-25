@@ -1,6 +1,7 @@
 package org.electrocodeogram.module.registry;
 
 import org.electrocodeogram.module.Module;
+import org.electrocodeogram.module.ModuleDescriptor;
 
 /**
  * This interfce declares methods that are used to access information about
