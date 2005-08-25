@@ -151,9 +151,9 @@
 
 
 		<!-- Copy module into ECG CodechangeDifferIntermediateModule module directory -->
-		<mkdir dir="../ECG_ServerAndLab/modules/ECG_CodechangeDifferIntermediateModule/"/>
+		<mkdir dir="../ECG_Lab/modules/ECG_CodechangeDifferIntermediateModule/"/>
 		
-		<copy todir="../ECG_ServerAndLab/modules/ECG_CodechangeDifferIntermediateModule/">
+		<copy todir="../ECG_Lab/modules/ECG_CodechangeDifferIntermediateModule/">
 
 			<fileset dir="${dist.dir}/ECG_CodechangeDifferIntermediateModule/"/>
 
@@ -161,9 +161,9 @@
 		
 		<!-- Copy module's MicroSensorDataTypes into ECG CodechangeDifferIntermediateModule msdt directory -->
 		
-		<mkdir dir="../ECG_ServerAndLab/modules/ECG_CodechangeDifferIntermediateModule/msdt/"/>
+		<mkdir dir="../ECG_Lab/modules/ECG_CodechangeDifferIntermediateModule/msdt/"/>
 		
-		<copy todir="../ECG_ServerAndLab/modules/ECG_CodechangeDifferIntermediateModule/msdt/">
+		<copy todir="../ECG_Lab/modules/ECG_CodechangeDifferIntermediateModule/msdt/">
 
 				<fileset dir="${dist.dir}/ECG_CodechangeDifferIntermediateModule/msdt/"/>
 
