@@ -5,7 +5,7 @@ import java.io.IOException;
 import junit.framework.TestCase;
 
 import org.electrocodeogram.event.ValidEventPacket;
-import org.electrocodeogram.msdt.EventValidator;
+import org.electrocodeogram.msdt.validation.EventValidator;
 import org.electrocodeogram.test.EventGenerator;
 import org.electrocodeogram.test.EventGenerator.MicroSensorDataType;
 

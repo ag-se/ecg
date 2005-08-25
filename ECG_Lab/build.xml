@@ -122,7 +122,8 @@
 							org/electrocodeogram/moduleapi/*,
 							org/electrocodeogram/moduleapi/system/*,
 							org/electrocodeogram/moduleapi/module/*,
-							org/electrocodeogram/moduleapi/module/registry*,
+							org/electrocodeogram/moduleapi/module/registry/*,
+							org/electrocodeogram/moduleapi/msdt/registry/*,
 							org/electrocodeogram/msdt/*,
 							org/electrocodeogram/event/*,
 							org/electrocodeogram/ui/IGui.class"

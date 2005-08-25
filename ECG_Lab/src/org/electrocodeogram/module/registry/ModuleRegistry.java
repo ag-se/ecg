@@ -13,6 +13,8 @@ import java.util.logging.Logger;
 
 import org.apache.xerces.parsers.DOMParser;
 import org.electrocodeogram.module.Module;
+import org.electrocodeogram.module.loader.ModuleClassLoader;
+import org.electrocodeogram.module.loader.ModuleClassLoaderInitializationException;
 import org.electrocodeogram.moduleapi.module.registry.IModuleModuleRegistry;
 import org.electrocodeogram.msdt.MicroSensorDataType;
 import org.electrocodeogram.msdt.MicroSensorDataTypeException;
@@ -44,11 +46,11 @@ import org.xml.sax.SAXNotSupportedException;
 public class ModuleRegistry extends Observable implements ISystemModuleRegistry, IModuleModuleRegistry
 {
 
-	private Logger logger = null;
+	private Logger logger;
 
-	private RunningModules runningModules = null;
+	private RunningModules runningModules;
 
-	private InstalledModules installedModules = null;
+	private InstalledModules installedModules;
 
 	/**
 	 * The constructor creates the ModuleRegistry instance.
@@ -537,7 +539,7 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 
 							try
 							{
-								microSensorDataTypes[j] = SystemRoot.getSystemInstance().getMsdtRegistry().parseMicroSensorDataType(msdtFile);
+								microSensorDataTypes[j] = SystemRoot.getSystemInstance().getSystemMsdtRegistry().parseMicroSensorDataType(msdtFile);
 							}
 							catch (MicroSensorDataTypeException e)
 							{

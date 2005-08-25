@@ -23,7 +23,7 @@ import javax.swing.event.ChangeListener;
 import org.electrocodeogram.module.registry.ModuleInstanceException;
 import org.electrocodeogram.module.registry.ModuleRegistry;
 
-import org.electrocodeogram.msdt.EventValidator;
+import org.electrocodeogram.msdt.validation.EventValidator;
 import org.electrocodeogram.system.SystemRoot;
 
 /**

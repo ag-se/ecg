@@ -12,10 +12,9 @@ import javax.xml.validation.SchemaFactory;
 import org.electrocodeogram.module.TestModule;
 import org.electrocodeogram.msdt.IllegalMicroSensorDataTypeNameException;
 import org.electrocodeogram.msdt.IllegalMicroSensorDataTypeSchemaException;
-import org.electrocodeogram.msdt.MSDTIsNullException;
 import org.electrocodeogram.msdt.MicroSensorDataType;
-import org.electrocodeogram.msdt.ModuleIsNullException;
-import org.electrocodeogram.msdt.MsdtRegistry;
+import org.electrocodeogram.msdt.registry.MicroSensorDataTypeRegistrationException;
+import org.electrocodeogram.msdt.registry.MsdtRegistry;
 import org.xml.sax.SAXException;
 
 /**
@@ -44,7 +43,7 @@ public class MockMsdtRegistry extends MsdtRegistry
         
         this.loadPredefinedSourceMsdt();
     }
-    private MicroSensorDataType requestMsdtRegistration(MicroSensorDataType msdt) throws MSDTIsNullException, ModuleIsNullException
+    private MicroSensorDataType requestMsdtRegistration(MicroSensorDataType msdt) throws MicroSensorDataTypeRegistrationException
     {
         return super.requestMsdtRegistration(msdt,this.testModule);
     }
@@ -88,7 +87,7 @@ public class MockMsdtRegistry extends MsdtRegistry
                     try {
                         this.requestMsdtRegistration(microSensorDataType);
                     }
-                    catch (ModuleIsNullException e) {
+                    catch (MicroSensorDataTypeRegistrationException e) {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
@@ -109,11 +108,7 @@ public class MockMsdtRegistry extends MsdtRegistry
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
-                catch (MSDTIsNullException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-
+               
             }
         }
         else {

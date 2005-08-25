@@ -4,7 +4,7 @@ package org.electrocodeogram.module.source;
 import org.electrocodeogram.event.TypedValidEventPacket;
 import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.module.Module;
-import org.electrocodeogram.msdt.EventValidator;
+import org.electrocodeogram.msdt.validation.EventValidator;
 import org.electrocodeogram.system.SystemRoot;
 
 import com.sun.org.apache.xerces.internal.impl.dv.xs.TypeValidator;
@@ -31,7 +31,7 @@ public abstract class SourceModule extends Module
     {
         super(ModuleType.SOURCE_MODULE,moduleClassId,name);
         
-        this.eventValidator = new EventValidator(SystemRoot.getSystemInstance().getMsdtRegistry());
+        this.eventValidator = new EventValidator(SystemRoot.getSystemInstance().getSystemMsdtRegistry());
         
     }
     

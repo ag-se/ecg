@@ -1,4 +1,4 @@
-package org.electrocodeogram.msdt;
+package org.electrocodeogram.msdt.validation;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -13,6 +13,8 @@ import javax.xml.validation.Validator;
 import org.electrocodeogram.event.IllegalEventParameterException;
 import org.electrocodeogram.event.TypedValidEventPacket;
 import org.electrocodeogram.event.ValidEventPacket;
+import org.electrocodeogram.msdt.MicroSensorDataType;
+import org.electrocodeogram.msdt.registry.ISystemMsdtRegistry;
 import org.hackystat.kernel.admin.SensorProperties;
 import org.hackystat.kernel.shell.SensorShell;
 import org.xml.sax.InputSource;
@@ -29,7 +31,7 @@ public class EventValidator
 
     private int processingID = 0;
 
-    private MsdtRegistry $mSdtManager = null;
+    private ISystemMsdtRegistry $mSdtManager = null;
 
     private SensorShell shell;
 
@@ -45,7 +47,7 @@ public class EventValidator
      *            keeps the MicroSensorDataType XML schema definitions which are used
      *            to validate the MicroActivities against.
      */
-    public EventValidator(MsdtRegistry mSdtManager)
+    public EventValidator(ISystemMsdtRegistry mSdtManager)
     {
         this.shell = new SensorShell(new SensorProperties("", ""), false,
                 "ElectroCodeoGram");

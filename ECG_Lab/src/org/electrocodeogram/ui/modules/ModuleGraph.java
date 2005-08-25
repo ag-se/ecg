@@ -21,7 +21,7 @@ import org.electrocodeogram.module.ModuleConnectionException;
 import org.electrocodeogram.module.registry.ModuleInstanceException;
 import org.electrocodeogram.module.registry.ModuleRegistry;
 
-import org.electrocodeogram.msdt.EventValidator;
+import org.electrocodeogram.msdt.validation.EventValidator;
 import org.electrocodeogram.system.SystemRoot;
 import org.electrocodeogram.ui.Gui;
 import org.electrocodeogram.ui.MenuManager;

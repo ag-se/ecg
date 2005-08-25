@@ -2,7 +2,7 @@ package org.electrocodeogram.system;
 
 import org.electrocodeogram.module.Module;
 import org.electrocodeogram.module.registry.ISystemModuleRegistry;
-import org.electrocodeogram.msdt.MsdtRegistry;
+import org.electrocodeogram.msdt.registry.ISystemMsdtRegistry;
 import org.electrocodeogram.ui.IGui;
 
 /**
@@ -38,7 +38,7 @@ public interface ISystemRoot
 	 * 
 	 * @return A reference to the MicroSensorDataType registry object
 	 */
-	public abstract MsdtRegistry getMsdtRegistry();
+	public abstract ISystemMsdtRegistry getSystemMsdtRegistry();
 
 	/**
 	 * This method returns a reference to the ModuleRegistry.

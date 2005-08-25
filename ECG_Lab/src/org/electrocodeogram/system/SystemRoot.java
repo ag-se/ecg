@@ -12,8 +12,10 @@ import org.electrocodeogram.module.Module;
 import org.electrocodeogram.module.registry.ISystemModuleRegistry;
 import org.electrocodeogram.module.registry.ModuleRegistry;
 import org.electrocodeogram.moduleapi.module.registry.IModuleModuleRegistry;
+import org.electrocodeogram.moduleapi.msdt.registry.IModuleMsdtRegistry;
 import org.electrocodeogram.moduleapi.system.IModuleSystemRoot;
-import org.electrocodeogram.msdt.MsdtRegistry;
+import org.electrocodeogram.msdt.registry.ISystemMsdtRegistry;
+import org.electrocodeogram.msdt.registry.MsdtRegistry;
 import org.electrocodeogram.ui.Gui;
 import org.electrocodeogram.ui.IGui;
 
@@ -29,28 +31,26 @@ import org.electrocodeogram.ui.IGui;
 public class SystemRoot extends Observable implements ISystemRoot, IModuleSystemRoot
 {
 
-	private static ISystemRoot theSystemInstance;
-
-	private static IModuleSystemRoot theModuleInstance;
+	private static SystemRoot theInstance;
 
 	private ModuleRegistry moduleRegistry;
 
 	private Gui gui;
 
-	private MsdtRegistry mstdManager;
+	private MsdtRegistry mstdRegistry;
 
 	private SystemRoot()
 	{
 
 		Console console = new Console();
 
-		this.mstdManager = new MsdtRegistry();
+		this.mstdRegistry = new MsdtRegistry();
 
 		this.moduleRegistry = new ModuleRegistry();
 
 		this.gui = new Gui(this.moduleRegistry);
 
-		theSystemInstance = this;
+		theInstance = this;
 
 		console.start();
 	}
@@ -79,12 +79,12 @@ public class SystemRoot extends Observable implements ISystemRoot, IModuleSystem
 	 */
 	public static ISystemRoot getSystemInstance()
 	{
-		if (theSystemInstance == null)
+		if (theInstance == null)
 		{
-			theSystemInstance = new SystemRoot();
+			theInstance = new SystemRoot();
 		}
 
-		return theSystemInstance;
+		return theInstance;
 	}
 
 	/**
@@ -96,20 +96,20 @@ public class SystemRoot extends Observable implements ISystemRoot, IModuleSystem
 	 */
 	public static IModuleSystemRoot getModuleInstance()
 	{
-		if (theModuleInstance == null)
+		if (theInstance == null)
 		{
-			theModuleInstance = new SystemRoot();
+			theInstance = new SystemRoot();
 		}
 
-		return theModuleInstance;
+		return theInstance;
 	}
 
 	/**
-	 * @see org.electrocodeogram.system.ISystemRoot#getMsdtRegistry()
+	 * @see org.electrocodeogram.system.ISystemRoot#getSystemMsdtRegistry()
 	 */
-	public MsdtRegistry getMsdtRegistry()
+	public ISystemMsdtRegistry getSystemMsdtRegistry()
 	{
-		return this.mstdManager;
+		return this.mstdRegistry;
 	}
 
 	/**
@@ -275,5 +275,13 @@ public class SystemRoot extends Observable implements ISystemRoot, IModuleSystem
 	public JFrame getRootFrame()
 	{
 		return this.gui;
+	}
+
+	/**
+	 * @see org.electrocodeogram.moduleapi.system.IModuleSystemRoot#getModuleMsdtRegistry()
+	 */
+	public IModuleMsdtRegistry getModuleMsdtRegistry()
+	{
+		return this.mstdRegistry;
 	}
 }

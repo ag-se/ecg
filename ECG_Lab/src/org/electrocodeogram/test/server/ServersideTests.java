@@ -5,7 +5,7 @@ import junit.framework.TestCase;
 import org.electrocodeogram.event.IllegalEventParameterException;
 import org.electrocodeogram.event.TypedValidEventPacket;
 import org.electrocodeogram.event.ValidEventPacket;
-import org.electrocodeogram.msdt.EventValidator;
+import org.electrocodeogram.msdt.validation.EventValidator;
 import org.electrocodeogram.test.EventGenerator;
 import org.electrocodeogram.test.NoTestDataException;
 import org.electrocodeogram.test.EventGenerator.SensorDataType;

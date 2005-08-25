@@ -1,7 +1,5 @@
 package org.electrocodeogram.module;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -10,28 +8,19 @@ import java.util.Observer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.XMLConstants;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
-
 import org.electrocodeogram.event.IllegalEventParameterException;
 import org.electrocodeogram.event.TypedValidEventPacket;
-import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.module.intermediate.IIntermediateModule;
 import org.electrocodeogram.module.registry.ModuleClassException;
 import org.electrocodeogram.module.registry.ModuleDescriptor;
 import org.electrocodeogram.module.registry.ModuleInstanceException;
 import org.electrocodeogram.module.source.SourceModule;
-import org.electrocodeogram.msdt.IllegalMicroSensorDataTypeNameException;
-import org.electrocodeogram.msdt.IllegalMicroSensorDataTypeSchemaException;
-import org.electrocodeogram.msdt.MSDTIsNullException;
 import org.electrocodeogram.msdt.MicroSensorDataType;
-import org.electrocodeogram.msdt.ModuleIsNullException;
+import org.electrocodeogram.msdt.registry.MicroSensorDataTypeRegistrationException;
 import org.electrocodeogram.system.ISystemRoot;
 import org.electrocodeogram.system.SystemRoot;
 import org.electrocodeogram.ui.messages.GuiWriter;
 import org.electrocodeogram.ui.messages.IGuiWriter;
-import org.xml.sax.SAXException;
 
 /**
  * This abstract class represents an ECG module. A module is an entity able
@@ -54,7 +43,7 @@ public abstract class Module extends Observable implements Observer
 {
 
     /**
-     * This is the Logger instance.
+     * This is the module's Logger.
      */
     protected Logger logger;
 
@@ -128,24 +117,19 @@ public abstract class Module extends Observable implements Observer
 
         if (this instanceof SourceModule) {
 
-            MicroSensorDataType[] msdts = SystemRoot.getSystemInstance().getMsdtRegistry().getPredefinedMicroSensorDataTypes();
+            MicroSensorDataType[] msdts = SystemRoot.getModuleInstance().getModuleMsdtRegistry().getPredefinedMicroSensorDataTypes();
 
             for (MicroSensorDataType msdt : msdts) {
                 try {
-                    SystemRoot.getSystemInstance().getMsdtRegistry().requestMsdtRegistration(msdt, this);
+                    SystemRoot.getModuleInstance().getModuleMsdtRegistry().requestMsdtRegistration(msdt, this);
 
                     this.providedMsdt.add(msdt);
                 }
-                catch (MSDTIsNullException e) {
+                catch (MicroSensorDataTypeRegistrationException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
-                catch (ModuleIsNullException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-
-            }
+                           }
 
         }
 
@@ -168,19 +152,16 @@ public abstract class Module extends Observable implements Observer
                     for (MicroSensorDataType msdt : microSensorDataTypes) {
                         this.providedMsdt.add(msdt);
 
-                        SystemRoot.getSystemInstance().getMsdtRegistry().requestMsdtRegistration(msdt, this);
+                        SystemRoot.getModuleInstance().getModuleMsdtRegistry().requestMsdtRegistration(msdt, this);
                     }
                 }
 
             }
-            catch (MSDTIsNullException e) {
+            catch (MicroSensorDataTypeRegistrationException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-            catch (ModuleIsNullException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+           
         }
 
         SystemRoot.getModuleInstance().getModuleModuleRegistry().registerRunningModule(this);
@@ -456,6 +437,7 @@ public abstract class Module extends Observable implements Observer
     /**
      * @param currentPropertyName
      * @param propertyValue
+     * @throws ModulePropertyException 
      */
     public abstract void setProperty(String currentPropertyName, Object propertyValue) throws ModulePropertyException;
 
@@ -554,7 +536,7 @@ public abstract class Module extends Observable implements Observer
             try {
                 msdt.removeProvidingModule(this);
             }
-            catch (ModuleIsNullException e) {
+            catch (MicroSensorDataTypeRegistrationException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }

@@ -3,7 +3,7 @@ package org.electrocodeogram.test.server.mockClient;
 
 import org.electrocodeogram.event.TypedValidEventPacket;
 import org.electrocodeogram.event.ValidEventPacket;
-import org.electrocodeogram.msdt.EventValidator;
+import org.electrocodeogram.msdt.validation.EventValidator;
 
 
 /**

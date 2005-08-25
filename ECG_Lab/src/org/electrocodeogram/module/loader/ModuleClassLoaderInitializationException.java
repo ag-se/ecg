@@ -1,5 +1,5 @@
 
-package org.electrocodeogram.module.registry;
+package org.electrocodeogram.module.loader;
 
 /**
  * This Exception can be thrown during the initialization of the module classes.

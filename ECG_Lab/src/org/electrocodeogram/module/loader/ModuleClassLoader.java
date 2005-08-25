@@ -1,4 +1,4 @@
-package org.electrocodeogram.module.registry;
+package org.electrocodeogram.module.loader;
 
 import java.io.File;
 import java.io.FileInputStream;
