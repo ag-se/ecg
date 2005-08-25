@@ -33,7 +33,7 @@
 		<echo message="CLEANING ECG SERVERANDLAB" />
 		<echo message="#########################" />
 
-		<ant dir="../ECG_ServerAndLab" target="cleanall" />
+		<ant dir="../ECG_Lab" target="cleanall" />
 
 	</target>
 
@@ -141,7 +141,7 @@
 		<echo message="#######################" />
 
 
-		<ant dir="../ECG_ServerAndLab" target="deployModuleApi" />
+		<ant dir="../ECG_Lab" target="deployModuleApi" />
 
 	</target>
 
@@ -219,7 +219,7 @@
 		<echo message="ASSEMBLING ECG SERVERANDLAB" />
 		<echo message="############################" />
 
-		<ant dir="../ECG_ServerAndLab" target="Assemble ECGLab" />
+		<ant dir="../ECG_Lab" target="Assemble ECGLab" />
 
 	</target>
 
@@ -245,7 +245,7 @@
 
 		</copy>
 
-		<zip zipfile="dist/ElectroCodeoGram${DSTAMP}${TSTAMP}.zip" basedir="../ECG_ServerAndLab/dist/application" />
+		<zip zipfile="dist/ElectroCodeoGram${DSTAMP}${TSTAMP}.zip" basedir="../ECG_Lab/dist/application" />
 
 		<zip zipfile="dist/plugins/org.hackystat.stdext.sensor_6.4.117.3x.zip" basedir="../HackyStat EclipseSensor/" />
 
