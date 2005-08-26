@@ -5,10 +5,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Observable;
+import java.util.Observer;
 
 import javax.swing.JFrame;
 
-import org.electrocodeogram.module.Module;
 import org.electrocodeogram.module.registry.ISystemModuleRegistry;
 import org.electrocodeogram.module.registry.ModuleRegistry;
 import org.electrocodeogram.moduleapi.module.registry.IModuleModuleRegistry;
@@ -210,20 +210,20 @@ public class SystemRoot extends Observable implements ISystemRoot, IModuleSystem
 	}
 
 	/**
-	 * @see org.electrocodeogram.system.ISystemRoot#addModule(org.electrocodeogram.module.Module)
+	 * @see org.electrocodeogram.system.ISystemRoot#addSystemObserver(SystemObserver)
 	 */
-	public void addModule(Module module)
+	public void addSystemObserver(Observer o)
 	{
-		this.addObserver(module);
+		this.addObserver(o);
 
 	}
 
 	/**
-	 * @see org.electrocodeogram.system.ISystemRoot#deleteModule(org.electrocodeogram.module.Module)
+	 * @see org.electrocodeogram.system.ISystemRoot#deleteSystemObserver(Observer)
 	 */
-	public void deleteModule(Module module)
+	public void deleteSystemObserver(Observer o)
 	{
-		this.deleteObserver(module);
+		this.deleteObserver(o);
 
 	}
 

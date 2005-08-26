@@ -8,7 +8,7 @@ import java.util.Observer;
 /**
  *
  */
-public interface IGuiWriter extends Observer
+public interface IGuiWriter
 {
 
     /**

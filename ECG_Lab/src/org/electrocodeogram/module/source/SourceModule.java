@@ -7,8 +7,6 @@ import org.electrocodeogram.module.Module;
 import org.electrocodeogram.msdt.validation.EventValidator;
 import org.electrocodeogram.system.SystemRoot;
 
-import com.sun.org.apache.xerces.internal.impl.dv.xs.TypeValidator;
-
 /**
  * This is the abstract class SourceModule that shall be subclassed
  * by all source modules. The abstract method startReader is to be implemented
@@ -69,7 +67,7 @@ public abstract class SourceModule extends Module
      * @param eventPacket not used
      */
     @Override
-    public void receiveEventPacket(@SuppressWarnings("unused") TypedValidEventPacket eventPacket)
+    public final void receiveEventPacket(@SuppressWarnings("unused") TypedValidEventPacket eventPacket)
     {
         return;
     }

@@ -631,7 +631,7 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 
 		this.logger.log(Level.INFO, "Registered module " + module.getName());
 
-		SystemRoot.getSystemInstance().addModule(module);
+		SystemRoot.getSystemInstance().addSystemObserver(module.getSystemObserver());
 
 		setChanged();
 
@@ -723,7 +723,7 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 
 		this.logger.log(Level.INFO, "Deregestered module " + module.getName());
 
-		SystemRoot.getSystemInstance().deleteModule(module);
+		SystemRoot.getSystemInstance().deleteSystemObserver(module.getSystemObserver());
 
 		setChanged();
 
@@ -743,6 +743,11 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 			throw new ModuleClassException("The module id is empty.");
 		}
 
+		if(this.installedModules == null)
+		{
+			throw new ModuleClassException("The module id is unknown.");
+		}
+		
 		if (!this.installedModules.availableModuleClassesMap.containsKey(moduleClassId))
 		{
 			throw new ModuleClassException("The module id is unknown.");

@@ -1,6 +1,7 @@
 package org.electrocodeogram.system;
 
-import org.electrocodeogram.module.Module;
+import java.util.Observer;
+
 import org.electrocodeogram.module.registry.ISystemModuleRegistry;
 import org.electrocodeogram.msdt.registry.ISystemMsdtRegistry;
 import org.electrocodeogram.ui.IGui;
@@ -18,19 +19,19 @@ public interface ISystemRoot
 	 * This method registers a module instance with the IModuleSystemRoot. all
 	 * registered modules ill be notified of system statechanges.
 	 * 
-	 * @param module
+	 * @param o
 	 *            Is the module instance to register
 	 */
-	public abstract void addModule(Module module);
+	public abstract void addSystemObserver(Observer o);
 
 	/**
 	 * This method deregisters a module instance with the IModuleSystemRoot. all
 	 * registered modules ill be notified of system statechanges.
 	 * 
-	 * @param module
+	 * @param o
 	 *            Is the module instance to deregister
 	 */
-	public abstract void deleteModule(Module module);
+	public abstract void deleteSystemObserver(Observer o);
 
 	/**
 	 * This method returns a reference to the MicroSensorDataType registry

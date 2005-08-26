@@ -7,7 +7,9 @@
 package org.electrocodeogram.ui.messages;
 
 import java.util.List;
+import java.util.Observable;
 
+import org.electrocodeogram.event.TypedValidEventPacket;
 import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.module.target.TargetModule;
 import org.electrocodeogram.system.SystemRoot;
@@ -70,7 +72,7 @@ public class GuiWriter extends TargetModule implements IGuiWriter
     /* (non-Javadoc)
      * @see org.electrocodeogram.module.writer.EventWriter#write(org.electrocodeogram.EventPacket)
      */
-    public void write(ValidEventPacket eventPacket)
+    public void write(TypedValidEventPacket eventPacket)
     {
         if(target != null)
         {
@@ -143,4 +145,5 @@ public class GuiWriter extends TargetModule implements IGuiWriter
         // TODO Auto-generated method stub
         
     }
+	
 }

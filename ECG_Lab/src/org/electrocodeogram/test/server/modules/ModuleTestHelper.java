@@ -16,7 +16,7 @@ import org.electrocodeogram.test.module.TestModule;
  * connect itself to the end of each module collection and wait for incoming events
  * to proof.  
  */
-public class TestModuleTransportModule extends Module
+public class ModuleTestHelper
 {
 
     private Module last;
@@ -30,16 +30,19 @@ public class TestModuleTransportModule extends Module
     private int receivedCount;
 
     private TestSourceModule root;
+    
+    private TestTargetModule leaf;
 
     /**
      * This creates the class as a module. 
      *
      */
-    public TestModuleTransportModule()
+    public ModuleTestHelper()
     {
-        super(ModuleType.SOURCE_MODULE,"org.electrocodeogram.test.server.modules.TestModuleTransportModule","TestModuleTransportModule");
-
-       
+     
+    	root = new TestSourceModule();
+    	
+    	leaf = new TestTargetModule(this);
     }
 
     private void removeConnectedModules(Module node)
@@ -78,7 +81,7 @@ public class TestModuleTransportModule extends Module
             this.last = next;
         }
 
-        this.last.connectReceiverModule(this);
+        this.last.connectReceiverModule(this.leaf);
     }
 
     /**
@@ -145,21 +148,21 @@ public class TestModuleTransportModule extends Module
 
         rightrightChild.connectReceiverModule(rightrightrightChild);
 
-        leftleftleftChild.connectReceiverModule(this);
+        leftleftleftChild.connectReceiverModule(this.leaf);
 
-        leftleftrightChild.connectReceiverModule(this);
+        leftleftrightChild.connectReceiverModule(this.leaf);
 
-        leftrightleftChild.connectReceiverModule(this);
+        leftrightleftChild.connectReceiverModule(this.leaf);
 
-        leftrightrightChild.connectReceiverModule(this);
+        leftrightrightChild.connectReceiverModule(this.leaf);
 
-        rightleftleftChild.connectReceiverModule(this);
+        rightleftleftChild.connectReceiverModule(this.leaf);
 
-        rightleftrightChild.connectReceiverModule(this);
+        rightleftrightChild.connectReceiverModule(this.leaf);
 
-        rightrightleftChild.connectReceiverModule(this);
+        rightrightleftChild.connectReceiverModule(this.leaf);
 
-        rightrightrightChild.connectReceiverModule(this);
+        rightrightrightChild.connectReceiverModule(this.leaf);
 
     }
 
@@ -194,13 +197,8 @@ public class TestModuleTransportModule extends Module
         return this.result;
     }
 
-    /**
-     * @see org.electrocodeogram.module.Module#receiveEventPacket(org.electrocodeogram.event.ValidEventPacket)
-     * This method compares the received event data to the original event data and sets flags to indicate
-     * the result.
-     */
-    @Override
-    public void receiveEventPacket(TypedValidEventPacket eventPacket)
+  
+    public void comparePackets(TypedValidEventPacket eventPacket)
     {
         if (this.testPacket.equals(eventPacket)) {
             this.receivedCount++;
@@ -212,38 +210,5 @@ public class TestModuleTransportModule extends Module
                 this.result = false;
             }
         }
-    }
-
-    /**
-     * @see org.electrocodeogram.module.Module#setProperty(java.lang.String, java.lang.Object)
-     */
-    @Override
-    public void setProperty(@SuppressWarnings("unused")
-    String currentPropertyName, @SuppressWarnings("unused")
-    Object propertyValue)
-    {
-        // not needed
-    }
-
-    /**
-     * @see org.electrocodeogram.module.Module#analyseCoreNotification()
-     */
-    @Override
-    public void analyseCoreNotification()
-    {
-        // not needed
-        
-    }
-
-    /**
-     * @see org.electrocodeogram.module.Module#initialize()
-     */
-    @Override
-    public void initialize()
-    {
-        this.root = new TestSourceModule();
-
-        removeConnectedModules(this.root);
-        
     }
 }

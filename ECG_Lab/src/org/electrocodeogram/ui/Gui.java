@@ -73,7 +73,7 @@ public class Gui extends JFrame implements IGui
 
     private int sourceModuleId;
 
-    private IGuiWriter guiEventWriter;
+    private GuiWriter guiEventWriter;
     
     private MenuManager menuManager = null;
 
@@ -402,20 +402,20 @@ public class Gui extends JFrame implements IGui
                 splitPane.add(pnlButtons);
             }
         }
-        else if(o instanceof Module)
-        {
-            if(arg instanceof Module)
-            {
-                Module module = (Module) arg;
-                
-                int id = module.getId();
-                
-                if(moduleGraph.containsModuleCell(id))
-                {
-                    moduleGraph.updateModuleCell(id,module);
-                }
-            }
-        }
+//        else if(o instanceof Module)
+//        {
+//            if(arg instanceof Module)
+//            {
+//                Module module = (Module) arg;
+//                
+//                int id = module.getId();
+//                
+//                if(moduleGraph.containsModuleCell(id))
+//                {
+//                    moduleGraph.updateModuleCell(id,module);
+//                }
+//            }
+//        }
 //        else {
 //            if (arg instanceof SocketServer) {
 //                SocketServer seso = (SocketServer) arg;
@@ -608,7 +608,7 @@ public class Gui extends JFrame implements IGui
         
     }
 
-    public IGuiWriter getGuiEventWriter()
+    public GuiWriter getGuiEventWriter()
     {
         return this.guiEventWriter;
     }

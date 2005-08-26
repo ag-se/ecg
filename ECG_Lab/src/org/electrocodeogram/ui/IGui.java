@@ -7,6 +7,7 @@ import java.util.Observer;
 
 import javax.swing.JFrame;
 
+import org.electrocodeogram.ui.messages.GuiWriter;
 import org.electrocodeogram.ui.messages.IGuiWriter;
 
 /**
@@ -37,7 +38,7 @@ public interface IGui extends Observer
     /**
      * @return
      */
-    public IGuiWriter getGuiEventWriter();
+    public GuiWriter getGuiEventWriter();
 
     /**
      * 

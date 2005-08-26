@@ -16,7 +16,7 @@ import utmj.threaded.RetriedAssert;
  */
 public class ModuleTests extends TestCase
 {
-    private TestModuleTransportModule testModuleTransport = null;
+    private ModuleTestHelper moduleTestHelper = null;
 
     private EventGenerator eventGenerator = null;
 
@@ -28,7 +28,7 @@ public class ModuleTests extends TestCase
     {
         super.setUp();
         
-        this.testModuleTransport = new TestModuleTransportModule();
+        this.moduleTestHelper = new ModuleTestHelper();
 
         this.eventGenerator = new EventGenerator();
     }
@@ -42,7 +42,7 @@ public class ModuleTests extends TestCase
      
         super.tearDown();
         
-        this.testModuleTransport = null;
+        this.moduleTestHelper = null;
 
         this.eventGenerator = null;
     }
@@ -59,15 +59,15 @@ public class ModuleTests extends TestCase
 
         ValidEventPacket eventPacket = this.eventGenerator.createECGEventPacket(org.electrocodeogram.test.EventGenerator.MicroSensorDataType.CODECHANGE);
 
-        this.testModuleTransport.makeModuleList(100);
+        this.moduleTestHelper.makeModuleList(100);
 
-        this.testModuleTransport.checkModuleEventTransport(eventPacket,1);
+        this.moduleTestHelper.checkModuleEventTransport(eventPacket,1);
 
         new RetriedAssert(5000, 100) {
             @Override
             public void run() throws Exception
             {
-                assertTrue(testModuleTransport.getResult());
+                assertTrue(moduleTestHelper.getResult());
             }
         }.start();
 
@@ -85,15 +85,15 @@ public class ModuleTests extends TestCase
 
         ValidEventPacket eventPacket = this.eventGenerator.createECGEventPacket(org.electrocodeogram.test.EventGenerator.MicroSensorDataType.CODECHANGE);
 
-        this.testModuleTransport.makeModuleBinTree();
+        this.moduleTestHelper.makeModuleBinTree();
 
-        this.testModuleTransport.checkModuleEventTransport(eventPacket,8);
+        this.moduleTestHelper.checkModuleEventTransport(eventPacket,8);
 
         new RetriedAssert(5000, 100) {
             @Override
             public void run() throws Exception
             {
-                assertTrue(testModuleTransport.getResult());
+                assertTrue(moduleTestHelper.getResult());
             }
         }.start();
 
