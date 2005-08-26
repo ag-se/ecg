@@ -6,9 +6,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import org.electrocodeogram.event.ValidEventPacket;
+import org.electrocodeogram.event.TypedValidEventPacket;
 import org.electrocodeogram.module.ModulePropertyException;
-import org.electrocodeogram.module.target.TargetModule;
 
 /**
  *
@@ -37,7 +36,7 @@ public class FileSystemTargetModule extends TargetModule
      * @see org.electrocodeogram.module.target.TargetModule#write(org.electrocodeogram.event.ValidEventPacket)
      */
     @Override
-    public void write(ValidEventPacket arg0)
+    public void write(TypedValidEventPacket arg0)
     {
 
         this.writer.println(arg0.toString());
