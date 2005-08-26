@@ -86,9 +86,9 @@ public class CodechangeDifferIntermediateModule extends IntermediateModule
             
             Diff.change changes = this.diff.diff(Diff.forwardScript);
             
-            this.logger.log(Level.INFO,"first deleted at: " + changes.line0);
+            this.getLogger().log(Level.INFO,"first deleted at: " + changes.line0);
             
-            this.logger.log(Level.INFO,"first inserted at: " + changes.line1);
+            this.getLogger().log(Level.INFO,"first inserted at: " + changes.line1);
             
             this.lastCode = currentCode;
         }
