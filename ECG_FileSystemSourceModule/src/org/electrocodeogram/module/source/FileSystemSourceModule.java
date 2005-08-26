@@ -11,7 +11,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
-import org.electrocodeogram.event.EventPacket;
+
 import org.electrocodeogram.event.IllegalEventParameterException;
 import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.module.ModulePropertyException;
@@ -118,9 +118,9 @@ public class FileSystemSourceModule extends SourceModule
                 
                 if(eventTokenizer.countTokens() != 3)
                 {
-                    this.logger.log(Level.WARNING,"Error while reading line " + lineNumber + ":");
+                    this.getLogger().log(Level.WARNING,"Error while reading line " + lineNumber + ":");
                     
-                    this.logger.log(Level.WARNING,"This line does not contain valid event data.");
+                    this.getLogger().log(Level.WARNING,"This line does not contain valid event data.");
                     
                     continue;
                 }
@@ -129,9 +129,9 @@ public class FileSystemSourceModule extends SourceModule
                 
                 if(timeStampString == null || timeStampString.equals(""))
                 {
-                    this.logger.log(Level.WARNING,"Error while reading timeStamp in line " + lineNumber + ":");
+                    this.getLogger().log(Level.WARNING,"Error while reading timeStamp in line " + lineNumber + ":");
                     
-                    this.logger.log(Level.WARNING,"The timeStamp is empty.");
+                    this.getLogger().log(Level.WARNING,"The timeStamp is empty.");
                     
                     continue;
                 }
@@ -140,9 +140,9 @@ public class FileSystemSourceModule extends SourceModule
                 
                 if(sensorDataTypeString == null || sensorDataTypeString.equals(""))
                 {
-                    this.logger.log(Level.WARNING,"Error while reading SensorDataType in line " + lineNumber + ":");
+                    this.getLogger().log(Level.WARNING,"Error while reading SensorDataType in line " + lineNumber + ":");
                     
-                    this.logger.log(Level.WARNING,"The SensorDataType is empty.");
+                    this.getLogger().log(Level.WARNING,"The SensorDataType is empty.");
                     
                     continue;
                 }
@@ -151,9 +151,9 @@ public class FileSystemSourceModule extends SourceModule
                 
                 if(argListString == null || argListString.equals(""))
                 {
-                    this.logger.log(Level.WARNING,"Error while reading argList in line " + lineNumber + ":");
+                    this.getLogger().log(Level.WARNING,"Error while reading argList in line " + lineNumber + ":");
                     
-                    this.logger.log(Level.WARNING,"The argList is empty.");
+                    this.getLogger().log(Level.WARNING,"The argList is empty.");
                     
                     continue;
                 }
@@ -165,11 +165,11 @@ public class FileSystemSourceModule extends SourceModule
                 }
                 catch (ParseException e) {
                     
-                    this.logger.log(Level.WARNING,"Error while reading timeStamp in line " + lineNumber + ":");
+                    this.getLogger().log(Level.WARNING,"Error while reading timeStamp in line " + lineNumber + ":");
                     
-                    this.logger.log(Level.WARNING,"The timeStamp is invalid.");
+                    this.getLogger().log(Level.WARNING,"The timeStamp is invalid.");
                     
-                    this.logger.log(Level.WARNING,e.getMessage());
+                    this.getLogger().log(Level.WARNING,e.getMessage());
                     
                     continue;
                 }
@@ -194,9 +194,9 @@ public class FileSystemSourceModule extends SourceModule
                 }
                 catch (IllegalEventParameterException e) {
                     
-                    this.logger.log(Level.WARNING,"Error while generating eventz from line " + lineNumber + ":");
+                    this.getLogger().log(Level.WARNING,"Error while generating eventz from line " + lineNumber + ":");
                     
-                    this.logger.log(Level.WARNING,e.getMessage());
+                    this.getLogger().log(Level.WARNING,e.getMessage());
                     
                     continue;
                 }
@@ -205,9 +205,9 @@ public class FileSystemSourceModule extends SourceModule
             }
         }
         catch (IOException e) {
-            this.logger.log(Level.WARNING,"Error while reading the file.");
+            this.getLogger().log(Level.WARNING,"Error while reading the file.");
             
-            this.logger.log(Level.WARNING,e.getMessage());
+            this.getLogger().log(Level.WARNING,e.getMessage());
         }
 
     }
