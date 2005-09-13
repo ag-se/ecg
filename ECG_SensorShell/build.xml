@@ -168,6 +168,10 @@
 		<delete dir="${dist.dir}"/>
 		<delete dir="${doc.dir}"/>
 
+		<delete failonerror="no">
+			<fileset dir="${lib.dir}/ecg" includes="**/*.jar"/>
+		</delete>
+		
 	</target>
 
 	<!-- Deploy the event.jar to ./dist/lib/.. -->
@@ -201,7 +205,7 @@
 
 		</copy>
 		
-		<copy todir="../ECG_ServerAndLab/lib/ecg">
+		<copy todir="../ECG_Lab/lib/ecg">
 
 			<fileset dir="${build.lib}" includes="event.jar" />
 

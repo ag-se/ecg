@@ -26,7 +26,7 @@ public class ValidEventPacket extends EventPacket
      * This is the pattern used to format the timeStamp Date values. The pattern symbols are
      * accroding to the java.text.DataFormatSymbols class.
      */
-    public static String DATE_FORMAT_PATTERN = "E M FF HH:mm:ss z yyyy";
+    public static String DATE_FORMAT_PATTERN = "EE dd.MM.yyyy HH:mm:ss z";
 
     private static final long serialVersionUID = 2507406265346291700L;
 

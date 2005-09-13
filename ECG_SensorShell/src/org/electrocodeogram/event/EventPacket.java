@@ -19,11 +19,7 @@ public class EventPacket implements Serializable
     private String $sensorDataType = null;
 
     private List $argList = null;
-    
-
-    
-   
-
+ 
     /**
      * This creates a new EventPacket object
      * @param id The module source ID identifies where the EventPacket comes from
