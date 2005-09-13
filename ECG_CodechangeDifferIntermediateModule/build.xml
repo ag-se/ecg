@@ -113,6 +113,10 @@
 		<delete dir="${build.dir}"/>
 		<delete dir="${dist.dir}"/>
 		<delete dir="${doc.dir}"/>
+		
+		<delete failonerror="no">
+				<fileset dir="${lib.dir}/ecg" includes="**/*.jar"/>
+		</delete>
 
 	</target>
 
