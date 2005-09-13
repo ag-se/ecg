@@ -26,6 +26,8 @@
 			<propertyType>
 				java.io.File
 			</propertyType>
+			<propertyValue>
+			</propertyValue>
 		</property>
 	</properties>
 </module>
