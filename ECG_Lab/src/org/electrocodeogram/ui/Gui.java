@@ -24,6 +24,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
+import org.electrocodeogram.event.TypedValidEventPacket;
 import org.electrocodeogram.module.Module;
 import org.electrocodeogram.module.ModuleDescriptor;
 
@@ -31,8 +32,6 @@ import org.electrocodeogram.module.registry.ModuleInstanceException;
 import org.electrocodeogram.module.registry.ModuleRegistry;
 
 import org.electrocodeogram.system.SystemRoot;
-import org.electrocodeogram.ui.messages.GuiWriter;
-import org.electrocodeogram.ui.messages.IGuiWriter;
 import org.electrocodeogram.ui.messages.MessagesFrame;
 import org.electrocodeogram.ui.modules.ModuleCell;
 import org.electrocodeogram.ui.modules.ModuleGraph;
@@ -73,8 +72,7 @@ public class Gui extends JFrame implements IGui
 
     private int sourceModuleId;
 
-    private GuiWriter guiEventWriter;
-    
+       
     private MenuManager menuManager = null;
 
     public Gui(ModuleRegistry moduleRegistry)
@@ -313,7 +311,7 @@ public class Gui extends JFrame implements IGui
             frmMessages.setSelectedModul(moduleGraph.getSelectedModuleCellId());
         }
         
-        this.frmMessages.show();
+        this.frmMessages.setVisible(true);
     }
 
     /**
@@ -360,14 +358,8 @@ public class Gui extends JFrame implements IGui
             
             
             // a module has been added or removed
-            if (arg instanceof Module && (!(arg instanceof IGuiWriter))) {
+            if (arg instanceof Module) {
 
-                if (this.guiEventWriter == null)
-                {
-                    this.guiEventWriter = new GuiWriter();
-                }
-
-                
                 Module module = (Module) arg;
 
                 if(moduleGraph.containsModuleCell(module.getId()))
@@ -401,6 +393,14 @@ public class Gui extends JFrame implements IGui
                 
                 splitPane.add(pnlButtons);
             }
+        }
+        
+        else if(arg instanceof TypedValidEventPacket)
+        {
+        	if(this.frmMessages != null)
+        	{
+        		this.frmMessages.append((TypedValidEventPacket) arg);
+        	}
         }
 //        else if(o instanceof Module)
 //        {
@@ -607,12 +607,7 @@ public class Gui extends JFrame implements IGui
         sourceModuleId = -1;
         
     }
-
-    public GuiWriter getGuiEventWriter()
-    {
-        return this.guiEventWriter;
-    }
-
+   
     /* (non-Javadoc)
      * @see org.electrocodeogram.ui.IGui#getMenuManager()
      */

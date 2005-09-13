@@ -35,7 +35,7 @@
 										<xs:sequence>
 											<xs:element name="propertyName" type="xs:token" minOccurs="1" maxOccurs="1"/>
 											<xs:element name="propertyType" type="xs:token" minOccurs="1" maxOccurs="1"/>
-											<xs:element name="propertyValue" type="xs:token" minOccurs="0" maxOccurs="1"/>
+											<xs:element name="propertyValue" type="xs:token" minOccurs="1" maxOccurs="1"/>
 										</xs:sequence>
 									</xs:complexType>
 								</xs:element>

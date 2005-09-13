@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 
 import org.electrocodeogram.event.IllegalEventParameterException;
 import org.electrocodeogram.event.TypedValidEventPacket;
+import org.electrocodeogram.event.TypedValidEventPacket.DELIVERY_STATE;
 import org.electrocodeogram.module.intermediate.IIntermediateModule;
 import org.electrocodeogram.module.registry.ModuleClassException;
 import org.electrocodeogram.module.registry.ModuleInstanceException;
@@ -92,7 +93,7 @@ public abstract class Module
 
 	private SystemObserver _systemObserver;
 
-	private SystemNotificator _systemNotificator;
+	SystemNotificator _systemNotificator;
 
 	/**
 	 * This creates a new Module of the given module type, module class id ans module name and registers it with the ModuleRegistry.
@@ -125,6 +126,7 @@ public abstract class Module
 		if (this._moduleType == ModuleType.SOURCE_MODULE)
 		{
 			this._eventSender = new EventSender(this);
+			
 		}
 		else if (this._moduleType == ModuleType.INTERMEDIATE_MODULE)
 		{
@@ -136,7 +138,7 @@ public abstract class Module
 		{
 			this._eventReceiver = new EventReceiver(this);
 		}
-
+		
 		registerMSDTs();
 
 		SystemRoot.getModuleInstance().getModuleModuleRegistry().registerRunningModule(this);
@@ -198,11 +200,17 @@ public abstract class Module
 
 				try
 				{
-					notifyObservers(new TypedValidEventPacket(
+					TypedValidEventPacket packet = new TypedValidEventPacket(
 							this._module.getId(), eventPacket.getTimeStamp(),
 							eventPacket.getSensorDataType(),
 							eventPacket.getArglist(),
-							eventPacket.getMicroSensorDataType()));
+							eventPacket.getMicroSensorDataType());
+					
+					packet.setDeliveryState(DELIVERY_STATE.SENT);
+					
+					notifyObservers(packet);
+					
+					this._module._systemNotificator.notifySystem(packet);
 				}
 				catch (IllegalEventParameterException e)
 				{
@@ -231,7 +239,7 @@ public abstract class Module
 	private static class EventReceiver implements Observer
 	{
 
-		private Module $module;
+		private Module _module;
 
 		/**
 		 * This creates the EventReceiver for the given Module.
@@ -239,7 +247,7 @@ public abstract class Module
 		 */
 		public EventReceiver(Module module)
 		{
-			this.$module = module;
+			this._module = module;
 		}
 
 		/**
@@ -257,9 +265,33 @@ public abstract class Module
 		{
 			if ((object instanceof EventSender) && data instanceof TypedValidEventPacket)
 			{
-				TypedValidEventPacket eventPacket = (TypedValidEventPacket) data;
+				try
+				{
+					TypedValidEventPacket receivedPacketForProcessing = (TypedValidEventPacket) data;
+					
+					receivedPacketForProcessing.setDeliveryState(DELIVERY_STATE.RECEIVED);
+					
+					TypedValidEventPacket receivedPacketForSystem = new TypedValidEventPacket(
+							this._module.getId(), receivedPacketForProcessing.getTimeStamp(),
+							receivedPacketForProcessing.getSensorDataType(),
+							receivedPacketForProcessing.getArglist(),
+							receivedPacketForProcessing.getMicroSensorDataType());
+					
+					receivedPacketForSystem.setDeliveryState(DELIVERY_STATE.RECEIVED);
+					
+					this._module._systemNotificator.notifySystem(receivedPacketForSystem);
+					
+					this._module.receiveEventPacket(receivedPacketForProcessing);
+				}
+				catch (IllegalEventParameterException e)
+				{
+					e.printStackTrace();
 
-				this.$module.receiveEventPacket(eventPacket);
+					this._module.getLogger().log(Level.SEVERE, "An unexpected exception has occurred. Please report this at www.electrocodeogram.org");
+
+				}
+				
+				
 			}
 
 		}
@@ -308,7 +340,30 @@ public abstract class Module
 	 */
 	private static class SystemNotificator extends Observable
 	{
-		// only superclass methods are needed
+		/**
+		 * The constructor registers the ECG GUI component with the SystemNotificator
+		 *
+		 */
+		public SystemNotificator()
+		{
+			this.addObserver(SystemRoot.getSystemInstance().getGui());
+		
+		}
+
+		/**
+		 * The method is called to notify the ECG system of state changes in the module.
+		 * @param packet Is the last sent event packet.
+		 */
+		public void notifySystem(TypedValidEventPacket packet)
+		{
+			setChanged();
+			
+			notifyObservers(packet);
+			
+			clearChanged();
+			
+		}
+		
 	}
 
 	private void registerMSDTs()
@@ -719,6 +774,8 @@ public abstract class Module
 
 			module.addParentModule(this);
 
+			this._systemNotificator.notifyObservers();
+			
 			return module._id;
 
 		}

@@ -304,24 +304,36 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 				catch (NodeValueException e)
 				{
 					getLogger().log(Level.SEVERE, "Unable to load the module.");
+					
+					getLogger().log(Level.SEVERE, "Error while reading a module.properties.xml value.");
+					
+					getLogger().log(Level.SEVERE, e.getMessage());
 
 					continue nextmodule;
 				}
 				catch (ClassLoadingException e)
 				{
 					getLogger().log(Level.SEVERE, "Unable to load the module.");
+					
+					getLogger().log(Level.SEVERE, "Error while loading the module class.");
+					
+					getLogger().log(Level.SEVERE, e.getMessage());
 
 					continue nextmodule;
 				}
 				catch (PropertyException e)
 				{
 					getLogger().log(Level.SEVERE, "Unable to load the module.");
+					
+					getLogger().log(Level.SEVERE, "Error while reading the module's properties.");
 
 					continue nextmodule;
 				}
 				catch (MicroSensorDataTypeException e)
 				{
 					getLogger().log(Level.SEVERE, "Unable to load the module.");
+					
+					getLogger().log(Level.SEVERE, "Error while readingthe module's MicroSensorDataTypes.");
 
 					continue nextmodule;
 				}
@@ -455,6 +467,11 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 							throw new PropertyException();
 						}
 
+						if(modulePropertyNameNode.getFirstChild() == null)
+						{
+							throw new PropertyException();
+						}
+						
 						String modulePropertyName = modulePropertyNameNode.getFirstChild().getNodeValue();
 
 						if (modulePropertyName == null || modulePropertyName.equals(""))
@@ -462,6 +479,11 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 							throw new PropertyException();
 						}
 
+						if(modulePropertyTypeNode.getFirstChild() == null)
+						{
+							throw new PropertyException();
+						}
+						
 						String modulePropertyType = modulePropertyTypeNode.getFirstChild().getNodeValue();
 
 						if (modulePropertyType == null || modulePropertyType.equals(""))
@@ -484,11 +506,14 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 
 						if (modulePropertyValueNode != null)
 						{
-							modulePropertyValue = modulePropertyValueNode.getFirstChild().getNodeValue();
-
-							if (modulePropertyValue == null || modulePropertyValue.equals(""))
+							if(modulePropertyValueNode.getFirstChild() != null)
 							{
-								throw new PropertyException();
+								modulePropertyValue = modulePropertyValueNode.getFirstChild().getNodeValue();
+	
+								if (modulePropertyValue == null || modulePropertyValue.equals(""))
+								{
+									throw new PropertyException();
+								}
 							}
 						}
 

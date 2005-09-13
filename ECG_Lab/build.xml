@@ -163,6 +163,10 @@
 		<delete dir="${dist.dir}"/>
 		<delete dir="${doc.dir}"/>
 		<delete dir="${module.dir}"/>
+		
+		<delete failonerror="no">
+			<fileset dir="${lib.dir}/ecg" includes="**/*.jar"/>
+		</delete>
 
 	</target>
 
