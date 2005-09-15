@@ -103,14 +103,9 @@ public class MSDTFilterIntermediateModule extends IntermediateModule
         
         for(MicroSensorDataType msdt : msdts)
         {
-            if(msdt.getName().equals("msdt.part.xsd"))
-            {
-                this.msdtFilterMap.put(msdt,new Boolean(false));
-            }
-            else
-            {
-                this.msdtFilterMap.put(msdt,new Boolean(true));
-            }
+           
+           this.msdtFilterMap.put(msdt,new Boolean(true));
+           
         }
     }
 
