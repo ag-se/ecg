@@ -1,5 +1,7 @@
 package org.electrocodeogram.module.registry;
 
+import java.io.File;
+
 import org.electrocodeogram.module.Module;
 import org.electrocodeogram.module.ModuleDescriptor;
 
@@ -43,6 +45,7 @@ public interface ISystemModuleRegistry
 	 *            create the running module from
 	 * @param name
 	 *            Is the name that should be given to the new running module
+	 * @return Is hte unique int id that is assigned to the module
 	 * @throws ModuleInstantiationException
 	 *             If an Exception is thrown during the instanciation of the
 	 *             module
@@ -50,7 +53,7 @@ public interface ISystemModuleRegistry
 	 *             If the given String id is empty or if an availabale module
 	 *             with the given String id can not be found
 	 */
-	public abstract void createRunningModule(String id, String name) throws ModuleInstantiationException, ModuleClassException;
+	public abstract int createRunningModule(String id, String name) throws ModuleInstantiationException, ModuleClassException;
 
 	/**
 	 * The method returns the ModuleDescriptor object of an available module.
@@ -66,4 +69,13 @@ public interface ISystemModuleRegistry
 	 */
 	public abstract ModuleDescriptor getModuleDescriptor(String id) throws ModuleClassException;
 
+	/**
+	 * This method stores the current module setup as configured in the ECG's GUI
+	 * into the given File.
+	 * @param file Is the File to store the module setup in
+	 * @throws ModuleSetupStoreException If an Exception occures during the storing
+	 */
+	public abstract void storeModuleSetup(File file) throws ModuleSetupStoreException;
+	
+	public abstract void loadModuleSetup(File file) throws ModuleSetupLoadException;
 }

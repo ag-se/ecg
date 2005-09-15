@@ -8,10 +8,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.util.Observable;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -30,6 +32,8 @@ import org.electrocodeogram.module.ModuleDescriptor;
 
 import org.electrocodeogram.module.registry.ModuleInstanceException;
 import org.electrocodeogram.module.registry.ModuleRegistry;
+import org.electrocodeogram.module.registry.ModuleSetupLoadException;
+import org.electrocodeogram.module.registry.ModuleSetupStoreException;
 
 import org.electrocodeogram.system.SystemRoot;
 import org.electrocodeogram.ui.messages.MessagesFrame;
@@ -64,7 +68,7 @@ public class Gui extends JFrame implements IGui
 
     private JMenu menu2;
 
-    private JMenu menu3;
+    private JMenu menuModule;
 
     private int selectedModuleCellId = -1;
 
@@ -133,9 +137,10 @@ public class Gui extends JFrame implements IGui
 
         this.menuManager = new MenuManager(this);
         
-        JMenu menu1 = new JMenu("Datei");
-        JMenuItem menuItem11 = new JMenuItem("Beenden");
-        menuItem11.addActionListener(new ActionListener() {
+        JMenu menuFile = new JMenu("File");
+        
+        JMenuItem mniExit = new JMenuItem("Exit");
+        mniExit.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e)
             {
@@ -143,11 +148,71 @@ public class Gui extends JFrame implements IGui
 
             }
         });
-        menu1.add(menuItem11);
+        
 
-        JMenu menu2 = new JMenu("Aufzeichnung");
-        JMenuItem menuitem21 = new JMenuItem("Anhalten");
-        menuitem21.addActionListener(new ActionListener() {
+        JMenuItem mniSave = new JMenuItem("Save module setup");
+        mniSave.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent e)
+			{
+				try
+				{
+					JFileChooser fileChooser = new JFileChooser();
+					
+					fileChooser.setDialogTitle("Select the file to store the module setup in");
+					
+					fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
+					
+					File file = null;
+					
+                    int result = fileChooser.showOpenDialog(Gui.this);
+                    
+                    switch(result)
+                    {
+                    case JFileChooser.CANCEL_OPTION:
+                        break;
+                    case JFileChooser.ERROR_OPTION:
+                        break;
+                    case JFileChooser.APPROVE_OPTION:
+                        
+                        file = new File(fileChooser.getSelectedFile().getAbsolutePath());
+                        
+                        break;
+                    }
+					
+					SystemRoot.getSystemInstance().getSystemModuleRegistry().storeModuleSetup(file);
+				}
+				catch (ModuleSetupStoreException e1)
+				{
+					JOptionPane.showMessageDialog(Gui.this,e1.getMessage(),"Module setup storage error",JOptionPane.ERROR_MESSAGE);
+				}
+				
+			}});
+        
+        JMenuItem mniLoad = new JMenuItem("Load module setup");
+        mniLoad.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent e)
+			{
+				try
+				{
+					SystemRoot.getSystemInstance().getSystemModuleRegistry().loadModuleSetup(new File("store.ser"));
+				}
+				catch (ModuleSetupLoadException e1)
+				{
+					JOptionPane.showMessageDialog(Gui.this,e1.getMessage(),"Module setup loading error",JOptionPane.ERROR_MESSAGE);
+				}
+				
+			}});
+        
+        menuFile.add(mniSave);
+        menuFile.add(mniLoad);
+        menuFile.addSeparator();
+        menuFile.add(mniExit);
+        
+        JMenu menuLogging = new JMenu("Logging");
+        JMenuItem mniStop = new JMenuItem("Stop");
+        mniStop.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e)
             {
@@ -164,8 +229,8 @@ public class Gui extends JFrame implements IGui
             }
         });
 
-        JMenuItem menuitem22 = new JMenuItem("Fortsetzen");
-        menuitem22.addActionListener(new ActionListener() {
+        JMenuItem mniContinue = new JMenuItem("Continue");
+        mniContinue.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e)
             {
@@ -183,15 +248,15 @@ public class Gui extends JFrame implements IGui
             }
         });
 
-        menu2.add(menuitem21);
-        menu2.add(menuitem22);
+        menuLogging.add(mniStop);
+        menuLogging.add(mniContinue);
 
-        menu3 = new JMenu("Modul");
-        menu3.addMouseListener(new MouseAdapter() {
+        menuModule = new JMenu("Modul");
+        menuModule.addMouseListener(new MouseAdapter() {
 
             public void mouseEntered(MouseEvent e)
             {
-               menuManager.populateModuleMenu(menu3, moduleGraph.getSelectedModuleCellId());
+               menuManager.populateModuleMenu(menuModule, moduleGraph.getSelectedModuleCellId());
             }
         });
 
@@ -208,9 +273,9 @@ public class Gui extends JFrame implements IGui
         });
         menu4.add(menuitem41);
 
-        menuBar.add(menu1);
-        menuBar.add(menu2);
-        menuBar.add(menu3);
+        menuBar.add(menuFile);
+        menuBar.add(menuLogging);
+        menuBar.add(menuModule);
         menuBar.add(menu4);
 
         this.setJMenuBar(menuBar);
@@ -402,6 +467,17 @@ public class Gui extends JFrame implements IGui
         		this.frmMessages.append((TypedValidEventPacket) arg);
         	}
         }
+        else if(arg instanceof Module)
+        {
+        	 Module module = (Module) arg;
+           
+           int id = module.getId();
+           
+           if(moduleGraph.containsModuleCell(id))
+           {
+               moduleGraph.updateModuleCell(id,module);
+           }
+        }
 //        else if(o instanceof Module)
 //        {
 //            if(arg instanceof Module)
@@ -480,10 +556,10 @@ public class Gui extends JFrame implements IGui
                 this.selectedModuleCellId = moduleGraph.getSelectedModuleCellId();
 
                 if (selectedModuleCellId == -1) {
-                    menu3.setEnabled(false);
+                    menuModule.setEnabled(false);
                 }
                 else {
-                    menu3.setEnabled(true);
+                    menuModule.setEnabled(true);
                 }
                 if (frmMessages != null) {
                     frmMessages.setSelectedModul(selectedModuleCellId);

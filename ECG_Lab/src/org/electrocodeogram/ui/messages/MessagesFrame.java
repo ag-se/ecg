@@ -108,9 +108,9 @@ public class MessagesFrame extends JFrame implements MessagesTarget
 
 			}
 		});
-
+		
 		ButtonGroup group = new ButtonGroup();
-
+		
 		group.add(menuSent);
 
 		group.add(menuReceived);
@@ -118,7 +118,7 @@ public class MessagesFrame extends JFrame implements MessagesTarget
 		menuView.add(menuSent);
 
 		menuView.add(menuReceived);
-
+		
 		menuBar.add(menuView);
 
 		this.setJMenuBar(menuBar);

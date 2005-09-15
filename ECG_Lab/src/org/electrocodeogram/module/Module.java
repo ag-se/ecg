@@ -126,7 +126,7 @@ public abstract class Module
 		if (this._moduleType == ModuleType.SOURCE_MODULE)
 		{
 			this._eventSender = new EventSender(this);
-			
+
 		}
 		else if (this._moduleType == ModuleType.INTERMEDIATE_MODULE)
 		{
@@ -138,7 +138,7 @@ public abstract class Module
 		{
 			this._eventReceiver = new EventReceiver(this);
 		}
-		
+
 		registerMSDTs();
 
 		SystemRoot.getModuleInstance().getModuleModuleRegistry().registerRunningModule(this);
@@ -157,6 +157,7 @@ public abstract class Module
 	 */
 	private static class EventSender extends Observable
 	{
+
 		private Module _module;
 
 		/**
@@ -205,12 +206,12 @@ public abstract class Module
 							eventPacket.getSensorDataType(),
 							eventPacket.getArglist(),
 							eventPacket.getMicroSensorDataType());
-					
+
 					packet.setDeliveryState(DELIVERY_STATE.SENT);
-					
+
 					notifyObservers(packet);
-					
-					this._module._systemNotificator.notifySystem(packet);
+
+					this._module._systemNotificator.fireEventNotification(packet);
 				}
 				catch (IllegalEventParameterException e)
 				{
@@ -268,19 +269,20 @@ public abstract class Module
 				try
 				{
 					TypedValidEventPacket receivedPacketForProcessing = (TypedValidEventPacket) data;
-					
+
 					receivedPacketForProcessing.setDeliveryState(DELIVERY_STATE.RECEIVED);
-					
+
 					TypedValidEventPacket receivedPacketForSystem = new TypedValidEventPacket(
-							this._module.getId(), receivedPacketForProcessing.getTimeStamp(),
+							this._module.getId(),
+							receivedPacketForProcessing.getTimeStamp(),
 							receivedPacketForProcessing.getSensorDataType(),
 							receivedPacketForProcessing.getArglist(),
 							receivedPacketForProcessing.getMicroSensorDataType());
-					
+
 					receivedPacketForSystem.setDeliveryState(DELIVERY_STATE.RECEIVED);
-					
-					this._module._systemNotificator.notifySystem(receivedPacketForSystem);
-					
+
+					this._module._systemNotificator.fireEventNotification(receivedPacketForSystem);
+
 					this._module.receiveEventPacket(receivedPacketForProcessing);
 				}
 				catch (IllegalEventParameterException e)
@@ -290,8 +292,7 @@ public abstract class Module
 					this._module.getLogger().log(Level.SEVERE, "An unexpected exception has occurred. Please report this at www.electrocodeogram.org");
 
 				}
-				
-				
+
 			}
 
 		}
@@ -340,6 +341,7 @@ public abstract class Module
 	 */
 	private static class SystemNotificator extends Observable
 	{
+
 		/**
 		 * The constructor registers the ECG GUI component with the SystemNotificator
 		 *
@@ -347,23 +349,35 @@ public abstract class Module
 		public SystemNotificator()
 		{
 			this.addObserver(SystemRoot.getSystemInstance().getGui());
-		
+
+		}
+
+		/**
+		 * The method is called to notify the ECG system of a new event beeing processed by thie module.
+		 * @param packet Is the last sent event packet.
+		 */
+		public void fireEventNotification(TypedValidEventPacket packet)
+		{
+			setChanged();
+
+			notifyObservers(packet);
+
+			clearChanged();
+
 		}
 
 		/**
 		 * The method is called to notify the ECG system of state changes in the module.
-		 * @param packet Is the last sent event packet.
 		 */
-		public void notifySystem(TypedValidEventPacket packet)
+		public void fireStatechangeNotification()
 		{
 			setChanged();
-			
-			notifyObservers(packet);
-			
+
+			notifyObservers(this);
+
 			clearChanged();
-			
 		}
-		
+
 	}
 
 	private void registerMSDTs()
@@ -774,8 +788,8 @@ public abstract class Module
 
 			module.addParentModule(this);
 
-			this._systemNotificator.notifyObservers();
-			
+			this._systemNotificator.fireStatechangeNotification();
+
 			return module._id;
 
 		}
@@ -803,6 +817,8 @@ public abstract class Module
 		this._eventSender.deleteObserver(module);
 
 		this._receiverModuleMap.remove(new Integer(module.getId()));
+
+		this._systemNotificator.fireStatechangeNotification();
 
 	}
 

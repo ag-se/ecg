@@ -38,7 +38,7 @@
 			<include name="**/*.jar/"/>
 		</fileset>
 
-		<fileset dir="e:/programme/eclipse 3.1RC3/plugins/org.junit_3.8.1/">
+		<fileset dir="e:/programme/eclipse 3.1/plugins/org.junit_3.8.1/">
 			<include name="junit.jar"/>
 		</fileset>
 

@@ -1,5 +1,6 @@
 package org.electrocodeogram.msdt;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 import java.util.logging.Level;
@@ -22,17 +23,17 @@ import org.electrocodeogram.system.SystemRoot;
  */
 public class MicroSensorDataType
 {
-	private Logger logger;
+	private Logger _logger;
 
-	private Schema $schema;
+	private Schema _schema;
 
-	private String $name;
+	private String _name;
 
-	private static int count;
+	private static int _count;
 
-	private int id;
+	private int _id;
 
-	private ArrayList<Module> providingModules;
+	private ArrayList<Module> _providingModules;
 
 	/**
 	 * This creates a MicroSensorDataType and assigns a unique integer id ti it.
@@ -47,9 +48,9 @@ public class MicroSensorDataType
 	 */
 	public MicroSensorDataType(String name, Schema schema) throws MicroSensorDataTypeException
 	{
-		this.logger = Logger.getLogger("MicroSensorDataType");
+		this._logger = Logger.getLogger("MicroSensorDataType");
 
-		this.id = ++count;
+		this._id = ++_count;
 
 		if (name == null || name.equals(""))
 		{
@@ -57,7 +58,7 @@ public class MicroSensorDataType
 					"The given name is \"null\" or empty.");
 		}
 
-		this.$name = name;
+		this._name = name;
 
 		if (schema == null)
 		{
@@ -65,9 +66,9 @@ public class MicroSensorDataType
 					"The given XML schema is \"null\".");
 		}
 
-		this.$schema = schema;
+		this._schema = schema;
 
-		this.providingModules = new ArrayList<Module>();
+		this._providingModules = new ArrayList<Module>();
 
 	}
 
@@ -78,7 +79,7 @@ public class MicroSensorDataType
 	 */
 	public String getName()
 	{
-		return this.$name;
+		return this._name;
 	}
 
 	/**
@@ -88,7 +89,7 @@ public class MicroSensorDataType
 	 */
 	public Schema getSchema()
 	{
-		return this.$schema;
+		return this._schema;
 	}
 
 	/**
@@ -98,7 +99,7 @@ public class MicroSensorDataType
 	 */
 	public int getId()
 	{
-		return this.id;
+		return this._id;
 	}
 
 	/**
@@ -121,14 +122,14 @@ public class MicroSensorDataType
 					"The given module is of value \"null\"");
 		}
 
-		if (this.providingModules.contains(module))
+		if (this._providingModules.contains(module))
 		{
 			return;
 		}
 
-		this.providingModules.add(module);
+		this._providingModules.add(module);
 
-		this.logger.log(Level.INFO, "Registered module " + module.getName() + " for the MSDT " + this.getName() + ".");
+		this._logger.log(Level.INFO, "Registered module " + module.getName() + " for the MSDT " + this.getName() + ".");
 	}
 
 	/**
@@ -152,14 +153,14 @@ public class MicroSensorDataType
 					"The given module is of value \"null\"");
 		}
 
-		if (!this.providingModules.contains(module))
+		if (!this._providingModules.contains(module))
 		{
 			return;
 		}
 
-		this.providingModules.remove(module);
+		this._providingModules.remove(module);
 
-		if (this.providingModules.size() == 0)
+		if (this._providingModules.size() == 0)
 		{
 			try
 			{

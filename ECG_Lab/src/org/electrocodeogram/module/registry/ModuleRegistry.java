@@ -2,8 +2,10 @@ package org.electrocodeogram.module.registry;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -13,6 +15,7 @@ import java.util.logging.Logger;
 
 import org.apache.xerces.parsers.DOMParser;
 import org.electrocodeogram.module.Module;
+import org.electrocodeogram.module.ModuleConnectionException;
 import org.electrocodeogram.module.ModuleDescriptor;
 import org.electrocodeogram.module.ModuleProperty;
 import org.electrocodeogram.module.loader.ModuleClassLoader;
@@ -55,6 +58,10 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 
 	private InstalledModules installedModules;
 
+	private static final String MODULE_PROPERTIES_XSD = "lib/ecg/module.properties.xsd";
+
+	private static final String MODULE_SETUP_XSD = "lib/ecg/module.setup.xsd";
+
 	/**
 	 * The constructor creates the ModuleRegistry instance.
 	 */
@@ -72,16 +79,16 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 	 * 
 	 * @param moduleDirectory
 	 *            This path is searched for available modules
-	 * @throws ModuleClassLoaderInitializationException 
+	 * @throws ModuleClassLoaderInitializationException
 	 */
 	public ModuleRegistry(File moduleDirectory) throws ModuleClassLoaderInitializationException
 	{
 		this();
 
 		this.installedModules = new InstalledModules(moduleDirectory);
-	
+
 		this.installedModules.initialize();
-		
+
 		setChanged();
 
 		notifyObservers();
@@ -96,21 +103,20 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 	 * 
 	 * @param file
 	 *            This path is searched for available modules
-	 * @throws ModuleClassLoaderInitializationException 
+	 * @throws ModuleClassLoaderInitializationException
 	 */
 	public void setFile(File file) throws ModuleClassLoaderInitializationException
 	{
 
-		
-			this.installedModules = new InstalledModules(file);
+		this.installedModules = new InstalledModules(file);
 
-			this.installedModules.initialize();
+		this.installedModules.initialize();
 
-			setChanged();
+		setChanged();
 
-			notifyObservers();
+		notifyObservers();
 
-			clearChanged();
+		clearChanged();
 	}
 
 	/**
@@ -135,6 +141,63 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 		}
 
 		return null;
+	}
+
+	Document parseDocument(File file, String schemaLocation) throws SAXException, IOException
+	{
+		InputSource inputSource = null;
+
+		// read the property file
+		try
+		{
+			inputSource = new InputSource(new FileReader(file));
+		}
+		catch (FileNotFoundException e2)
+		{
+
+			// is checked before and should never happen
+
+			// TODO : message
+
+		}
+
+		// create the XML parser
+		DOMParser parser = new DOMParser();
+
+		// set the parsing properties
+		try
+		{
+			parser.setFeature("http://xml.org/sax/features/validation", true);
+			parser.setFeature("http://apache.org/xml/features/validation/schema", true);
+			parser.setFeature("http://apache.org/xml/features/validation/schema-full-checking", true);
+			parser.setFeature("http://apache.org/xml/features/validation/dynamic", true);
+
+			// parse the property file against the "module.properties.xsd
+			// XML schema
+			parser.setProperty("http://apache.org/xml/properties/schema/external-noNamespaceSchemaLocation", schemaLocation);
+
+		}
+		catch (SAXNotRecognizedException e1)
+		{
+			// is checked and schould never occure
+
+			// TODO : message
+
+		}
+		catch (SAXNotSupportedException e1)
+		{
+			// is checked and schould never occure
+
+			// TODO : message
+		}
+
+		// parse
+
+		parser.parse(inputSource);
+
+		// get the XML document
+		return parser.getDocument();
+
 	}
 
 	private Class getModuleClassForId(String moduleClassId) throws ModuleClassException
@@ -167,7 +230,6 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 	private static class RunningModules
 	{
 		HashMap<Integer, Module> runningModuleMap = new HashMap<Integer, Module>();
-
 	}
 
 	private class InstalledModules
@@ -210,7 +272,7 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 				throw new ModuleClassLoaderInitializationException(
 						"The provided module directory path is \"null\".");
 			}
-			
+
 			// does the file exist and is it a directory?
 			if (!this.$moduleDirectory.exists() || !this.$moduleDirectory.isDirectory())
 			{
@@ -271,7 +333,7 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 
 				try
 				{
-					document = parseDocument(modulePropertyFile);
+					document = parseDocument(modulePropertyFile, MODULE_PROPERTIES_XSD);
 				}
 				catch (Exception e)
 				{
@@ -282,10 +344,9 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 
 					continue nextmodule;
 				}
-			
-				
+
 				ModuleDescriptor moduleDescriptor = null;
-				
+
 				try
 				{
 					MicroSensorDataType[] microSensorDataTypes = getMicroSensorDataTypes(document);
@@ -304,9 +365,9 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 				catch (NodeValueException e)
 				{
 					getLogger().log(Level.SEVERE, "Unable to load the module.");
-					
+
 					getLogger().log(Level.SEVERE, "Error while reading a module.properties.xml value.");
-					
+
 					getLogger().log(Level.SEVERE, e.getMessage());
 
 					continue nextmodule;
@@ -314,9 +375,9 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 				catch (ClassLoadingException e)
 				{
 					getLogger().log(Level.SEVERE, "Unable to load the module.");
-					
+
 					getLogger().log(Level.SEVERE, "Error while loading the module class.");
-					
+
 					getLogger().log(Level.SEVERE, e.getMessage());
 
 					continue nextmodule;
@@ -324,7 +385,7 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 				catch (PropertyException e)
 				{
 					getLogger().log(Level.SEVERE, "Unable to load the module.");
-					
+
 					getLogger().log(Level.SEVERE, "Error while reading the module's properties.");
 
 					continue nextmodule;
@@ -332,7 +393,7 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 				catch (MicroSensorDataTypeException e)
 				{
 					getLogger().log(Level.SEVERE, "Unable to load the module.");
-					
+
 					getLogger().log(Level.SEVERE, "Error while readingthe module's MicroSensorDataTypes.");
 
 					continue nextmodule;
@@ -467,11 +528,11 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 							throw new PropertyException();
 						}
 
-						if(modulePropertyNameNode.getFirstChild() == null)
+						if (modulePropertyNameNode.getFirstChild() == null)
 						{
 							throw new PropertyException();
 						}
-						
+
 						String modulePropertyName = modulePropertyNameNode.getFirstChild().getNodeValue();
 
 						if (modulePropertyName == null || modulePropertyName.equals(""))
@@ -479,11 +540,11 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 							throw new PropertyException();
 						}
 
-						if(modulePropertyTypeNode.getFirstChild() == null)
+						if (modulePropertyTypeNode.getFirstChild() == null)
 						{
 							throw new PropertyException();
 						}
-						
+
 						String modulePropertyType = modulePropertyTypeNode.getFirstChild().getNodeValue();
 
 						if (modulePropertyType == null || modulePropertyType.equals(""))
@@ -506,10 +567,10 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 
 						if (modulePropertyValueNode != null)
 						{
-							if(modulePropertyValueNode.getFirstChild() != null)
+							if (modulePropertyValueNode.getFirstChild() != null)
 							{
 								modulePropertyValue = modulePropertyValueNode.getFirstChild().getNodeValue();
-	
+
 								if (modulePropertyValue == null || modulePropertyValue.equals(""))
 								{
 									throw new PropertyException();
@@ -568,64 +629,6 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 			}
 
 			return string;
-		}
-
-		private Document parseDocument(File modulePropertyFile) throws SAXException, IOException
-		{
-			InputSource inputSource = null;
-
-			// read the property file
-			try
-			{
-				inputSource = new InputSource(
-						new FileReader(modulePropertyFile));
-			}
-			catch (FileNotFoundException e2)
-			{
-
-				// is checked before and should never happen
-
-				// TODO : message
-
-			}
-
-			// create the XML parser
-			DOMParser parser = new DOMParser();
-
-			// set the parsing properties
-			try
-			{
-				parser.setFeature("http://xml.org/sax/features/validation", true);
-				parser.setFeature("http://apache.org/xml/features/validation/schema", true);
-				parser.setFeature("http://apache.org/xml/features/validation/schema-full-checking", true);
-				parser.setFeature("http://apache.org/xml/features/validation/dynamic", true);
-
-				// parse the property file against the "module.properties.xsd
-				// XML schema
-				parser.setProperty("http://apache.org/xml/properties/schema/external-noNamespaceSchemaLocation", "lib/ecg/module.properties.xsd");
-
-			}
-			catch (SAXNotRecognizedException e1)
-			{
-				// is checked and schould never occure
-
-				// TODO : message
-
-			}
-			catch (SAXNotSupportedException e1)
-			{
-				// is checked and schould never occure
-
-				// TODO : message
-			}
-
-			// parse
-
-			parser.parse(inputSource);
-
-			// get the XML document
-			return parser.getDocument();
-
 		}
 
 		private class NodeValueException extends Exception
@@ -700,7 +703,7 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 	 * @see org.electrocodeogram.module.registry.ISystemModuleRegistry#createRunningModule(java.lang.String,
 	 *      java.lang.String)
 	 */
-	public void createRunningModule(String id, String name) throws ModuleInstantiationException, ModuleClassException
+	public int createRunningModule(String id, String name) throws ModuleInstantiationException, ModuleClassException
 	{
 		if (id == null || id.equals(""))
 		{
@@ -716,7 +719,16 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 
 			Object[] args = new Object[] { id, name };
 
-			constructors[0].newInstance(args);
+			Object o = constructors[0].newInstance(args);
+
+			if (!(o instanceof Module))
+			{
+				throw new ModuleInstantiationException("");
+			}
+
+			Module module = (Module) o;
+
+			return module.getId();
 
 		}
 		catch (InstantiationException e)
@@ -790,6 +802,370 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 
 		return this.installedModules.availableModuleClassesMap.get(moduleClassId);
 
+	}
+
+	/**
+	 * @see org.electrocodeogram.module.registry.ISystemModuleRegistry#storeModuleSetup(java.io.File)
+	 */
+	public void storeModuleSetup(File file) throws ModuleSetupStoreException
+	{
+		if(file == null)
+		{
+			throw new ModuleSetupStoreException("The given file is null");
+		}
+		
+		if (this.runningModules.runningModuleMap == null)
+		{
+			this.logger.log(Level.SEVERE, "No modules are currently running.");
+
+			throw new ModuleSetupStoreException(
+					"No modules are currently running.");
+
+		}
+
+		PrintWriter writer = null;
+
+		try
+		{
+			writer = new PrintWriter(new FileOutputStream(file));
+		}
+		catch (FileNotFoundException e)
+		{
+			this.logger.log(Level.SEVERE, "The given file " + file.getAbsolutePath() + "could not be found.");
+
+			throw new ModuleSetupStoreException(
+					"The given file " + file.getAbsolutePath() + "could not be found.");
+		}
+
+		writer.flush();
+
+		Module[] modules = this.runningModules.runningModuleMap.values().toArray(new Module[0]);
+
+		writer.println("<?xml version=\"1.0\"?>");
+
+		writer.println("<modulesetup>");
+
+		for (Module module : modules)
+		{
+			this.logger.log(Level.INFO, "Storing module " + module.getName());
+
+			writer.println("<module id=\"" + module.getId() + "\">");
+
+			writer.println("<name>");
+
+			writer.println(module.getName());
+
+			writer.println("</name>");
+
+			writer.println("<fromClassId>");
+
+			writer.println(module.getClassId());
+
+			writer.println("</fromClassId>");
+
+			if (module.getReceivingModuleCount() > 0)
+			{
+				writer.println("<connectedTo>");
+
+				Module[] receivingModules = module.getReceivingModules();
+
+				for (Module receivingModule : receivingModules)
+				{
+					writer.println("<id>");
+
+					writer.println(receivingModule.getId());
+
+					writer.println("</id>");
+
+				}
+
+				writer.println("</connectedTo>");
+			}
+
+			writer.println("</module>");
+
+			writer.flush();
+
+		}
+
+		writer.println("</modulesetup>");
+
+		writer.flush();
+
+		writer.close();
+
+	}
+
+	/**
+	 * @see org.electrocodeogram.module.registry.ISystemModuleRegistry#loadModuleSetup(java.io.File)
+	 */
+	public void loadModuleSetup(File file) throws ModuleSetupLoadException
+	{
+		HashMap<Integer, Integer[]> moduleConnectionMap;
+
+		HashMap<Integer, Integer> moduleIdTransformationMap;
+
+		if (!file.exists())
+		{
+			this.logger.log(Level.SEVERE, "The file " + file.getAbsolutePath() + " does not exist.");
+
+			throw new ModuleSetupLoadException(
+					"The file " + file.getAbsolutePath() + " does not exist.");
+		}
+
+		if (file.isDirectory())
+		{
+			this.logger.log(Level.SEVERE, file.getAbsolutePath() + " is a directory, not a file.");
+
+			throw new ModuleSetupLoadException(
+					file.getAbsolutePath() + " is a directory, not a file.");
+		}
+
+		if (!file.canRead())
+		{
+			this.logger.log(Level.SEVERE, "The file " + file.getAbsolutePath() + " can not be read.");
+
+			throw new ModuleSetupLoadException(
+					"The file " + file.getAbsolutePath() + " can not be read.");
+		}
+
+		Document document = null;
+
+		try
+		{
+			// TODO : complete logging and configurable logging
+
+			this.logger.log(Level.INFO, "Going to load module setup from file " + file.getAbsolutePath());
+
+			document = parseDocument(file, MODULE_SETUP_XSD);
+
+			this.logger.log(Level.INFO, "The file seems to be valid.");
+
+			NodeList moduleList = document.getElementsByTagName("module");
+
+			this.logger.log(Level.INFO, "Found " + moduleList.getLength() + " stored modules.");
+
+			if (moduleList.getLength() == 0)
+			{
+				throw new ModuleSetupLoadException("The module setup is empty.");
+			}
+
+			moduleConnectionMap = new HashMap<Integer, Integer[]>();
+
+			moduleIdTransformationMap = new HashMap<Integer, Integer>();
+
+			for (int i = 0; i < moduleList.getLength(); i++)
+			{
+				Node moduleNode = moduleList.item(i);
+
+				Integer storedModuleId = null;
+
+				if (moduleNode.getAttributes() == null || moduleNode.getAttributes().getLength() == 0)
+				{
+					throw new ModuleSetupLoadException(
+							"Attribute \"id\" missing for element \"module\".");
+				}
+
+				Node moduleIdNode = moduleNode.getAttributes().getNamedItem("id");
+
+				if (moduleIdNode == null || moduleIdNode.getFirstChild() == null)
+				{
+					throw new ModuleSetupLoadException(
+							"Attribute \"id\" missing for element \"module\".");
+				}
+
+				try
+				{
+					storedModuleId = new Integer(
+							moduleIdNode.getFirstChild().getNodeValue());
+
+				}
+				catch (NumberFormatException e)
+				{
+					throw new ModuleSetupLoadException(
+							"Illegal value for attribute \"id\".");
+				}
+
+				NodeList moduleNodeChildNodes = moduleNode.getChildNodes();
+
+				Node nameNode = moduleNodeChildNodes.item(1);
+
+				if (nameNode == null || !nameNode.getNodeName().equals("name"))
+				{
+					throw new ModuleSetupLoadException(
+							"Missing element \"name\".");
+				}
+
+				Node fromClassIdNode = moduleNodeChildNodes.item(3);
+
+				if (fromClassIdNode == null || !fromClassIdNode.getNodeName().equals("fromClassId"))
+				{
+					throw new ModuleSetupLoadException(
+							"Missing element \"fromClassId\".");
+				}
+
+				Node connectedToNode = moduleNodeChildNodes.item(5);
+
+				Integer[] connectedToArray = null;
+
+				if (connectedToNode != null)
+				{
+					if (!connectedToNode.getNodeName().equals("connectedTo"))
+					{
+						throw new ModuleSetupLoadException(
+								"Misspelled element \"connectedTo\".");
+					}
+
+					NodeList connectedToList = connectedToNode.getChildNodes();
+
+					if (connectedToList == null || connectedToList.getLength() == 0)
+					{
+						throw new ModuleSetupLoadException(
+								"Missing ids for element \"connectedTo\".");
+					}
+
+					connectedToArray = new Integer[connectedToList.getLength()];
+
+					for (int j = 0; j < connectedToList.getLength(); j++)
+					{
+						Node connectedToId = connectedToList.item(j);
+
+						if (connectedToId == null)
+						{
+							throw new ModuleSetupLoadException(
+									"Misspelled element \"id\".");
+						}
+
+						if (!connectedToId.getNodeName().equals("id"))
+						{
+							connectedToArray[j] = null;
+
+							continue;
+						}
+
+						if (connectedToId.getFirstChild() == null)
+						{
+							throw new ModuleSetupLoadException(
+									"Misspelled element \"id\".");
+						}
+
+						try
+						{
+							Integer id = new Integer(
+									connectedToId.getFirstChild().getNodeValue());
+
+							connectedToArray[j] = id;
+
+						}
+						catch (NumberFormatException e)
+						{
+							throw new ModuleSetupLoadException(
+									"Illegal value for attribute \"id\".");
+						}
+
+					}
+
+				}
+
+				if (nameNode.getFirstChild() == null)
+				{
+					throw new ModuleSetupLoadException(
+							"Missing value for element \"name\".");
+				}
+
+				String moduleName = nameNode.getFirstChild().getNodeValue();
+
+				if (moduleName == null || moduleName.equals(""))
+				{
+					throw new ModuleSetupLoadException(
+							"Missing value for element \"name\".");
+				}
+
+				if (fromClassIdNode.getFirstChild() == null)
+				{
+					throw new ModuleSetupLoadException(
+							"Missing value for element \"fromClassId\".");
+				}
+
+				String moduleFromClassId = fromClassIdNode.getFirstChild().getNodeValue();
+
+				if (moduleFromClassId == null || moduleFromClassId.equals(""))
+				{
+					throw new ModuleSetupLoadException(
+							"Missing value for element \"fromClassId\".");
+				}
+
+				try
+				{
+					int assignedModuleId = createRunningModule(moduleFromClassId, moduleName);
+
+					moduleIdTransformationMap.put(storedModuleId, new Integer(
+							assignedModuleId));
+
+					if (connectedToArray != null)
+					{
+						moduleConnectionMap.put(storedModuleId, connectedToArray);
+
+						connectedToArray = null;
+					}
+				}
+				catch (ModuleInstantiationException e)
+				{
+					throw new ModuleSetupLoadException(e.getMessage());
+				}
+				catch (ModuleClassException e)
+				{
+					throw new ModuleSetupLoadException(e.getMessage());
+				}
+
+			}
+
+			Integer[] storedModuleIds = moduleConnectionMap.keySet().toArray(new Integer[0]);
+
+			for (Integer storedModuleId : storedModuleIds)
+			{
+				Integer assignedModuleId = moduleIdTransformationMap.get(storedModuleId);
+
+				Integer[] storedReceivingModuleIds = moduleConnectionMap.get(storedModuleId);
+
+				for (Integer storedReceivingModuleId : storedReceivingModuleIds)
+				{
+					if (storedReceivingModuleId == null)
+					{
+						continue;
+					}
+
+					Integer assignedReceivingModuleId = moduleIdTransformationMap.get(storedReceivingModuleId);
+
+					try
+					{
+						Module module = getRunningModule(assignedModuleId.intValue());
+
+						Module receivingModule = getRunningModule(assignedReceivingModuleId.intValue());
+
+						module.connectReceiverModule(receivingModule);
+					}
+					catch (ModuleInstanceException e)
+					{
+						throw new ModuleSetupLoadException(e.getMessage());
+					}
+					catch (ModuleConnectionException e)
+					{
+						throw new ModuleSetupLoadException(e.getMessage());
+					}
+				}
+			}
+		}
+		catch (SAXException e)
+		{
+			throw new ModuleSetupLoadException(
+					"Error while parsing the module setup file.");
+		}
+		catch (IOException e)
+		{
+			throw new ModuleSetupLoadException(
+					"Error while parsing the module setup file.");
+		}
 	}
 
 }
