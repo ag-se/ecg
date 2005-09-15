@@ -3,7 +3,7 @@
 <plugin
    id="org.electrocodeogram.sensor.eclipse"
    name="Hackystat Sensor 5.1.1010.3x"
-   version="0.6"
+   version="0.6.1"
    provider-name="Takuya Yamashita (takuyay@hawaii.edu)"
    class="org.hackystat.stdext.sensor.eclipse.EclipseSensorPlugin">
 
