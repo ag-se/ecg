@@ -161,7 +161,7 @@ public class FileSystemSourceModule extends SourceModule
                 Date timeStamp = null;
                 
                 try {
-                    timeStamp = new SimpleDateFormat("E M FF HH:mm:ss z yyyy").parse(timeStampString);
+                    timeStamp = new SimpleDateFormat(ValidEventPacket.DATE_FORMAT_PATTERN).parse(timeStampString);
                 }
                 catch (ParseException e) {
                     
