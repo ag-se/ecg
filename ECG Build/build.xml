@@ -249,7 +249,9 @@
 
 		<zip zipfile="dist/plugins/org.hackystat.stdext.sensor_6.4.117.3x.zip" basedir="../HackyStat EclipseSensor/" />
 
-		<!-- <pde.exportPlugins destination="D:\UserDocuments\7oas7er\studium\Informatik\Diplomarbeit\Projektordner\ECG Build\dist" exportSource="false" exportType="directory" plugins="org.electrocodeogram.sensor.eclipse" source="1.5" target="1.5" useJARFormat="true"/> -->
+		<pde.exportPlugins destination="D:\UserDocuments\7oas7er\studium\Informatik\Diplomarbeit\Projektordner\ECG Build\dist" exportSource="false" exportType="directory" plugins="org.electrocodeogram.sensor.eclipse" source="1.5" target="1.5" useJARFormat="true"/>
+		
+		
 		
 	</target>
 
