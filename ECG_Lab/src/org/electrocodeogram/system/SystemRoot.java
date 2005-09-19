@@ -1,17 +1,13 @@
 package org.electrocodeogram.system;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.Observable;
 import java.util.Observer;
-
 import javax.swing.JFrame;
-
-import org.electrocodeogram.module.loader.ModuleClassLoaderInitializationException;
+import org.electrocodeogram.module.classloader.ModuleClassLoaderInitializationException;
 import org.electrocodeogram.module.registry.ISystemModuleRegistry;
 import org.electrocodeogram.module.registry.ModuleRegistry;
+import org.electrocodeogram.module.registry.ModuleSetupLoadException;
 import org.electrocodeogram.moduleapi.module.registry.IModuleModuleRegistry;
 import org.electrocodeogram.moduleapi.msdt.registry.IModuleMsdtRegistry;
 import org.electrocodeogram.moduleapi.system.IModuleSystemRoot;
@@ -43,38 +39,62 @@ public class SystemRoot extends Observable implements ISystemRoot, IModuleSystem
 	private SystemRoot()
 	{
 
-		Console console = new Console();
-
 		this.mstdRegistry = new MsdtRegistry();
 
 		this.moduleRegistry = new ModuleRegistry();
 
-		this.gui = new Gui(this.moduleRegistry);
-
 		theInstance = this;
 
-		console.start();
 	}
 
-	private SystemRoot(File file)
+	private SystemRoot(File moduleDir, File moduleSetup, boolean enableGui) throws ModuleSetupLoadException, ModuleClassLoaderInitializationException
 	{
 
 		this();
-		try
+
+		if (enableGui)
 		{
-			if (this.moduleRegistry == null)
-			{
-				this.moduleRegistry = new ModuleRegistry(file);
-			}
-			else
-			{
-				this.moduleRegistry.setFile(file);
-			}
+			this.gui = new Gui(this.moduleRegistry);
 		}
-		catch (ModuleClassLoaderInitializationException e)
+		else
 		{
-			System.out.println(e.getMessage());
+			Thread workerThread = new Thread(new Runnable() {
+
+				public void run()
+				{
+					while(true)
+					{
+						try
+						{
+							wait();
+						}
+						catch (InterruptedException e)
+						{
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+					
+				}});
+			
+			workerThread.start();
+			
 		}
+
+		if (this.moduleRegistry == null)
+		{
+			this.moduleRegistry = new ModuleRegistry(moduleDir);
+		}
+		else
+		{
+			this.moduleRegistry.setFile(moduleDir);
+		}
+
+		if (moduleSetup != null)
+		{
+			this.moduleRegistry.loadModuleSetup(moduleSetup);
+		}
+
 	}
 
 	/**
@@ -135,66 +155,6 @@ public class SystemRoot extends Observable implements ISystemRoot, IModuleSystem
 		System.exit(0);
 	}
 
-	private static class Console extends Thread
-	{
-
-		private BufferedReader bufferedReader = null;
-
-		/**
-		 * Creates the console to manage the ECG Server & Lab.
-		 * 
-		 */
-		public Console()
-		{
-			System.out.println("ElectroCodeoGram Server & Lab is starting...");
-
-			this.bufferedReader = new BufferedReader(new InputStreamReader(
-					System.in));
-		}
-
-		/**
-		 * Here the reading of the console-input is done.
-		 */
-		@Override
-		public void run()
-		{
-
-			while (true)
-			{
-
-				System.out.println(">>");
-
-				String inputString = "" + this.readLine();
-
-				System.out.println("Echo: " + inputString);
-
-				if (inputString.equalsIgnoreCase("quit"))
-				{
-					this.quit();
-					return;
-				}
-			}
-		}
-
-		private String readLine()
-		{
-			try
-			{
-				return this.bufferedReader.readLine();
-			}
-			catch (IOException e)
-			{
-				return "quit";
-			}
-		}
-
-		private void quit()
-		{
-			SystemRoot.getSystemInstance().quit();
-
-		}
-	}
-
 	/**
 	 * @see org.electrocodeogram.system.ISystemRoot#getGui()
 	 */
@@ -244,28 +204,193 @@ public class SystemRoot extends Observable implements ISystemRoot, IModuleSystem
 	public static void main(String[] args)
 	{
 
-		File file = null;
+		String moduleDir = null;
 
-		if (args != null && args.length > 0)
+		String moduleSetup = null;
+
+		String nogui = null;
+		try
 		{
-
-			file = new File(args[0]);
-
-			if (file.exists() && file.isDirectory())
+			if (args == null || args.length == 0)
 			{
-				new SystemRoot(file);
+
+				new SystemRoot(new File("modules"), null, true);
+			}
+
+			else if (args.length == 1)
+			{
+				if (args[0].equals("-nogui"))
+				{
+					new SystemRoot(new File("modules"), null, false);
+				}
+				else
+				{
+					printHelpMessage();
+				}
 			}
 			else
 			{
-				new SystemRoot();
+				for (int i = 0; i < args.length; i++)
+				{
+					String arg = args[i];
+
+					if (arg.equals("-m") && moduleDir == null)
+					{
+						if(i+1 > args.length-1)
+						{
+							printHelpMessage();
+						}
+						
+						if (args[i + 1] == null)
+						{
+							printHelpMessage();
+
+						}
+
+						if (args[i + 1].equals(""))
+						{
+							printHelpMessage();
+
+						}
+
+						if (args[i + 1].equals("-s"))
+						{
+							printHelpMessage();
+
+						}
+
+						if (args[i + 1].equals("-nogui"))
+						{
+							printHelpMessage();
+
+						}
+
+						moduleDir = args[i + 1];
+
+						i++;
+
+					}
+					else if (arg.equals("-s") && moduleSetup == null)
+					{
+						if(i+1 > args.length-1)
+						{
+							printHelpMessage();
+						}
+						
+						if (args[i + 1] == null)
+						{
+							printHelpMessage();
+
+						}
+
+						if (args[i + 1].equals(""))
+						{
+							printHelpMessage();
+
+						}
+
+						if (args[i + 1].equals("-m"))
+						{
+							printHelpMessage();
+
+						}
+
+						if (args[i + 1].equals("-nogui"))
+						{
+							printHelpMessage();
+
+						}
+
+						moduleSetup = args[i + 1];
+
+						i++;
+					}
+					else if (args[i].equals("-nogui"))
+					{
+						nogui = "nogui";
+					}
+					else
+					{
+						printHelpMessage();
+
+					}
+				}
+
+				if (moduleDir == null)
+				{
+					if (moduleSetup == null)
+					{
+						if (nogui == null)
+						{
+							new SystemRoot(new File("modules"), null, true);
+						}
+						{
+							new SystemRoot(new File("modules"), null, false);
+						}
+					}
+					else
+					{
+						if (nogui == null)
+						{
+							new SystemRoot(new File("modules"), new File(
+									moduleSetup), true);
+						}
+						{
+							new SystemRoot(new File("modules"), new File(
+									moduleSetup), false);
+						}
+					}
+				}
+				else
+				{
+					if (moduleSetup == null)
+					{
+						if (nogui == null)
+						{
+							new SystemRoot(new File(moduleDir), null, true);
+						}
+						{
+							new SystemRoot(new File(moduleDir), null, false);
+						}
+					}
+					else
+					{
+						if (nogui == null)
+						{
+							new SystemRoot(new File(moduleDir), new File(
+									moduleSetup), true);
+						}
+						{
+							new SystemRoot(new File(moduleDir), new File(
+									moduleSetup), false);
+						}
+					}
+				}
 			}
-
 		}
-		else
+		catch (ModuleSetupLoadException e)
 		{
-			new SystemRoot();
-		}
+			System.out.println("Error while reading the module directory: " + moduleDir);
 
+			System.out.println(e.getMessage());
+
+			printHelpMessage();
+		}
+		catch (ModuleClassLoaderInitializationException e)
+		{
+			System.out.println("Error while reading the module setup: " + moduleSetup);
+
+			System.out.println(e.getMessage());
+
+			printHelpMessage();
+		}
+	}
+
+	private static void printHelpMessage()
+	{
+		System.out.println("Usage: java -jar ECGLab.jar [-m <moduleDirectory>] | [-s <moduleSetup>] | [-nogui]");
+
+		System.exit(-1);
 	}
 
 	/**

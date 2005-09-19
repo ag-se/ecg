@@ -235,9 +235,9 @@
 		
 		<copy todir="../ECG_FileSystemSourceModule/lib/ecg/">
 
-					<fileset dir="${build.lib}" includes="moduleapi.jar" />
+			<fileset dir="${build.lib}" includes="moduleapi.jar" />
 
-				</copy>
+		</copy>
 
 		<copy todir="../ECG_MSDTFilterIntermediateModule/lib/ecg/">
 
@@ -251,6 +251,11 @@
 
 		</copy>
 
+		<copy todir="../ECG_IOSourceModule/lib/ecg/">
+
+			<fileset dir="${build.lib}" includes="moduleapi.jar" />
+
+		</copy>
 		
 	</target>
 

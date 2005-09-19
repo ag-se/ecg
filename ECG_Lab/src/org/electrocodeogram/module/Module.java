@@ -1,5 +1,6 @@
 package org.electrocodeogram.module;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -121,7 +122,7 @@ public abstract class Module
 
 		this._systemObserver = new SystemObserver(this);
 
-		this._systemNotificator = new SystemNotificator();
+		this._systemNotificator = new SystemNotificator(this);
 
 		if (this._moduleType == ModuleType.SOURCE_MODULE)
 		{
@@ -144,7 +145,7 @@ public abstract class Module
 		SystemRoot.getModuleInstance().getModuleModuleRegistry().registerRunningModule(this);
 
 		activate();
-
+		
 		initialize();
 	}
 
@@ -341,14 +342,22 @@ public abstract class Module
 	 */
 	private static class SystemNotificator extends Observable
 	{
+		
+		private Module _module;
 
 		/**
 		 * The constructor registers the ECG GUI component with the SystemNotificator
+		 * @param module Is the surrounding module 
 		 *
 		 */
-		public SystemNotificator()
+		public SystemNotificator(Module module)
 		{
-			this.addObserver(SystemRoot.getSystemInstance().getGui());
+			this._module = module;
+			
+			if(SystemRoot.getSystemInstance().getGui() != null)
+			{
+				this.addObserver(SystemRoot.getSystemInstance().getGui());
+			}
 
 		}
 
@@ -373,7 +382,7 @@ public abstract class Module
 		{
 			setChanged();
 
-			notifyObservers(this);
+			notifyObservers(_module);
 
 			clearChanged();
 		}
@@ -750,8 +759,11 @@ public abstract class Module
 	 * @param propertyValue
 	 * @throws ModulePropertyException 
 	 */
-	public abstract void setProperty(String currentPropertyName, Object propertyValue) throws ModulePropertyException;
+	public abstract void setProperty(String currentPropertyName, String propertyValue) throws ModulePropertyException;
 
+	public abstract String getProperty(String currentPropertyName);
+	
+	
 	/**
 	 * This method initializes the actual module. It must be implementes by all module
 	 * subclasses.

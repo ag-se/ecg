@@ -9,10 +9,24 @@
 						<xs:sequence>
 							<xs:element name="name" type="xs:token" minOccurs="1" maxOccurs="1" />
 							<xs:element name="fromClassId" type="xs:token" minOccurs="1" maxOccurs="1" />
-							<xs:element name="connectedTo" minOccurs="0" maxOccurs="1">
+							<xs:element name="connectedTo" minOccurs="1" maxOccurs="1">
 								<xs:complexType>
 									<xs:sequence>
-										<xs:element name="id" type="xs:integer" minOccurs="1" maxOccurs="unbounded" />
+										<xs:element name="id" type="xs:integer" minOccurs="0" maxOccurs="unbounded" />
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="properties" minOccurs="1" maxOccurs="1">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="property" minOccurs="0" maxOccurs="unbounded">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="name" type="xs:token" minOccurs="1" maxOccurs="1" />
+													<xs:element name="value" type="xs:token" minOccurs="1" maxOccurs="1" />
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>

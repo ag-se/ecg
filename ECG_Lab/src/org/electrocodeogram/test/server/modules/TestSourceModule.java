@@ -34,7 +34,7 @@ public class TestSourceModule extends SourceModule
      * @see org.electrocodeogram.module.Module#setProperty(java.lang.String, java.lang.Object)
      */
     @Override
-    public void setProperty(String currentPropertyName, Object propertyValue)
+    public void setProperty(String currentPropertyName, String propertyValue)
     {
         // Not used
         
@@ -59,5 +59,15 @@ public class TestSourceModule extends SourceModule
         // TODO Auto-generated method stub
         
     }
+
+	/* (non-Javadoc)
+	 * @see org.electrocodeogram.module.Module#getProperty(java.lang.String)
+	 */
+	@Override
+	public String getProperty(String currentPropertyName)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }

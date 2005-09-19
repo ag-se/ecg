@@ -8,7 +8,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 import org.electrocodeogram.module.ModuleDescriptor;
-import org.electrocodeogram.module.loader.ModuleClassLoaderInitializationException;
+import org.electrocodeogram.module.classloader.ModuleClassLoaderInitializationException;
 
 import utmj.threaded.RetriedAssert;
 

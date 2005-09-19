@@ -274,7 +274,7 @@ public class MenuManager
                     
                     Class propertyType = moduleProperties[i].getType();
                 
-                    Object propertyValue = moduleProperties[i].getValue();
+                    String propertyValue = moduleProperties[i].getValue();
                     
                         JMenuItem menuItem = new JMenuItem(propertyName);
                       
@@ -357,15 +357,15 @@ public class MenuManager
         
         private String $propertyName;
         
-        private Object $propertyResult;
+        private String $propertyResult;
         
-        private Object $propertyValue;
+        private String $propertyValue;
         
         private Class $propertyType;
         
         private Gui $gui;
         
-        public PropertyActionAdapter(Gui gui, int moduleId, Class propertyType, String propertyName, Object propertyValue)
+        public PropertyActionAdapter(Gui gui, int moduleId, Class propertyType, String propertyName, String propertyValue)
         {
             this.$gui = gui;
             
@@ -406,7 +406,7 @@ public class MenuManager
                             break;
                         case JFileChooser.APPROVE_OPTION:
                             
-                            $propertyResult = new File(fileChooser.getSelectedFile().getAbsolutePath());
+                            $propertyResult = fileChooser.getSelectedFile().getAbsolutePath();
                             
                             break;
                         }
@@ -516,7 +516,7 @@ public class MenuManager
 	                
 	                Class propertyType = moduleProperties[i].getType();
 	            
-                    Object propertyValue = moduleProperties[i].getValue();
+                    String propertyValue = moduleProperties[i].getValue();
 	                
                         JMenuItem menuItem = new JMenuItem(propertyName);
 	                  

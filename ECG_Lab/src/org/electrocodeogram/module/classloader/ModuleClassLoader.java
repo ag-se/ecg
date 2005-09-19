@@ -1,4 +1,4 @@
-package org.electrocodeogram.module.loader;
+package org.electrocodeogram.module.classloader;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.electrocodeogram.system.SystemRoot;
 
 /**
  * The ModuleClassLoader is able to load classes directly from a
@@ -21,8 +23,9 @@ public class ModuleClassLoader extends java.lang.ClassLoader
 
 	private Logger logger = null;
 
-	private ArrayList<String> $moduleClassPaths;
+	private static ArrayList<String> _moduleClassPaths;
 
+	private static ModuleClassLoader _theInstance;
 	/**
 	 * This creates the ModuleClassLoader and sets the given ClassLoader to be the parent
 	 * ClassLoader oh the ModuleClassLoader in the ClassLoader hierarchy.
@@ -45,7 +48,7 @@ public class ModuleClassLoader extends java.lang.ClassLoader
 	{
 		Class<?> toReturn = null;
 
-		if (this.$moduleClassPaths == null)
+		if (this._moduleClassPaths == null)
 		{
 			this.logger.log(Level.SEVERE, "No module class paths defined.");
 
@@ -61,7 +64,7 @@ public class ModuleClassLoader extends java.lang.ClassLoader
 			return null;
 		}
 
-		for (String moduleClassPath : this.$moduleClassPaths)
+		for (String moduleClassPath : this._moduleClassPaths)
 		{
 
 			String pathToModuleClass = moduleClassPath + normalizedClassName + ".class";
@@ -142,14 +145,29 @@ public class ModuleClassLoader extends java.lang.ClassLoader
 	 * to the list of knon module paths.
 	 * @param moduleClassPath Is the new module path
 	 */
-	public void addModuleClassPath(String moduleClassPath)
+	public static void addModuleClassPath(String moduleClassPath)
 	{
-		if (this.$moduleClassPaths == null)
+		if (_moduleClassPaths == null)
 		{
-			this.$moduleClassPaths = new ArrayList<String>();
+			_moduleClassPaths = new ArrayList<String>();
 		}
 
-		this.$moduleClassPaths.add(moduleClassPath);
+		_moduleClassPaths.add(moduleClassPath);
 
 	}
+	
+	public static ModuleClassLoader getInstance()
+	{
+		if(_theInstance == null)
+		{
+			Class clazz = SystemRoot.getSystemInstance().getClass();
+
+			ClassLoader currentClassLoader = clazz.getClassLoader();
+			
+			_theInstance = new ModuleClassLoader(currentClassLoader);
+		}
+		
+		return _theInstance;
+	}
+	
 }

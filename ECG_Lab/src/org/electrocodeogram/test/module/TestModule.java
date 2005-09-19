@@ -33,7 +33,7 @@ public class TestModule extends Module
      * @see org.electrocodeogram.module.Module#setProperty(java.lang.String, java.lang.Object)
      */
     @Override
-    public void setProperty(@SuppressWarnings("unused") String currentPropertyName, @SuppressWarnings({"unused","unused"}) Object propertyValue)
+    public void setProperty(@SuppressWarnings("unused") String currentPropertyName, @SuppressWarnings({"unused","unused"}) String propertyValue)
     {
         // not needed
         
@@ -58,6 +58,17 @@ public class TestModule extends Module
         // TODO Auto-generated method stub
         
     }
+
+
+	/* (non-Javadoc)
+	 * @see org.electrocodeogram.module.Module#getProperty(java.lang.String)
+	 */
+	@Override
+	public String getProperty(String currentPropertyName)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 
 }

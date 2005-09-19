@@ -14,7 +14,7 @@ public class ModuleProperty
 
     private String $name = null;
     
-    private Object $value = null;
+    private String $value = null;
     
     private Class $type = null;
 
@@ -24,7 +24,7 @@ public class ModuleProperty
      * @param value Is a default value to use before the user sets antoher value
      * @param type Is the type of the property. The type must always be a java class like "java.lang.Integer"
      */
-    public ModuleProperty(String name, Object value, Class type)
+    public ModuleProperty(String name, String value, Class type)
     {
         this.$name = name;
         
@@ -46,7 +46,7 @@ public class ModuleProperty
      * This returns the property's default value.
      * @return The property's default value
      */
-    public Object getValue()
+    public String getValue()
     {
         return this.$value;
     }
