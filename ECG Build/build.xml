@@ -91,9 +91,20 @@
 		<ant dir="../ECG_CodechangeDifferIntermediateModule" target="cleanall" />
 
 	</target>
+	
+	<!-- Calls the ant script of the ECG IOSourceModule to clean it -->
+		<target name="CleanAll ECG IOSourceModule">
+
+			<echo message="###################################" />
+			<echo message="CLEANING ECG IOSOURCEMODULE" />
+			<echo message="###################################" />
+
+			<ant dir="../ECG_IOSourceModule" target="cleanall" />
+
+		</target>
 
 	<!-- Cleans all ECG components -->
-	<target name="cleanAll" depends="CleanAll ECG SensorShell,CleanAll ECG TestHelper,CleanAll ECG ServerAndLab,CleanAll ECG SocketSourceModule, CleanAll ECG FileSystemTargetModule, CleanAll ECG FileSystemSourceModule, CleanAll ECG MSDTFilterIntermediateModule, CleanAll ECG CodechangeDifferIntermediateModule" />
+	<target name="cleanAll" depends="CleanAll ECG SensorShell,CleanAll ECG TestHelper,CleanAll ECG ServerAndLab,CleanAll ECG SocketSourceModule, CleanAll ECG FileSystemTargetModule, CleanAll ECG FileSystemSourceModule, CleanAll ECG MSDTFilterIntermediateModule, CleanAll ECG CodechangeDifferIntermediateModule, CleanAll ECG IOSourceModule" />
 
 
 	<!-- Calls the ant script of the ECG SensorShell component to build it -->
@@ -211,6 +222,17 @@
 		<ant dir="../ECG_SocketEchoSourceModule" target="deploy" />
 
 	</target>
+	
+	<!-- Calls the ant script of the ECG IOSourceModule to build it -->
+		<target name="Build ECG IOSourceModule">
+
+			<echo message="###################################" />
+			<echo message="BUILDING ECG IOSOURCEMODULE" />
+			<echo message="###################################" />
+
+			<ant dir="../ECG_IOSourceModule" target="deploy" />
+
+		</target>
 
 	<!-- Calls the ant script of the ECG ServerAndLab to assemble the application -->
 	<target name="Assemble ECG ServerAndLab">
@@ -226,7 +248,7 @@
 
 
 	<!-- Builds all ECG components -->
-	<target name="buildAll" depends="Build ECG SensorShell Event,Build ECG TestHelper, Build ECG SensorShell Shell,Build ECG ServerAndLab Module-API,Build ECG SocketSourceModule, Build ECG FileSystemTargetModule, Build ECG FileSystemSourceModule, Build ECG MSDTFilterIntermediateModule, Build ECG CodechangeDifferIntermediateModule, Assemble ECG ServerAndLab" />
+	<target name="buildAll" depends="Build ECG SensorShell Event,Build ECG TestHelper, Build ECG SensorShell Shell,Build ECG ServerAndLab Module-API,Build ECG SocketSourceModule, Build ECG FileSystemTargetModule, Build ECG FileSystemSourceModule, Build ECG MSDTFilterIntermediateModule, Build ECG CodechangeDifferIntermediateModule, Build ECG IOSourceModule, Assemble ECG ServerAndLab" />
 
 	<!-- Package release -->
 	<target name="Package release" depends="cleanAll,buildAll">
