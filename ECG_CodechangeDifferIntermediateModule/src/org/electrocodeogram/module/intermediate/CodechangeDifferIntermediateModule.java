@@ -165,7 +165,7 @@ public class CodechangeDifferIntermediateModule extends IntermediateModule
      * @param propertyValue
      */
     @Override
-    public void setProperty(String propertyName, Object propertyValue)
+    public void setProperty(String propertyName, String propertyValue)
     {
        
     }
@@ -195,6 +195,13 @@ public class CodechangeDifferIntermediateModule extends IntermediateModule
         
     }
     
-  
+    /**
+	 * @see org.electrocodeogram.module.Module#getProperty(java.lang.String)
+	 */
+	@Override
+	public String getProperty(String propertyName)
+	{
+		return null;
+	}
 
 }
