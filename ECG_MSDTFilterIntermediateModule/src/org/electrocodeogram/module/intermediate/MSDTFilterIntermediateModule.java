@@ -69,7 +69,7 @@ public class MSDTFilterIntermediateModule extends IntermediateModule
      * @param propertyValue
      */
     @Override
-    public void setProperty(String propertyName, Object propertyValue)
+    public void setProperty(String propertyName, String propertyValue)
     {
        if(propertyValue.equals("configureFilter"))
        {
@@ -321,5 +321,14 @@ public class MSDTFilterIntermediateModule extends IntermediateModule
         
         return pnlButtons;
     }
+    
+    /**
+	 * @see org.electrocodeogram.module.Module#getProperty(java.lang.String)
+	 */
+	@Override
+	public String getProperty(String propertyName)
+	{    
+		return null;
+	}
 
 }
