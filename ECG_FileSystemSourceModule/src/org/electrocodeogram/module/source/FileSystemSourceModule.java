@@ -45,7 +45,7 @@ public class FileSystemSourceModule extends SourceModule
      * 
      */
     @Override
-    public void setProperty(String propertyName, Object propertyValue) throws ModulePropertyException
+    public void setProperty(String propertyName, String propertyValue) throws ModulePropertyException
     {
         if (!propertyName.equals("Input File")) {
             throw new ModulePropertyException(
@@ -53,12 +53,7 @@ public class FileSystemSourceModule extends SourceModule
 
         }
 
-        if (!(propertyValue instanceof File)) {
-            throw new ModulePropertyException(
-                    "The module only support a property of type: \"java.io.File\".");
-        }
-
-        File propertyValueFile = (File) propertyValue;
+        File propertyValueFile = new File(propertyValue);
 
         this.inputFile = propertyValueFile;
 
@@ -211,4 +206,13 @@ public class FileSystemSourceModule extends SourceModule
         }
 
     }
+    
+    /**
+	 * @see org.electrocodeogram.module.Module#getProperty(java.lang.String)
+	 */
+	@Override
+	public String getProperty(String propertyName)
+	{
+		return null;
+	}
 }

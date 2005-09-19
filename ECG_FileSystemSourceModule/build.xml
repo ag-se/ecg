@@ -65,7 +65,7 @@
 
 	</target>
 
-	<!-- Build the ECG FileSystemSourceModule. -->
+	<!-- Build the ECG IOSourceModule. -->
 	<target name="build" depends="prepare">
 
 		<echo message="Building the ECG FileSystemSourceModule..."/>
