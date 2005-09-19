@@ -52,7 +52,7 @@ public class FileSystemTargetModule extends TargetModule
      * 
      */
     @Override
-    public void setProperty(String propertyName, Object propertyValue) throws ModulePropertyException
+    public void setProperty(String propertyName, String propertyValue) throws ModulePropertyException
     {
         if (!propertyName.equals("Output File")) {
             throw new ModulePropertyException(
@@ -60,12 +60,7 @@ public class FileSystemTargetModule extends TargetModule
             
         }
 
-        if (!(propertyValue instanceof File)) {
-            throw new ModulePropertyException(
-                    "The module only support a property of type: \"java.io.File\".");
-        }
-
-        File propertyValueFile = (File) propertyValue;
+        File propertyValueFile = new File(propertyValue);
 
         this.outputFile = propertyValueFile;
 
@@ -116,4 +111,13 @@ public class FileSystemTargetModule extends TargetModule
         }
         
     }
+    
+    /**
+	 * @see org.electrocodeogram.module.Module#getProperty(java.lang.String)
+	 */
+	@Override
+	public String getProperty(String propertyName)
+	{
+		return null;
+	}
 }
