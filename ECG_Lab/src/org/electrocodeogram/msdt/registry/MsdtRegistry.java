@@ -15,7 +15,10 @@ import org.electrocodeogram.moduleapi.msdt.registry.IModuleMsdtRegistry;
 import org.electrocodeogram.msdt.MicroSensorDataType;
 import org.electrocodeogram.msdt.MicroSensorDataTypeException;
 import org.electrocodeogram.system.SystemRoot;
+import org.electrocodeogram.system.logging.LogHelper;
 import org.xml.sax.SAXException;
+
+import sun.rmi.log.LogHandler;
 
 /**
  * The MicroSensorDataType registry is a database for MicroSensorDataTypes.
@@ -42,7 +45,7 @@ public class MsdtRegistry implements ISystemMsdtRegistry, IModuleMsdtRegistry
 	public MsdtRegistry()
 	{
 
-		this.logger = Logger.getLogger("MstdManager");
+		this.logger = LogHelper.createLogger(this);
 
 		this.registeredMsdt = new HashMap<String, MicroSensorDataType>();
 

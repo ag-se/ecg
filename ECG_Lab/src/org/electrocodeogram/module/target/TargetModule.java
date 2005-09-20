@@ -11,6 +11,7 @@ import org.electrocodeogram.module.Module;
  */
 public abstract class TargetModule extends Module
 {
+	
 
 	/**
 	 * This creates the module.
@@ -21,6 +22,8 @@ public abstract class TargetModule extends Module
 	public TargetModule(String moduleClassId, String name)
 	{
 		super(ModuleType.TARGET_MODULE, moduleClassId, name);
+		
+		this.getLogger().exiting(this.getClass().getName(),"TargetModule");
 	}
 
 	/**
@@ -31,10 +34,14 @@ public abstract class TargetModule extends Module
 	@Override
 	public void receiveEventPacket(TypedValidEventPacket eventPacket)
 	{
+		this.getLogger().entering(this.getClass().getName(),"receiveEventPacket");
+		
 		if (eventPacket != null)
 		{
 			write(eventPacket);
 		}
+		
+		this.getLogger().exiting(this.getClass().getName(),"receiveEventPacket");
 	}
 
 	/**

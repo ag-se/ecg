@@ -1,11 +1,11 @@
 package org.electrocodeogram.module;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -20,6 +20,7 @@ import org.electrocodeogram.msdt.MicroSensorDataType;
 import org.electrocodeogram.msdt.registry.MicroSensorDataTypeRegistrationException;
 import org.electrocodeogram.system.ISystemRoot;
 import org.electrocodeogram.system.SystemRoot;
+import org.electrocodeogram.system.logging.LogHelper;
 
 /**
  * This abstract class represents an ECG module. A module is an entity able
@@ -96,6 +97,8 @@ public abstract class Module
 
 	SystemNotificator _systemNotificator;
 
+	protected ModuleProperty[] runtimeProperties; 
+	
 	/**
 	 * This creates a new Module of the given module type, module class id ans module name and registers it with the ModuleRegistry.
 	 * @param moduleType Is the module type
@@ -104,6 +107,8 @@ public abstract class Module
 	 */
 	public Module(ModuleType moduleType, String moduleClassId, String moduleName)
 	{
+		this._logger = LogHelper.createLogger(this);
+		
 		this._id = ++_count;
 
 		this.name = moduleName;
@@ -111,8 +116,6 @@ public abstract class Module
 		this._moduleClassId = moduleClassId;
 
 		this._moduleType = moduleType;
-
-		this._logger = Logger.getLogger(this.name);
 
 		this._receiverModuleMap = new HashMap<Integer, Module>();
 
@@ -140,6 +143,16 @@ public abstract class Module
 			this._eventReceiver = new EventReceiver(this);
 		}
 
+		try
+		{
+			this.runtimeProperties = SystemRoot.getModuleInstance().getModuleModuleRegistry().getModuleDescriptor(this.getClassId()).getProperties();
+		}
+		catch (ModuleClassException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		registerMSDTs();
 
 		SystemRoot.getModuleInstance().getModuleModuleRegistry().registerRunningModule(this);
@@ -147,6 +160,8 @@ public abstract class Module
 		activate();
 		
 		initialize();
+		
+		this.getLogger().exiting(this.getClass().getName(),"Module");
 	}
 
 	/**
@@ -160,6 +175,8 @@ public abstract class Module
 	{
 
 		private Module _module;
+		
+		private Logger _logger = null;
 
 		/**
 		 * This creates the EventSender for the given Module.
@@ -168,6 +185,10 @@ public abstract class Module
 		public EventSender(Module module)
 		{
 			this._module = module;
+			
+			this._logger = this._logger = LogHelper.createLogger(this);
+			
+			this._logger.exiting(this.getClass().getName(),"eventSender");
 		}
 
 		/**
@@ -176,7 +197,12 @@ public abstract class Module
 		 */
 		public void addObserver(Module module)
 		{
+			
+			this._logger.entering(this.getClass().getName(),"addObserver");
+			
 			super.addObserver(module.getEventReceiver());
+			
+			this._logger.exiting(this.getClass().getName(),"addObserver");
 		}
 
 		/**
@@ -185,7 +211,11 @@ public abstract class Module
 		 */
 		public void deleteObserver(Module module)
 		{
+			this._logger.entering(this.getClass().getName(),"deleteObserver");
+			
 			super.deleteObserver(module.getEventReceiver());
+			
+			this._logger.exiting(this.getClass().getName(),"deleteObserver");
 		}
 
 		/**
@@ -196,6 +226,8 @@ public abstract class Module
 		 */
 		public void sendEventPacket(TypedValidEventPacket eventPacket)
 		{
+			this._logger.entering(this.getClass().getName(),"sendEventPacket");
+			
 			if (this._module.isActive() && (eventPacket != null))
 			{
 				setChanged();
@@ -228,7 +260,11 @@ public abstract class Module
 				}
 				clearChanged();
 			}
+			
+			this._logger.exiting(this.getClass().getName(),"sendEventPacket");
 		}
+		
+		
 	}
 
 	/**
@@ -242,6 +278,8 @@ public abstract class Module
 	{
 
 		private Module _module;
+		
+		private Logger _logger;
 
 		/**
 		 * This creates the EventReceiver for the given Module.
@@ -250,6 +288,10 @@ public abstract class Module
 		public EventReceiver(Module module)
 		{
 			this._module = module;
+			
+			this._logger = this._logger = LogHelper.createLogger(this);
+			
+			this._logger.exiting(this.getClass().getName(),"EventReceiver");
 		}
 
 		/**
@@ -265,6 +307,8 @@ public abstract class Module
 		 */
 		public void update(Observable object, Object data)
 		{
+			this._logger.entering(this.getClass().getName(),"update");
+			
 			if ((object instanceof EventSender) && data instanceof TypedValidEventPacket)
 			{
 				try
@@ -295,6 +339,8 @@ public abstract class Module
 				}
 
 			}
+			
+			this._logger.exiting(this.getClass().getName(),"update");
 
 		}
 
@@ -309,7 +355,9 @@ public abstract class Module
 	private static class SystemObserver implements Observer
 	{
 
-		private Module $module;
+		private Module _module;
+		
+		private Logger _logger; 
 
 		/**
 		 * This creates the SystemObserver for the given Module.
@@ -317,7 +365,11 @@ public abstract class Module
 		 */
 		public SystemObserver(Module module)
 		{
-			this.$module = module;
+			this._module = module;
+			
+			this._logger = this._logger = LogHelper.createLogger(this);
+			
+			this._logger.exiting(this.getClass().getName(),"SystemObserver");
 		}
 
 		/**
@@ -326,10 +378,14 @@ public abstract class Module
 		public void update(Observable o, @SuppressWarnings("unused")
 		Object arg)
 		{
+			this._logger.entering(this.getClass().getName(),"update");
+			
 			if (o instanceof ISystemRoot)
 			{
-				this.$module.analyseCoreNotification();
+				this._module.analyseCoreNotification();
 			}
+			
+			this._logger.exiting(this.getClass().getName(),"update");
 
 		}
 
@@ -344,6 +400,8 @@ public abstract class Module
 	{
 		
 		private Module _module;
+		
+		private Logger _logger; 
 
 		/**
 		 * The constructor registers the ECG GUI component with the SystemNotificator
@@ -354,10 +412,14 @@ public abstract class Module
 		{
 			this._module = module;
 			
+			this._logger = this._logger = LogHelper.createLogger(this);
+			
 			if(SystemRoot.getSystemInstance().getGui() != null)
 			{
 				this.addObserver(SystemRoot.getSystemInstance().getGui());
 			}
+			
+			this._logger.exiting(this.getClass().getName(),"SystemNotificator");
 
 		}
 
@@ -367,11 +429,15 @@ public abstract class Module
 		 */
 		public void fireEventNotification(TypedValidEventPacket packet)
 		{
+			this._logger.entering(this.getClass().getName(),"fireEventNotification");
+			
 			setChanged();
 
 			notifyObservers(packet);
 
 			clearChanged();
+			
+			this._logger.exiting(this.getClass().getName(),"fireEventNotification");
 
 		}
 
@@ -380,17 +446,23 @@ public abstract class Module
 		 */
 		public void fireStatechangeNotification()
 		{
+			this._logger.entering(this.getClass().getName(),"fireStatechangeNotification");
+			
 			setChanged();
 
 			notifyObservers(_module);
 
 			clearChanged();
+			
+			this._logger.exiting(this.getClass().getName(),"fireStatechangeNotification");
 		}
 
 	}
 
 	private void registerMSDTs()
 	{
+		this._logger.entering(this.getClass().getName(),"registerMSDTs");
+		
 		if (this instanceof SourceModule)
 		{
 
@@ -411,6 +483,8 @@ public abstract class Module
 				}
 			}
 
+			
+			
 		}
 
 		ModuleDescriptor moduleDescriptor = null;
@@ -441,6 +515,8 @@ public abstract class Module
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		this._logger.exiting(this.getClass().getName(),"registerMSDTs");
 	}
 
 	/**
@@ -449,6 +525,10 @@ public abstract class Module
 	 */
 	protected Logger getLogger()
 	{
+		this._logger.entering(this.getClass().getName(),"getLogger");
+		
+		this._logger.exiting(this.getClass().getName(),"getLogger");
+		
 		return this._logger;
 	}
 
@@ -458,6 +538,10 @@ public abstract class Module
 	 */
 	EventReceiver getEventReceiver()
 	{
+		this._logger.entering(this.getClass().getName(),"getEventReceiver");
+		
+		this._logger.exiting(this.getClass().getName(),"getEventReceiver");
+		
 		return this._eventReceiver;
 	}
 
@@ -468,6 +552,10 @@ public abstract class Module
 	 */
 	public SystemObserver getSystemObserver()
 	{
+		this._logger.entering(this.getClass().getName(),"getSystemObserver");
+		
+		this._logger.exiting(this.getClass().getName(),"getSystemObserver");
+		
 		return this._systemObserver;
 	}
 
@@ -477,6 +565,10 @@ public abstract class Module
 	 */
 	public int getId()
 	{
+		this._logger.entering(this.getClass().getName(),"getId");
+		
+		this._logger.exiting(this.getClass().getName(),"getId");
+		
 		return this._id;
 	}
 
@@ -486,6 +578,10 @@ public abstract class Module
 	 */
 	public ModuleType getModuleType()
 	{
+		this._logger.entering(this.getClass().getName(),"getModuleType");
+		
+		this._logger.exiting(this.getClass().getName(),"getModuleType");
+		
 		return this._moduleType;
 	}
 
@@ -495,6 +591,10 @@ public abstract class Module
 	 */
 	public String getName()
 	{
+		this._logger.entering(this.getClass().getName(),"getName");
+		
+		this._logger.exiting(this.getClass().getName(),"getName");
+		
 		return this.name;
 	}
 
@@ -504,6 +604,10 @@ public abstract class Module
 	 */
 	public int getReceivingModuleCount()
 	{
+		this._logger.entering(this.getClass().getName(),"getReceivingModuleMap");
+		
+		this._logger.exiting(this.getClass().getName(),"getReceivingModuleMap");
+		
 		return this._receiverModuleMap.size();
 	}
 
@@ -513,16 +617,23 @@ public abstract class Module
 	 */
 	public Module[] getReceivingModules()
 	{
+		this._logger.entering(this.getClass().getName(),"getReceivingModules");
+		
 		Collection<Module> receivingModules = this._receiverModuleMap.values();
 
+		this._logger.exiting(this.getClass().getName(),"getReceivingModules");
+		
 		return receivingModules.toArray(new Module[0]);
 	}
 
 	private Module[] getSendingModules()
 	{
-
+		this._logger.entering(this.getClass().getName(),"getSendingModules");
+		
 		Collection<Module> sendingModules = this._senderModuleMap.values();
 
+		this._logger.exiting(this.getClass().getName(),"getSendingModules");
+		
 		return sendingModules.toArray(new Module[0]);
 	}
 
@@ -532,6 +643,9 @@ public abstract class Module
 	 */
 	public String getDetails()
 	{
+		
+		this._logger.entering(this.getClass().getName(),"getDetails");
+		
 		String text = "Name: \t" + getName() + "\nID: \t " + getId() + "\nTyp: \t";
 
 		ModuleType type = getModuleType();
@@ -593,6 +707,8 @@ public abstract class Module
 
 		}
 
+		this._logger.exiting(this.getClass().getName(),"getDetails");
+		
 		return text;
 
 	}
@@ -603,6 +719,10 @@ public abstract class Module
 	 */
 	public MicroSensorDataType[] getProvidedMicroSensorDataType()
 	{
+		this._logger.entering(this.getClass().getName(),"getProvidedMicroSensorDataType");
+		
+		this._logger.exiting(this.getClass().getName(),"getProvidedMicroSensorDataType");
+		
 		return this._providedMsdtList.toArray(new MicroSensorDataType[0]);
 	}
 
@@ -613,6 +733,10 @@ public abstract class Module
 	 */
 	public String getClassId()
 	{
+		this._logger.entering(this.getClass().getName(),"getClassId");
+		
+		this._logger.exiting(this.getClass().getName(),"getClassId");
+		
 		return this._moduleClassId;
 	}
 
@@ -622,6 +746,10 @@ public abstract class Module
 	 */
 	public boolean isActive()
 	{
+		this._logger.entering(this.getClass().getName(),"isActive");
+		
+		this._logger.exiting(this.getClass().getName(),"isActive");
+		
 		return this._activeFlag;
 	}
 
@@ -632,10 +760,14 @@ public abstract class Module
 	 */
 	public boolean isModuleType(ModuleType moduleType)
 	{
+		this._logger.entering(this.getClass().getName(),"isModuleType");
+		
 		if (this._moduleType == moduleType)
 		{
 			return true;
 		}
+		
+		this._logger.exiting(this.getClass().getName(),"isModuleType");
 
 		return false;
 
@@ -647,10 +779,21 @@ public abstract class Module
 	 */
 	public void deactivate()
 	{
-		if (this._activeFlag == false) return;
+
+		this._logger.entering(this.getClass().getName(),"deactivate");
+		
+		if (this._activeFlag == false)
+		{
+			
+			this._logger.exiting(this.getClass().getName(),"deactivate");
+			
+			return;
+			
+		}
 
 		this._activeFlag = false;
 
+		this._logger.exiting(this.getClass().getName(),"deactivate");
 	}
 
 	/**
@@ -659,10 +802,18 @@ public abstract class Module
 	 */
 	public void activate()
 	{
-		if (this._activeFlag == true) return;
+		this._logger.entering(this.getClass().getName(),"activate");
+		
+		if (this._activeFlag == true)
+		{
+			this._logger.exiting(this.getClass().getName(),"activate");
+			
+			return;
+		}
 
 		this._activeFlag = true;
 
+		this._logger.exiting(this.getClass().getName(),"activate");
 	}
 
 	/**
@@ -672,6 +823,10 @@ public abstract class Module
 	@Override
 	public String toString()
 	{
+		this._logger.entering(this.getClass().getName(),"toString");
+		
+		this._logger.exiting(this.getClass().getName(),"toString");
+		
 		return this.name;
 
 	}
@@ -682,6 +837,8 @@ public abstract class Module
 	 */
 	public void remove()
 	{
+		this._logger.entering(this.getClass().getName(),"remove");
+		
 		if (this._senderModuleMap.size() != 0)
 		{
 
@@ -727,6 +884,8 @@ public abstract class Module
 			e.printStackTrace();
 		}
 
+		this._logger.exiting(this.getClass().getName(),"remove");
+		
 	}
 
 	/**
@@ -736,7 +895,11 @@ public abstract class Module
 	 */
 	protected void sendEventPacket(TypedValidEventPacket packet)
 	{
+		this._logger.entering(this.getClass().getName(),"sendEventPacket");
+		
 		this._eventSender.sendEventPacket(packet);
+		
+		this._logger.exiting(this.getClass().getName(),"sendEventPacket");
 	}
 
 	/**
@@ -780,6 +943,8 @@ public abstract class Module
 	 */
 	public int connectReceiverModule(Module module) throws ModuleConnectionException
 	{
+		
+		this._logger.entering(this.getClass().getName(),"connectReceivingModules");
 
 		if (this._moduleType == ModuleType.TARGET_MODULE)
 		{
@@ -802,12 +967,21 @@ public abstract class Module
 
 			this._systemNotificator.fireStatechangeNotification();
 
+			this._logger.exiting(this.getClass().getName(),"connectReceivingModules");
+			
 			return module._id;
 
 		}
+		
+		
 
 	}
 
+	public ModuleProperty[] getRuntimeProperties()
+	{
+		return this.runtimeProperties;
+	}
+	
 	/**
 	 * This method disconnects a connected module.
 	 * @param module The module to disconnect
@@ -815,6 +989,8 @@ public abstract class Module
 	 */
 	public void disconnectReceiverModule(Module module) throws ModuleInstanceException
 	{
+		this._logger.entering(this.getClass().getName(),"disconnectReceivingModules");
+		
 		if (module == null)
 		{
 			return;
@@ -832,10 +1008,15 @@ public abstract class Module
 
 		this._systemNotificator.fireStatechangeNotification();
 
+		this._logger.exiting(this.getClass().getName(),"disconnectReceivingModules");
 	}
 
 	private void addParentModule(Module module)
 	{
+		this._logger.entering(this.getClass().getName(),"addParentModule");
+		
 		this._senderModuleMap.put(new Integer(module.getId()), module);
+		
+		this._logger.exiting(this.getClass().getName(),"addParentModule");
 	}
 }

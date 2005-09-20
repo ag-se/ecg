@@ -23,6 +23,7 @@ import org.electrocodeogram.module.setup.ModuleSetup;
 import org.electrocodeogram.moduleapi.module.registry.IModuleModuleRegistry;
 import org.electrocodeogram.msdt.MicroSensorDataTypeException;
 import org.electrocodeogram.system.SystemRoot;
+import org.electrocodeogram.system.logging.LogHelper;
 import org.electrocodeogram.xml.ClassLoadingException;
 import org.electrocodeogram.xml.ECGParser;
 import org.electrocodeogram.xml.PropertyException;
@@ -59,7 +60,7 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 	 */
 	public ModuleRegistry()
 	{
-		this.logger = Logger.getLogger("ModuleRegistry");
+		this.logger = LogHelper.createLogger(this);
 
 		this.runningModules = new RunningModules();
 
@@ -306,8 +307,10 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 
 				// put the ModuleDescriptor into the HashMap
 				this.availableModuleClassesMap.put(moduleDescriptor.getId(), moduleDescriptor);
-
+											
 				getLogger().log(Level.INFO, "Loaded additional module class with id: " + moduleDescriptor.getId() + " " + moduleDescriptor.getClazz().getName());
+				
+				getLogger().log(Level.FINEST, "Loaded additional module class with id: " + moduleDescriptor.getId() + " " + moduleDescriptor.getClazz().getName());
 
 				notifyOfNewModuleDecriptor(moduleDescriptor);
 
@@ -478,14 +481,20 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 	 */
 	public void storeModuleSetup(File file) throws ModuleSetupStoreException
 	{
+		this.getLogger().entering(this.getClass().getName(),"storeModuleSetup");
+		
 		if (file == null)
 		{
+			this.getLogger().log(Level.SEVERE,"The given file is null");
+			
 			throw new ModuleSetupStoreException("The given file is null");
 		}
 
+		this.getLogger().log(Level.INFO,"Storing module setup in file " + file.getAbsolutePath());
+		
 		if (this.runningModules.runningModuleMap == null)
 		{
-			this.logger.log(Level.SEVERE, "No modules are currently running.");
+			this.logger.log(Level.WARNING, "No modules are currently running.");
 
 			throw new ModuleSetupStoreException(
 					"No modules are currently running.");
@@ -510,6 +519,8 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 
 		Module[] modules = this.runningModules.runningModuleMap.values().toArray(new Module[0]);
 
+		this.logger.log(Level.INFO,"Found " + modules.length + " module(s) to store");
+		
 		writer.println("<?xml version=\"1.0\"?>");
 
 		writer.println("<modulesetup>");
@@ -536,8 +547,11 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 
 			if (module.getReceivingModuleCount() > 0)
 			{
+								
 				Module[] receivingModules = module.getReceivingModules();
 
+				this.logger.log(Level.INFO,"Module " + module.getName() + " is connected to " + receivingModules.length + " other modules.");
+				
 				for (Module receivingModule : receivingModules)
 				{
 					writer.println("<id>");
@@ -546,29 +560,37 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 
 					writer.println("</id>");
 
+					this.logger.log(Level.INFO,"Connection to module " + receivingModule.getId() + " stored.");
 				}
 
 			}
-
+			else
+			{
+				this.logger.log(Level.INFO,"Module " + module.getName() + " is not connected to other modules.");
+				
+			}
 			writer.println("</connectedTo>");
 
 			writer.println("<properties>");
 
-			try
-			{
-				ModuleProperty[] moduleProperties = getModuleDescriptor(module.getClassId()).getProperties();
+			
+				ModuleProperty[] moduleProperties = module.getRuntimeProperties();
 
 				if (moduleProperties != null && moduleProperties.length > 0)
 				{
-
+					
+					this.logger.log(Level.INFO,"Found " + moduleProperties.length + " properties for module " + module.getName());
+					
 					for (ModuleProperty moduleProperty : moduleProperties)
 					{
 						String propertyName = moduleProperty.getName();
 
-						Object propertyValue = null;
+						this.logger.log(Level.INFO,"Property name " + moduleProperty.getName());
+						
+						String propertyValue = moduleProperty.getValue();
 
-						propertyValue = module.getProperty(propertyName);
-
+						this.logger.log(Level.INFO,"Property value " + propertyValue);
+						
 						if (propertyValue != null)
 						{
 							writer.println("<property>");
@@ -586,18 +608,23 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 							writer.println("</value>");
 
 							writer.println("</property>");
+							
+							this.logger.log(Level.INFO,"Property value was stored");
+						}
+						else
+						{
+							this.logger.log(Level.INFO,"Property value is null and not stored");
 						}
 
 					}
 
 				}
-			}
-			catch (ModuleClassException e)
-			{
-				this.logger.log(Level.SEVERE, e.getMessage());
-
-				throw new ModuleSetupStoreException(e.getMessage());
-			}
+				else
+				{
+					this.logger.log(Level.INFO,"Did not find any properties for module " + module.getName());
+				}
+			
+			
 
 			writer.println("</properties>");
 

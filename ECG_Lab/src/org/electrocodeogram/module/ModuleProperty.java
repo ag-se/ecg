@@ -12,11 +12,11 @@ package org.electrocodeogram.module;
 public class ModuleProperty
 {
 
-    private String $name = null;
+    private String _name = null;
     
-    private String $value = null;
+    private String _value = null;
     
-    private Class $type = null;
+    private Class _type = null;
 
     /**
      * This creates the ModuleProperty.
@@ -26,11 +26,11 @@ public class ModuleProperty
      */
     public ModuleProperty(String name, String value, Class type)
     {
-        this.$name = name;
+        this._name = name;
         
-        this.$value = value;
+        this._value = value;
         
-        this.$type = type;
+        this._type = type;
     }
 
     /**
@@ -39,7 +39,7 @@ public class ModuleProperty
      */
     public String getName()
     {
-        return this.$name;
+        return this._name;
     }
 
     /**
@@ -48,7 +48,7 @@ public class ModuleProperty
      */
     public String getValue()
     {
-        return this.$value;
+        return this._value;
     }
     
     /**
@@ -57,7 +57,12 @@ public class ModuleProperty
      */
     public Class getType()
     {
-        return this.$type;
+        return this._type;
     }
     
+    
+    public void setValue(String value)
+    {
+    	this._value = value;
+    }
 }

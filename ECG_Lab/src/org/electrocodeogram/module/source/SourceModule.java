@@ -31,6 +31,7 @@ public abstract class SourceModule extends Module
         
         this.eventValidator = new EventValidator(SystemRoot.getSystemInstance().getSystemMsdtRegistry());
         
+        this.getLogger().exiting(this.getClass().getName(),"SourceModule");
     }
     
     /**
@@ -54,12 +55,16 @@ public abstract class SourceModule extends Module
      */
     public void append(ValidEventPacket eventPacket)
     {
+    	this.getLogger().entering(this.getClass().getName(),"append");
+    	
         TypedValidEventPacket typedValidEventPacket = this.eventValidator.validate(eventPacket);
         
         if(typedValidEventPacket != null)
         {
             sendEventPacket(typedValidEventPacket);
         }
+        
+        this.getLogger().exiting(this.getClass().getName(),"append");
     }
     
     /**
@@ -69,6 +74,10 @@ public abstract class SourceModule extends Module
     @Override
     public final void receiveEventPacket(@SuppressWarnings("unused") TypedValidEventPacket eventPacket)
     {
+    	this.getLogger().entering(this.getClass().getName(),"receiveEventPacket");
+    	
+        this.getLogger().exiting(this.getClass().getName(),"receiveEventPacket");
+    	
         return;
     }
     

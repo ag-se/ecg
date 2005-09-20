@@ -119,6 +119,7 @@
 							org/electrocodeogram/module/source/*,
 							org/electrocodeogram/module/target/*,
 							org/electrocodeogram/system/SystemRoot.class*,
+							org/electrocodeogram/system/logging/*,
 							org/electrocodeogram/moduleapi/*,
 							org/electrocodeogram/moduleapi/system/*,
 							org/electrocodeogram/moduleapi/module/*,
