@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+	<xs:annotation>
+		<xs:documentation>
+			This XML schema defines the structure of a module property file. Each module
+			must provide a file called "module.properties.xml" which is an instance of
+			this XMl schema.
+			Each module must have a name value, a value that is the full qualified path to the
+			module's root class and a description text.
+			Each module can additionally have properties declared. A module property is 
+			made user setable by the ECG at runtime.
+			For each provided module property an property name and a property type must be given.
+			The property type has to be a valid full qualified Java class, like "java.lang.Integer".
+			A module property can also have a default value.
+		</xs:documentation>
+	</xs:annotation>
+	
+	<xs:element name="module">
+		<xs:complexType>
+	    	
+	    		<xs:all>
+		    		<xs:element name="id" type="xs:token" minOccurs="1" maxOccurs="1"/>
+					<xs:element name="name" type="xs:token" minOccurs="1" maxOccurs="1"/>
+					<xs:element name="version" type="xs:token" minOccurs="1" maxOccurs="1"/>
+					<xs:element name="provider-name" type="xs:token" minOccurs="1" maxOccurs="1"/>
+					<xs:element name="class" type="xs:token" minOccurs="1" maxOccurs="1"/>
+					<xs:element name="description" type="xs:token" minOccurs="1" maxOccurs="1"/>
+
+					<xs:element name="properties" minOccurs="0" maxOccurs="1">
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="property" maxOccurs="99">
+									<xs:complexType>
+										<xs:sequence>
+											<xs:element name="propertyName" type="xs:token" minOccurs="1" maxOccurs="1"/>
+											<xs:element name="propertyType" type="xs:token" minOccurs="1" maxOccurs="1"/>
+											<xs:element name="propertyValue" type="xs:token" minOccurs="1" maxOccurs="1"/>
+										</xs:sequence>
+									</xs:complexType>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+				
+					<xs:element name="microsensordatatypes" minOccurs="0" maxOccurs="1">
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="microsensordatatype" maxOccurs="99">
+									<xs:complexType>
+										<xs:sequence>
+											<xs:element name="msdtName" type="xs:token" minOccurs="1" maxOccurs="1"/>
+											<xs:element name="msdtFile" type="xs:token" minOccurs="1" maxOccurs="1"/>
+										</xs:sequence>
+									</xs:complexType>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+				
+				</xs:all>
+			
+		</xs:complexType>
+	</xs:element>
+
+</xs:schema>

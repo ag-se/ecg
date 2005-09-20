@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<module>
+	<id>
+		org.electrocodeogram.module.source.FileSystemSourceModule
+	</id>
+	<provider-name>
+		Frank Schlesinger (Frank@Schlesinger.com)
+	</provider-name>
+	<version>
+		0.6
+	</version>
+	<name>
+		File Reader
+	</name>
+	<class>
+		org.electrocodeogram.module.source.FileSystemSourceModule
+	</class>
+	<description>
+		This module is able to read a file system source for previously written events.
+	</description>
+	<properties>
+		<property>
+			<propertyName>
+				Input File
+			</propertyName>
+			<propertyType>
+				java.io.File
+			</propertyType>
+			<propertyValue>
+			</propertyValue>
+		</property>
+	</properties>
+</module>
