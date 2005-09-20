@@ -40,6 +40,8 @@ public class SocketServerThread extends Thread
      */
     public String getSensorName()
     {
+    	this.logger.exiting(this.getClass().getName(),"getSensorName");
+    	
         return this.sensorName;
     }
     
@@ -49,11 +51,15 @@ public class SocketServerThread extends Thread
      */
     public InetAddress getSensorAddress()
     {
+    	 this.logger.entering(this.getClass().getName(),"getSensorAddress");
+    	
         if (this.$socketToSensor != null)
         {
             return this.$socketToSensor.getInetAddress();
         }
        
+        this.logger.exiting(this.getClass().getName(),"getSensorAddress");
+        
         return null;
        
     }
@@ -82,6 +88,7 @@ public class SocketServerThread extends Thread
         
         this.objectInputStream = new ObjectInputStream(socketToSensor.getInputStream());
        
+        this.logger.exiting(this.getClass().getName(),"SocketServerThread");
     }
     
     /**
@@ -90,6 +97,10 @@ public class SocketServerThread extends Thread
      */
     public int getServerThreadId()
     {
+    	this.logger.entering(this.getClass().getName(),"getSensorThreadId");
+    	
+    	this.logger.exiting(this.getClass().getName(),"getSensorThreadId");
+    	
         return this.id;
     }
     
@@ -98,6 +109,8 @@ public class SocketServerThread extends Thread
      */
     public void stopSensorThread()
     {
+    	this.logger.entering(this.getClass().getName(),"stopSensorThread");
+    	
         this.runningFlag = false;
         
         this.$sensorServer.removeSensorThread(this.id);
@@ -117,6 +130,8 @@ public class SocketServerThread extends Thread
             
             this.logger.log(Level.WARNING,"The ServerThread could not be stopped cleanly.");
         }
+        
+        this.logger.exiting(this.getClass().getName(),"stopSensorThread");
     }
     
     
@@ -128,13 +143,14 @@ public class SocketServerThread extends Thread
     @Override
     public void run()
     {
+    	this.logger.entering(this.getClass().getName(),"run");
+    	
         while(this.runningFlag)
         {
             try {
                 
                 // This method call blocks until a serialized object could be received.
                 ValidEventPacket e = null;
-                
                 
                 Object object = this.objectInputStream.readObject();
                 
@@ -184,6 +200,8 @@ public class SocketServerThread extends Thread
                 e.printStackTrace();
             }
         }
+        
+        this.logger.exiting(this.getClass().getName(),"run");
         
     }
 }

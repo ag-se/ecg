@@ -23,7 +23,9 @@ public class SocketSourceModule extends SourceModule
 	public SocketSourceModule(String moduleClassId, String name)
 	{
 		super(moduleClassId, name);
-
+		
+		this.getLogger().exiting(this.getClass().getName(),"SocketSourceModule");
+		
 	}
 
 	/**
@@ -32,9 +34,13 @@ public class SocketSourceModule extends SourceModule
 	@Override
 	public void startReader(SourceModule sourceModule)
 	{
+		this.getLogger().entering(this.getClass().getName(),"startReader");
+		
 		this.socketServer = new SocketServer(sourceModule, this.port);
 
 		this.socketServer.start();
+		
+		this.getLogger().exiting(this.getClass().getName(),"startReader");
 
 	}
 
@@ -87,10 +93,13 @@ public class SocketSourceModule extends SourceModule
 	@Override
 	public void initialize()
 	{
+		this.getLogger().entering(this.getClass().getName(),"initialize");
+		
 		this.port = 22222;
 
 		this.startReader(this);
 
+		this.getLogger().exiting(this.getClass().getName(),"initialize");
 	}
 
 	/**
@@ -99,11 +108,15 @@ public class SocketSourceModule extends SourceModule
 	@Override
 	public String getProperty(String propertyName)
 	{
+		this.getLogger().entering(this.getClass().getName(),"getProperty");
+		
 		if (propertyName.equals("port"))
 		{
 			return "" + this.port;
 		}
 
+		this.getLogger().exiting(this.getClass().getName(),"getProperty");
+		
 		return null;
 	}
 

@@ -46,6 +46,8 @@ public class SocketServer extends Thread implements ISocketServer
         this.serverThreadPool = new HashMap<Integer,SocketServerThread>();
      
         this.logger = Logger.getLogger("ECG Server");
+        
+        this.logger.exiting(this.getClass().getName(),"SocketServer");
 
     }
     
@@ -55,6 +57,8 @@ public class SocketServer extends Thread implements ISocketServer
      */
     public InetAddress[] getSensorAddresses()
     {
+    	this.logger.entering(this.getClass().getName(),"getSensorAddress");
+    	
         int count = this.getSensorCount();
         
         InetAddress[] addresses = new InetAddress[count];
@@ -66,6 +70,8 @@ public class SocketServer extends Thread implements ISocketServer
             addresses[i] = ((SocketServerThread)sensorThreads[i]).getSensorAddress();
         }
         
+        this.logger.exiting(this.getClass().getName(),"getSensorAddress");
+        
         return addresses;
     }
     
@@ -75,7 +81,12 @@ public class SocketServer extends Thread implements ISocketServer
      */
     public int getSensorCount()
     {
+    	this.logger.entering(this.getClass().getName(),"getSensorCount");
+    	
+    	this.logger.exiting(this.getClass().getName(),"getSensorCount");
+    	
         return this.serverThreadPool.size();
+
     }
     
     /**
@@ -85,7 +96,11 @@ public class SocketServer extends Thread implements ISocketServer
      */
     public void removeSensorThread(int id)
     {
+    	this.logger.entering(this.getClass().getName(),"removeSensorThread");
+    	
         this.serverThreadPool.remove(new Integer(id));
+        
+        this.logger.exiting(this.getClass().getName(),"removeSensorThread");
     }
 
     /**
@@ -96,6 +111,8 @@ public class SocketServer extends Thread implements ISocketServer
      */
     public String[] getAddress()
     {
+    	 this.logger.entering(this.getClass().getName(),"getAddress");
+    	
         String[] toReturn = null;
         
         try {
@@ -107,6 +124,9 @@ public class SocketServer extends Thread implements ISocketServer
             
             this.logger.log(Level.SEVERE,"An unexpected exception has occurred. Please report this at www.electrocodeogram.org");
         }
+        
+        this.logger.exiting(this.getClass().getName(),"getAddress");
+        
         return toReturn;
     }
     
@@ -120,6 +140,8 @@ public class SocketServer extends Thread implements ISocketServer
     @Override
     public void run()
     {
+    	 this.logger.entering(this.getClass().getName(),"run");
+    	
         try {
 
             this.serverSocket = new ServerSocket(this.$port);
@@ -159,6 +181,8 @@ public class SocketServer extends Thread implements ISocketServer
                 
             }
         }
+        
+        this.logger.exiting(this.getClass().getName(),"run");
     }
 
     /**
@@ -167,6 +191,8 @@ public class SocketServer extends Thread implements ISocketServer
      */
     public String[] getSensorNames()
     {
+    	 this.logger.entering(this.getClass().getName(),"getSensorName");
+    	
         int count = this.getSensorCount();
         
         String[] names = new String[count];
@@ -178,6 +204,8 @@ public class SocketServer extends Thread implements ISocketServer
             names[i] = ((SocketServerThread)sensorThreads[i]).getSensorName();
         }
         
+        this.logger.exiting(this.getClass().getName(),"getSensorName");
+        
         return names;
     }
 
@@ -188,6 +216,9 @@ public class SocketServer extends Thread implements ISocketServer
      */
     public void shutDown()
     {
+    	
+    	this.logger.entering(this.getClass().getName(),"getSensorAddress");
+    	
         this.logger.log(Level.INFO,"Shutting down SocketServer at port: " + this.$port);
         
         Object[] threadArray = this.serverThreadPool.values().toArray();
@@ -214,5 +245,7 @@ public class SocketServer extends Thread implements ISocketServer
         }
         
         this.logger.log(Level.INFO,"Shutdown complete");
+        
+        this.logger.exiting(this.getClass().getName(),"getSensorAddress");
     }
 }
