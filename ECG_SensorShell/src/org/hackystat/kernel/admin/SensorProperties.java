@@ -107,6 +107,23 @@ public class SensorProperties {
       return Integer.parseInt(str);
   }
 
+  public String getECGServerType()
+  {
+      String ECGServerType = "ECG_SERVER_TYPE";
+      String str = this.getProperty(ECGServerType).trim();
+      
+      return str;
+  }
+  
+  public String getECGServerPath()
+  {
+      String ECGServerPath = "ECG_SERVER_PATH";
+      String str = this.getProperty(ECGServerPath).trim();
+      
+      return str;
+  }
+
+  
   /**
    * Returns the directory in which the sensor.properties file is located (if it exists). This is
    * normally the .hackystat directory. If this SensorProperties instance was created without a

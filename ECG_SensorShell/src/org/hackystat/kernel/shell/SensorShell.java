@@ -2,8 +2,13 @@ package org.hackystat.kernel.shell;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.lang.Thread.UncaughtExceptionHandler;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -14,7 +19,6 @@ import java.util.logging.Logger;
 
 import org.electrocodeogram.client.IllegalHostOrPortException;
 import org.electrocodeogram.client.SendingThread;
-import org.electrocodeogram.event.EventPacket;
 import org.electrocodeogram.event.IllegalEventParameterException;
 import org.electrocodeogram.event.ValidEventPacket;
 import org.hackystat.kernel.admin.SensorProperties;
@@ -48,21 +52,33 @@ public class SensorShell
 	 * This is a reference to the SensorProperties object, that contains the information of
 	 * the "sensor.properties" file. The file is used to configure all sensors in the system.
 	 */
-	private SensorProperties $properties = null;
+	private SensorProperties _properties = null;
 
-	private Logger logger = null;
+	private Logger _logger = null;
 
-	private BufferedReader bufferedReader = null;
+	private BufferedReader _bufferedReader = null;
 
-	private String cr = System.getProperty("line.separator");
+	private String _cr = System.getProperty("line.separator");
 
-	private String prompt = ">> ";
+	private String _prompt = ">> ";
 
-	private String delimiter = "#";
+	private String _delimiter = "#";
 
-	private boolean $interactive;
+	private boolean _interactive;
 
-	private SendingThread sendingThread = null;
+	private SendingThread _sendingThread = null;
+
+	private boolean _standalone;
+
+	private PrintWriter _logWriter;
+
+	private PrintWriter _toInlineServer;
+
+	private String ecgEclipseSensorPath;
+
+	private static String LOG_SUFFIX = ".log";
+
+	private static String LOG_PREFIX = "EcgEclipseSensor";
 
 	/**
 	 * This creates a ECG SensorShell instance with the given properties.
@@ -74,34 +90,116 @@ public class SensorShell
 	public SensorShell(SensorProperties properties, boolean interactive, @SuppressWarnings("unused")
 	String toolName)
 	{
+		this._logger = Logger.getLogger("ECG_SensorShell");
 
-		this.$properties = properties;
+		String filename = LOG_PREFIX + new Date().toString().replace(' ', '_').replace(':', '_') + LOG_SUFFIX;
 
-		this.$interactive = interactive;
+		try
+		{
+			this._logWriter = new PrintWriter(
+					new FileWriter(new File(filename)));
 
-		this.logger = Logger.getLogger("ECG_SensorShell");
+			this._logWriter.println(new Date().toString());
+		}
+		catch (IOException e)
+		{
+			log(e.getMessage());
+		}
 
-		this.bufferedReader = new BufferedReader(new InputStreamReader(
+		this._properties = properties;
+
+		this._interactive = interactive;
+
+		this._bufferedReader = new BufferedReader(new InputStreamReader(
 				System.in));
+
+		if (this._properties.getECGServerType().equals("INLINE"))
+		{
+			this.startInlineServer();
+		}
+		else if (this._properties.getECGServerType().equals("STANDALONE"))
+		{
+			this.startClientThread();
+		}
+		else
+		{
+			this.startClientThread();
+		}
+
+		log("SensorShell created");
+	}
+
+	private void startClientThread()
+	{
+		log("Starting ClientThread...");
 
 		try
 		{
 
 			// Try to create the SendingThread ith the given ECG server address information 
-			this.sendingThread = new SendingThread(
-					this.$properties.getECGServerAddress(),
-					this.$properties.getECGServerPort());
+			this._sendingThread = new SendingThread(
+					this._properties.getECGServerAddress(),
+					this._properties.getECGServerPort());
 		}
 		catch (IllegalHostOrPortException e)
 		{
 
-			this.logger.log(Level.SEVERE, "The ECG Server's address is invalid.\nPlease check the ECG_SERVER_ADDRESS and ECG_SERVER_PORT values in the file \".hackystat/sensor.properties\" in your home directory.");
+			this._logger.log(Level.SEVERE, "The ECG Server's address is invalid.\nPlease check the ECG_SERVER_ADDRESS and ECG_SERVER_PORT values in the file \".hackystat/sensor.properties\" in your home directory.");
 
 		}
 		catch (UnknownHostException e)
 		{
 
-			this.logger.log(Level.SEVERE, "The ECG Server's address is invalid.\nPlease check the ECG_SERVER_ADDRESS and ECG_SERVER_PORT values in the file \".hackystat/sensor.properties\" in your home directory.");
+			this._logger.log(Level.SEVERE, "The ECG Server's address is invalid.\nPlease check the ECG_SERVER_ADDRESS and ECG_SERVER_PORT values in the file \".hackystat/sensor.properties\" in your home directory.");
+		}
+
+		this._standalone = true;
+
+		log("ClientThread started");
+	}
+
+	private void startInlineServer()
+	{
+
+		log("Starting InlineServer...");
+
+		try
+		{
+
+			if (this.ecgEclipseSensorPath != null && !this.ecgEclipseSensorPath.equals(""))
+			{
+				ProcessBuilder pb = new ProcessBuilder("cmd.exe", "/C",
+						"ecg.bat");
+
+				pb.directory(new File(this.ecgEclipseSensorPath));
+
+				log("PATH" + pb.directory().getAbsolutePath());
+
+				Process p = pb.start();
+
+				log("InlineServer started");
+
+				this._toInlineServer = new PrintWriter(new OutputStreamWriter(
+						p.getOutputStream()));
+
+				StreamGobbler errorGobbler = new StreamGobbler(
+						p.getErrorStream(), "ERROR");
+
+				StreamGobbler outputGobbler = new StreamGobbler(
+						p.getInputStream(), "OUTPUT");
+
+				log("Streams to InlineServer established");
+
+				errorGobbler.start();
+
+				outputGobbler.start();
+
+				this._standalone = false;
+			}
+		}
+		catch (IOException e)
+		{
+			log(e.getMessage());
 		}
 	}
 
@@ -158,26 +256,70 @@ public class SensorShell
 	 */
 	public boolean doCommand(Date timeStamp, String sensorDataType, List argList)
 	{
-		// check parameters
-		if (!EventPacket.isSyntacticallyCorrect(timeStamp, sensorDataType, argList))
+		if (sensorDataType.equals("ECGEclipseSensorPath"))
 		{
-			return false;
+			log("Retreiving path of ECGEclipseSensor...");
+
+			if (this.ecgEclipseSensorPath == null)
+			{
+				log("Path to ECGEclipseSensor is " + this.ecgEclipseSensorPath);
+
+				this.ecgEclipseSensorPath = (String) argList.get(0);
+			}
+			else
+			{
+				log("Path has allready been set.");
+			}
 		}
-
-		// pass EventPacket to SendingThread
-		try
+		else
 		{
-			this.sendingThread.addEventPacket(new ValidEventPacket(0,
-					timeStamp, sensorDataType, argList));
-		}
-		catch (IllegalEventParameterException e)
-		{
+			log("Retreiving event packet...");
 
-			// As parameters are proofed above, this should never occur.
+			ValidEventPacket packet;
+			try
+			{
+				packet = new ValidEventPacket(0, timeStamp, sensorDataType,
+						argList);
 
-			// TODO : write out message here
+				log("Packet is valid");
 
-			e.printStackTrace();
+				log(packet.toString());
+			}
+			catch (IllegalEventParameterException e)
+			{
+				log(e.getMessage());
+
+				return false;
+			}
+
+			if (this._standalone)
+			{
+
+				if (this._sendingThread != null)
+				{
+					// pass EventPacket to SendingThread
+					this._sendingThread.addEventPacket(packet);
+
+					log("Event packet passed to sending Thread");
+				}
+			}
+			else
+			{
+
+				if (this._toInlineServer != null)
+				{
+					this._toInlineServer.flush();
+
+					this._toInlineServer.print("MicroActivity#");
+
+					this._toInlineServer.println(packet.toString());
+
+					this._toInlineServer.flush();
+
+					log("Event packet passed to InlineServer");
+				}
+
+			}
 		}
 		return true;
 
@@ -191,7 +333,7 @@ public class SensorShell
 	 */
 	public SensorProperties getSensorProperties()
 	{
-		return this.$properties;
+		return this._properties;
 	}
 
 	/**
@@ -247,9 +389,9 @@ public class SensorShell
 	private void print(String line)
 	{
 
-		this.logger.info(line);
+		this._logger.info(line);
 
-		if (this.$interactive)
+		if (this._interactive)
 		{
 			System.out.print(line);
 		}
@@ -259,9 +401,9 @@ public class SensorShell
 	{
 		try
 		{
-			String line = this.bufferedReader.readLine();
+			String line = this._bufferedReader.readLine();
 
-			this.logger.log(Level.INFO, line + this.cr);
+			this._logger.log(Level.INFO, line + this._cr);
 
 			return line;
 		}
@@ -275,12 +417,12 @@ public class SensorShell
 
 	private void printPrompt()
 	{
-		this.print(this.prompt);
+		this.print(this._prompt);
 	}
 
 	private void quit()
 	{
-		this.logger.log(Level.INFO, "Quitting SensorShell");
+		this._logger.log(Level.INFO, "Quitting SensorShell");
 
 		System.exit(0);
 
@@ -293,6 +435,8 @@ public class SensorShell
 	 */
 	public static void main(String args[])
 	{
+
+		Thread.setDefaultUncaughtExceptionHandler(new DefaultExceptionHandler());
 
 		if ((args.length == 1) && (args[0].equalsIgnoreCase("-help")))
 		{
@@ -341,7 +485,7 @@ public class SensorShell
 			}
 
 			StringTokenizer tokenizer = new StringTokenizer(inputString,
-					shell.delimiter);
+					shell._delimiter);
 
 			int numTokens = tokenizer.countTokens();
 
@@ -362,6 +506,88 @@ public class SensorShell
 			shell.doCommand(new Date(), commandName, argList);
 
 		}
+	}
+
+	/**
+	 * @param string
+	 */
+	private void log(String string)
+	{
+		if (this._logWriter != null)
+		{
+			this._logWriter.println(string);
+
+			this._logWriter.flush();
+		}
+
+	}
+
+	/**
+	 * @see java.lang.Object#finalize()
+	 */
+	@Override
+	protected void finalize() throws Throwable
+	{
+		super.finalize();
+
+		if (this._logWriter != null)
+		{
+			this._logWriter.close();
+		}
+	}
+
+	private static class StreamGobbler extends Thread
+	{
+		InputStream _is;
+
+		String _type;
+
+		StreamGobbler(InputStream is, String type)
+		{
+			this._is = is;
+			this._type = type;
+		}
+
+		public void run()
+		{
+			try
+			{
+				InputStreamReader isr = new InputStreamReader(this._is);
+				
+				BufferedReader br = new BufferedReader(isr);
+				
+				String line = null;
+				
+				while ((line = br.readLine()) != null)
+					System.out.println(this._type + ">" + line);
+			}
+			catch (IOException ioe)
+			{
+				ioe.printStackTrace();
+			}
+		}
+	}
+
+	private static class DefaultExceptionHandler implements UncaughtExceptionHandler
+	{
+		public void uncaughtException(Thread t, Throwable e)
+		{
+			System.out.println("An uncaught Exception had occured:");
+
+			System.out.println("Thread:" + t.getName());
+
+			System.out.println("Class: " + t.getClass());
+
+			System.out.println("State: " + t.getState());
+
+			System.out.println("Message: " + e.getMessage());
+
+			System.out.println("StackTrace: ");
+
+			e.printStackTrace();
+
+		}
+
 	}
 
 }

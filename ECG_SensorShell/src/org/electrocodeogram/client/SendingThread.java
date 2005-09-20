@@ -272,6 +272,8 @@ public class SendingThread extends Thread
             return result;
         }
 
+        // TODO : Overflow ?
+        
         /**
          * This method returns and removes the head-most EventPacket of the
          * queue.
