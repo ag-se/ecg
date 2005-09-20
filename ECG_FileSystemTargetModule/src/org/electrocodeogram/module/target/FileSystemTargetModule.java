@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 import org.electrocodeogram.event.TypedValidEventPacket;
+import org.electrocodeogram.module.ModuleDescriptor;
+import org.electrocodeogram.module.ModuleProperty;
 import org.electrocodeogram.module.ModulePropertyException;
 
 /**
@@ -28,7 +30,8 @@ public class FileSystemTargetModule extends TargetModule
     public FileSystemTargetModule(String arg0, String arg1)
     {
         super(arg0, arg1);
-
+        
+        this.getLogger().exiting(this.getClass().getName(),"FileSystemTargetModule");
 
     }
 
@@ -39,9 +42,13 @@ public class FileSystemTargetModule extends TargetModule
     public void write(TypedValidEventPacket arg0)
     {
 
+    	this.getLogger().entering(this.getClass().getName(),"write");
+    	
         this.writer.println(arg0.toString());
 
         this.writer.flush();
+        
+        this.getLogger().exiting(this.getClass().getName(),"write");
 
     }
 
@@ -59,7 +66,7 @@ public class FileSystemTargetModule extends TargetModule
             "The module does not support a property with the given name: " + propertyName);
             
         }
-
+        
         File propertyValueFile = new File(propertyValue);
 
         this.outputFile = propertyValueFile;
@@ -76,8 +83,15 @@ public class FileSystemTargetModule extends TargetModule
                     "The file could not be opened for writing.");
         }
 
+        for(ModuleProperty property : this.runtimeProperties)
+        {
+        	if(property.getName().equals(propertyName))
+        	{
+        		property.setValue(propertyValue);
+        	}
+        }
     }
-    
+   
     public void analyseCoreNotification()
     {
         
@@ -89,6 +103,8 @@ public class FileSystemTargetModule extends TargetModule
     @Override
     public void initialize()
     {
+    	this.getLogger().entering(this.getClass().getName(),"initialize");
+    	
         String homeDir = System.getProperty("user.home");
 
         if (homeDir == null) {
@@ -110,6 +126,7 @@ public class FileSystemTargetModule extends TargetModule
             e.printStackTrace();
         }
         
+        this.getLogger().exiting(this.getClass().getName(),"initialize");
     }
     
     /**
@@ -118,6 +135,10 @@ public class FileSystemTargetModule extends TargetModule
 	@Override
 	public String getProperty(String propertyName)
 	{
+		this.getLogger().entering(this.getClass().getName(),"getProperty");
+		
+		this.getLogger().exiting(this.getClass().getName(),"getProperty");
+		
 		return null;
 	}
 }
