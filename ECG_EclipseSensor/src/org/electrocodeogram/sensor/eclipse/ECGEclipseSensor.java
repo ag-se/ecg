@@ -6,6 +6,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -34,7 +36,9 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
+import org.electrocodeogram.logging.LogHelper;
 import org.hackystat.kernel.admin.SensorProperties;
+import org.hackystat.kernel.shell.SensorShell;
 import org.hackystat.stdext.sensor.eclipse.EclipseSensor;
 import org.hackystat.stdext.sensor.eclipse.EclipseSensorPlugin;
 import org.hackystat.stdext.sensor.eclipse.EclipseSensorShell;
@@ -58,6 +62,8 @@ public class ECGEclipseSensor
     private boolean _isEnabled = true;
 
     private EclipseSensorShell _eclipseSensorShell;
+    
+    private Logger _logger;
     
     String _username = null;
     
@@ -97,6 +103,8 @@ public class ECGEclipseSensor
     
     private ECGEclipseSensor()
     {
+    	this._logger = LogHelper.createLogger(this);
+    	
     	this._hackyEclipse = EclipseSensor.getInstance();
         
         this._eclipseSensorShell = this._hackyEclipse.getEclipseSensorShell();
@@ -109,7 +117,7 @@ public class ECGEclipseSensor
         
     	List list = Arrays.asList(path);
 		 
-    	this._eclipseSensorShell.doCommand("ECGEclipseSensorPath",list);
+    	this._eclipseSensorShell.doCommand(SensorShell.ECG_LAB_PATH,list);
     	
         // try to get the username from the operating system environment
         this._username = System.getenv("username");
@@ -119,6 +127,8 @@ public class ECGEclipseSensor
             this._username = "n.a.";
         }
       
+        this._logger.log(Level.INFO,"Username is set to" + this._username);
+        
         this._timer  = new Timer();
         
         // add the WindowListener for listening on
@@ -172,7 +182,6 @@ public class ECGEclipseSensor
         
         dp.addDebugEventListener(new DebugEventSetAdapter());
         
-
     }
   
 	Timer getTimer()
@@ -234,14 +243,14 @@ public class ECGEclipseSensor
             return;
         }
         
+        // TODO : bring constants to event
+         
         String[] args = { HACKYSTAT_ADD_COMMAND, MICRO_ACTIVITY_STRING, data};
         
         // if eclipse is shutting down the eclipseSensorShell might be gone allready
         if(this._eclipseSensorShell != null)
         {
         	this._eclipseSensorShell.doCommand(HACKYSTAT_ACTIVITY_STRING, Arrays.asList(args));
-        	
-        	//this._eclipseSensorShell.processStatusLine("ElectroCodeoGram : " + MICRO_ACTIVITY_STRING + " : " + data);
         	
         }
         
@@ -616,22 +625,21 @@ public class ECGEclipseSensor
 
             sensor.processActivity("<?xml version=\"1.0\"?><microActivity><commonData><username>"+sensor.getUsername()+"</username><projectname>"+sensor.getProjectname()+"</projectname></commonData><codechange><document><![CDATA["+this.$document.get()+"]]></document><documentname>"+this.$documentName+"</documentname></codechange></microActivity>");
             
-          while(true)
-          {
-        	 try
-			{
-				Thread.sleep(10);
-			}
-			catch (InterruptedException e)
-			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-        	 
-        	 sensor.processActivity("<?xml version=\"1.0\"?><microActivity><commonData><username>"+sensor.getUsername()+"</username><projectname>"+sensor.getProjectname()+"</projectname></commonData><window><activity>activated</activity><windowname>foo</windowname></window></microActivity>");
-          }
+//          while(true)
+//          {
+//        	try
+//			{
+//				Thread.sleep(10);
+//			}
+//			catch (InterruptedException e)
+//			{
+//				SensorShell.log(e.getMessage());
+//			}
+//        	 
+//        	 sensor.processActivity("<?xml version=\"1.0\"?><microActivity><commonData><username>"+sensor.getUsername()+"</username><projectname>"+sensor.getProjectname()+"</projectname></commonData><window><activity>activated</activity><windowname>foo</windowname></window></microActivity>");
+//          }
 
         }
     }
-
+   
 }
