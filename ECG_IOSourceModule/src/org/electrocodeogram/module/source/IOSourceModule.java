@@ -55,7 +55,6 @@ public class IOSourceModule extends SourceModule
 	@Override
 	public void initialize()
 	{
-		startReader(this);
 	}
 
 	/**
@@ -70,6 +69,13 @@ public class IOSourceModule extends SourceModule
 
 	}
 
+	
+	public void stopReader()
+	{
+		this._console.shutDown();
+		
+		this._console = null;
+	}
 	/**
 	 * @see org.electrocodeogram.module.Module#getProperty(java.lang.String)
 	 */
@@ -87,6 +93,8 @@ public class IOSourceModule extends SourceModule
 		private SourceModule _sourceModule;
 
 		private StringTokenizer stringTokenizer;
+		
+		private boolean _run = true;
 
 		/**
 		 * Creates the console to manage the ECG Server & Lab.
@@ -103,14 +111,41 @@ public class IOSourceModule extends SourceModule
 
 		}
 
+		
+		public void shutDown()
+		{
+			this._run = false;
+		}
 		/**
 		 * Here the reading of the console-input is done.
 		 */
 		@Override
 		public void run()
 		{
-
-			while (true)
+			
+			Date timeStamp = null;
+			
+			String eventString;
+			
+			String[] eventStrings;
+			
+			int i;
+			
+			String token;
+			
+			String sensorDataTypeString;
+			
+			String argListString;
+			
+			StringTokenizer argListTokenizer;
+			
+			String[] argListStringArray;
+			
+			ValidEventPacket eventPacket;
+			
+			List argList;
+			
+			while (this._run)
 			{
 
 				System.out.println(this.getName() + " >>");
@@ -121,21 +156,19 @@ public class IOSourceModule extends SourceModule
 
 				if (inputString.startsWith("MicroActivity#"))
 				{
-					Date timeStamp = null;
-
-					String eventString = inputString.substring(new String(
+					eventString = inputString.substring(new String(
 							"MicroActivty#").length());
 
 					this.stringTokenizer = new StringTokenizer(eventString,
 							ValidEventPacket.EVENT_SEPARATOR);
 
-					String[] eventStrings = new String[this.stringTokenizer.countTokens()];
+					eventStrings = new String[this.stringTokenizer.countTokens()];
 
-					int i = 0;
+					i = 0;
 
 					while (this.stringTokenizer.hasMoreTokens())
 					{
-						String token = this.stringTokenizer.nextToken();
+						token = this.stringTokenizer.nextToken();
 
 						if (token == null || token.equals(""))
 						{
@@ -156,14 +189,14 @@ public class IOSourceModule extends SourceModule
 						e.printStackTrace();
 					}
 
-					String sensorDataTypeString = eventStrings[1];
+					sensorDataTypeString = eventStrings[1];
 
-					String argListString = eventStrings[2];
+					argListString = eventStrings[2];
 
-					StringTokenizer argListTokenizer = new StringTokenizer(
+					argListTokenizer = new StringTokenizer(
 							argListString, ValidEventPacket.ARGLIST_SEPARATOR);
 
-					String[] argListStringArray = new String[argListTokenizer.countTokens()];
+					argListStringArray = new String[argListTokenizer.countTokens()];
 
 					int j = 0;
 
@@ -172,9 +205,9 @@ public class IOSourceModule extends SourceModule
 						argListStringArray[j++] = argListTokenizer.nextToken();
 					}
 
-					List argList = Arrays.asList(argListStringArray);
+					argList = Arrays.asList(argListStringArray);
 					
-					ValidEventPacket eventPacket = null;
+					eventPacket = null;
 	                
 	                
                     try
