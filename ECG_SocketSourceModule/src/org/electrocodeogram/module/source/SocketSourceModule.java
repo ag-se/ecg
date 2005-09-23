@@ -43,6 +43,17 @@ public class SocketSourceModule extends SourceModule
 		this.getLogger().exiting(this.getClass().getName(),"startReader");
 
 	}
+	
+	public void stopReader()
+	{
+		this.getLogger().entering(this.getClass().getName(),"stopReader");
+		
+		this.socketServer.shutDown();
+		
+		this.socketServer = null;
+		
+		this.getLogger().exiting(this.getClass().getName(),"stopReader");
+	}
 
 	/**
 	 * @throws ModulePropertyException 
@@ -61,7 +72,10 @@ public class SocketSourceModule extends SourceModule
 				{
 					this.port = portValue;
 
-					this.socketServer.shutDown();
+					if(this.socketServer != null)
+					{
+						this.socketServer.shutDown();
+					}
 
 					this.startReader(this);
 
@@ -97,7 +111,7 @@ public class SocketSourceModule extends SourceModule
 		
 		this.port = 22222;
 
-		this.startReader(this);
+		//this.startReader(this);
 
 		this.getLogger().exiting(this.getClass().getName(),"initialize");
 	}

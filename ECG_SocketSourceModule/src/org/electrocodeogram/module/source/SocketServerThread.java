@@ -33,6 +33,10 @@ public class SocketServerThread extends Thread
     protected String sensorName = null;
     
     protected SourceModule sourceModule;
+    
+    private Object object;
+    
+    private ValidEventPacket packet;
    
     /**
      * This method returns the name of the currently connected ECG sensor.
@@ -147,28 +151,28 @@ public class SocketServerThread extends Thread
     	
         while(this.runningFlag)
         {
-            try {
+        	try {
                 
-                // This method call blocks until a serialized object could be received.
-                ValidEventPacket e = null;
+                this.object = this.objectInputStream.readObject();
                 
-                Object object = this.objectInputStream.readObject();
+                this.packet = (ValidEventPacket) this.object;
                 
-                e = (ValidEventPacket) object;
+                ValidEventPacket packet = new ValidEventPacket(0,this.packet.getTimeStamp(),this.packet.getSensorDataType(),this.packet.getArglist());
                 
-                if(e != null)
+                if(this.packet != null)
                 {
-                    this.sourceModule.append(e);
+                    this.sourceModule.append(packet);
+                    
                 }
                 
                     /* If the event data contains the "setTool" String, which is giving the name of the application
                      * the sensor runs in, this String is used as the sensor name.
                      */
-                    if(e.getSensorDataType().equals("Activity") && e.getArglist().get(0).equals("setTool"))
+                    if(this.packet.getSensorDataType().equals("Activity") && this.packet.getArglist().get(0).equals("setTool"))
                     {
-                        String tmpSensorName;
+                    	String tmpSensorName;
                         
-                        if((tmpSensorName = (String)e.getArglist().get(1)) != null)
+                        if((tmpSensorName = (String)this.packet.getArglist().get(1)) != null)
                         {
                             this.sensorName = tmpSensorName;
                             
@@ -178,25 +182,36 @@ public class SocketServerThread extends Thread
             }
             catch(SocketException e)
             {
+            	
+            	this.logger.log(Level.ALL,"catch(SocketException e)");
+            	
                 this.runningFlag = false;
                 
                 this.logger.log(Level.WARNING,"The socket connection to the ECG Sensor is lost.");
             }
             catch (IOException e) {
+            	
+            	this.logger.log(Level.ALL,"catch (IOException e) {");
                 
                 this.logger.log(Level.WARNING,"Error while reading from the ECG sensor.");
             }
             catch (ClassNotFoundException e) {
 
+            	this.logger.log(Level.ALL,"catch (ClassNotFoundException e) {");
+            	
                 this.logger.log(Level.WARNING,"Error while reading from the ECG sensor.");
                 
             }
             catch(ClassCastException e)
             {
+            	this.logger.log(Level.ALL,"catch(ClassCastException e)");
+            	
                 // If something else then a ValidEventPacket is received, we don't care!
             }
             catch(Exception e)
             {
+            	this.logger.log(Level.ALL,"catch(Exception e)");
+            	
                 e.printStackTrace();
             }
         }
