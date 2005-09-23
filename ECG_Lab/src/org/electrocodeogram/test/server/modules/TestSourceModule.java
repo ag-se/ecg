@@ -70,4 +70,14 @@ public class TestSourceModule extends SourceModule
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.electrocodeogram.module.source.SourceModule#stopReader()
+	 */
+	@Override
+	public void stopReader()
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
 }

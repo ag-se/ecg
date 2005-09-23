@@ -22,8 +22,10 @@ import org.electrocodeogram.module.registry.ModuleInstanceException;
 import org.electrocodeogram.module.registry.ModuleRegistry;
 
 import org.electrocodeogram.msdt.validation.EventValidator;
+import org.electrocodeogram.system.ISystemRoot;
 import org.electrocodeogram.system.SystemRoot;
 import org.electrocodeogram.ui.Gui;
+import org.electrocodeogram.ui.IGui;
 import org.electrocodeogram.ui.MenuManager;
 import org.jgraph.JGraph;
 import org.jgraph.event.GraphSelectionEvent;
@@ -92,7 +94,13 @@ public class ModuleGraph extends JGraph
             
             public void mouseClicked(MouseEvent e)
             {
-                if(SystemRoot.getSystemInstance().getGui().getModuleConnectionMode())
+            	ISystemRoot systemRoot = SystemRoot.getSystemInstance();
+            	
+            	IGui gui = systemRoot.getGui();
+            	
+            	boolean mode = gui.getModuleConnectionMode();
+            	
+                if(mode)
                 {
                     if(e.getButton() == MouseEvent.BUTTON1)
                     {

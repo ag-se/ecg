@@ -15,6 +15,8 @@ public class ModuleConfiguration
 	
 	private int _moduleId;
 	
+	private boolean _active;
+	
 	private ModuleProperty[] _moduleProperties;
 	
 	private Integer[] _connectedTo;
@@ -34,13 +36,14 @@ public class ModuleConfiguration
 	 * @param name
 	 * @param properties
 	 */
-	public ModuleConfiguration(Integer[] to, int id, String name, ModuleProperty[] properties,String fromClassId)
+	public ModuleConfiguration(Integer[] to, int id, String name, boolean active,ModuleProperty[] properties,String fromClassId)
 	{
 		this._connectedTo = to;
 		this._moduleId = id;
 		this._moduleName = name;
 		this._moduleProperties = properties;
 		this._fromClassId = fromClassId;
+		this._active = active;
 	}
 
 	public Integer[] getConnectedTo()
@@ -63,4 +66,8 @@ public class ModuleConfiguration
 		return this._moduleProperties;
 	}
 	
+	public boolean isActive()
+	{
+		return this._active;
+	}
 }

@@ -23,6 +23,8 @@ public abstract class TargetModule extends Module
 	{
 		super(ModuleType.TARGET_MODULE, moduleClassId, name);
 		
+		initialize();
+		
 		this.getLogger().exiting(this.getClass().getName(),"TargetModule");
 	}
 

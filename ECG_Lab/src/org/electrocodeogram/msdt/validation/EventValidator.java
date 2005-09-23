@@ -16,6 +16,7 @@ import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.msdt.MicroSensorDataType;
 import org.electrocodeogram.msdt.registry.ISystemMsdtRegistry;
 import org.hackystat.kernel.admin.SensorProperties;
+import org.hackystat.kernel.shell.OfflineManagerClearer;
 import org.hackystat.kernel.shell.SensorShell;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -27,264 +28,305 @@ import org.xml.sax.SAXException;
  */
 public class EventValidator
 {
-    private Logger logger = null;
+	private Logger logger = null;
 
-    private int processingID = 0;
+	private int processingID = 0;
 
-    private ISystemMsdtRegistry $mSdtManager = null;
+	private ISystemMsdtRegistry $mSdtManager = null;
 
-    private SensorShell shell;
+	private SensorShell shell;
 
-    private boolean $allowNonHackyStatSDTConformEvents = false;
+	private boolean $allowNonHackyStatSDTConformEvents = false;
 
-    private boolean $allowNonECGmSDTConformEvents = false;
+	private boolean $allowNonECGmSDTConformEvents = false;
+	
+	private int count = 0;
 
-    /**
-     * This creates a EventValidator object.
-     * 
-     * @param mSdtManager
-     *            Is the MicroSensorDataType-Manager (MsdtManager) object that
-     *            keeps the MicroSensorDataType XML schema definitions which are used
-     *            to validate the MicroActivities against.
-     */
-    public EventValidator(ISystemMsdtRegistry mSdtManager)
-    {
-        this.shell = new SensorShell(new SensorProperties("", ""), false,
-                "ElectroCodeoGram");
+	/**
+	 * This creates a EventValidator object.
+	 * 
+	 * @param mSdtManager
+	 *            Is the MicroSensorDataType-Manager (MsdtManager) object that
+	 *            keeps the MicroSensorDataType XML schema definitions which are used
+	 *            to validate the MicroActivities against.
+	 */
+	public EventValidator(ISystemMsdtRegistry mSdtManager)
+	{
+		this.shell = new SensorShell(new SensorProperties("", ""), false,
+				"ElectroCodeoGram",false);
 
-        this.$mSdtManager = mSdtManager;
+		this.$mSdtManager = mSdtManager;
 
-        this.logger = Logger.getLogger("ECG Server");
+		this.logger = Logger.getLogger("ECG Server");
 
-    }
+	}
 
-    /**
-     * This method checks if a given ValidEventPacket object complies to
-     * HackyStat and ECG standards. Checking is done in a sequence from
-     * the weakest condition to the strongest.
-     * First the event data is checked by the HackyStat SensorShell component
-     * for comliance to a HackyStat SensorDataType.
-     * If positive the event data is checked to be a HackyStat "Activity"
-     * event.
-     * If positive the event data is chekced to be an ECG "MicroActivity"
-     * event.
-     * At last the event data is checked for compliance to a ECG MicroSensorDataType.
-     * Only if the last stage checking is positive this method returns "true".
-     * 
-     * @param packet
-     *            Is the ValidEventPacket object to check
-     * @return "true" if the event data is according to a HackyStat
-     *         SensorDataType and an ECG MicroSensorDataType
-     */
-    public TypedValidEventPacket validate(ValidEventPacket packet)
-    {
-        this.processingID++;
+	/**
+	 * This method checks if a given ValidEventPacket object complies to
+	 * HackyStat and ECG standards. Checking is done in a sequence from
+	 * the weakest condition to the strongest.
+	 * First the event data is checked by the HackyStat SensorShell component
+	 * for comliance to a HackyStat SensorDataType.
+	 * If positive the event data is checked to be a HackyStat "Activity"
+	 * event.
+	 * If positive the event data is chekced to be an ECG "MicroActivity"
+	 * event.
+	 * At last the event data is checked for compliance to a ECG MicroSensorDataType.
+	 * Only if the last stage checking is positive this method returns "true".
+	 * 
+	 * @param packet
+	 *            Is the ValidEventPacket object to check
+	 * @return "true" if the event data is according to a HackyStat
+	 *         SensorDataType and an ECG MicroSensorDataType
+	 */
+	public TypedValidEventPacket validate(ValidEventPacket packet)
+	{
+		//this.processingID++;
 
-        this.logger.log(Level.INFO, this.processingID + ": Begin to process new event data at " + new Date().toString());
+		//this.logger.log(Level.INFO, this.processingID + ": Begin to process new event data at " + new Date().toString());
 
-        if (this.$allowNonHackyStatSDTConformEvents)
-            try {
-                return new TypedValidEventPacket(-1,packet.getTimeStamp(),packet.getSensorDataType(),packet.getArglist(),null);
-            }
-            catch (IllegalEventParameterException e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
-            }
+		if (this.$allowNonHackyStatSDTConformEvents)
+		{
+			try
+			{
+				return new TypedValidEventPacket(-1, packet.getTimeStamp(),
+						packet.getSensorDataType(), packet.getArglist(), null);
+			}
+			catch (IllegalEventParameterException e1)
+			{
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+		/*
+		 * Is the incoming event according to a HackyStat SensorDataType?
+		 */
+		boolean isHackyStatSensorDataTypeConform = this.shell.doCommand(packet.getTimeStamp(), packet.getSensorDataType(), packet.getArglist());
+		
+		this.count++;
+		
+		if(this.count == 100)
+		{
+			this.shell = new SensorShell(new SensorProperties("", ""), false,
+					"ElectroCodeoGram",false);
+			
+			OfflineManagerClearer.clearOfflineManager();
+			
+			System.gc();
+			
+			this.count = 0;
+		}
+		
+		//boolean isHackyStatSensorDataTypeConform = true;
 
-        /*
-         * Is the incoming event according to a HackyStat SensorDataType?
-         */
-        boolean isHackyStatSensorDataTypeConform = this.shell.doCommand(packet.getTimeStamp(), packet.getSensorDataType(), packet.getArglist());
+		if (isHackyStatSensorDataTypeConform)
+		{
 
-        if (isHackyStatSensorDataTypeConform) {
+			this.logger.log(Level.INFO, this.processingID + ": Event data is conforming to a HackyStat SensorDataType and is processed.");
 
-            this.logger.log(Level.INFO, this.processingID + ": Event data is conforming to a HackyStat SensorDataType and is processed.");
+			this.logger.log(Level.INFO, this.processingID + " : " + packet.toString());
 
-            this.logger.log(Level.INFO, this.processingID + " : " + packet.toString());
+			if (this.$allowNonECGmSDTConformEvents)
+			{
+				try
+				{
+					return new TypedValidEventPacket(0, packet.getTimeStamp(),
+							packet.getSensorDataType(), packet.getArglist(),
+							null);
+				}
+				catch (IllegalEventParameterException e)
+				{
+					return null;
+				}
+			}
 
-            if (this.$allowNonECGmSDTConformEvents)
-                try {
-                    return new TypedValidEventPacket(0,packet.getTimeStamp(),packet.getSensorDataType(),packet.getArglist(),null);
-                }
-                catch (IllegalEventParameterException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
+			if (isActivityEvent(packet))
+			{
+				if (isMicroActivityEvent(packet))
+				{
+					return isMicroSensorDataType(packet);
+				}
+			}
+			
+		}
+		
+		return null;
+	}
 
-            if (isActivityEvent(packet)) {
-                if (isMicroActivityEvent(packet))
-                {
-                     return isMicroSensorDataType(packet);
-                }
-            }
+	/**
+	 * This method checks if an ValidEventPacket is containing a ECG "MicroActivity" event.
+	 * @param packet Is the ValidEventPacket to check
+	 * @return "true" if the packet is a "MicroActivity" event and "false" if not
+	 */
+	private boolean isMicroActivityEvent(ValidEventPacket packet)
+	{
+		if (packet == null) return false;
 
-        }
+		if (packet.getArglist().get(1).equals("MicroActivity"))
+		{
+			this.logger.log(Level.INFO, this.processingID + ": The event is an ECG \"MicroActivity\" event.");
+			return true;
+		}
 
-        return null;
-    }
+		this.logger.log(Level.INFO, this.processingID + ": The event is not an ECG \"MicroActivity\" event.");
+		return false;
+	}
 
-    /**
-     * This method checks if an ValidEventPacket is containing a ECG "MicroActivity" event.
-     * @param packet Is the ValidEventPacket to check
-     * @return "true" if the packet is a "MicroActivity" event and "false" if not
-     */
-    private boolean isMicroActivityEvent(ValidEventPacket packet)
-    {
-        if (packet == null)
-            return false;
+	/**
+	 * This method checks if an ValidEventPacket is containing a HackyStat "Activity" event.
+	 * @param packet Is the ValidEventPacket to check
+	 * @return "true" if the packet is an "Activity" event and "false" if not
+	 */
+	private boolean isActivityEvent(ValidEventPacket packet)
+	{
 
-        if (packet.getArglist().get(1).equals("MicroActivity")) {
-            this.logger.log(Level.INFO, this.processingID + ": The event is an ECG \"MicroActivity\" event.");
-            return true;
-        }
+		if (packet == null)
+		{
+			return false;
+		}
 
-        this.logger.log(Level.INFO, this.processingID + ": The event is not an ECG \"MicroActivity\" event.");
-        return false;
-    }
+		if (packet.getSensorDataType().equals("Activity"))
+		{
+			this.logger.log(Level.INFO, this.processingID + ": The event is a HackyStat \"Activity\" event.");
+			return true;
+		}
 
-    /**
-     * This method checks if an ValidEventPacket is containing a HackyStat "Activity" event.
-     * @param packet Is the ValidEventPacket to check
-     * @return "true" if the packet is an "Activity" event and "false" if not
-     */
-    private boolean isActivityEvent(ValidEventPacket packet)
-    {
+		this.logger.log(Level.INFO, this.processingID + ": The event is not a HackyStat \"Activity\" event.");
+		return false;
+	}
 
-        if (packet == null) {
-            return false;
-        }
+	private TypedValidEventPacket isMicroSensorDataType(ValidEventPacket packet)
+	{
 
-        if (packet.getSensorDataType().equals("Activity")) {
-            this.logger.log(Level.INFO, this.processingID + ": The event is a HackyStat \"Activity\" event.");
-            return true;
-        }
+		List argList = packet.getArglist();
 
-        this.logger.log(Level.INFO, this.processingID + ": The event is not a HackyStat \"Activity\" event.");
-        return false;
-    }
+		String microActivityString = (String) argList.get(2);
 
-    private TypedValidEventPacket isMicroSensorDataType(ValidEventPacket packet)
-    {
+		if (microActivityString == null || microActivityString.equals(""))
+		{
 
-        List argList = packet.getArglist();
+			this.logger.log(Level.INFO, this.processingID + ": No MicroActivity data found.");
 
-        String microActivityString = (String) argList.get(2);
+			this.logger.log(Level.INFO, this.processingID + ": Event data is not conforming to a HackyStat SensorDataType and is discarded.");
 
-        if (microActivityString == null || microActivityString.equals("")) {
+			this.logger.log(Level.INFO, this.processingID + ":" + packet.toString());
 
-            this.logger.log(Level.INFO, this.processingID + ": No MicroActivity data found.");
+			return null;
+		}
 
-            this.logger.log(Level.INFO, this.processingID + ": Event data is not conforming to a HackyStat SensorDataType and is discarded.");
+		MicroSensorDataType[] microSensorDataTypes = this.$mSdtManager.getMicroSensorDataTypes();
 
-            this.logger.log(Level.INFO, this.processingID + ":" + packet.toString());
+		if (microSensorDataTypes.length == 0)
+		{
 
-            return null;
-        }
+			this.logger.log(Level.INFO, this.processingID + ": No MicroSensorDataTypes are found.");
 
-        MicroSensorDataType[] microSensorDataTypes = this.$mSdtManager.getMicroSensorDataTypes();
+			this.logger.log(Level.INFO, this.processingID + ": Event data is not conforming to a HackyStat SensorDataType and is discarded.");
 
-        if (microSensorDataTypes.length == 0) {
+			this.logger.log(Level.INFO, this.processingID + ":" + packet.toString());
 
-            this.logger.log(Level.INFO, this.processingID + ": No MicroSensorDataTypes are found.");
+			return null;
+		}
 
-            this.logger.log(Level.INFO, this.processingID + ": Event data is not conforming to a HackyStat SensorDataType and is discarded.");
+		for (int i = 0; i < microSensorDataTypes.length; i++)
+		{
 
-            this.logger.log(Level.INFO, this.processingID + ":" + packet.toString());
+			SAXSource saxSource = new SAXSource(new InputSource(
+					new StringReader(microActivityString)));
 
-            return null;
-        }
+			Validator validator = microSensorDataTypes[i].getSchema().newValidator();
 
-        for (int i = 0; i < microSensorDataTypes.length; i++) {
+			try
+			{
 
-            SAXSource saxSource = new SAXSource(new InputSource(
-                    new StringReader(microActivityString)));
+				//this.logger.log(Level.INFO, "Validating MicroActivity against " + microSensorDataTypes[i].getName() + " XML schema.");
 
-            Validator validator = microSensorDataTypes[i].getSchema().newValidator();
+				validator.validate(saxSource);
 
-            try {
+				this.logger.log(Level.INFO, "The MicroActivity is a valid " + microSensorDataTypes[i].getName() + " event.");
 
-                //this.logger.log(Level.INFO, "Validating MicroActivity against " + microSensorDataTypes[i].getName() + " XML schema.");
+				TypedValidEventPacket typedValidEventPacket = null;
 
-                validator.validate(saxSource);
+				try
+				{
+					typedValidEventPacket = new TypedValidEventPacket(0,
+							packet.getTimeStamp(), packet.getSensorDataType(),
+							packet.getArglist(), microSensorDataTypes[i]);
+				}
+				catch (IllegalEventParameterException e)
+				{
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 
-                this.logger.log(Level.INFO, "The MicroActivity is a valid " + microSensorDataTypes[i].getName() + " event.");
+				return typedValidEventPacket;
+			}
+			catch (SAXException e)
+			{
 
-                TypedValidEventPacket typedValidEventPacket = null;
-                
-                try {
-                    typedValidEventPacket = new TypedValidEventPacket(0,packet.getTimeStamp(),packet.getSensorDataType(),packet.getArglist(),microSensorDataTypes[i]);
-                }
-                catch (IllegalEventParameterException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-                
-                return typedValidEventPacket;
-            }
-            catch (SAXException e) {
+				// ignore this
 
-               // ignore this
+			}
+			catch (IOException e)
+			{
 
-            }
-            catch (IOException e) {
+				this.logger.log(Level.INFO, "The MicroActivity event could not been read.");
 
-                this.logger.log(Level.INFO, "The MicroActivity event could not been read.");
+			}
 
-            }
+		}
 
-        }
+		this.logger.log(Level.INFO, "The MicroActivity is not conforming to a known MicroSensorDataType.");
 
-        this.logger.log(Level.INFO, "The MicroActivity is not conforming to a known MicroSensorDataType.");
-        
-        return null;
-    }
+		return null;
+	}
 
-    /**
-     * This method tells wheter event data that does not conform to
-     * a ECG MicroSensorDataType is allowed to pass validation or not.
-     * @return "true" if event data that does not conform to
-     * a ECG MicroSensorDataType is allowed and "false" if not
-     */
-    public boolean areNonECGmSDTConformEventsAllowed()
-    {
-        return this.$allowNonECGmSDTConformEvents;
-    }
+	/**
+	 * This method tells wheter event data that does not conform to
+	 * a ECG MicroSensorDataType is allowed to pass validation or not.
+	 * @return "true" if event data that does not conform to
+	 * a ECG MicroSensorDataType is allowed and "false" if not
+	 */
+	public boolean areNonECGmSDTConformEventsAllowed()
+	{
+		return this.$allowNonECGmSDTConformEvents;
+	}
 
-    /**
-     * This method is used to decalare whether event data that does not conform to
-     * a ECG MicroSensorDataType is allowed to pass validation.
-     * A value of "false" is ignored if the value for allowing non HackyStat conform
-     * event data is set to "true".
-     * @param allowNonECGmSDTConformEvents Is "true" if event data that does not conform to
-     * a ECG MicroSensorDataType is allowed and "false" if not
-     */
-    public void setAllowNonECGmSDTConformEvents(boolean allowNonECGmSDTConformEvents)
-    {
-        this.$allowNonECGmSDTConformEvents = allowNonECGmSDTConformEvents;
-    }
+	/**
+	 * This method is used to decalare whether event data that does not conform to
+	 * a ECG MicroSensorDataType is allowed to pass validation.
+	 * A value of "false" is ignored if the value for allowing non HackyStat conform
+	 * event data is set to "true".
+	 * @param allowNonECGmSDTConformEvents Is "true" if event data that does not conform to
+	 * a ECG MicroSensorDataType is allowed and "false" if not
+	 */
+	public void setAllowNonECGmSDTConformEvents(boolean allowNonECGmSDTConformEvents)
+	{
+		this.$allowNonECGmSDTConformEvents = allowNonECGmSDTConformEvents;
+	}
 
-    /**
-     * This method tells wheter event data that does not conform to
-     * a HackyStat SensorDataType is allowed to pass validation or not.
-     * @return "true" if event data that does not conform to
-     * a HackyStat SensorDataType is allowed and "false" if not
-     */
+	/**
+	 * This method tells wheter event data that does not conform to
+	 * a HackyStat SensorDataType is allowed to pass validation or not.
+	 * @return "true" if event data that does not conform to
+	 * a HackyStat SensorDataType is allowed and "false" if not
+	 */
 
-    public boolean areNonHackyStatSDTConformEventsAllowed()
-    {
-        return this.$allowNonHackyStatSDTConformEvents;
-    }
+	public boolean areNonHackyStatSDTConformEventsAllowed()
+	{
+		return this.$allowNonHackyStatSDTConformEvents;
+	}
 
-    /**
-     * This method is used to declare whether event data that does not conform to
-     * a HackyStat SensorDataType is allowed to pass validation.
-     * @param allowNonHackyStatSDTConformEvents Is "true" if event data that does not conform to
-     * a HackyStat SensorDataType is allowed and "false" if not
-     */
+	/**
+	 * This method is used to declare whether event data that does not conform to
+	 * a HackyStat SensorDataType is allowed to pass validation.
+	 * @param allowNonHackyStatSDTConformEvents Is "true" if event data that does not conform to
+	 * a HackyStat SensorDataType is allowed and "false" if not
+	 */
 
-    public void setAllowNonHackyStatSDTConformEvents(boolean allowNonHackyStatSDTConformEvents)
-    {
-        this.$allowNonHackyStatSDTConformEvents = allowNonHackyStatSDTConformEvents;
-    }
+	public void setAllowNonHackyStatSDTConformEvents(boolean allowNonHackyStatSDTConformEvents)
+	{
+		this.$allowNonHackyStatSDTConformEvents = allowNonHackyStatSDTConformEvents;
+	}
 
 }

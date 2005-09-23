@@ -177,6 +177,8 @@ public class ECGParser
 			logger.log(Level.INFO, "Going to load next module.");
 
 			String idValue = getAttributeValue(moduleNode, "id");
+			
+			String activeValue = getAttributeValue(moduleNode,"active");
 
 			try
 			{
@@ -190,6 +192,13 @@ public class ECGParser
 						"Illegal value for attribute \"id\" for element \"module\".");
 			}
 
+			boolean active = false;
+			
+			if(activeValue != null && activeValue.equalsIgnoreCase("true"))
+			{
+				active = true;
+			}
+			
 			logger.log(Level.INFO, "Value for attribute \"id\" for element \"module\".");
 
 			Node nameNode = getChildNode(moduleNode, "name");
@@ -269,7 +278,7 @@ public class ECGParser
 
 			moduleConfiguration = new ModuleConfiguration(
 					connectedToList.toArray(new Integer[0]), storedModuleId.intValue(),
-					moduleName,
+					moduleName,active,
 					modulePropertyList.toArray(new ModuleProperty[0]),
 					fromClassId);
 
@@ -327,7 +336,9 @@ public class ECGParser
 
 			try
 			{
-				type = Class.forName(modulePropertyType);
+				//type = Class.forName(modulePropertyType);
+				
+				type = ModuleClassLoader.getInstance().loadClass(modulePropertyType);
 			}
 			catch (ClassNotFoundException e)
 			{
@@ -421,16 +432,9 @@ public class ECGParser
 			File msdtFile = new File(
 					currentModuleDirectoryString + File.separator + msdtFileString);
 
-			try
-			{
-				microSensorDataTypes.add(SystemRoot.getSystemInstance().getSystemMsdtRegistry().parseMicroSensorDataType(msdtFile));
-			}
-			catch (MicroSensorDataTypeException e)
-			{
-				throw new MicroSensorDataTypeException("");
-
-			}
-
+			
+			microSensorDataTypes.add(SystemRoot.getSystemInstance().getSystemMsdtRegistry().parseMicroSensorDataType(msdtFile));
+			
 		}
 
 		return microSensorDataTypes.toArray(new MicroSensorDataType[0]);

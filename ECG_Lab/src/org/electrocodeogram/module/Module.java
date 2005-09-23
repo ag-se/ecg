@@ -20,7 +20,7 @@ import org.electrocodeogram.msdt.MicroSensorDataType;
 import org.electrocodeogram.msdt.registry.MicroSensorDataTypeRegistrationException;
 import org.electrocodeogram.system.ISystemRoot;
 import org.electrocodeogram.system.SystemRoot;
-import org.electrocodeogram.system.logging.LogHelper;
+import org.electrocodeogram.logging.LogHelper;
 
 /**
  * This abstract class represents an ECG module. A module is an entity able
@@ -126,7 +126,7 @@ public abstract class Module
 		this._systemObserver = new SystemObserver(this);
 
 		this._systemNotificator = new SystemNotificator(this);
-
+			
 		if (this._moduleType == ModuleType.SOURCE_MODULE)
 		{
 			this._eventSender = new EventSender(this);
@@ -156,10 +156,6 @@ public abstract class Module
 		registerMSDTs();
 
 		SystemRoot.getModuleInstance().getModuleModuleRegistry().registerRunningModule(this);
-
-		activate();
-		
-		initialize();
 		
 		this.getLogger().exiting(this.getClass().getName(),"Module");
 	}
@@ -787,12 +783,23 @@ public abstract class Module
 			
 			this._logger.exiting(this.getClass().getName(),"deactivate");
 			
+			this._logger.log(Level.INFO,"Module allready inactive " + this.getName());
+			
 			return;
 			
 		}
 
 		this._activeFlag = false;
 
+		if(this instanceof SourceModule)
+		{
+			SourceModule module = (SourceModule) this;
+			
+			module.stopReader();
+		}
+		
+		this._logger.log(Level.INFO,"Module deactivated " + this.getName());
+		
 		this._logger.exiting(this.getClass().getName(),"deactivate");
 	}
 
@@ -808,11 +815,22 @@ public abstract class Module
 		{
 			this._logger.exiting(this.getClass().getName(),"activate");
 			
+			this._logger.log(Level.INFO,"Module allready active " + this.getName());
+			
 			return;
 		}
 
 		this._activeFlag = true;
+		
+		if(this instanceof SourceModule)
+		{
+			SourceModule module = (SourceModule) this;
+			
+			module.startReader(module);
+		}
 
+		this._logger.log(Level.INFO,"Module activated " + this.getName());
+		
 		this._logger.exiting(this.getClass().getName(),"activate");
 	}
 

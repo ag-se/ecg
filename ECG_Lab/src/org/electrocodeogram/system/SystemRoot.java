@@ -1,6 +1,7 @@
 package org.electrocodeogram.system;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.Observable;
 import java.util.Observer;
@@ -17,7 +18,7 @@ import org.electrocodeogram.moduleapi.msdt.registry.IModuleMsdtRegistry;
 import org.electrocodeogram.moduleapi.system.IModuleSystemRoot;
 import org.electrocodeogram.msdt.registry.ISystemMsdtRegistry;
 import org.electrocodeogram.msdt.registry.MsdtRegistry;
-import org.electrocodeogram.system.logging.LogHelper;
+import org.electrocodeogram.logging.LogHelper;
 import org.electrocodeogram.ui.Gui;
 import org.electrocodeogram.ui.IGui;
 
@@ -52,12 +53,12 @@ public class SystemRoot extends Observable implements ISystemRoot, IModuleSystem
 
 	}
 
-	private SystemRoot(File moduleDir, File moduleSetup, boolean enableGui) throws ModuleSetupLoadException, ModuleClassLoaderInitializationException
+	private SystemRoot(String moduleDir, String moduleSetup, boolean nogui) throws ModuleSetupLoadException, ModuleClassLoaderInitializationException
 	{
 
 		this();
 
-		if (enableGui)
+		if (!nogui)
 		{
 			this._gui = new Gui(this._moduleRegistry);
 		}
@@ -91,18 +92,31 @@ public class SystemRoot extends Observable implements ISystemRoot, IModuleSystem
 			workerThread.start();
 		}
 
-		if (this._moduleRegistry == null)
+		if(moduleDir == null)
 		{
-			this._moduleRegistry = new ModuleRegistry(moduleDir);
+			if (this._moduleRegistry == null)
+			{
+				this._moduleRegistry = new ModuleRegistry(new File("modules"));
+			}
+			else
+			{
+				this._moduleRegistry.setFile(new File("modules"));
+			}
 		}
-		else
+		else 
 		{
-			this._moduleRegistry.setFile(moduleDir);
+			if (this._moduleRegistry == null)
+			{
+				this._moduleRegistry = new ModuleRegistry(new File(moduleDir));
+			}
+			else
+			{
+				this._moduleRegistry.setFile(new File(moduleDir));
+			}
 		}
-
 		if (moduleSetup != null)
 		{
-			this._moduleRegistry.loadModuleSetup(moduleSetup);
+			this._moduleRegistry.loadModuleSetup(new File(moduleSetup));
 		}
 
 	}
@@ -249,57 +263,21 @@ public class SystemRoot extends Observable implements ISystemRoot, IModuleSystem
 		
 		LogHelper.setLogLevel(logLevel);
 		
-		if (moduleDir == null)
+		try
 		{
-			if (moduleSetup == null)
-			{
-				if (nogui)
-				{
-					new SystemRoot(new File("modules"), null, true);
-				}
-				{
-					new SystemRoot(new File("modules"), null, false);
-				}
-			}
-			else
-			{
-				if (nogui)
-				{
-					new SystemRoot(new File("modules"), new File(
-							moduleSetup), true);
-				}
-				{
-					new SystemRoot(new File("modules"), new File(
-							moduleSetup), false);
-				}
-			}
+			LogHelper.setLogFile(logFile);
 		}
-		else
+		catch (SecurityException e)
 		{
-			if (moduleSetup == null)
-			{
-				if (nogui)
-				{
-					new SystemRoot(new File(moduleDir), null, true);
-				}
-				{
-					new SystemRoot(new File(moduleDir), null, false);
-				}
-			}
-			else
-			{
-				if (nogui)
-				{
-					new SystemRoot(new File(moduleDir), new File(
-							moduleSetup), true);
-				}
-				{
-					new SystemRoot(new File(moduleDir), new File(
-							moduleSetup), false);
-				}
-			}
+			System.err.println("Unable to set the lof file " + logFile);
 		}
-	
+		catch (IOException e)
+		{
+			System.err.println("Unable to set the lof file " + logFile);
+		}
+		
+		new SystemRoot(moduleDir,moduleSetup,nogui);
+			
 	}
 	
 	private static String getModuleDir(String[] args)
@@ -333,16 +311,16 @@ public class SystemRoot extends Observable implements ISystemRoot, IModuleSystem
 	{
 		if(args == null || args.length == 0)
 		{
-			return true;
+			return false;
 		}
 		for(int i=0;i<args.length;i++)
 		{
 			if(args[i].equals("-nogui"))
 			{
-				return false;
+				return true;
 			}
 		}
-		return true;
+		return false;
 	}
 	
 	private static String getModuleSetup(String[] args)
@@ -460,7 +438,7 @@ public class SystemRoot extends Observable implements ISystemRoot, IModuleSystem
 
 		System.out.println("-s <moduleSetupFile>\t\t\t\tIs the file containing the module setup to load.\n");
 
-		System.out.println("-log-level [off | error | warning | info | debug ]\tSets the log level.\n");
+		System.out.println("--log-level [off | error | warning | info | debug ]\tSets the log level.\n");
 
 		System.out.println("--log-file <logFile>\t\t\t\tIs the logfile to use. If no logfile is given, logging goes to standard out.\n");
 

@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Observable;
 import java.util.logging.Level;
@@ -17,13 +18,14 @@ import org.electrocodeogram.module.ModuleConnectionException;
 import org.electrocodeogram.module.ModuleDescriptor;
 import org.electrocodeogram.module.ModuleProperty;
 import org.electrocodeogram.module.ModulePropertyException;
+import org.electrocodeogram.module.Module.ModuleType;
 import org.electrocodeogram.module.classloader.ModuleClassLoaderInitializationException;
 import org.electrocodeogram.module.setup.ModuleConfiguration;
 import org.electrocodeogram.module.setup.ModuleSetup;
 import org.electrocodeogram.moduleapi.module.registry.IModuleModuleRegistry;
 import org.electrocodeogram.msdt.MicroSensorDataTypeException;
 import org.electrocodeogram.system.SystemRoot;
-import org.electrocodeogram.system.logging.LogHelper;
+import org.electrocodeogram.logging.LogHelper;
 import org.electrocodeogram.xml.ClassLoadingException;
 import org.electrocodeogram.xml.ECGParser;
 import org.electrocodeogram.xml.PropertyException;
@@ -529,7 +531,7 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 		{
 			this.logger.log(Level.INFO, "Storing module " + module.getName());
 
-			writer.println("<module id=\"" + module.getId() + "\">");
+			writer.println("<module id=\"" + module.getId() + "\" active=\"" + module.isActive() + "\">");
 
 			writer.println("<name>");
 
@@ -650,6 +652,8 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 		HashMap<Integer, Integer> moduleIdTransformationMap = new HashMap<Integer, Integer>();
 
 		HashMap<Integer, Integer[]> moduleConnectionMap = new HashMap<Integer, Integer[]>();
+		
+		ArrayList<Integer> moduleActivationList = new ArrayList<Integer>();
 
 		if (!file.exists())
 		{
@@ -675,24 +679,10 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 					"The file " + file.getAbsolutePath() + " can not be read.");
 		}
 
-		Module[] modules = this.runningModules.runningModuleMap.values().toArray(new Module[0]);
-
-		for (Module module : modules)
-		{
-			try
-			{
-				deregisterRunningModule(module.getId());
-			}
-			catch (ModuleInstanceException e)
-			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-
-		this.logger.log(Level.INFO, "All running modules are deregistered. ECG Lab is cleared.");
+		clearLab();
 
 		ModuleSetup moduleSetup;
+
 		try
 		{
 			moduleSetup = ECGParser.parseAsModuleSetup(file);
@@ -702,6 +692,8 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 			for (ModuleConfiguration moduleConfiguration : moduleConfigurations)
 			{
 
+				
+				
 				int assignedModuleId = createRunningModule(moduleConfiguration.getFromClassId(), moduleConfiguration.getModuleName());
 
 				ModuleProperty[] moduleProperties = moduleConfiguration.getModuleProperties();
@@ -715,6 +707,11 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 					}
 				}
 
+				if(moduleConfiguration.isActive())
+				{
+					moduleActivationList.add(new Integer(assignedModuleId));
+				}
+				
 				moduleIdTransformationMap.put(moduleConfiguration.getModuleId(), new Integer(
 						assignedModuleId));
 
@@ -750,6 +747,36 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 				}
 			}
 
+			for(Integer moduleId : moduleActivationList)
+			{
+				Module module = this.getRunningModule(moduleId.intValue());
+				
+				if(module.isModuleType(ModuleType.TARGET_MODULE))
+				{
+					module.activate();
+				}
+			}
+			
+			for(Integer moduleId : moduleActivationList)
+			{
+				Module module = this.getRunningModule(moduleId.intValue());
+				
+				if(module.isModuleType(ModuleType.INTERMEDIATE_MODULE))
+				{
+					module.activate();
+				}
+			}
+			
+			for(Integer moduleId : moduleActivationList)
+			{
+				Module module = this.getRunningModule(moduleId.intValue());
+				
+				if(module.isModuleType(ModuleType.SOURCE_MODULE))
+				{
+					module.activate();
+				}
+			}
+			
 		}
 		catch (SAXException e)
 		{
@@ -797,5 +824,28 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 			e.printStackTrace();
 		}
 
+	}
+
+	/**
+	 * 
+	 */
+	private void clearLab()
+	{
+		Module[] modules = this.runningModules.runningModuleMap.values().toArray(new Module[0]);
+
+		for (Module module : modules)
+		{
+			try
+			{
+				deregisterRunningModule(module.getId());
+			}
+			catch (ModuleInstanceException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		this.logger.log(Level.INFO, "All running modules are deregistered. ECG Lab is cleared.");
 	}
 }

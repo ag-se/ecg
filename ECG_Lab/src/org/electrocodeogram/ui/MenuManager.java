@@ -415,6 +415,19 @@ public class MenuManager
                     {
                        $propertyResult = $propertyValue;
                     }
+                    else if($propertyType.equals(Class.forName("java.lang.Boolean")))
+                    {
+                    	int result = JOptionPane.showConfirmDialog($gui,"Do you want to enable the " + $propertyName + " property?",$propertyName,JOptionPane.YES_NO_OPTION);
+                    	
+                    	if(result == JOptionPane.YES_OPTION)
+                    	{
+                    		$propertyResult="true";
+                    	}
+                    	else
+                    	{
+                    		$propertyResult="false";
+                    	}
+                    }
                 }
                 catch (HeadlessException e2) {
                     // TODO Auto-generated catch block

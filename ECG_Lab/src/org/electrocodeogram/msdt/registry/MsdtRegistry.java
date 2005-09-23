@@ -15,7 +15,7 @@ import org.electrocodeogram.moduleapi.msdt.registry.IModuleMsdtRegistry;
 import org.electrocodeogram.msdt.MicroSensorDataType;
 import org.electrocodeogram.msdt.MicroSensorDataTypeException;
 import org.electrocodeogram.system.SystemRoot;
-import org.electrocodeogram.system.logging.LogHelper;
+import org.electrocodeogram.logging.LogHelper;
 import org.xml.sax.SAXException;
 
 import sun.rmi.log.LogHandler;

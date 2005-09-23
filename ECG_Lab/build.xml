@@ -258,6 +258,12 @@
 
 		</copy>
 		
+		<copy todir="../ECG_ManualAnnotatorSourceModule/lib/ecg/">
+
+			<fileset dir="${build.lib}" includes="moduleapi.jar" />
+
+		</copy>
+		
 	</target>
 
 	<!-- Assemble application -->

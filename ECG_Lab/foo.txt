@@ -1,0 +1,111 @@
+<?xml version="1.0"?>
+<modulesetup>
+<module id="2" active="true">
+<name>
+File Writer
+</name>
+<fromClassId>
+org.electrocodeogram.module.intermediate.FileSystemTargetModule
+</fromClassId>
+<connectedTo>
+</connectedTo>
+<properties>
+</properties>
+</module>
+<module id="4" active="true">
+<name>
+Standard Input Reader
+</name>
+<fromClassId>
+org.electrocodeogram.module.source.IOSourceModule
+</fromClassId>
+<connectedTo>
+<id>
+6
+</id>
+</connectedTo>
+<properties>
+</properties>
+</module>
+<module id="6" active="true">
+<name>
+MicroActivity Filter
+</name>
+<fromClassId>
+org.electrocodeogram.module.intermediate.MSDTFilterIntermediateModule
+</fromClassId>
+<connectedTo>
+<id>
+2
+</id>
+</connectedTo>
+<properties>
+<property>
+<name>
+Configure Filter
+</name>
+<value>
+configureFilter
+</value>
+</property>
+</properties>
+</module>
+<module id="1" active="true">
+<name>
+File Writer
+</name>
+<fromClassId>
+org.electrocodeogram.module.intermediate.FileSystemTargetModule
+</fromClassId>
+<connectedTo>
+</connectedTo>
+<properties>
+</properties>
+</module>
+<module id="3" active="true">
+<name>
+Socket Server And Reader
+</name>
+<fromClassId>
+org.electrocodeogram.module.intermediate.SocketSourceModule
+</fromClassId>
+<connectedTo>
+<id>
+5
+</id>
+</connectedTo>
+<properties>
+<property>
+<name>
+port
+</name>
+<value>
+10557
+</value>
+</property>
+</properties>
+</module>
+<module id="5" active="true">
+<name>
+MicroActivity Filter
+</name>
+<fromClassId>
+org.electrocodeogram.module.intermediate.MSDTFilterIntermediateModule
+</fromClassId>
+<connectedTo>
+<id>
+1
+</id>
+</connectedTo>
+<properties>
+<property>
+<name>
+Configure Filter
+</name>
+<value>
+configureFilter
+</value>
+</property>
+</properties>
+</module>
+</modulesetup>
