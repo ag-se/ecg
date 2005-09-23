@@ -146,12 +146,12 @@
 
 		</copy>
 		
-		<!-- Copy the documentation -->
-				<copy todir="${dist.dir}/ECG_CodechangeDifferIntermediateModule/msdt/">
+		<!-- Copy the MicroSensorDataTypes -->
+		<copy todir="${dist.dir}/ECG_CodechangeDifferIntermediateModule/msdt/">
 
-					<fileset dir="${msdt.dir}"/>
+			<fileset dir="${msdt.dir}"/>
 
-				</copy>
+		</copy>
 
 
 		<!-- Copy module into ECG CodechangeDifferIntermediateModule module directory -->
