@@ -29,5 +29,25 @@
 			<propertyValue>
 			</propertyValue>
 		</property>
+		<property>
+			<propertyName>
+				Split Files
+			</propertyName>
+			<propertyType>
+				java.lang.Boolean
+			</propertyType>
+			<propertyValue>
+			</propertyValue>
+		</property>
+		<property>
+			<propertyName>
+				File Size
+			</propertyName>
+			<propertyType>
+				java.lang.Integer
+			</propertyType>
+			<propertyValue>
+			</propertyValue>
+		</property>
 	</properties>
 </module>
