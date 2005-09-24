@@ -29,5 +29,25 @@
 			<propertyValue>
 			</propertyValue>
 		</property>
+		<property>
+			<propertyName>
+				Enable Burst Mode
+			</propertyName>
+			<propertyType>
+				java.lang.Boolean
+			</propertyType>
+			<propertyValue>
+			</propertyValue>
+		</property>
+		<property>
+			<propertyName>
+				Enable Realtime Mode
+			</propertyName>
+			<propertyType>
+				java.lang.Boolean
+			</propertyType>
+			<propertyValue>
+			</propertyValue>
+		</property>
 	</properties>
 </module>
