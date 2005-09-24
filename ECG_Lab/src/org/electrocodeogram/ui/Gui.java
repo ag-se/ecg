@@ -28,6 +28,7 @@ import javax.swing.border.TitledBorder;
 
 import org.electrocodeogram.event.TypedValidEventPacket;
 import org.electrocodeogram.module.Module;
+import org.electrocodeogram.module.ModuleActivationException;
 import org.electrocodeogram.module.ModuleDescriptor;
 
 import org.electrocodeogram.module.registry.ModuleInstanceException;
@@ -237,7 +238,14 @@ public class Gui extends JFrame implements IGui
 
                
                 	try {
-                        SystemRoot.getSystemInstance().getSystemModuleRegistry().getRunningModule(1).activate();
+                        try
+						{
+							SystemRoot.getSystemInstance().getSystemModuleRegistry().getRunningModule(1).activate();
+						}
+						catch (ModuleActivationException e1)
+						{
+							JOptionPane.showMessageDialog(Gui.this,e1.getMessage(),"Module setup loading error",JOptionPane.ERROR_MESSAGE);
+						}
                     }
                     catch (ModuleInstanceException e1) {
                         // TODO Auto-generated catch block

@@ -20,6 +20,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 
 import org.electrocodeogram.module.Module;
+import org.electrocodeogram.module.ModuleActivationException;
 import org.electrocodeogram.module.ModuleConnectionException;
 import org.electrocodeogram.module.ModuleDescriptor;
 import org.electrocodeogram.module.ModuleProperty;
@@ -122,6 +123,10 @@ public class MenuManager
                     // TODO Auto-generated catch block
                     e1.printStackTrace();
                 }
+				catch (ModuleActivationException e2)
+				{
+					JOptionPane.showMessageDialog($gui,e2.getMessage(),"Module activation error",JOptionPane.ERROR_MESSAGE);
+				}
            
                 
             }});

@@ -7,6 +7,7 @@ import org.electrocodeogram.event.TypedValidEventPacket;
 import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.module.ModulePropertyException;
 import org.electrocodeogram.module.target.TargetModule;
+import org.electrocodeogram.module.target.TargetModuleException;
 
 /**
  *
@@ -71,6 +72,26 @@ public class TestTargetModule extends TargetModule
 	{
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.electrocodeogram.module.target.TargetModule#startWriter()
+	 */
+	@Override
+	public void startWriter() throws TargetModuleException
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.electrocodeogram.module.target.TargetModule#stopWriter()
+	 */
+	@Override
+	public void stopWriter()
+	{
+		// TODO Auto-generated method stub
+		
 	}
 
 }

@@ -264,6 +264,12 @@
 
 		</copy>
 		
+		<copy todir="../ECG_HackyStatTargetModule/lib/ecg/">
+
+			<fileset dir="${build.lib}" includes="moduleapi.jar" />
+
+		</copy>
+		
 	</target>
 
 	<!-- Assemble application -->

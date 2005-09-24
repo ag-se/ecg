@@ -49,7 +49,7 @@ public abstract class SourceModule extends Module
 	 * itself.
 	 * @param sourceModule Is the backward reference to the SourceModule 
 	 */
-	public abstract void startReader(SourceModule sourceModule);
+	public abstract void startReader(SourceModule sourceModule) throws SourceModuleException;
 
 	/**
 	 * 

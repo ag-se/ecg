@@ -14,6 +14,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.electrocodeogram.module.Module;
+import org.electrocodeogram.module.ModuleActivationException;
 import org.electrocodeogram.module.ModuleConnectionException;
 import org.electrocodeogram.module.ModuleDescriptor;
 import org.electrocodeogram.module.ModuleProperty;
@@ -753,7 +754,16 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 				
 				if(module.isModuleType(ModuleType.TARGET_MODULE))
 				{
-					module.activate();
+					try
+					{
+						module.activate();
+					}
+					catch (ModuleActivationException e)
+					{
+						clearLab();
+						
+						throw new ModuleSetupLoadException(e.getMessage());
+					}
 				}
 			}
 			
@@ -763,7 +773,16 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 				
 				if(module.isModuleType(ModuleType.INTERMEDIATE_MODULE))
 				{
-					module.activate();
+					try
+					{
+						module.activate();
+					}
+					catch (ModuleActivationException e)
+					{
+						clearLab();
+						
+						throw new ModuleSetupLoadException(e.getMessage());
+					}
 				}
 			}
 			
@@ -773,7 +792,16 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 				
 				if(module.isModuleType(ModuleType.SOURCE_MODULE))
 				{
-					module.activate();
+					try
+					{
+						module.activate();
+					}
+					catch (ModuleActivationException e)
+					{
+						clearLab();
+						
+						throw new ModuleSetupLoadException(e.getMessage());
+					}
 				}
 			}
 			

@@ -16,6 +16,9 @@ import org.electrocodeogram.module.intermediate.IIntermediateModule;
 import org.electrocodeogram.module.registry.ModuleClassException;
 import org.electrocodeogram.module.registry.ModuleInstanceException;
 import org.electrocodeogram.module.source.SourceModule;
+import org.electrocodeogram.module.source.SourceModuleException;
+import org.electrocodeogram.module.target.TargetModule;
+import org.electrocodeogram.module.target.TargetModuleException;
 import org.electrocodeogram.msdt.MicroSensorDataType;
 import org.electrocodeogram.msdt.registry.MicroSensorDataTypeRegistrationException;
 import org.electrocodeogram.system.ISystemRoot;
@@ -789,14 +792,22 @@ public abstract class Module
 			
 		}
 
-		this._activeFlag = false;
-
 		if(this instanceof SourceModule)
 		{
 			SourceModule module = (SourceModule) this;
 			
 			module.stopReader();
 		}
+		
+		if(this instanceof TargetModule)
+		{
+			TargetModule module = (TargetModule) this;
+			
+			module.stopWriter();
+		}
+		
+		this._activeFlag = false;
+
 		
 		this._logger.log(Level.INFO,"Module deactivated " + this.getName());
 		
@@ -805,9 +816,10 @@ public abstract class Module
 
 	/**
 	 * This method activates the module. The module might be already activated.
+	 * @throws ModuleActivationException 
 	 *
 	 */
-	public void activate()
+	public void activate() throws ModuleActivationException
 	{
 		this._logger.entering(this.getClass().getName(),"activate");
 		
@@ -819,16 +831,37 @@ public abstract class Module
 			
 			return;
 		}
-
-		this._activeFlag = true;
 		
 		if(this instanceof SourceModule)
 		{
 			SourceModule module = (SourceModule) this;
 			
-			module.startReader(module);
+			try
+			{
+				module.startReader(module);
+			}
+			catch (SourceModuleException e)
+			{
+				throw new ModuleActivationException(e.getMessage());
+			}
+		}
+		
+		if(this instanceof TargetModule)
+		{
+			TargetModule module = (TargetModule) this;
+			
+			try
+			{
+				module.startWriter();
+			}
+			catch (TargetModuleException e)
+			{
+				throw new ModuleActivationException(e.getMessage());
+			}
 		}
 
+		this._activeFlag = true;
+		
 		this._logger.log(Level.INFO,"Module activated " + this.getName());
 		
 		this._logger.exiting(this.getClass().getName(),"activate");

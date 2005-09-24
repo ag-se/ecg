@@ -58,4 +58,8 @@ public abstract class TargetModule extends Module
 	@Override
 	public abstract void initialize();
 
+	public abstract void startWriter() throws TargetModuleException;
+	
+	public abstract void stopWriter();
+	
 }
