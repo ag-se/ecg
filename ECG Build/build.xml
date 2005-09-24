@@ -58,6 +58,17 @@
 		<ant dir="../ECG_FileSystemTargetModule" target="cleanall" />
 
 	</target>
+	
+	<!-- Calls the ant script of the ECG HackyStatTargetModule to clean it -->
+		<target name="CleanAll ECG HackyStatTargetModule">
+
+			<echo message="##################################" />
+			<echo message="CLEANING ECG HACKYSTATTARGETMODULE" />
+			<echo message="##################################" />
+
+			<ant dir="../ECG_HackyStatTargetModule" target="cleanall" />
+
+		</target>
 
 	<!-- Calls the ant script of the ECG FileSystemSourceModule to clean it -->
 	<target name="CleanAll ECG FileSystemSourceModule">
@@ -115,7 +126,7 @@
 			</target>
 
 	<!-- Cleans all ECG components -->
-	<target name="cleanAll" depends="CleanAll ECG SensorShell,CleanAll ECG TestHelper,CleanAll ECG ServerAndLab,CleanAll ECG SocketSourceModule, CleanAll ECG FileSystemTargetModule, CleanAll ECG FileSystemSourceModule, CleanAll ECG MSDTFilterIntermediateModule, CleanAll ECG CodechangeDifferIntermediateModule, CleanAll ECG IOSourceModule, CleanAll ECG ManualAnnotatorSourceModule" />
+	<target name="cleanAll" depends="CleanAll ECG SensorShell,CleanAll ECG TestHelper,CleanAll ECG ServerAndLab,CleanAll ECG SocketSourceModule, CleanAll ECG FileSystemTargetModule, CleanAll ECG FileSystemSourceModule, CleanAll ECG MSDTFilterIntermediateModule, CleanAll ECG CodechangeDifferIntermediateModule, CleanAll ECG IOSourceModule, CleanAll ECG ManualAnnotatorSourceModule, CleanAll ECG HackyStatTargetModule" />
 
 
 	<!-- Calls the ant script of the ECG SensorShell component to build it -->
@@ -189,6 +200,17 @@
 		<ant dir="../ECG_FileSystemTargetModule" target="deploy" />
 
 	</target>
+	
+	<!-- Calls the ant script of the ECG FileSystemTargetModule to build it -->
+		<target name="Build ECG HackyStatTargetModule">
+
+			<echo message="###################################" />
+			<echo message="BUILDING ECG HACKYSTATTARGETMODULE" />
+			<echo message="###################################" />
+
+			<ant dir="../ECG_HackyStatTargetModule" target="deploy" />
+
+		</target>
 
 	<!-- Calls the ant script of the ECG FileSystemSourceModule to build it -->
 	<target name="Build ECG FileSystemSourceModule">
@@ -270,7 +292,7 @@
 
 
 	<!-- Builds all ECG components -->
-	<target name="buildAll" depends="Build ECG SensorShell Event,Build ECG TestHelper, Build ECG SensorShell Shell,Build ECG ServerAndLab Module-API,Build ECG SocketSourceModule, Build ECG FileSystemTargetModule, Build ECG FileSystemSourceModule, Build ECG MSDTFilterIntermediateModule, Build ECG CodechangeDifferIntermediateModule, Build ECG IOSourceModule, Build ECG ManualAnnotatorSourceModule, Assemble ECG ServerAndLab" />
+	<target name="buildAll" depends="Build ECG SensorShell Event,Build ECG TestHelper, Build ECG SensorShell Shell,Build ECG ServerAndLab Module-API,Build ECG SocketSourceModule, Build ECG FileSystemTargetModule, Build ECG FileSystemSourceModule, Build ECG MSDTFilterIntermediateModule, Build ECG CodechangeDifferIntermediateModule, Build ECG IOSourceModule, Build ECG ManualAnnotatorSourceModule, Build ECG HackyStatTargetModule, Assemble ECG ServerAndLab" />
 
 	<!-- Package release -->
 	<target name="Package release" depends="cleanAll,buildAll">
