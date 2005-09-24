@@ -228,4 +228,24 @@ public class FileSystemTargetModule extends TargetModule
 
 		return null;
 	}
+
+	/* (non-Javadoc)
+	 * @see org.electrocodeogram.module.target.TargetModule#startWriter()
+	 */
+	@Override
+	public void startWriter() throws TargetModuleException
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.electrocodeogram.module.target.TargetModule#stopWriter()
+	 */
+	@Override
+	public void stopWriter()
+	{
+		// TODO Auto-generated method stub
+		
+	}
 }
