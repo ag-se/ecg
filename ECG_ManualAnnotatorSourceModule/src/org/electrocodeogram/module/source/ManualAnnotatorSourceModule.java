@@ -12,6 +12,7 @@ import javax.swing.JFrame;
 
 import org.electrocodeogram.event.IllegalEventParameterException;
 import org.electrocodeogram.event.ValidEventPacket;
+import org.electrocodeogram.module.ModuleActivationException;
 import org.electrocodeogram.module.ModuleProperty;
 import org.electrocodeogram.module.ModulePropertyException;
 
@@ -77,8 +78,6 @@ public class ManualAnnotatorSourceModule extends SourceModule
 			}
 		}
 		
-		startReader(this);
-		
 	}
 
 	/**
@@ -88,6 +87,7 @@ public class ManualAnnotatorSourceModule extends SourceModule
 	public void startReader(SourceModule sourceModule)
 	{
 		this._frame = new ManualAnnotatorFrame(this);
+		
 	}
 
 	/**
@@ -184,7 +184,9 @@ public class ManualAnnotatorSourceModule extends SourceModule
 	@Override
 	public void stopReader()
 	{
-		// TODO Auto-generated method stub
+		this._frame.dispose();
+		
+		this._frame = null;
 		
 	}
 }
