@@ -2,9 +2,9 @@
 <?eclipse version="3.0"?>
 <plugin
    id="org.electrocodeogram.sensor.eclipse"
-   name="Hackystat Sensor 5.1.1010.3x"
-   version="0.6.1"
-   provider-name="Takuya Yamashita (takuyay@hawaii.edu)"
+   name="ElectroCodeoGram Eclipse Sensor (Extending HackyStat Sensor)"
+   version="0.9"
+   provider-name="Frank Schlesinger (Frank@Schlesinger.com)"
    class="org.hackystat.stdext.sensor.eclipse.EclipseSensorPlugin">
 
    <runtime>
