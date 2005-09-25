@@ -17,7 +17,6 @@ import org.electrocodeogram.test.NoTestDataException;
 import org.electrocodeogram.test.client.mocksensor.MockSensor;
 
 import utmj.threaded.RetriedAssert;
-import utmj.threaded.ThreadedTest;
 
 /**
  * Test to validate the behaviour of connection attempts to the ECG server and

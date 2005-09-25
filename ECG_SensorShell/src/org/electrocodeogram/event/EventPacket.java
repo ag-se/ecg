@@ -4,169 +4,277 @@ import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.electrocodeogram.logging.LogHelper;
 
 /**
  * An EventPacket is a for a recorded event.
  */
 public class EventPacket implements Serializable
 {
-    private static final long serialVersionUID = 2353171166739768704L;
+	private static final long serialVersionUID = 2353171166739768704L;
 
-    private int sourceId = -1;
+	private static Logger _logger = LogHelper.createLogger(EventPacket.class.getName());
 
-    private Date $timeStamp = null;
+	private int sourceId = -1;
 
-    private String $sensorDataType = null;
+	private Date _timeStamp = null;
 
-    private List $argList = null;
- 
-    /**
-     * This creates a new EventPacket object
-     * @param id The module source ID identifies where the EventPacket comes from
-     * @param timeStamp The timeStamp tells when the event was recorded
-     * @param sensorDataType The HackyStat SensorDataType of the event
-     * @param argList The argList of parameters containing all the relevant event data
-     */
-    public EventPacket(int id, Date timeStamp, String sensorDataType, List argList)
-    {
+	private String _sensorDataType = null;
 
-        this.sourceId = id;
+	private List _argList = null;
 
-        if (timeStamp != null) {
-            this.$timeStamp = new Date(timeStamp.getTime());
-        }
+	/**
+	 * This creates a new EventPacket object
+	 * @param id The module source ID identifies where the EventPacket comes from
+	 * @param timeStamp The timeStamp tells when the event was recorded
+	 * @param sensorDataType The HackyStat SensorDataType of the event
+	 * @param argList The argList of parameters containing all the relevant event data
+	 */
+	public EventPacket(int id, Date timeStamp, String sensorDataType, List argList)
+	{
 
-        this.$sensorDataType = sensorDataType;
+		_logger.entering(this.getClass().getName(), "EventPacket");
 
-        this.$argList = argList;
+		this.sourceId = id;
 
-    }
+		if (timeStamp != null)
+		{
+			this._timeStamp = new Date(timeStamp.getTime());
+		}
 
-    /**
-     * This method returns the ID that identifies the source module of this EventPacket object.
-     * @return The ID of the source module
-     */
-    public int getSourceId()
-    {
-        return this.sourceId;
-    }
+		this._sensorDataType = sensorDataType;
 
-    /**
-     * This method returns the timestamp of the EventPacket.
-     * @return The timestamp as a Date object
-     */
-    public Date getTimeStamp()
-    {
-        if (this.$timeStamp != null) {
-            return new Date(this.$timeStamp.getTime());
-        }
+		this._argList = argList;
 
-        return null;
-    }
+		_logger.exiting(this.getClass().getName(), "EventPacket");
 
-    /**
-     * This method returns the HackyStat SensorDataType of the event.
-     * @return The HackyStat SensorDataType
-     */
-    public String getSensorDataType()
-    {
-        return this.$sensorDataType;
-    }
+	}
 
-    /**
-     * This method returns the argList of the EventPacket
-     * @return The argList as a List
-     */
-    public List getArglist()
-    {
-        return this.$argList;
-    }
+	/**
+	 * This method returns the ID that identifies the source module of this EventPacket object.
+	 * @return The ID of the source module
+	 */
+	public int getSourceId()
+	{
+		_logger.entering(this.getClass().getName(), "getSourceId");
 
-    /**
-     * This method checks the syntactically correctness of an EventPacket.
-     * @param timeStamp The timeStamp tells when the event was recorded
-     * @param commandName The HackyStat The HackyStat SensorDataType of the event
-     * @param argList The argList of parameters containing all the relevant event data
-     * @return "true" if the EventPacket is syntactically correct and "false" if not
-     */
-    public static boolean isSyntacticallyCorrect(Date timeStamp, String commandName, List argList)
-    {
-        if (timeStamp == null || commandName == null || argList == null || argList.isEmpty() || !(argList.get(0) instanceof String)) {
-            return false;
-        }
+		_logger.exiting(this.getClass().getName(), "getSourceId");
 
-        return true;
+		return this.sourceId;
+	}
 
-    }
+	/**
+	 * This method returns the timestamp of the EventPacket.
+	 * @return The timestamp as a Date object
+	 */
+	public Date getTimeStamp()
+	{
+		_logger.entering(this.getClass().getName(), "getTimeStamp");
 
-    /**
-     * This method returns a String representation of the EventPacket.
-     * @return A String representation of the EventPacket
-     * 
-     */
-    @Override
-    public String toString()
-    {
-        String string = "";
+		if (this._timeStamp != null)
+		{
+			_logger.exiting(this.getClass().getName(), "getTimeStamp");
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat(ValidEventPacket.DATE_FORMAT_PATTERN);
-        
-        String dateString = dateFormat.format(this.getTimeStamp());
-        
-        string += dateString + "#";
-        
-        string += this.getSensorDataType() + "#";
+			return new Date(this._timeStamp.getTime());
+		}
 
-        StringBuffer stringBuffer = new StringBuffer();
+		_logger.exiting(this.getClass().getName(), "getTimeStamp");
 
-        for (int i = 0; i < this.getArglist().size(); i++) {
-            stringBuffer.append(";");
+		return null;
+	}
 
-            stringBuffer.append((String) this.getArglist().get(i));
-        }
+	/**
+	 * This method returns the HackyStat SensorDataType of the event.
+	 * @return The HackyStat SensorDataType
+	 */
+	public String getSensorDataType()
+	{
+		_logger.entering(this.getClass().getName(), "getSensorDataType");
 
-        return string + stringBuffer.toString();
-    }
+		_logger.exiting(this.getClass().getName(), "getSensorDataType");
 
-    /**
-     * This method compares a given EventPacket with this EventPacket.
-     * @param packet Is the EventPacket to compare
-     * @return "true" if the two EventPackets have identical timeStamps, SensorDataTypes and argLists; "false" otherwise
-     */
-    @Override
-    public boolean equals(Object packet)
-    {
-        boolean equals = false;
+		return this._sensorDataType;
+	}
 
-        if(!(packet instanceof EventPacket))
-        {
-            return false;
-        }
-        
-        EventPacket eventPacket = (EventPacket) packet;
-        
-        if (this.getTimeStamp().equals(eventPacket.getTimeStamp()) && this.getSensorDataType().equals(eventPacket.getSensorDataType())) {
-            if (this.getArglist().size() == eventPacket.getArglist().size()) {
-                int size = eventPacket.getArglist().size();
+	/**
+	 * This method returns the argList of the EventPacket
+	 * @return The argList as a List
+	 */
+	public List getArglist()
+	{
+		_logger.entering(this.getClass().getName(), "getArglist");
 
-                for (int i = 0; i < size; i++) {
-                    String testString = (String) this.getArglist().get(i);
+		_logger.exiting(this.getClass().getName(), "getArglist");
 
-                    String receivedString = (String) eventPacket.getArglist().get(i);
+		return this._argList;
+	}
 
-                    if (testString.equals(receivedString)) {
+	/**
+	 * This method checks the syntactically correctness of an EventPacket.
+	 * @param timeStamp The timeStamp tells when the event was recorded
+	 * @param commandName The HackyStat The HackyStat SensorDataType of the event
+	 * @param argList The argList of parameters containing all the relevant event data
+	 * @return "true" if the EventPacket is syntactically correct and "false" if not
+	 */
+	public static boolean isValid(Date timeStamp, String commandName, List argList)
+	{
+		_logger.entering(EventPacket.class.getName(), "isValid");
 
-                        equals = true;
-                    }
-                    else {
-                        equals = false;
-                    }
-                }
-            }
-            
-        }
-        
-        return equals;
-        
-    }
+		if (timeStamp == null)
+		{
+			_logger.log(Level.INFO, "Packet is not valid");
+
+			_logger.log(Level.FINEST, "timeStamp is null");
+
+			_logger.exiting(EventPacket.class.getName(), "isValid");
+
+			return false;
+		}
+
+		if (commandName == null)
+		{
+			_logger.log(Level.INFO, "Packet is not valid");
+
+			_logger.log(Level.FINEST, "commandName is null");
+
+			_logger.exiting(EventPacket.class.getName(), "isValid");
+
+			return false;
+		}
+
+		if (argList == null)
+		{
+
+			_logger.log(Level.INFO, "Packet is not valid");
+
+			_logger.log(Level.FINEST, "argList is null");
+
+			_logger.exiting(EventPacket.class.getName(), "isValid");
+
+			return false;
+		}
+
+		if (argList.isEmpty())
+		{
+
+			_logger.log(Level.INFO, "Packet is not valid");
+
+			_logger.log(Level.FINEST, "argList is empty");
+
+			_logger.exiting(EventPacket.class.getName(), "isValid");
+
+			return false;
+		}
+
+		if (!(argList.get(0) instanceof String))
+		{
+			_logger.log(Level.INFO, "Packet is not valid");
+
+			_logger.log(Level.FINEST, "argList is not of type String");
+
+			_logger.exiting(EventPacket.class.getName(), "isValid");
+
+			return false;
+
+		}
+
+		_logger.log(Level.INFO, "Packet is valid");
+
+		_logger.exiting(EventPacket.class.getName(), "isValid");
+
+		return true;
+
+	}
+
+	/**
+	 * This method returns a String representation of the EventPacket.
+	 * @return A String representation of the EventPacket
+	 * 
+	 */
+	@Override
+	public String toString()
+	{
+		_logger.entering(this.getClass().getName(), "isValid");
+
+		String string = "";
+
+		SimpleDateFormat dateFormat = new SimpleDateFormat(
+				ValidEventPacket.DATE_FORMAT_PATTERN);
+
+		String dateString = dateFormat.format(this.getTimeStamp());
+
+		string += dateString + "#";
+
+		string += this.getSensorDataType() + "#";
+
+		StringBuffer stringBuffer = new StringBuffer();
+
+		for (int i = 0; i < this.getArglist().size(); i++)
+		{
+			stringBuffer.append(";");
+
+			stringBuffer.append((String) this.getArglist().get(i));
+		}
+
+		_logger.exiting(this.getClass().getName(), "isValid");
+
+		return string + stringBuffer.toString();
+	}
+
+	/**
+	 * This method compares a given EventPacket with this EventPacket.
+	 * @param packet Is the EventPacket to compare
+	 * @return "true" if the two EventPackets have identical timeStamps, SensorDataTypes and argLists; "false" otherwise
+	 */
+	@Override
+	public boolean equals(Object packet)
+	{
+		_logger.entering(this.getClass().getName(), "equals");
+
+		boolean equals = false;
+
+		if (!(packet instanceof EventPacket))
+		{
+			_logger.log(Level.FINEST, "Object is not an EventPacket");
+
+			_logger.exiting(this.getClass().getName(), "equals");
+
+			return false;
+		}
+
+		EventPacket eventPacket = (EventPacket) packet;
+
+		if (this.getTimeStamp().equals(eventPacket.getTimeStamp()) && this.getSensorDataType().equals(eventPacket.getSensorDataType()))
+		{
+			if (this.getArglist().size() == eventPacket.getArglist().size())
+			{
+				int size = eventPacket.getArglist().size();
+
+				for (int i = 0; i < size; i++)
+				{
+					String testString = (String) this.getArglist().get(i);
+
+					String receivedString = (String) eventPacket.getArglist().get(i);
+
+					if (testString.equals(receivedString))
+					{
+						equals = true;
+					}
+					else
+					{
+						equals = false;
+					}
+				}
+			}
+
+		}
+
+		_logger.exiting(this.getClass().getName(), "equals");
+
+		return equals;
+
+	}
 }

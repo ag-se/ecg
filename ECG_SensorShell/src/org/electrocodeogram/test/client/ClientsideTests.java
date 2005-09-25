@@ -11,6 +11,8 @@ import org.electrocodeogram.test.NoTestDataException;
 import org.electrocodeogram.test.EventGenerator.SensorDataType;
 import org.electrocodeogram.test.client.mocksensor.MockSensor;
 
+import utmj.threaded.RetriedAssert;
+
 /**
  * This class collects all testcases for testing the client side of the ECG framework for
  * correct EventPacket object transportation.
@@ -19,11 +21,17 @@ import org.electrocodeogram.test.client.mocksensor.MockSensor;
 public class ClientsideTests extends TestCase
 {
 
-    private MockSensor testSensor = null;
+    private static MockSensor _testSensor = new MockSensor();
 
-    private EventGenerator eventGenerator = null;
+    private EventGenerator _eventGenerator = null;
     
-    private int $line = -1;
+    int _line = -1;
+    
+    SendingThreadTest _threadTest;
+    
+    int _bufferSizeBefore;
+    
+    ValidEventPacket _eventPacket;
 
     /**
      * This creates the testcases of this collection.
@@ -34,7 +42,7 @@ public class ClientsideTests extends TestCase
     {
         super(name);
         
-        this.$line = line;
+        this._line = line;
     }
 
     /**
@@ -44,10 +52,8 @@ public class ClientsideTests extends TestCase
     protected void setUp() throws Exception
     {
         super.setUp();
-        
-        this.testSensor = new MockSensor();
-
-        this.eventGenerator = new EventGenerator();
+       
+        this._eventGenerator = new EventGenerator();
     }
 
     /**
@@ -58,9 +64,7 @@ public class ClientsideTests extends TestCase
     {
         super.tearDown();
         
-        this.testSensor = null;
-
-        this.eventGenerator = null;
+        this._eventGenerator = null;
     }
 
     /**
@@ -76,11 +80,11 @@ public class ClientsideTests extends TestCase
     {
         ValidEventPacket eventPacket;
 
-        eventPacket = this.eventGenerator.createValidEventPacket(true, true, this.$line, true, true, 10, 10);
+        eventPacket = this._eventGenerator.createValidEventPacket(true, true, this._line, true, true, 10, 10);
 
-        boolean result = this.testSensor.sendEvent(eventPacket);
+        boolean result = this._testSensor.sendEvent(eventPacket);
 
-        assertTrue("" + this.$line,result);
+        assertTrue("" + this._line,result);
        
     }
 
@@ -98,21 +102,36 @@ public class ClientsideTests extends TestCase
      */
     public void testValidEventIsQueued() throws IllegalEventParameterException, NoTestDataException
     {
-        ValidEventPacket eventPacket;
+        ClientsideTests.this._eventPacket = this._eventGenerator.createValidEventPacket(true, true, this._line,  true, true, 10, 10);
 
-        eventPacket = this.eventGenerator.createValidEventPacket(true, true, this.$line,  true, true, 10, 10);
+        this._testSensor.sendEvent(ClientsideTests.this._eventPacket);
 
-        this.testSensor.sendEvent(eventPacket);
+        ClientsideTests.this._threadTest = new SendingThreadTest();
 
-        SendingThreadTest threadTest = new SendingThreadTest();
+        ClientsideTests.this._bufferSizeBefore = ClientsideTests.this._threadTest.getBufferSize();
 
-        int bufferSizeBefore = threadTest.getBufferSize();
+        this._testSensor.sendEvent(ClientsideTests.this._eventPacket);
+        
+        try
+		{
+			new RetriedAssert(2000, 100) {
+			    @Override
+			    public void run() throws Exception
+			    {
+			    	 assertTrue("" + ClientsideTests.this._line,ClientsideTests.this._threadTest.testBufferSize(ClientsideTests.this._bufferSizeBefore + 1));
+			    	 
+			    	 assertTrue("" + ClientsideTests.this._line,ClientsideTests.this._threadTest.testLastElement(ClientsideTests.this._eventPacket));
+			    }
+			}.start();
+		}
+		catch (Exception e)
+		{
+			assertTrue(e.getMessage(),false);
+		}
 
-        this.testSensor.sendEvent(eventPacket);
+       
 
-        assertTrue("" + this.$line,threadTest.testBufferSize(bufferSizeBefore + 1));
-
-        assertTrue("" + this.$line,threadTest.testLastElement(eventPacket));
+        
     }
 
     /**
@@ -126,11 +145,11 @@ public class ClientsideTests extends TestCase
      */
     public void testInvalidEventIsNotAcceptedTimeStampIsNull() throws NoTestDataException
     {
-        EventPacket eventPacket = this.eventGenerator.createEventPacket(false, true, this.$line, true, true, 10, 10);
+        EventPacket eventPacket = this._eventGenerator.createEventPacket(false, true, this._line, true, true, 10, 10);
 
-        boolean result = this.testSensor.sendEvent(eventPacket);
+        boolean result = this._testSensor.sendEvent(eventPacket);
 
-        assertFalse("" + this.$line,result);
+        assertFalse("" + this._line,result);
     }
 
     /**
@@ -144,11 +163,11 @@ public class ClientsideTests extends TestCase
      */
     public void testInvalidEventIsNotAcceptedCommandNameIsNull() throws NoTestDataException
     {
-        EventPacket eventPacket = this.eventGenerator.createEventPacket(true, false, this.$line, true, true, 10, 10);
+        EventPacket eventPacket = this._eventGenerator.createEventPacket(true, false, this._line, true, true, 10, 10);
 
-        boolean result = this.testSensor.sendEvent(eventPacket);
+        boolean result = this._testSensor.sendEvent(eventPacket);
 
-        assertFalse("" + this.$line,result);
+        assertFalse("" + this._line,result);
     }
 
     /**
@@ -162,11 +181,11 @@ public class ClientsideTests extends TestCase
      */
     public void testInvalidEventIsNotAcceptedArgListIsNull() throws NoTestDataException
     {
-        EventPacket eventPacket = this.eventGenerator.createEventPacket(true, true, this.$line, false, true, 10, 10);
+        EventPacket eventPacket = this._eventGenerator.createEventPacket(true, true, this._line, false, true, 10, 10);
 
-        boolean result = this.testSensor.sendEvent(eventPacket);
+        boolean result = this._testSensor.sendEvent(eventPacket);
 
-        assertFalse("" + this.$line,result);
+        assertFalse("" + this._line,result);
     }
 
     /**
@@ -180,11 +199,11 @@ public class ClientsideTests extends TestCase
      */
     public void testInvalidEventIsNotAcceptedArgListIsEmpty() throws NoTestDataException
     {
-        EventPacket eventPacket = this.eventGenerator.createEventPacket(true, true, this.$line, true, true, 0, 10);
+        EventPacket eventPacket = this._eventGenerator.createEventPacket(true, true, this._line, true, true, 0, 10);
 
-        boolean result = this.testSensor.sendEvent(eventPacket);
+        boolean result = this._testSensor.sendEvent(eventPacket);
 
-        assertFalse("" + this.$line,result);
+        assertFalse("" + this._line,result);
     }
 
     /**
@@ -198,11 +217,11 @@ public class ClientsideTests extends TestCase
      */
     public void testInvalidEventIsNotAcceptedArgListIsNotOfTypeString() throws NoTestDataException
     {
-        EventPacket eventPacket = this.eventGenerator.createEventPacket(true, true, this.$line, true, false, 10, 10);
+        EventPacket eventPacket = this._eventGenerator.createEventPacket(true, true, this._line, true, false, 10, 10);
 
-        boolean result = this.testSensor.sendEvent(eventPacket);
+        boolean result = this._testSensor.sendEvent(eventPacket);
 
-        assertFalse("" + this.$line,result);
+        assertFalse("" + this._line,result);
     }
 
     /**
@@ -215,45 +234,45 @@ public class ClientsideTests extends TestCase
     public void testIllegalEventParametersCauseException() throws NoTestDataException
     {
         try {
-            this.eventGenerator.createValidEventPacket(false, true, this.$line, true, true, 10, 10);
+            this._eventGenerator.createValidEventPacket(false, true, this._line, true, true, 10, 10);
 
             fail("IllegalEventParameterException should be thrown");
         }
         catch (IllegalEventParameterException e) {
-            assertTrue("" + this.$line,true);
+            assertTrue("" + this._line,true);
 
             try {
-                this.eventGenerator.createValidEventPacket(true, false, this.$line, true, true, 10, 10);
+                this._eventGenerator.createValidEventPacket(true, false, this._line, true, true, 10, 10);
 
                 fail("IllegalEventParameterException should be thrown");
             }
             catch (IllegalEventParameterException e1) {
 
-                assertTrue("" + this.$line,true);
+                assertTrue("" + this._line,true);
 
                 try {
-                    this.eventGenerator.createValidEventPacket(true, true, this.$line, false, true, 10, 10);
+                    this._eventGenerator.createValidEventPacket(true, true, this._line, false, true, 10, 10);
 
                     fail("IllegalEventParameterException should be thrown");
                 }
                 catch (IllegalEventParameterException e2) {
-                    assertTrue("" + this.$line,true);
+                    assertTrue("" + this._line,true);
 
                     try {
-                        this.eventGenerator.createValidEventPacket(true, true, this.$line, true, true, 0, 10);
+                        this._eventGenerator.createValidEventPacket(true, true, this._line, true, true, 0, 10);
 
                         fail("IllegalEventParameterException should be thrown");
                     }
                     catch (IllegalEventParameterException e3) {
-                        assertTrue("" + this.$line,true);
+                        assertTrue("" + this._line,true);
 
                         try {
-                            this.eventGenerator.createValidEventPacket(true, true, this.$line, true, false, 10, 10);
+                            this._eventGenerator.createValidEventPacket(true, true, this._line, true, false, 10, 10);
 
                             fail("IllegalEventParameterException should be thrown");
                         }
                         catch (IllegalEventParameterException e4) {
-                            assertTrue("" + this.$line,true);
+                            assertTrue("" + this._line,true);
                         }
                     }
                 }
@@ -271,11 +290,11 @@ public class ClientsideTests extends TestCase
      */
     public void testHackyStatActivityEventsAccepted() throws NoTestDataException
     {
-        ValidEventPacket eventPacket = this.eventGenerator.createHackyStatEventPacket(SensorDataType.ACTIVITY,this.$line);
+        ValidEventPacket eventPacket = this._eventGenerator.createHackyStatEventPacket(SensorDataType.ACTIVITY,this._line);
 
-        boolean result = this.testSensor.sendEvent(eventPacket);
+        boolean result = this._testSensor.sendEvent(eventPacket);
 
-        assertTrue("" + this.$line,result);
+        assertTrue("" + this._line,result);
 
     }
 
@@ -289,11 +308,11 @@ public class ClientsideTests extends TestCase
      */
     public void testHackyStatBuildEventsAccepted() throws NoTestDataException
     {
-        ValidEventPacket eventPacket = this.eventGenerator.createHackyStatEventPacket(SensorDataType.BUILD,this.$line);
+        ValidEventPacket eventPacket = this._eventGenerator.createHackyStatEventPacket(SensorDataType.BUILD,this._line);
 
-        boolean result = this.testSensor.sendEvent(eventPacket);
+        boolean result = this._testSensor.sendEvent(eventPacket);
 
-        assertTrue("" + this.$line,result);
+        assertTrue("" + this._line,result);
 
     }
 
@@ -307,11 +326,11 @@ public class ClientsideTests extends TestCase
      */
     public void testHackyStatBuffTransEventsAccepted() throws NoTestDataException
     {
-        ValidEventPacket eventPacket = this.eventGenerator.createHackyStatEventPacket(SensorDataType.BUFFTRANS,this.$line);
+        ValidEventPacket eventPacket = this._eventGenerator.createHackyStatEventPacket(SensorDataType.BUFFTRANS,this._line);
 
-        boolean result = this.testSensor.sendEvent(eventPacket);
+        boolean result = this._testSensor.sendEvent(eventPacket);
 
-        assertTrue("" + this.$line,result);
+        assertTrue("" + this._line,result);
 
     }
 
@@ -325,11 +344,11 @@ public class ClientsideTests extends TestCase
      */
     public void testHackyStatCommitEventsAccepted() throws NoTestDataException
     {
-        ValidEventPacket eventPacket = this.eventGenerator.createHackyStatEventPacket(SensorDataType.COMMIT,this.$line);
+        ValidEventPacket eventPacket = this._eventGenerator.createHackyStatEventPacket(SensorDataType.COMMIT,this._line);
 
-        boolean result = this.testSensor.sendEvent(eventPacket);
+        boolean result = this._testSensor.sendEvent(eventPacket);
 
-        assertTrue("" + this.$line,result);
+        assertTrue("" + this._line,result);
 
     }
 
@@ -343,11 +362,11 @@ public class ClientsideTests extends TestCase
      */
     public void testHackyStatFileMetricEventsAccepted() throws NoTestDataException
     {
-        ValidEventPacket eventPacket = this.eventGenerator.createHackyStatEventPacket(SensorDataType.FILEMETRIC,this.$line);
+        ValidEventPacket eventPacket = this._eventGenerator.createHackyStatEventPacket(SensorDataType.FILEMETRIC,this._line);
 
-        boolean result = this.testSensor.sendEvent(eventPacket);
+        boolean result = this._testSensor.sendEvent(eventPacket);
 
-        assertTrue("" + this.$line,result);
+        assertTrue("" + this._line,result);
 
     }
 
@@ -361,11 +380,11 @@ public class ClientsideTests extends TestCase
      */
     public void testHackyStatUnitTestEventsAccepted() throws NoTestDataException
     {
-        ValidEventPacket eventPacket = this.eventGenerator.createHackyStatEventPacket(SensorDataType.UNITTEST,this.$line);
+        ValidEventPacket eventPacket = this._eventGenerator.createHackyStatEventPacket(SensorDataType.UNITTEST,this._line);
 
-        boolean result = this.testSensor.sendEvent(eventPacket);
+        boolean result = this._testSensor.sendEvent(eventPacket);
 
-        assertTrue("" + this.$line,result);
+        assertTrue("" + this._line,result);
 
     }
 

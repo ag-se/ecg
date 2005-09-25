@@ -72,7 +72,7 @@
 	</target>
 
 	<!-- Build the Event-API. -->
-	<target name="buildEvent" depends="prepare">
+	<target name="buildEvent" depends="prepare,buildLogging">
 
 		<echo message="Building the Event-API..."/>
 

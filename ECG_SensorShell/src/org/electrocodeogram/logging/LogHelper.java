@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.electrocodeogram.logging;
 
 import java.io.File;
@@ -18,88 +15,100 @@ import java.util.logging.Logger;
  */
 public class LogHelper
 {
-	
+
+	private static String LOG_DIR = "ecg_log";
+
 	private static Level DEFAULT_LEVEL = Level.WARNING;
-		
-	public static Logger createLogger(Object object)
+
+	public static Logger createLogger(String name)
 	{
 		Logger logger = Logger.getLogger("");
-		
+
 		logger.setUseParentHandlers(true);
-		
+
 		return logger;
 	}
-	
+
 	public static void setLogLevel(Level logLevel)
 	{
-		if(logLevel == null)
+		if (logLevel == null)
 		{
-			logLevel = DEFAULT_LEVEL; 
+			logLevel = DEFAULT_LEVEL;
 		}
-		
+
 		Logger logger = Logger.getLogger("");
-		
+
 		logger.setLevel(logLevel);
-		
+
 		Handler[] handlers = Logger.getLogger("").getHandlers();
-		
-		for(Handler handler : handlers)
+
+		for (Handler handler : handlers)
 		{
 			handler.setLevel(logLevel);
-			
+
 		}
-		
+
 	}
 
 	public static void setLogFile(String filename) throws SecurityException, IOException
 	{
-		if(filename == null)
+		if (filename == null)
 		{
 			return;
 		}
-		    // Create a file handler that write log record to a file called my.log
-	        FileHandler handler = new FileHandler(filename,true);
-	        
-	        handler.setFormatter(new Formatter() {
 
-				@Override
-				public String format(LogRecord record)
-				{
-					return new Date(record.getMillis()).toString() + " : " + record.getLoggerName() + " : " + record.getMessage() + "\r\n"; 
-				}});
-	    
-	        // Add to the desired logger
-	        Logger logger = Logger.getLogger("");
-	        
-	        if(logger != null)
-	        {
-	        	logger.addHandler(handler);
-	        }
-	        
-	    
+		String homeDir = System.getProperty("user.home");
+
+		if (homeDir == null || homeDir.equals(""))
+		{
+			homeDir = ".";
+		}
+
+		filename = homeDir + File.separator + LOG_DIR + File.separator + filename;
+
+		// Create a file handler that write log record to a file called my.log
+		FileHandler handler = new FileHandler(filename, true);
+
+		handler.setFormatter(new Formatter()
+		{
+
+			@Override
+			public String format(LogRecord record)
+			{
+				return new Date(record.getMillis()).toString() + " : " + record.getLoggerName() + " : " + record.getMessage() + "\r\n";
+			}
+		});
+
+		// Add to the desired logger
+		Logger logger = Logger.getLogger("");
+
+		if (logger != null)
+		{
+			logger.addHandler(handler);
+		}
 
 	}
 
 	public static Level getLogLevel(String logLevel)
 	{
-		
-		if(logLevel == null)
+
+		if (logLevel == null)
 		{
 			return DEFAULT_LEVEL;
 		}
-		else if(logLevel.equalsIgnoreCase("INFO"))
+		else if (logLevel.equalsIgnoreCase("INFO"))
 		{
 			return Level.INFO;
 		}
-		else if(logLevel.equals("WARNING"))
+		else if (logLevel.equals("WARNING"))
 		{
 			return Level.WARNING;
 		}
-		else if(logLevel.equals("ERROR"))
+		else if (logLevel.equals("ERROR"))
 		{
 			return Level.SEVERE;
 		}
-		else if(logLevel.equals("DEBUG"))
+		else if (logLevel.equals("DEBUG"))
 		{
 			return Level.FINEST;
 		}
