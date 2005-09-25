@@ -2,6 +2,7 @@ package org.electrocodeogram.msdt.registry;
 
 import java.io.File;
 
+import org.electrocodeogram.module.classloader.ModuleClassLoaderInitializationException;
 import org.electrocodeogram.msdt.MicroSensorDataType;
 import org.electrocodeogram.msdt.MicroSensorDataTypeException;
 

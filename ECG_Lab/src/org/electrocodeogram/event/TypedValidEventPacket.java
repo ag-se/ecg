@@ -6,19 +6,20 @@ import java.util.List;
 import org.electrocodeogram.msdt.MicroSensorDataType;
 
 /**
- *
+ * A TypedValidEventPacket is a ValidEventPacket which has a recognized
+ * and valid MicroSensorDataType.
  */
 public class TypedValidEventPacket extends ValidEventPacket
 {
 	/**
 	 * This constant integer value is the location of the HackyStat ActivityType value in the event's argList.
 	 */
-	public static int ACTIVITY_TYPE_INDEX = 1;
+	public static final int ACTIVITY_TYPE_INDEX = 1;
 
 	/**
 	 * This constant integer value gives the location of the MicroActivity in the event's argList.
 	 */
-	public static int MICROACTIVITY_INDEX = 2;
+	public static final int MICROACTIVITY_INDEX = 2;
 
 	private static final long serialVersionUID = -2907957495470756557L;
 
@@ -34,15 +35,15 @@ public class TypedValidEventPacket extends ValidEventPacket
 		 * The event was sent by a module.
 		 */
 		SENT,
-		
+
 		/**
 		 * The event was received by a module. 
 		 */
 		RECEIVED;
 	}
-	
+
 	private DELIVERY_STATE _deliveryState = null;
-	
+
 	/**
 	 * This creates a TypedValidEventPacket
 	 * @param sourceId Is the id of the module that sent this packet
@@ -69,7 +70,6 @@ public class TypedValidEventPacket extends ValidEventPacket
 		return this._msdt;
 	}
 
-	
 	/**
 	 * This returns the delivery state of this event.
 	 * @return the delivery state of this event
@@ -78,7 +78,7 @@ public class TypedValidEventPacket extends ValidEventPacket
 	{
 		return this._deliveryState;
 	}
-	
+
 	/**
 	 * This sets the delivery state of this event.
 	 * @param state Is the delivery state

@@ -9,7 +9,7 @@ import org.electrocodeogram.msdt.validation.EventValidator;
 import org.electrocodeogram.test.EventGenerator;
 import org.electrocodeogram.test.NoTestDataException;
 import org.electrocodeogram.test.EventGenerator.SensorDataType;
-import org.electrocodeogram.test.server.mockClient.TestClient;
+import org.electrocodeogram.test.server.mockClient.MockClient;
 
 /**
  * This class collects testcases running over the ECG serverside.
@@ -18,13 +18,13 @@ import org.electrocodeogram.test.server.mockClient.TestClient;
 public class ServersideTests extends TestCase
 {
 
-    private EventValidator validator = null;
+    private EventValidator _eventValidator = null;
 
-    private TestClient testClient = null;
+    private MockClient _mockClient = null;
 
-    private EventGenerator eventGenerator = null;
+    private EventGenerator _eventGenerator = null;
 
-    private int line = -1;
+    private int _line = -1;
 
     /**
      * This creates a testcase with the given name.
@@ -39,7 +39,7 @@ public class ServersideTests extends TestCase
     {
         super(name);
 
-        this.line = linePar;
+        this._line = linePar;
     }
 
     @Override
@@ -47,15 +47,15 @@ public class ServersideTests extends TestCase
     {
         super.setUp();
 
-        this.validator = new EventValidator(null);
+        this._eventValidator = new EventValidator(null);
 
-        this.validator.setAllowNonECGmSDTConformEvents(false);
+        this._eventValidator.setAllowNonECGmSDTConformEvents(false);
 
-        this.validator.setAllowNonECGmSDTConformEvents(true);
+        this._eventValidator.setAllowNonECGmSDTConformEvents(true);
 
-        this.testClient = new TestClient();
+        this._mockClient = new MockClient();
 
-        this.eventGenerator = new EventGenerator();
+        this._eventGenerator = new EventGenerator();
     }
 
     @Override
@@ -63,136 +63,12 @@ public class ServersideTests extends TestCase
     {
         super.tearDown();
 
-        this.validator = null;
+        this._eventValidator = null;
 
-        this.testClient = null;
+        this._mockClient = null;
 
-        this.eventGenerator = null;
+        this._eventGenerator = null;
     }
-
-    // /**
-    // * Testcase SE1 according to the document TESTPLAN Version 1.0 or higher.
-    // * This testcase passes a single syntactically invalid EventPacket from a
-    // TestClient
-    // * to the ECG SensorShellWrapper. In this case the timestamp of the
-    // EventPacket has the value "null".
-    // * The test is successfull if the result from the ECG SensorShell is
-    // "false", meaning the
-    // * EventPacket is syntactically invalid and not accepted.
-    // * @throws NoTestDataException If a pseudorandom String is requested by a
-    // line number that is not available or if the requested String size is to
-    // higher then available
-    // *
-    // */
-    // public void testInvalidEventIsNotAcceptedTimeStampIsNull() throws
-    // NoTestDataException
-    // {
-    // EventPacket eventPacket = this.eventGenerator.createEventPacket(false,
-    // true, this.line, true, true, 10, 10);
-    //
-    // boolean result = this.testClient.passEventData(this.shell, eventPacket);
-    //
-    // assertFalse(result);
-    // }
-    //
-    // /**
-    // * Testcase SE2 according to the document TESTPLAN Version 1.0 or higher.
-    // * This testcase passes a single syntactically invalid EventPacket from a
-    // TestClient
-    // * to the ECG SensorShellWrapper. In this case the commandName of the
-    // EventPacket has the value "null".
-    // * The test is successfull if the result from the ECG SensorShellWrapper
-    // is "false", meaning the
-    // * EventPacket is syntactically invalid and not accepted.
-    // * @throws NoTestDataException If a pseudorandom String is requested by a
-    // line number that is not available or if the requested String size is to
-    // higher then available
-    // *
-    // */
-    // public void testInvalidEventIsNotAcceptedCommandNameIsNull() throws
-    // NoTestDataException
-    // {
-    // EventPacket eventPacket = this.eventGenerator.createEventPacket(true,
-    // false, this.line, true, true, 10, 10);
-    //
-    // boolean result = this.testClient.passEventData(this.shell, eventPacket);
-    //
-    // assertFalse(result);
-    // }
-    //
-    // /**
-    // * Testcase SE3 according to the document TESTPLAN Version 1.0 or higher.
-    // * This testcase passes a single syntactically invalid EventPacket from a
-    // TestClient
-    // * to the ECG SensorShellWrapper. In this case the argList of the
-    // EventPacket has the value "null".
-    // * The test is successfull if the result from the ECG SensorShellWrapper
-    // is "false", meaning the
-    // * EventPacket is syntactically invalid and not accepted.
-    // * @throws NoTestDataException If a pseudorandom String is requested by a
-    // line number that is not available or if the requested String size is to
-    // higher then available
-    // *
-    // */
-    // public void testInvalidEventIsNotAcceptedArgListIsNull() throws
-    // NoTestDataException
-    // {
-    // EventPacket eventPacket = this.eventGenerator.createEventPacket(true,
-    // true, this.line, false, true, 10, 10);
-    //
-    // boolean result = this.testClient.passEventData(this.shell, eventPacket);
-    //
-    // assertFalse(result);
-    // }
-    //
-    // /**
-    // * Testcase SE4 according to the document TESTPLAN Version 1.0 or higher.
-    // * This testcase passes a single syntactically invalid EventPacket from a
-    // TestClient
-    // * to the ECG SensorShellWrapper. In this case the argList is empty.
-    // * The test is successfull if the result from the ECG SensorShellWrapper
-    // is "false", meaning the
-    // * EventPacket is syntactically invalid and not accepted.
-    // * @throws NoTestDataException If a pseudorandom String is requested by a
-    // line number that is not available or if the requested String size is to
-    // higher then available
-    // *
-    // */
-    // public void testInvalidEventIsNotAcceptedArgListIsEmpty() throws
-    // NoTestDataException
-    // {
-    // EventPacket eventPacket = this.eventGenerator.createEventPacket(true,
-    // true, this.line, true, true, 0, 10);
-    //
-    // boolean result = this.testClient.passEventData(this.shell, eventPacket);
-    //
-    // assertFalse(result);
-    // }
-    //
-    // /**
-    // * Testcase SE5 according to the document TESTPLAN Version 1.0 or higher.
-    // * This testcase passes a single syntactically invalid EventPacket from a
-    // TestClient
-    // * to the ECG SensorShellWrapper. In this case the argList is not of type
-    // List<String>.
-    // * The test is successfull if the result from the ECG SensorShellWrapper
-    // is "false", meaning the
-    // * EventPacket is syntactically invalid and not accepted.
-    // * @throws NoTestDataException If a pseudorandom String is requested by a
-    // line number that is not available or if the requested String size is to
-    // higher then available
-    // *
-    // */
-    // public void testInvalidEventIsNotAcceptedArgListIsNotOfTypeString()
-    // throws NoTestDataException
-    // {
-    // EventPacket eventPacket = this.eventGenerator.createEventPacket(true,
-    // true, this.line, true, false, 10, 10);
-    //
-    // boolean result = this.testClient.passEventData(this.shell, eventPacket);
-    //
-    // assertFalse(result);
-    // }
 
     /**
      * Testcase SE6 according to the document TESTPLAN Version 1.0 or higher.
@@ -214,9 +90,9 @@ public class ServersideTests extends TestCase
     {
         ValidEventPacket eventPacket = null;
 
-        eventPacket = this.eventGenerator.createValidEventPacket(true, true, this.line, true, true, 10, 10);
+        eventPacket = this._eventGenerator.createValidEventPacket(true, true, this._line, true, true, 10, 10);
 
-        TypedValidEventPacket result = this.testClient.passEventData(this.validator, eventPacket);
+        TypedValidEventPacket result = this._mockClient.passEventData(this._eventValidator, eventPacket);
 
         assertNull(result);
     }
@@ -237,9 +113,9 @@ public class ServersideTests extends TestCase
      */
     public void testHackyStatActivityEventsAccepted() throws NoTestDataException
     {
-        ValidEventPacket eventPacket = this.eventGenerator.createHackyStatEventPacket(SensorDataType.ACTIVITY, this.line);
+        ValidEventPacket eventPacket = this._eventGenerator.createHackyStatEventPacket(SensorDataType.ACTIVITY, this._line);
 
-        TypedValidEventPacket result = this.testClient.passEventData(this.validator, eventPacket);
+        TypedValidEventPacket result = this._mockClient.passEventData(this._eventValidator, eventPacket);
 
         assertNotNull(result);
 
@@ -261,9 +137,9 @@ public class ServersideTests extends TestCase
      */
     public void testHackyStatBuildEventsAccepted() throws NoTestDataException
     {
-        ValidEventPacket eventPacket = this.eventGenerator.createHackyStatEventPacket(SensorDataType.BUILD, this.line);
+        ValidEventPacket eventPacket = this._eventGenerator.createHackyStatEventPacket(SensorDataType.BUILD, this._line);
 
-        TypedValidEventPacket result = this.testClient.passEventData(this.validator, eventPacket);
+        TypedValidEventPacket result = this._mockClient.passEventData(this._eventValidator, eventPacket);
 
         assertNotNull(result);
     }
@@ -284,9 +160,9 @@ public class ServersideTests extends TestCase
      */
     public void testHackyStatBuffTransEventsAccepted() throws NoTestDataException
     {
-        ValidEventPacket eventPacket = this.eventGenerator.createHackyStatEventPacket(SensorDataType.BUFFTRANS, this.line);
+        ValidEventPacket eventPacket = this._eventGenerator.createHackyStatEventPacket(SensorDataType.BUFFTRANS, this._line);
 
-        TypedValidEventPacket result = this.testClient.passEventData(this.validator, eventPacket);
+        TypedValidEventPacket result = this._mockClient.passEventData(this._eventValidator, eventPacket);
 
         assertNotNull(result);
 
@@ -308,9 +184,9 @@ public class ServersideTests extends TestCase
      */
     public void testHackyStatCommitEventsAccepted() throws NoTestDataException
     {
-        ValidEventPacket eventPacket = this.eventGenerator.createHackyStatEventPacket(SensorDataType.COMMIT, this.line);
+        ValidEventPacket eventPacket = this._eventGenerator.createHackyStatEventPacket(SensorDataType.COMMIT, this._line);
 
-        TypedValidEventPacket result = this.testClient.passEventData(this.validator, eventPacket);
+        TypedValidEventPacket result = this._mockClient.passEventData(this._eventValidator, eventPacket);
 
         assertNotNull(result);
 
@@ -332,9 +208,9 @@ public class ServersideTests extends TestCase
      */
     public void testHackyStatFileMetricEventsAccepted() throws NoTestDataException
     {
-        ValidEventPacket eventPacket = this.eventGenerator.createHackyStatEventPacket(SensorDataType.FILEMETRIC, this.line);
+        ValidEventPacket eventPacket = this._eventGenerator.createHackyStatEventPacket(SensorDataType.FILEMETRIC, this._line);
 
-        TypedValidEventPacket result = this.testClient.passEventData(this.validator, eventPacket);
+        TypedValidEventPacket result = this._mockClient.passEventData(this._eventValidator, eventPacket);
 
         assertNotNull(result);
 
@@ -356,9 +232,9 @@ public class ServersideTests extends TestCase
      */
     public void testHackyStatUnitTestEventsAccepted() throws NoTestDataException
     {
-        ValidEventPacket eventPacket = this.eventGenerator.createHackyStatEventPacket(SensorDataType.UNITTEST, this.line);
+        ValidEventPacket eventPacket = this._eventGenerator.createHackyStatEventPacket(SensorDataType.UNITTEST, this._line);
 
-        TypedValidEventPacket result = this.testClient.passEventData(this.validator, eventPacket);
+        TypedValidEventPacket result = this._mockClient.passEventData(this._eventValidator, eventPacket);
 
         assertNotNull(result);
 

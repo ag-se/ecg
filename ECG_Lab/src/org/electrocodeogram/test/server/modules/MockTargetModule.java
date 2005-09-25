@@ -1,10 +1,6 @@
-/**
- * 
- */
 package org.electrocodeogram.test.server.modules;
 
 import org.electrocodeogram.event.TypedValidEventPacket;
-import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.module.ModulePropertyException;
 import org.electrocodeogram.module.target.TargetModule;
 import org.electrocodeogram.module.target.TargetModuleException;
@@ -12,85 +8,76 @@ import org.electrocodeogram.module.target.TargetModuleException;
 /**
  *
  */
-public class TestTargetModule extends TargetModule
+public class MockTargetModule extends TargetModule
 {
 
-	private ModuleTestHelper helper;
+	private ModuleTestHelper _moduleTestHelper;
 
-	public TestTargetModule(ModuleTestHelper helper)
+	public MockTargetModule(ModuleTestHelper helper)
 	{
 		super("org.electrocodeogram.test.server.modules.TestTargetModule", "TestTargetModule");
 		
-		this.helper = helper;
+		this._moduleTestHelper = helper;
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see org.electrocodeogram.module.target.TargetModule#write(org.electrocodeogram.event.ValidEventPacket)
 	 */
 	@Override
 	public void write(TypedValidEventPacket eventPacket)
 	{
-		helper.comparePackets(eventPacket);
+		this._moduleTestHelper.comparePackets(eventPacket);
 		
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see org.electrocodeogram.module.target.TargetModule#initialize()
 	 */
 	@Override
 	public void initialize()
 	{
-		// TODO Auto-generated method stub
+		// not implemented
 		
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see org.electrocodeogram.module.Module#analyseCoreNotification()
 	 */
 	@Override
 	public void analyseCoreNotification()
 	{
-		// TODO Auto-generated method stub
+		// not implemented
 		
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see org.electrocodeogram.module.Module#setProperty(java.lang.String, java.lang.Object)
 	 */
 	@Override
 	public void setProperty(String currentPropertyName, String propertyValue) throws ModulePropertyException
 	{
-		// TODO Auto-generated method stub
+		// not implemented
 		
 	}
 
-	/* (non-Javadoc)
-	 * @see org.electrocodeogram.module.Module#getProperty(java.lang.String)
-	 */
-	@Override
-	public String getProperty(String currentPropertyName)
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
+	
+	/**
 	 * @see org.electrocodeogram.module.target.TargetModule#startWriter()
 	 */
 	@Override
 	public void startWriter() throws TargetModuleException
 	{
-		// TODO Auto-generated method stub
+		// not implemented
 		
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see org.electrocodeogram.module.target.TargetModule#stopWriter()
 	 */
 	@Override
 	public void stopWriter()
 	{
-		// TODO Auto-generated method stub
+		// not implemented
 		
 	}
 

@@ -130,18 +130,26 @@ public class ECGParser
 
 		Document document = parseDocument(file, MODULE_PROPERTIES_XSD);
 
-		return new ModuleDescriptor(
-				getSingleNodeValue("id", document),
-				getSingleNodeValue("name", document),
-				getSingleNodeValue("provider-name", document),
-				getSingleNodeValue("version", document),
-				getClass(file.getParent(), getSingleNodeValue("class", document)),
-				getSingleNodeValue("description", document),
-				getModuleProperties(document),
-				getMicroSensorDataTypes(document, file.getParent()));
+		String id = getSingleNodeValue("id", document);
+		
+		String name = getSingleNodeValue("name", document);
+		
+		String providerName = getSingleNodeValue("provider-name", document);
+		
+		String version = getSingleNodeValue("version", document);
+		
+		String moduleDescription = getSingleNodeValue("description", document);
+		
+		Class clazz = getClass(file.getParent(), getSingleNodeValue("class", document));
+		
+		ModuleProperty[] moduleProperties = getModuleProperties(document);
+		
+		MicroSensorDataType[] microSensorDataTypes = getMicroSensorDataTypes(document, file.getParent());
+		
+		return new ModuleDescriptor(id,name,providerName,version,clazz,moduleDescription,moduleProperties,microSensorDataTypes);
 	}
 
-	public static ModuleSetup parseAsModuleSetup(File file) throws SAXException, IOException, ModuleSetupLoadException, PropertyException
+	public static ModuleSetup parseAsModuleSetup(File file) throws SAXException, IOException, ModuleSetupLoadException, PropertyException, ClassNotFoundException, ClassLoadingException
 	{
 		Document document = parseDocument(file, MODULE_SETUP_XSD);
 
@@ -256,6 +264,8 @@ public class ECGParser
 					String propertyName = null;
 
 					String propertyValue = null;
+					
+					Class propertyType = null;
 
 					Node propertyNameNode = getChildNode(propertyNode, "name");
 
@@ -265,8 +275,12 @@ public class ECGParser
 
 					propertyValue = getNodeValue(propertyValueNode);
 
+					Node propertyTypeNode = getChildNode(propertyNode, "type");
+					
+					propertyType = getClass(null,getNodeValue(propertyTypeNode));
+					
 					ModuleProperty moduleProperty = new ModuleProperty(
-							propertyName, propertyValue, null);
+							propertyName, propertyValue, propertyType);
 
 					modulePropertyList.add(moduleProperty);
 				}
@@ -336,15 +350,26 @@ public class ECGParser
 
 			try
 			{
-				//type = Class.forName(modulePropertyType);
-				
-				type = ModuleClassLoader.getInstance().loadClass(modulePropertyType);
-			}
+				type = Class.forName(modulePropertyType);
+			}				
 			catch (ClassNotFoundException e)
+			{
+				try
+				{
+					type = ModuleClassLoader.getInstance().loadClass(modulePropertyType);
+				}
+				catch(ClassNotFoundException e1)
+				{
+					throw new PropertyException();
+				}
+			}
+			
+			if(type == null)
 			{
 				throw new PropertyException();
 			}
-
+		
+			
 			String modulePropertyValue = null;
 
 			try
@@ -373,7 +398,10 @@ public class ECGParser
 	{
 		Class moduleClass;
 
-		ModuleClassLoader.getInstance().addModuleClassPath(classPath);
+		if(classPath != null)
+		{
+			ModuleClassLoader.getInstance().addModuleClassPath(classPath);
+		}
 
 		try
 		{

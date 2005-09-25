@@ -52,6 +52,31 @@ public abstract class SourceModule extends Module
 	public abstract void startReader(SourceModule sourceModule) throws SourceModuleException;
 
 	/**
+	 * This method is used to decalare whether event data that does not conform to
+	 * a ECG MicroSensorDataType is allowed to pass validation.
+	 * A value of "false" is ignored if the value for allowing non HackyStat conform
+	 * event data is set to "true".
+	 * @param allowNonECGmSDTConformEvents Is "true" if event data that does not conform to
+	 * a ECG MicroSensorDataType is allowed and "false" if not
+	 */
+	public void setAllowNonECGmSDTConformEvents(boolean allowNonECGmSDTConformEvents)
+	{
+		this.eventValidator.setAllowNonECGmSDTConformEvents(allowNonECGmSDTConformEvents);
+	}
+	
+	/**
+	 * This method is used to declare whether event data that does not conform to
+	 * a HackyStat SensorDataType is allowed to pass validation.
+	 * @param allowNonHackyStatSDTConformEvents Is "true" if event data that does not conform to
+	 * a HackyStat SensorDataType is allowed and "false" if not
+	 */
+
+	public void setAllowNonHackyStatSDTConformEvents(boolean allowNonHackyStatSDTConformEvents)
+	{
+		this.eventValidator.setAllowNonHackyStatSDTConformEvents(allowNonHackyStatSDTConformEvents);
+	}
+	
+	/**
 	 * 
 	 *
 	 */

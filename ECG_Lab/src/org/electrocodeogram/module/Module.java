@@ -5,13 +5,13 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.electrocodeogram.event.IllegalEventParameterException;
 import org.electrocodeogram.event.TypedValidEventPacket;
 import org.electrocodeogram.event.TypedValidEventPacket.DELIVERY_STATE;
+import org.electrocodeogram.logging.LogHelper;
 import org.electrocodeogram.module.intermediate.IIntermediateModule;
 import org.electrocodeogram.module.registry.ModuleClassException;
 import org.electrocodeogram.module.registry.ModuleInstanceException;
@@ -23,7 +23,6 @@ import org.electrocodeogram.msdt.MicroSensorDataType;
 import org.electrocodeogram.msdt.registry.MicroSensorDataTypeRegistrationException;
 import org.electrocodeogram.system.ISystemRoot;
 import org.electrocodeogram.system.SystemRoot;
-import org.electrocodeogram.logging.LogHelper;
 
 /**
  * This abstract class represents an ECG module. A module is an entity able
@@ -40,7 +39,6 @@ import org.electrocodeogram.logging.LogHelper;
  * The connection degree, which is the number of modules connected to another module, is
  * not limited by the implementation. 
  * Each module gets an unique integer id during its object creation.
- *
  */
 public abstract class Module
 {
@@ -48,7 +46,7 @@ public abstract class Module
 	private Logger _logger;
 
 	/**
-	 * These values are indicating the type of the module.
+	 * This enum contains the three different module types.
 	 */
 	public enum ModuleType
 	{
@@ -80,7 +78,7 @@ public abstract class Module
 
 	private int _id;
 
-	private String name;
+	private String _name;
 
 	private HashMap<Integer, Module> _receiverModuleMap;
 
@@ -100,10 +98,16 @@ public abstract class Module
 
 	SystemNotificator _systemNotificator;
 
+	/**
+	 * Each ECG Module can have a set of properties which are declared
+	 * in the "module.properties.xml" file for each module.
+	 * At runtime the module's properties are stored in this field along with their values. 
+	 */
 	protected ModuleProperty[] runtimeProperties; 
 	
 	/**
-	 * This creates a new Module of the given module type, module class id ans module name and registers it with the ModuleRegistry.
+	 * The constructor creates a new Module object of the given module type,
+	 * module class id ans module name and registers it with the ModuleRegistry.
 	 * @param moduleType Is the module type
 	 * @param moduleClassId Is the unique id of this module's class as registered with the ModuleRegistry
 	 * @param moduleName Is the name to give to this module instance
@@ -114,7 +118,7 @@ public abstract class Module
 		
 		this._id = ++_count;
 
-		this.name = moduleName;
+		this._name = moduleName;
 
 		this._moduleClassId = moduleClassId;
 
@@ -152,8 +156,11 @@ public abstract class Module
 		}
 		catch (ModuleClassException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			this._logger.log(Level.SEVERE,"An unexpected error occured during the module creation.");
+			
+			this._logger.log(Level.SEVERE,e.getMessage());
+			
+			return;
 		}
 		
 		registerMSDTs();
@@ -594,7 +601,7 @@ public abstract class Module
 		
 		this._logger.exiting(this.getClass().getName(),"getName");
 		
-		return this.name;
+		return this._name;
 	}
 
 	/**
@@ -878,7 +885,7 @@ public abstract class Module
 		
 		this._logger.exiting(this.getClass().getName(),"toString");
 		
-		return this.name;
+		return this._name;
 
 	}
 
@@ -975,7 +982,7 @@ public abstract class Module
 	 */
 	public abstract void setProperty(String currentPropertyName, String propertyValue) throws ModulePropertyException;
 
-	public abstract String getProperty(String currentPropertyName);
+	//public abstract String getProperty(String currentPropertyName);
 	
 	
 	/**

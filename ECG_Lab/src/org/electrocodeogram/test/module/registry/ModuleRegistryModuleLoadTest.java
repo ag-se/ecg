@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.electrocodeogram.test.module.registry;
 
 import java.io.File;
@@ -17,30 +14,30 @@ import junit.framework.TestCase;
 /**
  *
  */
-public class ModuleRegistryTest extends TestCase implements Observer
+public class ModuleRegistryModuleLoadTest extends TestCase implements Observer
 {
 
-	private MockModuleRegistry mockModuleRegistry;
+	private MockModuleRegistry _mockModuleRegistry;
 
 	private boolean result = false;
 
 	protected void setUp()
 	{
-		this.mockModuleRegistry = null;
+		this._mockModuleRegistry = null;
 
 		this.result = false;
 	}
 
 	public void testIfNotExistingModuleDirectoryCausesException()
 	{
-		this.mockModuleRegistry = new MockModuleRegistry();
+		this._mockModuleRegistry = new MockModuleRegistry();
 
-		this.mockModuleRegistry.addObserver(this);
+		this._mockModuleRegistry.addObserver(this);
 
 		try
 		{
-			this.mockModuleRegistry.setFile(new File(
-					"bin\\org\\electrocodeogram\\test\\module\\registry\\notExistingDirectory"));
+			this._mockModuleRegistry.setModuleDirectory(new File(
+					"testmodules\\notExistingDirectory"));
 
 			assertTrue(false);
 		}
@@ -53,14 +50,14 @@ public class ModuleRegistryTest extends TestCase implements Observer
 
 	public void testIfEmptyModuleDirectoryCausesException()
 	{
-		this.mockModuleRegistry = new MockModuleRegistry();
+		this._mockModuleRegistry = new MockModuleRegistry();
 
-		this.mockModuleRegistry.addObserver(this);
+		this._mockModuleRegistry.addObserver(this);
 
 		try
 		{
-			this.mockModuleRegistry.setFile(new File(
-					"bin\\org\\electrocodeogram\\test\\module\\registry\\emptyDirectory"));
+			this._mockModuleRegistry.setModuleDirectory(new File(
+					"testmodules\\emptyDirectory"));
 
 			assertTrue(false);
 		}
@@ -73,11 +70,11 @@ public class ModuleRegistryTest extends TestCase implements Observer
 
 	public void testIfNoModulePropertyFileCausesException() throws ModuleClassLoaderInitializationException, InterruptedException
 	{
-		this.mockModuleRegistry = new MockModuleRegistry();
+		this._mockModuleRegistry = new MockModuleRegistry();
 
-		this.mockModuleRegistry.addObserver(this);
+		this._mockModuleRegistry.addObserver(this);
 
-		this.mockModuleRegistry.setFile(new File(
+		this._mockModuleRegistry.setModuleDirectory(new File(
 				"testmodules\\noModulePropertyFile"));
 		
 		Thread.sleep(1000);
@@ -88,11 +85,11 @@ public class ModuleRegistryTest extends TestCase implements Observer
 
 	public void testIfEmptyModulePropertyFileIsNotLoaded() throws ModuleClassLoaderInitializationException, InterruptedException
 	{
-		this.mockModuleRegistry = new MockModuleRegistry();
+		this._mockModuleRegistry = new MockModuleRegistry();
 
-		this.mockModuleRegistry.addObserver(this);
+		this._mockModuleRegistry.addObserver(this);
 
-		this.mockModuleRegistry.setFile(new File(
+		this._mockModuleRegistry.setModuleDirectory(new File(
 				"testmodules\\emptyModulePropertyFile"));
 
 		Thread.sleep(1000);
@@ -103,11 +100,11 @@ public class ModuleRegistryTest extends TestCase implements Observer
 	
 	public void testIfMissingClassFileIsNotLoaded() throws ModuleClassLoaderInitializationException, InterruptedException
 	{
-		this.mockModuleRegistry = new MockModuleRegistry();
+		this._mockModuleRegistry = new MockModuleRegistry();
 
-		this.mockModuleRegistry.addObserver(this);
+		this._mockModuleRegistry.addObserver(this);
 
-		this.mockModuleRegistry.setFile(new File(
+		this._mockModuleRegistry.setModuleDirectory(new File(
 				"testmodules\\missingClassFile"));
 
 		Thread.sleep(1000);
@@ -118,11 +115,11 @@ public class ModuleRegistryTest extends TestCase implements Observer
 	
 	public void testIfMalformedModulePropertyIsNotLoadedA() throws ModuleClassLoaderInitializationException, InterruptedException
 	{
-		this.mockModuleRegistry = new MockModuleRegistry();
+		this._mockModuleRegistry = new MockModuleRegistry();
 
-		this.mockModuleRegistry.addObserver(this);
+		this._mockModuleRegistry.addObserver(this);
 
-		this.mockModuleRegistry.setFile(new File(
+		this._mockModuleRegistry.setModuleDirectory(new File(
 				"testmodules\\malformedA"));
 
 		Thread.sleep(1000);
@@ -133,11 +130,11 @@ public class ModuleRegistryTest extends TestCase implements Observer
 
 	public void testIfMalformedModulePropertyIsNotLoadedB() throws ModuleClassLoaderInitializationException, InterruptedException
 	{
-		this.mockModuleRegistry = new MockModuleRegistry();
+		this._mockModuleRegistry = new MockModuleRegistry();
 
-		this.mockModuleRegistry.addObserver(this);
+		this._mockModuleRegistry.addObserver(this);
 
-		this.mockModuleRegistry.setFile(new File(
+		this._mockModuleRegistry.setModuleDirectory(new File(
 				"testmodules\\malformedB"));
 
 		Thread.sleep(1000);
@@ -148,11 +145,11 @@ public class ModuleRegistryTest extends TestCase implements Observer
 	
 	public void testIfMalformedModulePropertyIsNotLoadedC() throws ModuleClassLoaderInitializationException, InterruptedException
 	{
-		this.mockModuleRegistry = new MockModuleRegistry();
+		this._mockModuleRegistry = new MockModuleRegistry();
 
-		this.mockModuleRegistry.addObserver(this);
+		this._mockModuleRegistry.addObserver(this);
 
-		this.mockModuleRegistry.setFile(new File(
+		this._mockModuleRegistry.setModuleDirectory(new File(
 				"testmodules\\malformedC"));
 
 		Thread.sleep(1000);
@@ -163,11 +160,11 @@ public class ModuleRegistryTest extends TestCase implements Observer
 	
 	public void testIfWellformedButInvalidModulePropertyIsNotLoadedA() throws ModuleClassLoaderInitializationException, InterruptedException
 	{
-		this.mockModuleRegistry = new MockModuleRegistry();
+		this._mockModuleRegistry = new MockModuleRegistry();
 
-		this.mockModuleRegistry.addObserver(this);
+		this._mockModuleRegistry.addObserver(this);
 
-		this.mockModuleRegistry.setFile(new File(
+		this._mockModuleRegistry.setModuleDirectory(new File(
 				"testmodules\\invalidA"));
 
 		Thread.sleep(1000);
@@ -178,11 +175,11 @@ public class ModuleRegistryTest extends TestCase implements Observer
 	
 	public void testIfWellformedButInvalidModulePropertyIsNotLoadedB() throws ModuleClassLoaderInitializationException, InterruptedException
 	{
-		this.mockModuleRegistry = new MockModuleRegistry();
+		this._mockModuleRegistry = new MockModuleRegistry();
 
-		this.mockModuleRegistry.addObserver(this);
+		this._mockModuleRegistry.addObserver(this);
 
-		this.mockModuleRegistry.setFile(new File(
+		this._mockModuleRegistry.setModuleDirectory(new File(
 				"testmodules\\invalidB"));
 
 		Thread.sleep(1000);
@@ -193,11 +190,11 @@ public class ModuleRegistryTest extends TestCase implements Observer
 	
 	public void testIfWellformedButInvalidModulePropertyIsNotLoadedC() throws ModuleClassLoaderInitializationException, InterruptedException
 	{
-		this.mockModuleRegistry = new MockModuleRegistry();
+		this._mockModuleRegistry = new MockModuleRegistry();
 
-		this.mockModuleRegistry.addObserver(this);
+		this._mockModuleRegistry.addObserver(this);
 
-		this.mockModuleRegistry.setFile(new File(
+		this._mockModuleRegistry.setModuleDirectory(new File(
 				"testmodules\\invalidC"));
 
 		Thread.sleep(1000);
@@ -208,11 +205,11 @@ public class ModuleRegistryTest extends TestCase implements Observer
 	
 	public void testIfValidModuleIsLoaded() throws Exception
 	{
-		this.mockModuleRegistry = new MockModuleRegistry();
+		this._mockModuleRegistry = new MockModuleRegistry();
 
-		this.mockModuleRegistry.addObserver(this);
+		this._mockModuleRegistry.addObserver(this);
 
-		this.mockModuleRegistry.setFile(new File(
+		this._mockModuleRegistry.setModuleDirectory(new File(
 				"testmodules\\validModule"));
 
 		new RetriedAssert(5000, 100) {

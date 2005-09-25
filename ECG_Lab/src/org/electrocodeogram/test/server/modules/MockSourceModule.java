@@ -9,13 +9,13 @@ import org.electrocodeogram.module.source.SourceModule;
 /**
  *
  */
-public class TestSourceModule extends SourceModule
+public class MockSourceModule extends SourceModule
 {
 
     
     
 
-    public TestSourceModule()
+    public MockSourceModule()
     {
         super("org.electrocodeogram.test.server.modules.TestSourceModule", "TestSourceModule");
     }
@@ -60,17 +60,7 @@ public class TestSourceModule extends SourceModule
         
     }
 
-	/* (non-Javadoc)
-	 * @see org.electrocodeogram.module.Module#getProperty(java.lang.String)
-	 */
-	@Override
-	public String getProperty(String currentPropertyName)
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
+		/* (non-Javadoc)
 	 * @see org.electrocodeogram.module.source.SourceModule#stopReader()
 	 */
 	@Override

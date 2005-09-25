@@ -100,7 +100,7 @@ public class SystemRoot extends Observable implements ISystemRoot, IModuleSystem
 			}
 			else
 			{
-				this._moduleRegistry.setFile(new File("modules"));
+				this._moduleRegistry.setModuleDirectory(new File("modules"));
 			}
 		}
 		else 
@@ -111,7 +111,7 @@ public class SystemRoot extends Observable implements ISystemRoot, IModuleSystem
 			}
 			else
 			{
-				this._moduleRegistry.setFile(new File(moduleDir));
+				this._moduleRegistry.setModuleDirectory(new File(moduleDir));
 			}
 		}
 		if (moduleSetup != null)

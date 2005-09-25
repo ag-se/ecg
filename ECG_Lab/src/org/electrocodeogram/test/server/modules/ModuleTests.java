@@ -3,9 +3,7 @@ package org.electrocodeogram.test.server.modules;
 import junit.framework.TestCase;
 
 import org.electrocodeogram.event.ValidEventPacket;
-import org.electrocodeogram.msdt.MicroSensorDataType;
 import org.electrocodeogram.test.EventGenerator;
-import org.electrocodeogram.test.EventGenerator.SensorDataType;
 
 import utmj.threaded.RetriedAssert;
 
@@ -16,9 +14,9 @@ import utmj.threaded.RetriedAssert;
  */
 public class ModuleTests extends TestCase
 {
-    private ModuleTestHelper moduleTestHelper = null;
+    ModuleTestHelper _moduleTestHelper = null;
 
-    private EventGenerator eventGenerator = null;
+    private EventGenerator _eventGenerator = null;
 
     /**
      * @see junit.framework.TestCase#setUp()
@@ -28,9 +26,9 @@ public class ModuleTests extends TestCase
     {
         super.setUp();
         
-        this.moduleTestHelper = new ModuleTestHelper();
+        this._moduleTestHelper = new ModuleTestHelper();
 
-        this.eventGenerator = new EventGenerator();
+        this._eventGenerator = new EventGenerator();
     }
 
     /**
@@ -42,9 +40,9 @@ public class ModuleTests extends TestCase
      
         super.tearDown();
         
-        this.moduleTestHelper = null;
+        this._moduleTestHelper = null;
 
-        this.eventGenerator = null;
+        this._eventGenerator = null;
     }
 
     /**
@@ -57,17 +55,17 @@ public class ModuleTests extends TestCase
     public void testEventTransportInHundredNodeModuleList() throws Exception
     {
 
-        ValidEventPacket eventPacket = this.eventGenerator.createECGEventPacket(org.electrocodeogram.test.EventGenerator.MicroSensorDataType.CODECHANGE);
+        ValidEventPacket eventPacket = this._eventGenerator.createECGEventPacket(org.electrocodeogram.test.EventGenerator.MicroSensorDataType.CODECHANGE);
 
-        this.moduleTestHelper.makeModuleList(100);
+        this._moduleTestHelper.makeModuleList(100);
 
-        this.moduleTestHelper.checkModuleEventTransport(eventPacket,1);
+        this._moduleTestHelper.checkModuleEventTransport(eventPacket,1);
 
-        new RetriedAssert(5000, 100) {
+        new RetriedAssert(50000, 100) {
             @Override
             public void run() throws Exception
             {
-                assertTrue(moduleTestHelper.getResult());
+                assertTrue(ModuleTests.this._moduleTestHelper.getResult());
             }
         }.start();
 
@@ -83,17 +81,17 @@ public class ModuleTests extends TestCase
     public void testEventTransportInFifteenNodeModuleTree() throws Exception
     {
 
-        ValidEventPacket eventPacket = this.eventGenerator.createECGEventPacket(org.electrocodeogram.test.EventGenerator.MicroSensorDataType.CODECHANGE);
+        ValidEventPacket eventPacket = this._eventGenerator.createECGEventPacket(org.electrocodeogram.test.EventGenerator.MicroSensorDataType.CODECHANGE);
 
-        this.moduleTestHelper.makeModuleBinTree();
+        this._moduleTestHelper.makeModuleBinTree();
 
-        this.moduleTestHelper.checkModuleEventTransport(eventPacket,8);
+        this._moduleTestHelper.checkModuleEventTransport(eventPacket,8);
 
         new RetriedAssert(5000, 100) {
             @Override
             public void run() throws Exception
             {
-                assertTrue(moduleTestHelper.getResult());
+                assertTrue(ModuleTests.this._moduleTestHelper.getResult());
             }
         }.start();
 

@@ -4,6 +4,7 @@ import java.io.File;
 
 import org.electrocodeogram.module.Module;
 import org.electrocodeogram.module.ModuleDescriptor;
+import org.electrocodeogram.module.classloader.ModuleClassLoaderInitializationException;
 
 /**
  * This interfce declares methods that are used to access information about
@@ -78,4 +79,6 @@ public interface ISystemModuleRegistry
 	public abstract void storeModuleSetup(File file) throws ModuleSetupStoreException;
 	
 	public abstract void loadModuleSetup(File file) throws ModuleSetupLoadException;
+	
+	public abstract void setModuleDirectory(File file) throws ModuleClassLoaderInitializationException;
 }

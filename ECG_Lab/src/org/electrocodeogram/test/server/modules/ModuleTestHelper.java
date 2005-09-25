@@ -3,6 +3,7 @@ package org.electrocodeogram.test.server.modules;
 import org.electrocodeogram.event.TypedValidEventPacket;
 import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.module.Module;
+import org.electrocodeogram.module.ModuleActivationException;
 import org.electrocodeogram.module.ModuleConnectionException;
 import org.electrocodeogram.test.module.TestModule;
 
@@ -19,30 +20,32 @@ import org.electrocodeogram.test.module.TestModule;
 public class ModuleTestHelper
 {
 
-    private Module last;
+    private Module _lastModule;
 
-    private ValidEventPacket testPacket;
+    private ValidEventPacket _testPacket;
 
-    private boolean result;
+    private boolean _result;
 
-    private int packetCount;
+    private int _packetCount;
 
-    private int receivedCount;
+    private int _receivedCount;
 
-    private TestSourceModule root;
+    private MockSourceModule _rootModule;
     
-    private TestTargetModule leaf;
+    private MockTargetModule _leafModule;
 
     /**
      * This creates the class as a module. 
-     *
      */
     public ModuleTestHelper()
     {
      
-    	root = new TestSourceModule();
+    	this._rootModule = new MockSourceModule();
     	
-    	leaf = new TestTargetModule(this);
+    	this._rootModule.setAllowNonECGmSDTConformEvents(true);
+    	
+    	this._leafModule = new MockTargetModule(this);
+    	
     }
 
     private void removeConnectedModules(Module node)
@@ -61,55 +64,75 @@ public class ModuleTestHelper
      * as head and the class itself as the last element in the list.
      * @param length Is the length of the list
      * @throws ModuleConnectionException If something goes wrong during conection of the modules
+     * @throws ModuleActivationException 
      */
-    public void makeModuleList(int length) throws ModuleConnectionException
+    public void makeModuleList(int length) throws ModuleConnectionException, ModuleActivationException
     {
 
         for (int i = 0; i < length; i++) {
 
             Module next = new TestModule();
-
+            
             if (i == 0) {
 
-                this.root.connectReceiverModule(next);
+                this._rootModule.connectReceiverModule(next);
             }
             else {
 
-                this.last.connectReceiverModule(next);
+                this._lastModule.connectReceiverModule(next);
             }
 
-            this.last = next;
+            next.activate();
+            
+            this._lastModule = next;
         }
 
-        this.last.connectReceiverModule(this.leaf);
+        this._lastModule.connectReceiverModule(this._leafModule);
+        
+        this._rootModule.activate();
+        
+        this._leafModule.activate();
     }
 
     /**
      * This method creates a binary tree of connected modules with the SensorShellWrapper.sensorSource
      * as the root and this TestModuleTransportModule connected to each leaf.
      * @throws ModuleConnectionException If something goes wrong during conection of the modules
+     * @throws ModuleActivationException 
      */
-    public void makeModuleBinTree() throws ModuleConnectionException
+    public void makeModuleBinTree() throws ModuleConnectionException, ModuleActivationException
     {
 
         Module leftChild = new TestModule();
+        
+        leftChild.activate();
 
         Module rightChild = new TestModule();
 
-        this.root.connectReceiverModule(leftChild);
+        rightChild.activate();
+        
+        this._rootModule.connectReceiverModule(leftChild);
 
-        this.root.connectReceiverModule(rightChild);
+        this._rootModule.connectReceiverModule(rightChild);
 
         Module leftleftChild = new TestModule();
 
+        leftleftChild.activate();
+        
         Module leftrightChild = new TestModule();
 
+        leftrightChild.activate();
+        
         Module rightleftChild = new TestModule();
 
+        rightleftChild.activate();
+        
         Module rightrightChild = new TestModule();
 
+        rightrightChild.activate();
+        
         leftChild.connectReceiverModule(leftleftChild);
-
+        
         leftChild.connectReceiverModule(leftrightChild);
 
         rightChild.connectReceiverModule(rightleftChild);
@@ -118,20 +141,36 @@ public class ModuleTestHelper
 
         Module leftleftleftChild = new TestModule();
 
+        leftleftleftChild.activate();
+        
         Module leftleftrightChild = new TestModule();
 
+        leftleftrightChild.activate();
+        
         Module leftrightleftChild = new TestModule();
 
+        leftrightleftChild.activate();
+        
         Module leftrightrightChild = new TestModule();
 
+        leftrightrightChild.activate();
+        
         Module rightleftleftChild = new TestModule();
 
+        rightleftleftChild.activate();
+        
         Module rightleftrightChild = new TestModule();
 
+        rightleftrightChild.activate();
+        
         Module rightrightleftChild = new TestModule();
 
+        rightrightleftChild.activate();
+        
         Module rightrightrightChild = new TestModule();
 
+        rightrightrightChild.activate();
+        
         leftleftChild.connectReceiverModule(leftleftleftChild);
 
         leftleftChild.connectReceiverModule(leftleftrightChild);
@@ -148,22 +187,25 @@ public class ModuleTestHelper
 
         rightrightChild.connectReceiverModule(rightrightrightChild);
 
-        leftleftleftChild.connectReceiverModule(this.leaf);
+        leftleftleftChild.connectReceiverModule(this._leafModule);
 
-        leftleftrightChild.connectReceiverModule(this.leaf);
+        leftleftrightChild.connectReceiverModule(this._leafModule);
 
-        leftrightleftChild.connectReceiverModule(this.leaf);
+        leftrightleftChild.connectReceiverModule(this._leafModule);
 
-        leftrightrightChild.connectReceiverModule(this.leaf);
+        leftrightrightChild.connectReceiverModule(this._leafModule);
 
-        rightleftleftChild.connectReceiverModule(this.leaf);
+        rightleftleftChild.connectReceiverModule(this._leafModule);
 
-        rightleftrightChild.connectReceiverModule(this.leaf);
+        rightleftrightChild.connectReceiverModule(this._leafModule);
 
-        rightrightleftChild.connectReceiverModule(this.leaf);
+        rightrightleftChild.connectReceiverModule(this._leafModule);
 
-        rightrightrightChild.connectReceiverModule(this.leaf);
+        rightrightrightChild.connectReceiverModule(this._leafModule);
 
+        this._rootModule.activate();
+        
+        this._leafModule.activate();
     }
 
     /**
@@ -179,13 +221,13 @@ public class ModuleTestHelper
      */
     public void checkModuleEventTransport(ValidEventPacket packet, int packetCountPar)
     {
-        this.testPacket = packet;
+        this._testPacket = packet;
 
-        this.result = false;
+        this._result = false;
 
-        this.packetCount = packetCountPar;
+        this._packetCount = packetCountPar;
 
-        this.root.append(packet);
+        this._rootModule.append(packet);
     }
 
     /**
@@ -194,20 +236,20 @@ public class ModuleTestHelper
      */
     public boolean getResult()
     {
-        return this.result;
+        return this._result;
     }
 
   
     public void comparePackets(TypedValidEventPacket eventPacket)
     {
-        if (this.testPacket.equals(eventPacket)) {
-            this.receivedCount++;
+        if (this._testPacket.equals(eventPacket)) {
+            this._receivedCount++;
 
-            if (this.receivedCount == this.packetCount) {
-                this.result = true;
+            if (this._receivedCount == this._packetCount) {
+                this._result = true;
             }
             else {
-                this.result = false;
+                this._result = false;
             }
         }
     }

@@ -11,7 +11,7 @@ import org.electrocodeogram.msdt.validation.EventValidator;
  * generating valid and different kinds of invalid EventPackets and it defines
  * methods to send these EventPackets.
  */
-public class TestClient
+public class MockClient
 {
     
    

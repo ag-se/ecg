@@ -101,7 +101,7 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 	 *            This path is searched for available modules
 	 * @throws ModuleClassLoaderInitializationException
 	 */
-	public void setFile(File file) throws ModuleClassLoaderInitializationException
+	public void setModuleDirectory(File file) throws ModuleClassLoaderInitializationException
 	{
 
 		this.installedModules = new InstalledModules(file);
@@ -358,6 +358,7 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 	 */
 	public Module getRunningModule(int moduleId) throws ModuleInstanceException
 	{
+		
 		if (!(moduleId > 0))
 		{
 			throw new ModuleInstanceException("The module id is invalid.");
@@ -594,6 +595,10 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 
 						this.logger.log(Level.INFO,"Property value " + propertyValue);
 						
+						String propertyType = moduleProperty.getType().getName();
+						
+						this.logger.log(Level.INFO,"Property type " + propertyType);
+						
 						if (propertyValue != null)
 						{
 							writer.println("<property>");
@@ -610,6 +615,13 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 
 							writer.println("</value>");
 
+							writer.println("<type>");
+
+							writer.println(propertyType);
+
+							writer.println("</type>");
+
+							
 							writer.println("</property>");
 							
 							this.logger.log(Level.INFO,"Property value was stored");
@@ -703,6 +715,11 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 				{
 					for (ModuleProperty moduleProperty : moduleProperties)
 					{
+						if(moduleProperty.getType().equals(Class.forName("java.lang.reflect.Method")))
+						{
+							continue;
+						}
+						
 						getRunningModule(assignedModuleId).setProperty(moduleProperty.getName(), moduleProperty.getValue());
 
 					}
@@ -711,6 +728,11 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 				if(moduleConfiguration.isActive())
 				{
 					moduleActivationList.add(new Integer(assignedModuleId));
+				}
+				
+				if(moduleIdTransformationMap.containsKey(new Integer(moduleConfiguration.getModuleId())))
+				{
+					throw new ModuleSetupLoadException("Duplicate module id found " + moduleConfiguration.getModuleId());
 				}
 				
 				moduleIdTransformationMap.put(moduleConfiguration.getModuleId(), new Integer(
@@ -739,6 +761,10 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 
 					Integer assignedReceivingModuleId = moduleIdTransformationMap.get(storedReceivingModuleId);
 
+					if(assignedReceivingModuleId == null)
+					{
+						throw new ModuleSetupLoadException("An unknown connected to id was found for module id: " + storedModuleId);
+					}
 					Module module = getRunningModule(assignedModuleId.intValue());
 
 					Module receivingModule = getRunningModule(assignedReceivingModuleId.intValue());
@@ -808,48 +834,47 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 		}
 		catch (SAXException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new ModuleSetupLoadException(e.getMessage());
 		}
 		catch (IOException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new ModuleSetupLoadException(e.getMessage());
 		}
 		catch (ModuleSetupLoadException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new ModuleSetupLoadException(e.getMessage());
 		}
 		catch (ModuleInstanceException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new ModuleSetupLoadException(e.getMessage());
 		}
 		catch (ModuleConnectionException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new ModuleSetupLoadException(e.getMessage());
 		}
 		catch (ModuleInstantiationException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new ModuleSetupLoadException(e.getMessage());
 		}
 		catch (ModuleClassException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new ModuleSetupLoadException(e.getMessage());
 		}
 		catch (ModulePropertyException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new ModuleSetupLoadException(e.getMessage());
 		}
 		catch (PropertyException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new ModuleSetupLoadException(e.getMessage());
+		}
+		catch (ClassNotFoundException e)
+		{
+			throw new ModuleSetupLoadException(e.getMessage());
+		}
+		catch (ClassLoadingException e)
+		{
+			throw new ModuleSetupLoadException(e.getMessage());
 		}
 
 	}

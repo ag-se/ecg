@@ -60,15 +60,4 @@ public class TestModule extends Module
     }
 
 
-	/* (non-Javadoc)
-	 * @see org.electrocodeogram.module.Module#getProperty(java.lang.String)
-	 */
-	@Override
-	public String getProperty(String currentPropertyName)
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
 }
