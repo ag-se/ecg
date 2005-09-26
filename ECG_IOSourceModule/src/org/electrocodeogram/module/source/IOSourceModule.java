@@ -15,7 +15,10 @@ import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.module.ModulePropertyException;
 
 /**
- * 
+ * This class is an ECG nodule that reads in ECG events form standard input.
+ * It is primarilly used by the ECG EclipseSenor if it runs in InlineServer mode.
+ * In that case the ECG Lab is started with this module and
+ * the ECG EclipseSensor writes recorded events to the standard input of this module.
  */
 public class IOSourceModule extends SourceModule
 {
@@ -23,38 +26,51 @@ public class IOSourceModule extends SourceModule
 	private Console _console;
 	
 	/**
-	 * @param arg0
-	 * @param arg1
+	 * The constructor creates the module instance. It is not to be called by
+	 * developers, instead it is called from the ECG ModuleRegistry when the
+	 * user requested a new instance of this module.
+	 * 
+	 * @param id
+	 *            This is the unique String id of the module
+	 * @param name
+	 *            This is the name which is given to the module instance
 	 */
-	public IOSourceModule(String arg0, String arg1)
+	public IOSourceModule(String id, String name)
 	{
-		super(arg0, arg1);
+		super(id, name);
 
 	}
 
 	/**
-	 * @param propertyName
-	 * @param propertyValue
-	 * @throws ModulePropertyException
-	 * 
+	 * @see org.electrocodeogram.module.Module#setProperty(java.lang.String,
+	 *      java.lang.String)
+	 * The method is not implemented in this module.      
+	 */
+	@SuppressWarnings("unused")
+	@Override
+	public void setProperty(String propertyName, @SuppressWarnings("unused") String propertyValue) throws ModulePropertyException
+	{
+		// not implemented
+	}
+	
+	/**
+	 * @see org.electrocodeogram.module.Module#analyseCoreNotification() This
+	 * The method is not implemented in this module.
 	 */
 	@Override
-	public void setProperty(String propertyName, String propertyValue) throws ModulePropertyException
-	{
-
-	}
-
 	public void analyseCoreNotification()
 	{
-
+		// not implemented
 	}
 
 	/**
 	 * @see org.electrocodeogram.module.Module#initialize()
+	 * The method is not implemented in this module. 
 	 */
 	@Override
 	public void initialize()
 	{
+		// not implemented
 	}
 
 	/**
@@ -70,20 +86,17 @@ public class IOSourceModule extends SourceModule
 	}
 
 	
+	/**
+	 * @see org.electrocodeogram.module.source.SourceModule#stopReader()
+	 */
+	@Override
 	public void stopReader()
 	{
 		this._console.shutDown();
 		
 		this._console = null;
 	}
-	/**
-	 * @see org.electrocodeogram.module.Module#getProperty(java.lang.String)
-	 */
-	@Override
-	public String getProperty(String propertyName)
-	{
-		return null;
-	}
+	
 
 	private class Console extends Thread
 	{
@@ -97,8 +110,9 @@ public class IOSourceModule extends SourceModule
 		private boolean _run = true;
 
 		/**
-		 * Creates the console to manage the ECG Server & Lab.
-		 * 
+		 * This creates the Console Thread to
+		 * continously read in events from standard input.
+		 * @param sourceModule Is the SourceModule to which events are beeing passed
 		 */
 		public Console(SourceModule sourceModule)
 		{
@@ -106,18 +120,19 @@ public class IOSourceModule extends SourceModule
 
 			this.bufferedReader = new BufferedReader(new InputStreamReader(
 					System.in));
-
-			System.out.println("ElectroCodeoGram Server & Lab is starting...");
-
 		}
 
-		
+		/**
+		 * This stops the Console Thread.
+		 *
+		 */
 		public void shutDown()
 		{
 			this._run = false;
 		}
+		
 		/**
-		 * Here the reading of the console-input is done.
+		 * @see java.lang.Thread#run()
 		 */
 		@Override
 		public void run()
