@@ -50,13 +50,17 @@ public class ManualAnnotatorSourceModule extends SourceModule
 		{
 			this._frame.setVisible(true);
 		}
+		else if(propertyName.equals("Events"))
+		{
+			
+		}
 		else
 		{
 			throw new ModulePropertyException(
 					"The module does not support a property with the given name: " + propertyName);
 		}
 		
-		this.getLogger().log(Level.INFO,"The " + propertyName + " property has been set to " + propertyValue);
+		getLogger().log(Level.INFO,"The " + propertyName + " property has been set to " + propertyValue);
 	}
 
 	public void analyseCoreNotification()
@@ -90,15 +94,7 @@ public class ManualAnnotatorSourceModule extends SourceModule
 		
 	}
 
-	/**
-	 * @see org.electrocodeogram.module.Module#getProperty(java.lang.String)
-	 */
-	@Override
-	public String getProperty(String propertyName)
-	{
-		return null;
-	}
-
+	
 	private static class ManualAnnotatorFrame extends JFrame
 	{
 		

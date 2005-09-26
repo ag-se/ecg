@@ -35,7 +35,7 @@
 				Events
 			</propertyName>
 			<propertyType>
-				org.electrocodeogram.module.source.ManualAnnotatorEvents;
+				org.electrocodeogram.module.source.ManualAnnotatorEvents
 			</propertyType>
 			<propertyValue>
 				Unterbrechung beobachtet,Beginn einer Pause, Ende einer Pause
