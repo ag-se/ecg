@@ -9,6 +9,7 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 /**
  *
@@ -20,12 +21,29 @@ public class LogHelper
 
 	private static Level DEFAULT_LEVEL = Level.WARNING;
 
+	private static int MAX_FILES = 50;
+	
+	private static final int FILE_SIZE = 10*1024*1024;
+	
+	static
+	{
+		Logger rootLogger = Logger.getLogger("");
+		
+		Handler[] handlers = rootLogger.getHandlers();
+		
+		for (Handler handler : handlers)
+		{
+			handler.setFormatter(new ECGFormatter());
+		}
+		
+	}
+	
 	public static Logger createLogger(String name)
 	{
-		Logger logger = Logger.getLogger("");
+		Logger logger = Logger.getLogger(name);
 
 		logger.setUseParentHandlers(true);
-
+		
 		return logger;
 	}
 
@@ -67,18 +85,10 @@ public class LogHelper
 		filename = homeDir + File.separator + LOG_DIR + File.separator + filename;
 
 		// Create a file handler that write log record to a file called my.log
-		FileHandler handler = new FileHandler(filename, true);
-
-		handler.setFormatter(new Formatter()
-		{
-
-			@Override
-			public String format(LogRecord record)
-			{
-				return new Date(record.getMillis()).toString() + " : " + record.getLoggerName() + " : " + record.getMessage() + "\r\n";
-			}
-		});
-
+		FileHandler handler = new FileHandler(filename, FILE_SIZE, MAX_FILES, true);
+		
+		handler.setFormatter(new ECGFormatter());
+		
 		// Add to the desired logger
 		Logger logger = Logger.getLogger("");
 
@@ -116,5 +126,19 @@ public class LogHelper
 		{
 			return DEFAULT_LEVEL;
 		}
+	}
+
+	private static class ECGFormatter extends Formatter
+	{
+
+		/**
+		 * @see java.util.logging.Formatter#format(java.util.logging.LogRecord)
+		 */
+		@Override
+		public String format(LogRecord record)
+		{
+			return "[" + record.getLevel()  + "]  " +  new Date(record.getMillis()).toString() + " : " + record.getSourceClassName() + "#" + record.getSourceMethodName() + " : " + record.getMessage() + "\r\n";
+		}
+		
 	}
 }
