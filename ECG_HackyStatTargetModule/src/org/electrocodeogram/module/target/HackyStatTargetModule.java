@@ -1,40 +1,38 @@
 package org.electrocodeogram.module.target;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.logging.Level;
-
 import org.electrocodeogram.event.TypedValidEventPacket;
-import org.electrocodeogram.module.ModuleProperty;
 import org.electrocodeogram.module.ModulePropertyException;
 import org.hackystat.kernel.admin.SensorProperties;
 import org.hackystat.kernel.shell.SensorShell;
 
 /**
- *
+ * This class is an ECG module used to send ECG events to a HackyStat server.
  */
 public class HackyStatTargetModule extends TargetModule
 {
 
 	private SensorShell _shell;
-	
+
 	private SensorProperties _properties;
-	
+
 	private String _host;
-	
+
 	private String _key;
-	
+
 	/**
-	 * @param arg0
-	 * @param arg1
+	 * The constructor creates the module instance. It is not to be called by
+	 * developers, instead it is called from the ECG ModuleRegistry when the
+	 * user requested a new instance of this module.
+	 * 
+	 * @param id
+	 *            This is the unique String id of the module
+	 * @param name
+	 *            This is the name which is given to the module instance
 	 */
-	public HackyStatTargetModule(String arg0, String arg1)
+	public HackyStatTargetModule(String id, String name)
 	{
-		super(arg0, arg1);
-		
+		super(id, name);
+
 		this.getLogger().exiting(this.getClass().getName(), "HackyStatTargetModule");
 
 	}
@@ -45,43 +43,47 @@ public class HackyStatTargetModule extends TargetModule
 	@Override
 	public void write(TypedValidEventPacket arg0)
 	{
-		if(this._shell == null)
+		if (this._shell == null)
 		{
 			return;
 		}
-			
-		this._shell.doCommand(arg0.getTimeStamp(),arg0.getSensorDataType(),arg0.getArglist());
-		
+
+		this._shell.doCommand(arg0.getTimeStamp(), arg0.getSensorDataType(), arg0.getArglist());
+
 		this._shell.send();
-		
+
 	}
 
 	/**
-	 * @param propertyName 
-	 * @param propertyValue 
-	 * @throws ModulePropertyException 
-	 * 
+	 * @see org.electrocodeogram.module.Module#setProperty(java.lang.String,
+	 *      java.lang.String)
 	 */
 	@Override
 	public void setProperty(String propertyName, String propertyValue) throws ModulePropertyException
 	{
-		if(propertyName.equals("HackyStat Host"))
+		if (propertyName.equals("HackyStat Host"))
 		{
 			this._host = propertyValue;
 		}
-		else if(propertyName.equals("HackyStat Admin Key"))
+		else if (propertyName.equals("HackyStat Admin Key"))
 		{
 			this._key = propertyValue;
 		}
 		else
 		{
-			throw new ModulePropertyException("The property " + propertyName + " is not supported.");
+			throw new ModulePropertyException(
+					"The property " + propertyName + " is not supported.");
 		}
 	}
 
+	/**
+	 * @see org.electrocodeogram.module.Module#analyseCoreNotification() This
+	 * The method is not implemented in this module.
+	 */
+	@Override
 	public void analyseCoreNotification()
 	{
-
+		// not implemented
 	}
 
 	/**
@@ -92,44 +94,42 @@ public class HackyStatTargetModule extends TargetModule
 	{
 		this.getLogger().entering(this.getClass().getName(), "initialize");
 
-		
 		this.getLogger().exiting(this.getClass().getName(), "initialize");
 	}
 
 	/**
-	 * @see org.electrocodeogram.module.Module#getProperty(java.lang.String)
+	 * @see org.electrocodeogram.module.target.TargetModule#startWriter() This
+	 *      method is not implemented in this module.
 	 */
 	@Override
-	public String getProperty(String propertyName)
-	{
-		this.getLogger().entering(this.getClass().getName(), "getProperty");
-
-		this.getLogger().exiting(this.getClass().getName(), "getProperty");
-
-		return null;
-	}
-	
 	public void startWriter() throws TargetModuleException
 	{
-		if(this._host == null)
+		if (this._host == null)
 		{
-			throw new TargetModuleException("The HackyStat host property is not set yet.");
+			throw new TargetModuleException(
+					"The HackyStat host property is not set yet.");
 		}
-		
-		if(this._key == null)
+
+		if (this._key == null)
 		{
-			throw new TargetModuleException("The HackyStat admin key property is not set yet.");
+			throw new TargetModuleException(
+					"The HackyStat admin key property is not set yet.");
 		}
-		
-		this._properties = new SensorProperties(this._host,this._key);
-		
-		this._shell = new SensorShell(this._properties,false,"ElectroCodeoGram",false);
-		
-		
+
+		this._properties = new SensorProperties(this._host, this._key);
+
+		this._shell = new SensorShell(this._properties, false,
+				"ElectroCodeoGram", false);
+
 	}
-	
+
+	/**
+	 * @see org.electrocodeogram.module.target.TargetModule#stopWriter() This
+	 *      method is not implemented in this module.
+	 */
+	@Override
 	public void stopWriter()
 	{
-		
+		// not implemented
 	}
 }
