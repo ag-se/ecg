@@ -1,5 +1,9 @@
 package org.electrocodeogram.module.source;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.electrocodeogram.logging.LogHelper;
 import org.electrocodeogram.module.ModulePropertyException;
 
 /**
@@ -12,9 +16,26 @@ import org.electrocodeogram.module.ModulePropertyException;
 public class SocketSourceModule extends SourceModule
 {
 
-	private int port;
+	/**
+	 * 
+	 */
+	private static final int DEFAULT_PORT = 22222;
 
-	private SocketServer socketServer;
+	/**
+	 * 
+	 */
+	protected static final int MAX_PORT = 65536;
+
+	/**
+	 * 
+	 */
+	protected static final int MIN_PORT = 1024;
+
+	private static Logger _logger = LogHelper.createLogger(SocketSourceModule.class.getName());
+
+	private int _port;
+
+	private SocketServer _socketServer;
 
 	/**
 	 * @param moduleClassId
@@ -23,9 +44,9 @@ public class SocketSourceModule extends SourceModule
 	public SocketSourceModule(String moduleClassId, String name)
 	{
 		super(moduleClassId, name);
-		
-		this.getLogger().exiting(this.getClass().getName(),"SocketSourceModule");
-		
+
+		_logger.exiting(this.getClass().getName(), "SocketSourceModule");
+
 	}
 
 	/**
@@ -34,25 +55,25 @@ public class SocketSourceModule extends SourceModule
 	@Override
 	public void startReader(SourceModule sourceModule)
 	{
-		this.getLogger().entering(this.getClass().getName(),"startReader");
-		
-		this.socketServer = new SocketServer(sourceModule, this.port);
+		_logger.entering(this.getClass().getName(), "startReader");
 
-		this.socketServer.start();
-		
-		this.getLogger().exiting(this.getClass().getName(),"startReader");
+		this._socketServer = new SocketServer(sourceModule, this._port);
+
+		this._socketServer.start();
+
+		_logger.exiting(this.getClass().getName(), "startReader");
 
 	}
-	
+
 	public void stopReader()
 	{
-		this.getLogger().entering(this.getClass().getName(),"stopReader");
-		
-		this.socketServer.shutDown();
-		
-		this.socketServer = null;
-		
-		this.getLogger().exiting(this.getClass().getName(),"stopReader");
+		_logger.entering(this.getClass().getName(), "stopReader");
+
+		this._socketServer.shutDown();
+
+		this._socketServer = null;
+
+		_logger.exiting(this.getClass().getName(), "stopReader");
 	}
 
 	/**
@@ -62,19 +83,34 @@ public class SocketSourceModule extends SourceModule
 	@Override
 	public void setProperty(String propertyName, String propertyValue) throws ModulePropertyException
 	{
+		_logger.entering(this.getClass().getName(), "setProperty");
+
+		if (propertyName == null)
+		{
+			_logger.log(Level.WARNING, "The value for the port property must be a number greater than " + MIN_PORT + " and less then " + MAX_PORT + ".");
+
+			throw new ModulePropertyException(
+					"The value for the port property must be a number greater than " + MIN_PORT + " and less then " + MAX_PORT + ".");
+
+		}
+
 		if (propertyName.equals("port"))
 		{
+			_logger.log(Level.INFO, "Request to set the property: " + propertyName);
+
 			try
 			{
 				int portValue = Integer.parseInt(propertyValue);
 
-				if (portValue > 1024 && portValue < 65536)
+				if (portValue > MIN_PORT && portValue < MAX_PORT)
 				{
-					this.port = portValue;
+					this._port = portValue;
 
-					if(this.socketServer != null)
+					_logger.log(Level.INFO, "Property: " + propertyName + " set.");
+
+					if (this._socketServer != null)
 					{
-						this.socketServer.shutDown();
+						this._socketServer.shutDown();
 					}
 
 					this.startReader(this);
@@ -82,23 +118,34 @@ public class SocketSourceModule extends SourceModule
 				}
 				else
 				{
+					_logger.log(Level.WARNING, "The value for the port property must be a number greater than " + MIN_PORT + " and less then " + MAX_PORT + ".");
+
 					throw new ModulePropertyException(
-						"The value for the port property must be a number greater than 1024 and less then 65536.");
+							"The value for the port property must be a number greater than " + MIN_PORT + " and less then " + MAX_PORT + ".");
 				}
 
 			}
 			catch (NumberFormatException e)
 			{
+				_logger.log(Level.WARNING, "The value for the port property must be a number greater than " + MIN_PORT + " and less then " + MAX_PORT + ".");
+
 				throw new ModulePropertyException(
-						"The value for the port property must be a number greater than 1024 and less then 65536.");
+						"The value for the port property must be a number greater than " + MIN_PORT + " and less then " + MAX_PORT + ".");
 			}
 
 		}
+
+		_logger.exiting(this.getClass().getName(), "setProperty");
 	}
 
+	@Override
 	public void analyseCoreNotification()
 	{
+		_logger.entering(this.getClass().getName(), "analyseCoreNotification");
 
+		// not implemented
+
+		_logger.exiting(this.getClass().getName(), "analyseCoreNotification");
 	}
 
 	/**
@@ -107,31 +154,11 @@ public class SocketSourceModule extends SourceModule
 	@Override
 	public void initialize()
 	{
-		this.getLogger().entering(this.getClass().getName(),"initialize");
-		
-		this.port = 22222;
+		_logger.entering(this.getClass().getName(), "initialize");
 
-		//this.startReader(this);
+		this._port = DEFAULT_PORT;
 
-		this.getLogger().exiting(this.getClass().getName(),"initialize");
-	}
-
-	/**
-	 * @see org.electrocodeogram.module.Module#getProperty(java.lang.String)
-	 */
-	@Override
-	public String getProperty(String propertyName)
-	{
-		this.getLogger().entering(this.getClass().getName(),"getProperty");
-		
-		if (propertyName.equals("port"))
-		{
-			return "" + this.port;
-		}
-
-		this.getLogger().exiting(this.getClass().getName(),"getProperty");
-		
-		return null;
+		_logger.exiting(this.getClass().getName(), "initialize");
 	}
 
 }

@@ -9,6 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.electrocodeogram.event.ValidEventPacket;
+import org.electrocodeogram.logging.LogHelper;
 
 /**
  * A ServerThread maintains communication with a single ECG sensor.
@@ -16,27 +17,27 @@ import org.electrocodeogram.event.ValidEventPacket;
  */
 public class SocketServerThread extends Thread
 {
-    protected Logger logger = null;
+    private static Logger _logger = LogHelper.createLogger(SocketServerThread.class.getName());
     
-    private static int count = 0;
+    private static int _count = 0;
     
-    private int id = -1;
+    private int _id = -1;
     
-    protected Socket $socketToSensor = null;
+    private Socket _socketToSensor = null;
     
-    protected boolean runningFlag = true;
+    private boolean _run = true;
     
-    protected ObjectInputStream objectInputStream = null;
+    private ObjectInputStream _ois = null;
     
-    private ISocketServer $sensorServer = null;
+    private ISocketServer _sensorServer = null;
 
-    protected String sensorName = null;
+    private String _sensorName = null;
     
-    protected SourceModule sourceModule;
+    private SourceModule _sourceModule;
     
-    private Object object;
+    private Object _object;
     
-    private ValidEventPacket packet;
+    private ValidEventPacket _packet;
    
     /**
      * This method returns the name of the currently connected ECG sensor.
@@ -44,9 +45,11 @@ public class SocketServerThread extends Thread
      */
     public String getSensorName()
     {
-    	this.logger.exiting(this.getClass().getName(),"getSensorName");
+    	_logger.entering(this.getClass().getName(),"getSensorName");
     	
-        return this.sensorName;
+    	_logger.exiting(this.getClass().getName(),"getSensorName");
+    	
+        return this._sensorName;
     }
     
     /**
@@ -55,14 +58,14 @@ public class SocketServerThread extends Thread
      */
     public InetAddress getSensorAddress()
     {
-    	 this.logger.entering(this.getClass().getName(),"getSensorAddress");
+    	 _logger.entering(this.getClass().getName(),"getSensorAddress");
     	
-        if (this.$socketToSensor != null)
+        if (this._socketToSensor != null)
         {
-            return this.$socketToSensor.getInetAddress();
+            return this._socketToSensor.getInetAddress();
         }
        
-        this.logger.exiting(this.getClass().getName(),"getSensorAddress");
+        _logger.exiting(this.getClass().getName(),"getSensorAddress");
         
         return null;
        
@@ -79,20 +82,41 @@ public class SocketServerThread extends Thread
     {
         super();
         
-        this.sourceModule = module;
+        _logger.entering(this.getClass().getName(),"SocketServerThread");
+        
+        this._sourceModule = module;
+        
+        if(module == null)
+        {
+        	_logger.log(Level.SEVERE,"The parameter module is null. Can not create the SocketServerThread");
+    		
+    		return;
+        }
+        
+        if(sensorServer == null)
+        {
+        	_logger.log(Level.SEVERE,"The parameter sensorServer is null. Can not create the SocketServerThread");
+    		
+    		return;
+        }
 
-        this.logger = Logger.getLogger("ECG Server");
+        if(socketToSensor == null)
+        {
+        	_logger.log(Level.SEVERE,"The parameter socketToSensor is null. Can not create the SocketServerThread");
+    		
+    		return;
+        }
         
-        // give the ServerThread a unique ID
-        this.id = ++count;
+        // Assign the ServerThread a unique ID
+        this._id = ++_count;
         
-        this.$sensorServer = sensorServer;
+        this._sensorServer = sensorServer;
         
-        this.$socketToSensor = socketToSensor;
+        this._socketToSensor = socketToSensor;
         
-        this.objectInputStream = new ObjectInputStream(socketToSensor.getInputStream());
+        this._ois = new ObjectInputStream(socketToSensor.getInputStream());
        
-        this.logger.exiting(this.getClass().getName(),"SocketServerThread");
+        _logger.exiting(this.getClass().getName(),"SocketServerThread");
     }
     
     /**
@@ -101,11 +125,11 @@ public class SocketServerThread extends Thread
      */
     public int getServerThreadId()
     {
-    	this.logger.entering(this.getClass().getName(),"getSensorThreadId");
+    	_logger.entering(this.getClass().getName(),"getSensorThreadId");
     	
-    	this.logger.exiting(this.getClass().getName(),"getSensorThreadId");
+    	_logger.exiting(this.getClass().getName(),"getSensorThreadId");
     	
-        return this.id;
+        return this._id;
     }
     
     /**
@@ -113,29 +137,28 @@ public class SocketServerThread extends Thread
      */
     public void stopSensorThread()
     {
-    	this.logger.entering(this.getClass().getName(),"stopSensorThread");
+    	_logger.entering(this.getClass().getName(),"stopSensorThread");
     	
-        this.runningFlag = false;
+        this._run = false;
         
-        this.$sensorServer.removeSensorThread(this.id);
-        
+        this._sensorServer.removeSensorThread(this._id);
         
         try {
-            if(this.objectInputStream != null)
+            if(this._ois != null)
             {
-                this.objectInputStream.close();
+                this._ois.close();
             }
-            if(this.$socketToSensor != null)
+            if(this._socketToSensor != null)
             {
-                this.$socketToSensor.close();
+                this._socketToSensor.close();
             }
         }
         catch (IOException e) {
             
-            this.logger.log(Level.WARNING,"The ServerThread could not be stopped cleanly.");
+            _logger.log(Level.WARNING,"The ServerThread could not be stopped cleanly.");
         }
         
-        this.logger.exiting(this.getClass().getName(),"stopSensorThread");
+        _logger.exiting(this.getClass().getName(),"stopSensorThread");
     }
     
     
@@ -147,34 +170,34 @@ public class SocketServerThread extends Thread
     @Override
     public void run()
     {
-    	this.logger.entering(this.getClass().getName(),"run");
+    	_logger.entering(this.getClass().getName(),"run");
     	
-        while(this.runningFlag)
+        while(this._run)
         {
         	try {
                 
-                this.object = this.objectInputStream.readObject();
+                this._object = this._ois.readObject();
                 
-                this.packet = (ValidEventPacket) this.object;
+                this._packet = (ValidEventPacket) this._object;
                 
-                ValidEventPacket packet = new ValidEventPacket(0,this.packet.getTimeStamp(),this.packet.getSensorDataType(),this.packet.getArglist());
+                ValidEventPacket packet = new ValidEventPacket(0,this._packet.getTimeStamp(),this._packet.getSensorDataType(),this._packet.getArglist());
                 
-                if(this.packet != null)
+                if(this._packet != null)
                 {
-                    this.sourceModule.append(packet);
+                    this._sourceModule.append(packet);
                     
                 }
                 
                     /* If the event data contains the "setTool" String, which is giving the name of the application
                      * the sensor runs in, this String is used as the sensor name.
                      */
-                    if(this.packet.getSensorDataType().equals("Activity") && this.packet.getArglist().get(0).equals("setTool"))
+                    if(this._packet.getSensorDataType().equals("Activity") && this._packet.getArglist().get(0).equals("setTool"))
                     {
                     	String tmpSensorName;
                         
-                        if((tmpSensorName = (String)this.packet.getArglist().get(1)) != null)
+                        if((tmpSensorName = (String)this._packet.getArglist().get(1)) != null)
                         {
-                            this.sensorName = tmpSensorName;
+                            this._sensorName = tmpSensorName;
                             
                         }
                     }
@@ -183,40 +206,40 @@ public class SocketServerThread extends Thread
             catch(SocketException e)
             {
             	
-            	this.logger.log(Level.ALL,"catch(SocketException e)");
+            	_logger.log(Level.ALL,"catch(SocketException e)");
             	
-                this.runningFlag = false;
+                this._run = false;
                 
-                this.logger.log(Level.WARNING,"The socket connection to the ECG Sensor is lost.");
+                _logger.log(Level.WARNING,"The socket connection to the ECG Sensor is lost.");
             }
             catch (IOException e) {
             	
-            	this.logger.log(Level.ALL,"catch (IOException e) {");
+            	_logger.log(Level.ALL,"catch (IOException e) {");
                 
-                this.logger.log(Level.WARNING,"Error while reading from the ECG sensor.");
+                _logger.log(Level.WARNING,"Error while reading from the ECG sensor.");
             }
             catch (ClassNotFoundException e) {
 
-            	this.logger.log(Level.ALL,"catch (ClassNotFoundException e) {");
+            	_logger.log(Level.ALL,"catch (ClassNotFoundException e) {");
             	
-                this.logger.log(Level.WARNING,"Error while reading from the ECG sensor.");
+                _logger.log(Level.WARNING,"Error while reading from the ECG sensor.");
                 
             }
             catch(ClassCastException e)
             {
-            	this.logger.log(Level.ALL,"catch(ClassCastException e)");
+            	_logger.log(Level.ALL,"catch(ClassCastException e)");
             	
                 // If something else then a ValidEventPacket is received, we don't care!
             }
             catch(Exception e)
             {
-            	this.logger.log(Level.ALL,"catch(Exception e)");
+            	_logger.log(Level.ALL,"catch(Exception e)");
             	
                 e.printStackTrace();
             }
         }
         
-        this.logger.exiting(this.getClass().getName(),"run");
+        _logger.exiting(this.getClass().getName(),"run");
         
     }
 }
