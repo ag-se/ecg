@@ -322,13 +322,5 @@ public class MSDTFilterIntermediateModule extends IntermediateModule
         return pnlButtons;
     }
     
-    /**
-	 * @see org.electrocodeogram.module.Module#getProperty(java.lang.String)
-	 */
-	@Override
-	public String getProperty(String propertyName)
-	{    
-		return null;
-	}
-
+   
 }
