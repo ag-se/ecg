@@ -2,7 +2,10 @@ package org.electrocodeogram.event;
 
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import org.electrocodeogram.logging.LogHelper;
 import org.electrocodeogram.msdt.MicroSensorDataType;
 
 /**
@@ -11,6 +14,8 @@ import org.electrocodeogram.msdt.MicroSensorDataType;
  */
 public class TypedValidEventPacket extends ValidEventPacket
 {
+	private static Logger _logger = LogHelper.createLogger(TypedValidEventPacket.class.getName());
+	
 	/**
 	 * This constant integer value is the location of the HackyStat ActivityType value in the event's argList.
 	 */
@@ -57,7 +62,11 @@ public class TypedValidEventPacket extends ValidEventPacket
 	{
 		super(sourceId, timeStamp, sensorDataType, argList);
 
+		_logger.entering(this.getClass().getName(),"TypedValidEventPacket");
+		
 		this._msdt = msdt;
+		
+		_logger.exiting(this.getClass().getName(),"TypedValidEventPacket");
 	}
 
 	/**
@@ -67,6 +76,10 @@ public class TypedValidEventPacket extends ValidEventPacket
 	 */
 	public MicroSensorDataType getMicroSensorDataType()
 	{
+		_logger.entering(this.getClass().getName(),"getMicroSensorDataType");
+		
+		_logger.exiting(this.getClass().getName(),"getMicroSensorDataType");
+		
 		return this._msdt;
 	}
 
@@ -76,6 +89,10 @@ public class TypedValidEventPacket extends ValidEventPacket
 	 */
 	public DELIVERY_STATE getDeliveryState()
 	{
+		_logger.entering(this.getClass().getName(),"getDeliveryState");
+		
+		_logger.exiting(this.getClass().getName(),"getDeliveryState");
+		
 		return this._deliveryState;
 	}
 
@@ -86,7 +103,18 @@ public class TypedValidEventPacket extends ValidEventPacket
 
 	public void setDeliveryState(DELIVERY_STATE state)
 	{
+		_logger.entering(this.getClass().getName(),"setDeliveryState");
+		
+		if(state == null)
+		{
+			_logger.log(Level.WARNING,"state is null");
+			
+			return;
+		}
+		
 		this._deliveryState = state;
+		
+		_logger.exiting(this.getClass().getName(),"setDeliveryState");
 	}
 
 }

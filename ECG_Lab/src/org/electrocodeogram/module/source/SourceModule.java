@@ -1,8 +1,11 @@
 package org.electrocodeogram.module.source;
 
-import org.electrocodeogram.event.IllegalEventParameterException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.electrocodeogram.event.TypedValidEventPacket;
 import org.electrocodeogram.event.ValidEventPacket;
+import org.electrocodeogram.logging.LogHelper;
 import org.electrocodeogram.module.Module;
 import org.electrocodeogram.msdt.validation.EventValidator;
 import org.electrocodeogram.system.SystemRoot;
@@ -18,6 +21,8 @@ import org.electrocodeogram.system.SystemRoot;
 public abstract class SourceModule extends Module
 {
 
+	private static Logger _logger = LogHelper.createLogger(SourceModule.class.getName());
+
 	private EventValidator eventValidator = null;
 
 	/**
@@ -29,10 +34,12 @@ public abstract class SourceModule extends Module
 	{
 		super(ModuleType.SOURCE_MODULE, moduleClassId, name);
 
+		_logger.entering(this.getClass().getName(), "SourceModule");
+
 		this.eventValidator = new EventValidator(
 				SystemRoot.getSystemInstance().getSystemMsdtRegistry());
 
-		this.getLogger().exiting(this.getClass().getName(), "SourceModule");
+		_logger.exiting(this.getClass().getName(), "SourceModule");
 
 		initialize();
 	}
@@ -61,9 +68,13 @@ public abstract class SourceModule extends Module
 	 */
 	public void setAllowNonECGmSDTConformEvents(boolean allowNonECGmSDTConformEvents)
 	{
+		_logger.entering(this.getClass().getName(), "setAllowNonECGmSDTConformEvents");
+
 		this.eventValidator.setAllowNonECGmSDTConformEvents(allowNonECGmSDTConformEvents);
+
+		_logger.exiting(this.getClass().getName(), "setAllowNonECGmSDTConformEvents");
 	}
-	
+
 	/**
 	 * This method is used to declare whether event data that does not conform to
 	 * a HackyStat SensorDataType is allowed to pass validation.
@@ -73,15 +84,19 @@ public abstract class SourceModule extends Module
 
 	public void setAllowNonHackyStatSDTConformEvents(boolean allowNonHackyStatSDTConformEvents)
 	{
+		_logger.entering(this.getClass().getName(), "setAllowNonHackyStatSDTConformEvents");
+
 		this.eventValidator.setAllowNonHackyStatSDTConformEvents(allowNonHackyStatSDTConformEvents);
+
+		_logger.exiting(this.getClass().getName(), "setAllowNonHackyStatSDTConformEvents");
 	}
-	
+
 	/**
 	 * 
 	 *
 	 */
 	public abstract void stopReader();
-	
+
 	/**
 	 * This method is called by the reader implementation to pass over read or
 	 * received ValidEventPackets to this SourceModule.
@@ -89,16 +104,23 @@ public abstract class SourceModule extends Module
 	 */
 	public void append(ValidEventPacket eventPacket)
 	{
-		//this.getLogger().entering(this.getClass().getName(), "append");
+		_logger.entering(this.getClass().getName(), "append");
 
-			TypedValidEventPacket typedValidEventPacket = this.eventValidator.validate(eventPacket);
+		if (eventPacket == null)
+		{
+			_logger.log(Level.WARNING, "eventPacket is null");
 
-			if (typedValidEventPacket != null)
-			{
-				sendEventPacket(typedValidEventPacket);
-			}
+			return;
+		}
 
-		//this.getLogger().exiting(this.getClass().getName(), "append");
+		TypedValidEventPacket typedValidEventPacket = this.eventValidator.validate(eventPacket);
+
+		if (typedValidEventPacket != null)
+		{
+			sendEventPacket(typedValidEventPacket);
+		}
+
+		_logger.exiting(this.getClass().getName(), "append");
 	}
 
 	/**
@@ -109,9 +131,9 @@ public abstract class SourceModule extends Module
 	public final void receiveEventPacket(@SuppressWarnings("unused")
 	TypedValidEventPacket eventPacket)
 	{
-		this.getLogger().entering(this.getClass().getName(), "receiveEventPacket");
+		_logger.entering(this.getClass().getName(), "receiveEventPacket");
 
-		this.getLogger().exiting(this.getClass().getName(), "receiveEventPacket");
+		_logger.exiting(this.getClass().getName(), "receiveEventPacket");
 
 		return;
 	}

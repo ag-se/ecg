@@ -10,15 +10,13 @@ import javax.xml.XMLConstants;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
+import org.electrocodeogram.logging.LogHelper;
 import org.electrocodeogram.module.Module;
 import org.electrocodeogram.moduleapi.msdt.registry.IModuleMsdtRegistry;
 import org.electrocodeogram.msdt.MicroSensorDataType;
 import org.electrocodeogram.msdt.MicroSensorDataTypeException;
 import org.electrocodeogram.system.SystemRoot;
-import org.electrocodeogram.logging.LogHelper;
 import org.xml.sax.SAXException;
-
-import sun.rmi.log.LogHandler;
 
 /**
  * The MicroSensorDataType registry is a database for MicroSensorDataTypes.
@@ -37,7 +35,7 @@ public class MsdtRegistry implements ISystemMsdtRegistry, IModuleMsdtRegistry
 
 	private HashMap<String, MicroSensorDataType> predefinedMsdt;
 
-	private Logger logger;
+	private static Logger _logger = LogHelper.createLogger(MsdtRegistry.class.getName());
 
 	/**
 	 * This creates the MsdtRegistry.
@@ -45,7 +43,7 @@ public class MsdtRegistry implements ISystemMsdtRegistry, IModuleMsdtRegistry
 	public MsdtRegistry()
 	{
 
-		this.logger = LogHelper.createLogger(this);
+		_logger.entering(this.getClass().getName(), "MsdtRegistry");
 
 		this.registeredMsdt = new HashMap<String, MicroSensorDataType>();
 
@@ -58,9 +56,12 @@ public class MsdtRegistry implements ISystemMsdtRegistry, IModuleMsdtRegistry
 		catch (FileNotFoundException e)
 		{
 
-			this.logger.log(Level.WARNING, e.getMessage());
+			_logger.log(Level.SEVERE, "The predifined MSDTs could not be found.");
+
+			_logger.log(Level.FINEST, e.getMessage());
 
 		}
+		_logger.exiting(this.getClass().getName(), "MsdtRegistry");
 
 	}
 
@@ -71,12 +72,16 @@ public class MsdtRegistry implements ISystemMsdtRegistry, IModuleMsdtRegistry
 	private void loadPredefinedSourceMsdt() throws FileNotFoundException
 	{
 
+		_logger.entering(this.getClass().getName(), "loadPredefinedSourceMsdt");
+
 		String msdtSubDirString = "msdt";
 
 		File msdtDir = new File(msdtSubDirString);
 
 		if (!msdtDir.exists() || !msdtDir.isDirectory())
 		{
+			_logger.log(Level.WARNING, "The MicroSensorDataType \"msdt\" subdirectory can not be found.");
+
 			throw new FileNotFoundException(
 					"The MicroSensorDataType \"msdt\" subdirectory can not be found.");
 		}
@@ -102,7 +107,7 @@ public class MsdtRegistry implements ISystemMsdtRegistry, IModuleMsdtRegistry
 					MicroSensorDataType microSensorDataType = new MicroSensorDataType(
 							defFile.getName(), schema);
 
-					this.logger.log(Level.INFO, "Loaded additional MicroSensorDatyType " + defFile.getName());
+					_logger.log(Level.INFO, "Loaded additional MicroSensorDatyType " + defFile.getName());
 
 					this.predefinedMsdt.put(microSensorDataType.getName(), microSensorDataType);
 
@@ -110,23 +115,24 @@ public class MsdtRegistry implements ISystemMsdtRegistry, IModuleMsdtRegistry
 				catch (SAXException e)
 				{
 
-					this.logger.log(Level.WARNING, "Error while reading the XML schema file " + defFile.getName());
+					_logger.log(Level.WARNING, "Error while reading the XML schema file " + defFile.getName());
 
-					this.logger.log(Level.WARNING, e.getMessage());
+					_logger.log(Level.FINEST, e.getMessage());
 
 				}
 				catch (MicroSensorDataTypeException e)
 				{
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					_logger.log(Level.WARNING, "Error while reading the XML schema file " + defFile.getName());
 				}
-				
+
 			}
 		}
 		else
 		{
-			this.logger.log(Level.INFO, "No msdt data is found.");
+			_logger.log(Level.SEVERE, "No MSDTs are found!");
 		}
+
+		_logger.exiting(this.getClass().getName(), "loadPredefinedSourceMsdt");
 
 	}
 
@@ -135,7 +141,12 @@ public class MsdtRegistry implements ISystemMsdtRegistry, IModuleMsdtRegistry
 	 */
 	public MicroSensorDataType[] getMicroSensorDataTypes()
 	{
+		_logger.entering(this.getClass().getName(), "getMicroSensorDataTypes");
+
+		_logger.exiting(this.getClass().getName(), "getMicroSensorDataTypes");
+
 		return this.registeredMsdt.values().toArray(new MicroSensorDataType[0]);
+
 	}
 
 	/**
@@ -145,6 +156,8 @@ public class MsdtRegistry implements ISystemMsdtRegistry, IModuleMsdtRegistry
 	 */
 	public MicroSensorDataType requestMsdtRegistration(MicroSensorDataType msdt, Module module) throws MicroSensorDataTypeRegistrationException
 	{
+		_logger.entering(this.getClass().getName(), "requestMsdtRegistration");
+
 		if (msdt == null)
 		{
 			throw new MicroSensorDataTypeRegistrationException(
@@ -154,7 +167,7 @@ public class MsdtRegistry implements ISystemMsdtRegistry, IModuleMsdtRegistry
 		if (module == null)
 		{
 			throw new MicroSensorDataTypeRegistrationException(
-					"the given Module is of value \"null\"");
+					"The given Module is of value \"null\"");
 		}
 
 		if (this.registeredMsdt.containsKey(msdt.getName()))
@@ -163,7 +176,7 @@ public class MsdtRegistry implements ISystemMsdtRegistry, IModuleMsdtRegistry
 
 			knownMsdt.addProvidingModule(module);
 
-			this.logger.log(Level.INFO, "Registered additonal Module with a known MicroSensorDatyType " + knownMsdt.getName());
+			_logger.log(Level.INFO, "Registered additonal Module with a known MicroSensorDatyType " + knownMsdt.getName());
 
 			SystemRoot.getSystemInstance().fireStateChange();
 
@@ -175,9 +188,11 @@ public class MsdtRegistry implements ISystemMsdtRegistry, IModuleMsdtRegistry
 
 		this.registeredMsdt.put(msdt.getName(), msdt);
 
-		this.logger.log(Level.INFO, "Registered a new MicroSensorDatyType " + msdt.getName());
+		_logger.log(Level.INFO, "Registered a new MicroSensorDatyType " + msdt.getName());
 
 		SystemRoot.getSystemInstance().fireStateChange();
+
+		_logger.exiting(this.getClass().getName(), "requestMsdtRegistration");
 
 		return msdt;
 
@@ -188,6 +203,8 @@ public class MsdtRegistry implements ISystemMsdtRegistry, IModuleMsdtRegistry
 	 */
 	public void deregisterMsdt(MicroSensorDataType msdt) throws MicroSensorDataTypeRegistrationException
 	{
+		_logger.entering(this.getClass().getName(), "deregisterMsdt");
+
 		if (msdt == null)
 		{
 			throw new MicroSensorDataTypeRegistrationException(
@@ -202,9 +219,11 @@ public class MsdtRegistry implements ISystemMsdtRegistry, IModuleMsdtRegistry
 
 		this.registeredMsdt.remove(msdt.getName());
 
-		this.logger.log(Level.INFO, "Deregistered MicroSensorDatyType " + msdt.getName());
+		_logger.log(Level.INFO, "Deregistered MicroSensorDatyType " + msdt.getName());
 
 		SystemRoot.getSystemInstance().fireStateChange();
+
+		_logger.exiting(this.getClass().getName(), "deregisterMsdt");
 	}
 
 	/**
@@ -212,6 +231,10 @@ public class MsdtRegistry implements ISystemMsdtRegistry, IModuleMsdtRegistry
 	 */
 	public MicroSensorDataType[] getPredefinedMicroSensorDataTypes()
 	{
+		_logger.entering(this.getClass().getName(), "getPredefinedMicroSensorDataTypes");
+
+		_logger.exiting(this.getClass().getName(), "getPredefinedMicroSensorDataTypes");
+
 		return this.predefinedMsdt.values().toArray(new MicroSensorDataType[0]);
 	}
 
@@ -220,6 +243,8 @@ public class MsdtRegistry implements ISystemMsdtRegistry, IModuleMsdtRegistry
 	 */
 	public MicroSensorDataType parseMicroSensorDataType(File defFile) throws MicroSensorDataTypeException
 	{
+		_logger.entering(this.getClass().getName(), "parseMicroSensorDataType");
+
 		if (!defFile.exists())
 		{
 			throw new MicroSensorDataTypeException(
@@ -244,7 +269,9 @@ public class MsdtRegistry implements ISystemMsdtRegistry, IModuleMsdtRegistry
 			MicroSensorDataType microSensorDataType = new MicroSensorDataType(
 					defFile.getName(), schema);
 
-			this.logger.log(Level.INFO, "Loaded additional MicroSensorDatyType " + defFile.getName());
+			_logger.log(Level.INFO, "Loaded additional MicroSensorDatyType " + defFile.getName());
+
+			_logger.exiting(this.getClass().getName(), "parseMicroSensorDataType");
 
 			return microSensorDataType;
 
@@ -255,6 +282,6 @@ public class MsdtRegistry implements ISystemMsdtRegistry, IModuleMsdtRegistry
 			throw new MicroSensorDataTypeException(
 					"Error while reading the XML schema file " + defFile.getName() + "\n" + e.getMessage());
 		}
-		
+
 	}
 }

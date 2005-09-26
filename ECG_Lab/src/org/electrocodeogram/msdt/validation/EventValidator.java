@@ -2,7 +2,6 @@ package org.electrocodeogram.msdt.validation;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -13,6 +12,7 @@ import javax.xml.validation.Validator;
 import org.electrocodeogram.event.IllegalEventParameterException;
 import org.electrocodeogram.event.TypedValidEventPacket;
 import org.electrocodeogram.event.ValidEventPacket;
+import org.electrocodeogram.logging.LogHelper;
 import org.electrocodeogram.msdt.MicroSensorDataType;
 import org.electrocodeogram.msdt.registry.ISystemMsdtRegistry;
 import org.hackystat.kernel.admin.SensorProperties;
@@ -28,36 +28,38 @@ import org.xml.sax.SAXException;
  */
 public class EventValidator
 {
-	private Logger logger = null;
+	private static Logger _logger = LogHelper.createLogger(EventValidator.class.getName());
 
-	private int processingID = 0;
+	private ISystemMsdtRegistry _msdtRegistry = null;
 
-	private ISystemMsdtRegistry $mSdtManager = null;
+	private SensorShell _sensorShell;
 
-	private SensorShell shell;
+	private boolean _allowNonHackyStatSDTConformEvents = false;
 
-	private boolean $allowNonHackyStatSDTConformEvents = false;
+	private boolean _allowNonECGmSDTConformEvents = false;
 
-	private boolean $allowNonECGmSDTConformEvents = false;
-	
-	private int count = 0;
+	private int _count = 0;
 
 	/**
 	 * This creates a EventValidator object.
 	 * 
-	 * @param mSdtManager
+	 * @param msdtRegistry
 	 *            Is the MicroSensorDataType-Manager (MsdtManager) object that
 	 *            keeps the MicroSensorDataType XML schema definitions which are used
 	 *            to validate the MicroActivities against.
 	 */
-	public EventValidator(ISystemMsdtRegistry mSdtManager)
+	public EventValidator(ISystemMsdtRegistry msdtRegistry)
 	{
-		this.shell = new SensorShell(new SensorProperties("", ""), false,
-				"ElectroCodeoGram",false);
+		_logger.entering(this.getClass().getName(), "EventValidator");
 
-		this.$mSdtManager = mSdtManager;
+		this._sensorShell = new SensorShell(new SensorProperties("", ""),
+				false, "ElectroCodeoGram", false);
 
-		this.logger = Logger.getLogger("ECG Server");
+		_logger.log(Level.INFO, "Created the HackyStat SensorShell.");
+
+		this._msdtRegistry = msdtRegistry;
+
+		_logger.exiting(this.getClass().getName(), "EventValidator");
 
 	}
 
@@ -81,61 +83,72 @@ public class EventValidator
 	 */
 	public TypedValidEventPacket validate(ValidEventPacket packet)
 	{
-		//this.processingID++;
+		_logger.entering(this.getClass().getName(), "validate");
 
-		//this.logger.log(Level.INFO, this.processingID + ": Begin to process new event data at " + new Date().toString());
+		TypedValidEventPacket toReturn;
 
-		if (this.$allowNonHackyStatSDTConformEvents)
+		if (this._allowNonHackyStatSDTConformEvents)
 		{
 			try
 			{
-				return new TypedValidEventPacket(-1, packet.getTimeStamp(),
+				toReturn = new TypedValidEventPacket(-1, packet.getTimeStamp(),
 						packet.getSensorDataType(), packet.getArglist(), null);
+
+				_logger.exiting(this.getClass().getName(), "validate");
+
+				return toReturn;
 			}
 			catch (IllegalEventParameterException e1)
 			{
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				_logger.log(Level.WARNING, "An Exception occured while validating an event.");
 			}
 		}
 		/*
 		 * Is the incoming event according to a HackyStat SensorDataType?
 		 */
-		boolean isHackyStatSensorDataTypeConform = this.shell.doCommand(packet.getTimeStamp(), packet.getSensorDataType(), packet.getArglist());
-		
-		this.count++;
-		
-		if(this.count == 100)
+		boolean isHackyStatSensorDataTypeConform = this._sensorShell.doCommand(packet.getTimeStamp(), packet.getSensorDataType(), packet.getArglist());
+
+		this._count++;
+
+		if (this._count == 100)
 		{
-			this.shell = new SensorShell(new SensorProperties("", ""), false,
-					"ElectroCodeoGram",false);
-			
+			this._sensorShell = new SensorShell(new SensorProperties("", ""),
+					false, "ElectroCodeoGram", false);
+
 			OfflineManagerClearer.clearOfflineManager();
-			
+
 			System.gc();
-			
-			this.count = 0;
+
+			this._count = 0;
 		}
-		
+
 		//boolean isHackyStatSensorDataTypeConform = true;
 
 		if (isHackyStatSensorDataTypeConform)
 		{
 
-			this.logger.log(Level.INFO, this.processingID + ": Event data is conforming to a HackyStat SensorDataType and is processed.");
+			_logger.log(Level.INFO, "Event is conforming to a HackyStat SensorDataType and is processed.");
 
-			this.logger.log(Level.INFO, this.processingID + " : " + packet.toString());
+			_logger.log(Level.FINEST, packet.toString());
 
-			if (this.$allowNonECGmSDTConformEvents)
+			if (this._allowNonECGmSDTConformEvents)
 			{
 				try
 				{
-					return new TypedValidEventPacket(0, packet.getTimeStamp(),
-							packet.getSensorDataType(), packet.getArglist(),
-							null);
+					toReturn = new TypedValidEventPacket(0,
+							packet.getTimeStamp(), packet.getSensorDataType(),
+							packet.getArglist(), null);
+
+					_logger.exiting(this.getClass().getName(), "validate");
+
+					return toReturn;
 				}
 				catch (IllegalEventParameterException e)
 				{
+					_logger.log(Level.WARNING, "An Exception occured while validating an event.");
+
+					_logger.exiting(this.getClass().getName(), "validate");
+
 					return null;
 				}
 			}
@@ -144,12 +157,19 @@ public class EventValidator
 			{
 				if (isMicroActivityEvent(packet))
 				{
-					return isMicroSensorDataType(packet);
+					toReturn = isMicroSensorDataType(packet);
+
+					_logger.exiting(this.getClass().getName(), "validate");
+
+					return toReturn;
+
 				}
 			}
-			
+
 		}
-		
+
+		_logger.exiting(this.getClass().getName(), "validate");
+
 		return null;
 	}
 
@@ -160,15 +180,30 @@ public class EventValidator
 	 */
 	private boolean isMicroActivityEvent(ValidEventPacket packet)
 	{
-		if (packet == null) return false;
+		_logger.entering(this.getClass().getName(), "isMicroActivityEvent");
+
+		if (packet == null)
+		{
+			_logger.log(Level.WARNING, "packet is null");
+
+			_logger.exiting(this.getClass().getName(), "isMicroActivityEvent");
+
+			return false;
+		}
 
 		if (packet.getArglist().get(1).equals("MicroActivity"))
 		{
-			this.logger.log(Level.INFO, this.processingID + ": The event is an ECG \"MicroActivity\" event.");
+			_logger.log(Level.INFO, "The event is an ECG \"MicroActivity\" event.");
+
+			_logger.exiting(this.getClass().getName(), "isMicroActivityEvent");
+
 			return true;
 		}
 
-		this.logger.log(Level.INFO, this.processingID + ": The event is not an ECG \"MicroActivity\" event.");
+		_logger.log(Level.INFO, "The event is not an ECG \"MicroActivity\" event.");
+
+		_logger.exiting(this.getClass().getName(), "isMicroActivityEvent");
+
 		return false;
 	}
 
@@ -180,23 +215,46 @@ public class EventValidator
 	private boolean isActivityEvent(ValidEventPacket packet)
 	{
 
+		_logger.entering(this.getClass().getName(), "isActivityEvent");
+
 		if (packet == null)
 		{
+			_logger.log(Level.WARNING, "packet is null");
+
+			_logger.exiting(this.getClass().getName(), "isActivityEvent");
+
 			return false;
 		}
 
 		if (packet.getSensorDataType().equals("Activity"))
 		{
-			this.logger.log(Level.INFO, this.processingID + ": The event is a HackyStat \"Activity\" event.");
+			_logger.log(Level.INFO, "The event is a HackyStat \"Activity\" event.");
+
+			_logger.exiting(this.getClass().getName(), "isActivityEvent");
+
 			return true;
 		}
 
-		this.logger.log(Level.INFO, this.processingID + ": The event is not a HackyStat \"Activity\" event.");
+		_logger.log(Level.INFO, "The event is not a HackyStat \"Activity\" event.");
+
+		_logger.exiting(this.getClass().getName(), "isActivityEvent");
+
 		return false;
 	}
 
 	private TypedValidEventPacket isMicroSensorDataType(ValidEventPacket packet)
 	{
+
+		_logger.entering(this.getClass().getName(), "isMicroSensorDataType");
+
+		if (packet == null)
+		{
+			_logger.log(Level.WARNING, "packet is null");
+
+			_logger.exiting(this.getClass().getName(), "isMicroSensorDataType");
+
+			return null;
+		}
 
 		List argList = packet.getArglist();
 
@@ -205,25 +263,29 @@ public class EventValidator
 		if (microActivityString == null || microActivityString.equals(""))
 		{
 
-			this.logger.log(Level.INFO, this.processingID + ": No MicroActivity data found.");
+			_logger.log(Level.INFO, "No MicroActivity data found.");
 
-			this.logger.log(Level.INFO, this.processingID + ": Event data is not conforming to a HackyStat SensorDataType and is discarded.");
+			_logger.log(Level.INFO, "Event data is not conforming to a HackyStat SensorDataType and is discarded.");
 
-			this.logger.log(Level.INFO, this.processingID + ":" + packet.toString());
+			_logger.log(Level.INFO, packet.toString());
+
+			_logger.exiting(this.getClass().getName(), "isMicroSensorDataType");
 
 			return null;
 		}
 
-		MicroSensorDataType[] microSensorDataTypes = this.$mSdtManager.getMicroSensorDataTypes();
+		MicroSensorDataType[] microSensorDataTypes = this._msdtRegistry.getMicroSensorDataTypes();
 
-		if (microSensorDataTypes.length == 0)
+		if (microSensorDataTypes != null && microSensorDataTypes.length == 0)
 		{
 
-			this.logger.log(Level.INFO, this.processingID + ": No MicroSensorDataTypes are found.");
+			_logger.log(Level.INFO, "No MicroSensorDataTypes are found.");
 
-			this.logger.log(Level.INFO, this.processingID + ": Event data is not conforming to a HackyStat SensorDataType and is discarded.");
+			_logger.log(Level.INFO, "Event data is not conforming to a HackyStat SensorDataType and is discarded.");
 
-			this.logger.log(Level.INFO, this.processingID + ":" + packet.toString());
+			_logger.log(Level.INFO, packet.toString());
+
+			_logger.exiting(this.getClass().getName(), "isMicroSensorDataType");
 
 			return null;
 		}
@@ -239,11 +301,11 @@ public class EventValidator
 			try
 			{
 
-				//this.logger.log(Level.INFO, "Validating MicroActivity against " + microSensorDataTypes[i].getName() + " XML schema.");
+				_logger.log(Level.FINEST, "Validating MicroActivity against " + microSensorDataTypes[i].getName() + " XML schema.");
 
 				validator.validate(saxSource);
 
-				this.logger.log(Level.INFO, "The MicroActivity is a valid " + microSensorDataTypes[i].getName() + " event.");
+				_logger.log(Level.INFO, "The MicroActivity is a valid " + microSensorDataTypes[i].getName() + " event.");
 
 				TypedValidEventPacket typedValidEventPacket = null;
 
@@ -255,28 +317,34 @@ public class EventValidator
 				}
 				catch (IllegalEventParameterException e)
 				{
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					_logger.log(Level.WARNING, "An Exception occured while validating an event.");
 				}
+
+				_logger.exiting(this.getClass().getName(), "isMicroSensorDataType");
 
 				return typedValidEventPacket;
 			}
 			catch (SAXException e)
 			{
 
-				// ignore this
+				_logger.log(Level.FINEST, "The event could is not valid against a Schema");
+
+				_logger.log(Level.FINEST, e.getMessage());
 
 			}
 			catch (IOException e)
 			{
+				_logger.log(Level.WARNING, "The MicroActivity event could not be read.");
 
-				this.logger.log(Level.INFO, "The MicroActivity event could not been read.");
+				_logger.log(Level.FINEST, e.getMessage());
 
 			}
 
 		}
 
-		this.logger.log(Level.INFO, "The MicroActivity is not conforming to a known MicroSensorDataType.");
+		_logger.log(Level.INFO, "The MicroActivity is not conforming to a known MicroSensorDataType.");
+
+		_logger.exiting(this.getClass().getName(), "isMicroSensorDataType");
 
 		return null;
 	}
@@ -289,7 +357,11 @@ public class EventValidator
 	 */
 	public boolean areNonECGmSDTConformEventsAllowed()
 	{
-		return this.$allowNonECGmSDTConformEvents;
+		_logger.entering(this.getClass().getName(), "areNonECGmSDTConformEventsAllowed");
+
+		_logger.exiting(this.getClass().getName(), "areNonECGmSDTConformEventsAllowed");
+
+		return this._allowNonECGmSDTConformEvents;
 	}
 
 	/**
@@ -302,7 +374,11 @@ public class EventValidator
 	 */
 	public void setAllowNonECGmSDTConformEvents(boolean allowNonECGmSDTConformEvents)
 	{
-		this.$allowNonECGmSDTConformEvents = allowNonECGmSDTConformEvents;
+		_logger.entering(this.getClass().getName(), "setAllowNonECGmSDTConformEvents");
+
+		this._allowNonECGmSDTConformEvents = allowNonECGmSDTConformEvents;
+
+		_logger.exiting(this.getClass().getName(), "setAllowNonECGmSDTConformEvents");
 	}
 
 	/**
@@ -314,7 +390,11 @@ public class EventValidator
 
 	public boolean areNonHackyStatSDTConformEventsAllowed()
 	{
-		return this.$allowNonHackyStatSDTConformEvents;
+		_logger.entering(this.getClass().getName(), "areNonHackyStatSDTConformEventsAllowed");
+
+		_logger.exiting(this.getClass().getName(), "areNonHackyStatSDTConformEventsAllowed");
+
+		return this._allowNonHackyStatSDTConformEvents;
 	}
 
 	/**
@@ -326,7 +406,11 @@ public class EventValidator
 
 	public void setAllowNonHackyStatSDTConformEvents(boolean allowNonHackyStatSDTConformEvents)
 	{
-		this.$allowNonHackyStatSDTConformEvents = allowNonHackyStatSDTConformEvents;
+		_logger.entering(this.getClass().getName(), "setAllowNonHackyStatSDTConformEvents");
+
+		this._allowNonHackyStatSDTConformEvents = allowNonHackyStatSDTConformEvents;
+
+		_logger.exiting(this.getClass().getName(), "setAllowNonHackyStatSDTConformEvents");
 	}
 
 }

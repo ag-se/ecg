@@ -6,6 +6,7 @@ import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JFrame;
 
@@ -34,6 +35,13 @@ import org.electrocodeogram.ui.IGui;
 public class SystemRoot extends Observable implements ISystemRoot, IModuleSystemRoot
 {
 
+	/**
+	 * 
+	 */
+	private static final String DEFAULT_MODULE_DIRECTORY = "modules";
+
+	static Logger _logger = LogHelper.createLogger(SystemRoot.class.getName());
+
 	private static SystemRoot _theInstance;
 
 	private ModuleRegistry _moduleRegistry;
@@ -45,11 +53,15 @@ public class SystemRoot extends Observable implements ISystemRoot, IModuleSystem
 	private SystemRoot()
 	{
 
+		_logger.entering(this.getClass().getName(), "SystemRoot");
+
 		this._mstdRegistry = new MsdtRegistry();
 
 		this._moduleRegistry = new ModuleRegistry();
 
 		_theInstance = this;
+
+		_logger.exiting(this.getClass().getName(), "SystemRoot");
 
 	}
 
@@ -58,12 +70,18 @@ public class SystemRoot extends Observable implements ISystemRoot, IModuleSystem
 
 		this();
 
+		_logger.entering(this.getClass().getName(), "SystemRoot");
+
 		if (!nogui)
 		{
+			_logger.log(Level.INFO, "Starting ECG Lab with GUI.");
+
 			this._gui = new Gui(this._moduleRegistry);
 		}
 		else
 		{
+			_logger.log(Level.INFO, "Starting ECG Lab without GUI.");
+
 			Thread workerThread = new Thread(new Runnable()
 			{
 
@@ -81,8 +99,7 @@ public class SystemRoot extends Observable implements ISystemRoot, IModuleSystem
 						}
 						catch (InterruptedException e)
 						{
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+							_logger.log(Level.WARNING, "The SystemRoot's WorkerThread has been interrupted.");
 						}
 					}
 
@@ -92,19 +109,25 @@ public class SystemRoot extends Observable implements ISystemRoot, IModuleSystem
 			workerThread.start();
 		}
 
-		if(moduleDir == null)
+		if (moduleDir == null)
 		{
+			_logger.log(Level.INFO, "Starting with default module directory: " + DEFAULT_MODULE_DIRECTORY);
+
 			if (this._moduleRegistry == null)
 			{
-				this._moduleRegistry = new ModuleRegistry(new File("modules"));
+				this._moduleRegistry = new ModuleRegistry(new File(
+						DEFAULT_MODULE_DIRECTORY));
 			}
 			else
 			{
-				this._moduleRegistry.setModuleDirectory(new File("modules"));
+				this._moduleRegistry.setModuleDirectory(new File(
+						DEFAULT_MODULE_DIRECTORY));
 			}
 		}
-		else 
+		else
 		{
+			_logger.log(Level.INFO, "Starting with module directory: " + moduleDir);
+
 			if (this._moduleRegistry == null)
 			{
 				this._moduleRegistry = new ModuleRegistry(new File(moduleDir));
@@ -116,8 +139,12 @@ public class SystemRoot extends Observable implements ISystemRoot, IModuleSystem
 		}
 		if (moduleSetup != null)
 		{
+			_logger.log(Level.INFO, "Starting with module setup: " + moduleSetup);
+
 			this._moduleRegistry.loadModuleSetup(new File(moduleSetup));
 		}
+
+		_logger.exiting(this.getClass().getName(), "SystemRoot");
 
 	}
 
@@ -130,10 +157,14 @@ public class SystemRoot extends Observable implements ISystemRoot, IModuleSystem
 	 */
 	public static ISystemRoot getSystemInstance()
 	{
+		_logger.entering(SystemRoot.class.getName(), "getSystemInstance");
+
 		if (_theInstance == null)
 		{
 			_theInstance = new SystemRoot();
 		}
+
+		_logger.exiting(SystemRoot.class.getName(), "getSystemInstance");
 
 		return _theInstance;
 	}
@@ -147,10 +178,14 @@ public class SystemRoot extends Observable implements ISystemRoot, IModuleSystem
 	 */
 	public static IModuleSystemRoot getModuleInstance()
 	{
+		_logger.entering(SystemRoot.class.getName(), "getModuleInstance");
+
 		if (_theInstance == null)
 		{
 			_theInstance = new SystemRoot();
 		}
+
+		_logger.exiting(SystemRoot.class.getName(), "getModuleInstance");
 
 		return _theInstance;
 	}
@@ -160,6 +195,10 @@ public class SystemRoot extends Observable implements ISystemRoot, IModuleSystem
 	 */
 	public ISystemMsdtRegistry getSystemMsdtRegistry()
 	{
+		_logger.entering(this.getClass().getName(), "getSystemMsdtRegistry");
+
+		_logger.exiting(this.getClass().getName(), "getSystemMsdtRegistry");
+
 		return this._mstdRegistry;
 	}
 
@@ -168,6 +207,10 @@ public class SystemRoot extends Observable implements ISystemRoot, IModuleSystem
 	 */
 	public IModuleModuleRegistry getModuleModuleRegistry()
 	{
+		_logger.entering(this.getClass().getName(), "getModuleModuleRegistry");
+
+		_logger.exiting(this.getClass().getName(), "getModuleModuleRegistry");
+
 		return this._moduleRegistry;
 	}
 
@@ -176,7 +219,11 @@ public class SystemRoot extends Observable implements ISystemRoot, IModuleSystem
 	 */
 	public void quit()
 	{
+		_logger.entering(this.getClass().getName(), "quit");
+
 		System.exit(0);
+
+		_logger.exiting(this.getClass().getName(), "quit");
 	}
 
 	/**
@@ -184,6 +231,10 @@ public class SystemRoot extends Observable implements ISystemRoot, IModuleSystem
 	 */
 	public IGui getGui()
 	{
+		_logger.entering(this.getClass().getName(), "getGui");
+
+		_logger.exiting(this.getClass().getName(), "getGui");
+
 		return this._gui;
 	}
 
@@ -192,11 +243,15 @@ public class SystemRoot extends Observable implements ISystemRoot, IModuleSystem
 	 */
 	public void fireStateChange()
 	{
+		_logger.entering(this.getClass().getName(), "fireStateChange");
+
 		this.setChanged();
 
 		this.notifyObservers();
 
 		this.clearChanged();
+
+		_logger.exiting(this.getClass().getName(), "fireStateChange");
 
 	}
 
@@ -205,7 +260,18 @@ public class SystemRoot extends Observable implements ISystemRoot, IModuleSystem
 	 */
 	public void addSystemObserver(Observer o)
 	{
+		_logger.entering(this.getClass().getName(), "addSystemObserver");
+
+		if (o == null)
+		{
+			_logger.log(Level.WARNING, "Observer is null");
+
+			return;
+		}
+
 		this.addObserver(o);
+
+		_logger.exiting(this.getClass().getName(), "addSystemObserver");
 
 	}
 
@@ -214,7 +280,18 @@ public class SystemRoot extends Observable implements ISystemRoot, IModuleSystem
 	 */
 	public void deleteSystemObserver(Observer o)
 	{
+		_logger.entering(this.getClass().getName(), "deleteSystemObserver");
+
+		if (o == null)
+		{
+			_logger.log(Level.WARNING, "Observer is null");
+
+			return;
+		}
+
 		this.deleteObserver(o);
+
+		_logger.exiting(this.getClass().getName(), "deleteSystemObserver");
 
 	}
 
@@ -228,41 +305,51 @@ public class SystemRoot extends Observable implements ISystemRoot, IModuleSystem
 	public static void main(String[] args)
 	{
 
+		_logger.entering(SystemRoot.class.getName(), "main");
+
 		Thread.setDefaultUncaughtExceptionHandler(new DefaultExceptionHandler());
-		
+
+		_logger.log(Level.INFO, "Registered DefaultExceptionHandler");
+
 		String moduleDir = getModuleDir(args);
 
 		String moduleSetup = getModuleSetup(args);
 
 		Level logLevel = getLogLevel(args);
-		
+
 		String logFile = getLogFile(args);
-		
+
 		boolean nogui = isNogui(args);
 
 		try
 		{
-			startSystem(moduleDir,moduleSetup,nogui,logLevel,logFile);
+			startSystem(moduleDir, moduleSetup, nogui, logLevel, logFile);
+
+			_logger.log(Level.INFO, "ECG Lab is starting...");
 		}
 		catch (ModuleSetupLoadException e)
 		{
 			System.out.println("A module could not be loaded");
-			
+
 			System.out.println(e.getMessage());
 		}
 		catch (ModuleClassLoaderInitializationException e)
 		{
 			System.out.println("The module loader could not be initialized");
-			
+
 			System.out.println(e.getMessage());
 		}
+
+		_logger.exiting(SystemRoot.class.getName(), "main");
 	}
 
 	private static void startSystem(String moduleDir, String moduleSetup, boolean nogui, Level logLevel, String logFile) throws ModuleSetupLoadException, ModuleClassLoaderInitializationException
 	{
-		
+
+		_logger.entering(SystemRoot.class.getName(), "startSystem");
+
 		LogHelper.setLogLevel(logLevel);
-		
+
 		try
 		{
 			LogHelper.setLogFile(logFile);
@@ -275,161 +362,219 @@ public class SystemRoot extends Observable implements ISystemRoot, IModuleSystem
 		{
 			System.err.println("Unable to set the lof file " + logFile);
 		}
-		
-		new SystemRoot(moduleDir,moduleSetup,nogui);
-			
+
+		new SystemRoot(moduleDir, moduleSetup, nogui);
+
+		_logger.exiting(SystemRoot.class.getName(), "startSystem");
+
 	}
-	
+
 	private static String getModuleDir(String[] args)
 	{
-		if(args == null || args.length == 0)
+		_logger.entering(SystemRoot.class.getName(), "getModuleDir");
+
+		if (args == null || args.length == 0)
 		{
+			_logger.exiting(SystemRoot.class.getName(), "getModuleDir");
+
 			return null;
 		}
-		for(int i=0;i<args.length;i++)
+		for (int i = 0; i < args.length; i++)
 		{
-			if(args[i].equals("-m"))
+			if (args[i].equals("-m"))
 			{
-				if(args.length-1 < i+1)
+				if (args.length - 1 < i + 1)
 				{
 					printHelpMessage();
 				}
-				if(args[i+1] == null || args[i+1].equals("") || args[i+1].equals("-s") || args[i+1].equals("-l") || args[i+1].equals("--log-file") || args[i+1].equals("-nogui"))
+				if (args[i + 1] == null || args[i + 1].equals("") || args[i + 1].equals("-s") || args[i + 1].equals("-l") || args[i + 1].equals("--log-file") || args[i + 1].equals("-nogui"))
 				{
 					printHelpMessage();
 				}
 				else
 				{
-					return args[i+1];
+					_logger.exiting(SystemRoot.class.getName(), "getModuleDir");
+
+					return args[i + 1];
 				}
 			}
 		}
+
+		_logger.exiting(SystemRoot.class.getName(), "getModuleDir");
+
 		return null;
 	}
 
 	private static boolean isNogui(String[] args)
 	{
-		if(args == null || args.length == 0)
+		_logger.entering(SystemRoot.class.getName(), "isNogui");
+
+		if (args == null || args.length == 0)
 		{
+			_logger.exiting(SystemRoot.class.getName(), "isNogui");
+
 			return false;
 		}
-		for(int i=0;i<args.length;i++)
+		for (int i = 0; i < args.length; i++)
 		{
-			if(args[i].equals("-nogui"))
+			if (args[i].equals("-nogui"))
 			{
+				_logger.exiting(SystemRoot.class.getName(), "isNogui");
+
 				return true;
 			}
 		}
+
+		_logger.exiting(SystemRoot.class.getName(), "isNogui");
+
 		return false;
 	}
-	
+
 	private static String getModuleSetup(String[] args)
 	{
-		
-		if(args == null || args.length == 0)
+		_logger.entering(SystemRoot.class.getName(), "getModuleSetup");
+
+		if (args == null || args.length == 0)
 		{
+			_logger.exiting(SystemRoot.class.getName(), "getModuleSetup");
+
 			return null;
 		}
-		for(int i=0;i<args.length;i++)
+		for (int i = 0; i < args.length; i++)
 		{
-			if(args[i].equals("-s"))
+			if (args[i].equals("-s"))
 			{
-				if(args.length-1 < i+1)
+				if (args.length - 1 < i + 1)
 				{
 					printHelpMessage();
 				}
-				if(args[i+1] == null || args[i+1].equals("") || args[i+1].equals("-m") || args[i+1].equals("-l") || args[i+1].equals("--log-file") || args[i+1].equals("-nogui"))
+				if (args[i + 1] == null || args[i + 1].equals("") || args[i + 1].equals("-m") || args[i + 1].equals("-l") || args[i + 1].equals("--log-file") || args[i + 1].equals("-nogui"))
 				{
 					printHelpMessage();
 				}
 				else
 				{
-					return args[i+1];
+
+					_logger.exiting(SystemRoot.class.getName(), "getModuleSetup");
+
+					return args[i + 1];
 				}
 			}
 		}
+
+		_logger.exiting(SystemRoot.class.getName(), "getModuleSetup");
+
 		return null;
 	}
-	
+
 	private static String getLogFile(String[] args)
 	{
-		if(args == null || args.length == 0)
+		_logger.entering(SystemRoot.class.getName(), "getLogFile");
+
+		if (args == null || args.length == 0)
 		{
+			_logger.exiting(SystemRoot.class.getName(), "getLogFile");
+
 			return null;
 		}
-		for(int i=0;i<args.length;i++)
+		for (int i = 0; i < args.length; i++)
 		{
-			if(args[i].equals("--log-file"))
+			if (args[i].equals("--log-file"))
 			{
-				if(args.length-1 < i+1)
+				if (args.length - 1 < i + 1)
 				{
 					printHelpMessage();
 				}
-				if(args[i+1] == null || args[i+1].equals("") || args[i+1].equals("-m") || args[i+1].equals("-l") || args[i+1].equals("-s") || args[i+1].equals("-nogui"))
+				if (args[i + 1] == null || args[i + 1].equals("") || args[i + 1].equals("-m") || args[i + 1].equals("-l") || args[i + 1].equals("-s") || args[i + 1].equals("-nogui"))
 				{
 					printHelpMessage();
 				}
 				else
 				{
-					return args[i+1];
+					_logger.exiting(SystemRoot.class.getName(), "getLogFile");
+
+					return args[i + 1];
 				}
 			}
 		}
+		_logger.exiting(SystemRoot.class.getName(), "getLogFile");
+
 		return null;
 	}
-	
+
 	private static Level getLogLevel(String[] args)
 	{
-		if(args == null || args.length == 0)
+		_logger.entering(SystemRoot.class.getName(), "getLogLevel");
+
+		if (args == null || args.length == 0)
 		{
+			_logger.exiting(SystemRoot.class.getName(), "getLogLevel");
+
 			return null;
 		}
-		for(int i=0;i<args.length;i++)
+		for (int i = 0; i < args.length; i++)
 		{
-			if(args[i].equals("--log-level"))
+			if (args[i].equals("--log-level"))
 			{
-				if(args.length-1 < i+1)
+				if (args.length - 1 < i + 1)
 				{
 					printHelpMessage();
 				}
-				if(args[i+1] == null || args[i+1].equals("") || args[i+1].equals("-m") || args[i+1].equals("-l") || args[i+1].equals("--log-file") || args[i+1].equals("-s") || args[i+1].equals("-nogui"))
+				if (args[i + 1] == null || args[i + 1].equals("") || args[i + 1].equals("-m") || args[i + 1].equals("-l") || args[i + 1].equals("--log-file") || args[i + 1].equals("-s") || args[i + 1].equals("-nogui"))
 				{
 					printHelpMessage();
 				}
 				else
 				{
-					if(args[i+1].equalsIgnoreCase("off"))
+					if (args[i + 1].equalsIgnoreCase("off"))
 					{
+						_logger.exiting(SystemRoot.class.getName(), "getLogLevel");
+
 						return Level.OFF;
 					}
-					else if(args[i+1].equalsIgnoreCase("error"))
+					else if (args[i + 1].equalsIgnoreCase("error"))
 					{
+						_logger.exiting(SystemRoot.class.getName(), "getLogLevel");
+
 						return Level.SEVERE;
 					}
-					else if(args[i+1].equalsIgnoreCase("warning"))
+					else if (args[i + 1].equalsIgnoreCase("warning"))
 					{
+						_logger.exiting(SystemRoot.class.getName(), "getLogLevel");
+
 						return Level.WARNING;
 					}
-					else if(args[i+1].equalsIgnoreCase("info"))
+					else if (args[i + 1].equalsIgnoreCase("info"))
 					{
+						_logger.exiting(SystemRoot.class.getName(), "getLogLevel");
+
 						return Level.INFO;
 					}
-					else if(args[i+1].equalsIgnoreCase("debug"))
+					else if (args[i + 1].equalsIgnoreCase("debug"))
 					{
+						_logger.exiting(SystemRoot.class.getName(), "getLogLevel");
+
 						return Level.FINEST;
 					}
 					else
 					{
+						_logger.exiting(SystemRoot.class.getName(), "getLogLevel");
+
 						return null;
 					}
 				}
 			}
 		}
+		_logger.exiting(SystemRoot.class.getName(), "getLogLevel");
+
 		return null;
 	}
-	
+
 	private static void printHelpMessage()
 	{
+
+		_logger.entering(SystemRoot.class.getName(), "printHelpMessage");
+
 		System.out.println("Usage: java -jar ECGLab.jar <options>\n");
 
 		System.out.println("Where options are:\n");
@@ -445,6 +590,8 @@ public class SystemRoot extends Observable implements ISystemRoot, IModuleSystem
 		System.out.println("-nogui\t\t\t\t\t\tTells the ECG Lab to start without graphical user interface (for inline server mode).\n");
 
 		System.exit(-1);
+
+		_logger.exiting(SystemRoot.class.getName(), "printHelpMessage");
 	}
 
 	/**
@@ -452,6 +599,10 @@ public class SystemRoot extends Observable implements ISystemRoot, IModuleSystem
 	 */
 	public ISystemModuleRegistry getSystemModuleRegistry()
 	{
+		_logger.entering(SystemRoot.class.getName(), "getSystemModuleRegistry");
+
+		_logger.exiting(SystemRoot.class.getName(), "getSystemModuleRegistry");
+
 		return this._moduleRegistry;
 	}
 
@@ -460,6 +611,10 @@ public class SystemRoot extends Observable implements ISystemRoot, IModuleSystem
 	 */
 	public JFrame getRootFrame()
 	{
+		_logger.entering(SystemRoot.class.getName(), "getRootFrame");
+
+		_logger.exiting(SystemRoot.class.getName(), "getRootFrame");
+
 		return this._gui;
 	}
 
@@ -468,6 +623,10 @@ public class SystemRoot extends Observable implements ISystemRoot, IModuleSystem
 	 */
 	public IModuleMsdtRegistry getModuleMsdtRegistry()
 	{
+		_logger.entering(SystemRoot.class.getName(), "getModuleMsdtRegistry");
+
+		_logger.exiting(SystemRoot.class.getName(), "getModuleMsdtRegistry");
+
 		return this._mstdRegistry;
 	}
 
@@ -475,20 +634,24 @@ public class SystemRoot extends Observable implements ISystemRoot, IModuleSystem
 	{
 		public void uncaughtException(Thread t, Throwable e)
 		{
+			_logger.entering(SystemRoot.class.getName(), "uncaughtException");
+
 			System.out.println("An uncaught Exception had occured:");
-			
+
 			System.out.println("Thread:" + t.getName());
-			
+
 			System.out.println("Class: " + t.getClass());
-			
+
 			System.out.println("State: " + t.getState());
-			
+
 			System.out.println("Message: " + e.getMessage());
-			
+
 			System.out.println("StackTrace: ");
-			
+
 			e.printStackTrace();
-					
+
+			_logger.exiting(SystemRoot.class.getName(), "uncaughtException");
+
 		}
 
 	}

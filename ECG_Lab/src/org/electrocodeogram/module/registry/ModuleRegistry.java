@@ -52,20 +52,23 @@ import org.xml.sax.SAXException;
 public class ModuleRegistry extends Observable implements ISystemModuleRegistry, IModuleModuleRegistry
 {
 
-	Logger logger;
+	private static Logger _logger = LogHelper.createLogger(ModuleRegistry.class.getName());
 
-	private RunningModules runningModules;
+	private RunningModules _runningModules;
 
-	private InstalledModules installedModules;
+	private InstalledModules _installedModules;
 
 	/**
 	 * The constructor creates the ModuleRegistry instance.
 	 */
 	public ModuleRegistry()
 	{
-		this.logger = LogHelper.createLogger(this);
 
-		this.runningModules = new RunningModules();
+		_logger.entering(this.getClass().getName(), "ModuleRegistry");
+
+		this._runningModules = new RunningModules();
+
+		_logger.exiting(this.getClass().getName(), "ModuleRegistry");
 
 	}
 
@@ -81,15 +84,27 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 	{
 		this();
 
-		this.installedModules = new InstalledModules(moduleDirectory);
+		_logger.entering(this.getClass().getName(), "ModuleRegistry");
 
-		this.installedModules.initialize();
+		if (moduleDirectory == null)
+		{
+			_logger.log(Level.WARNING, "moduleDirectory is null");
+
+			return;
+		}
+
+		this._installedModules = new InstalledModules(this, moduleDirectory);
+
+		this._installedModules.initialize();
 
 		setChanged();
 
 		notifyObservers();
 
 		clearChanged();
+
+		_logger.exiting(this.getClass().getName(), "ModuleRegistry");
+
 	}
 
 	/**
@@ -97,33 +112,33 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 	 * method is used by the SystemRoot to set the module directory when known.
 	 * This method is not for use by the user.
 	 * 
-	 * @param file
+	 * @param moduleDirectory
 	 *            This path is searched for available modules
 	 * @throws ModuleClassLoaderInitializationException
 	 */
-	public void setModuleDirectory(File file) throws ModuleClassLoaderInitializationException
+	public void setModuleDirectory(File moduleDirectory) throws ModuleClassLoaderInitializationException
 	{
+		_logger.entering(this.getClass().getName(), "setModuleDirectory");
 
-		this.installedModules = new InstalledModules(file);
+		if (moduleDirectory == null)
+		{
+			_logger.log(Level.WARNING, "moduleDirectory is null");
 
-		this.installedModules.initialize();
+			return;
+		}
+
+		this._installedModules = new InstalledModules(this, moduleDirectory);
+
+		this._installedModules.initialize();
 
 		setChanged();
 
 		notifyObservers();
 
 		clearChanged();
-	}
 
-	/**
-	 * This returns the ModuleRegistry's Logger instance. This method is nor for
-	 * use by the user.
-	 * 
-	 * @return The Logger instance
-	 */
-	protected Logger getLogger()
-	{
-		return this.logger;
+		_logger.exiting(this.getClass().getName(), "setModuleDirectory");
+
 	}
 
 	/**
@@ -131,39 +146,53 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 	 */
 	public String[] getAvailableModuleIds()
 	{
-		if (this.installedModules.availableModuleClassesMap.size() > 0)
+		_logger.entering(this.getClass().getName(), "setModuleDirectory");
+
+		if (this._installedModules.availableModuleClassesMap.size() > 0)
 		{
-			return this.installedModules.availableModuleClassesMap.keySet().toArray(new String[0]);
+			return this._installedModules.availableModuleClassesMap.keySet().toArray(new String[0]);
 		}
+
+		_logger.exiting(this.getClass().getName(), "setModuleDirectory");
 
 		return null;
 	}
 
 	private Class getModuleClassForId(String moduleClassId) throws ModuleClassException
 	{
+		_logger.entering(this.getClass().getName(), "getModuleClassForId");
+
 		if (moduleClassId == null || moduleClassId.equals(""))
 		{
-			throw new ModuleClassException("The module id is empty.");
+			_logger.log(Level.WARNING, "The module id is null or empty.");
+
+			throw new ModuleClassException("The module id is null orempty.");
 		}
 
-		if (!this.installedModules.availableModuleClassesMap.containsKey(moduleClassId))
+		if (!this._installedModules.availableModuleClassesMap.containsKey(moduleClassId))
 		{
 			throw new ModuleClassException(
 					"The module id " + moduleClassId + " is unknown.");
 		}
 
-		ModuleDescriptor moduleDescriptor = this.installedModules.availableModuleClassesMap.get(moduleClassId);
+		ModuleDescriptor moduleDescriptor = this._installedModules.availableModuleClassesMap.get(moduleClassId);
+
+		_logger.exiting(this.getClass().getName(), "getModuleClassForId");
 
 		return moduleDescriptor.getClazz();
 	}
 
 	void notifyOfNewModuleDecriptor(ModuleDescriptor moduleDescriptor)
 	{
+		_logger.entering(this.getClass().getName(), "notifyOfNewModuleDecriptor");
+
 		setChanged();
 
 		notifyObservers(moduleDescriptor);
 
 		clearChanged();
+
+		_logger.exiting(this.getClass().getName(), "notifyOfNewModuleDecriptor");
 	}
 
 	private static class RunningModules
@@ -171,42 +200,54 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 		HashMap<Integer, Module> runningModuleMap = new HashMap<Integer, Module>();
 	}
 
-	private class InstalledModules
+	private static class InstalledModules
 	{
-		private String currentModuleDirectoryString;
+		private static Logger _installedModulesLogger = LogHelper.createLogger(InstalledModules.class.getName());
+
+		private String _currentModuleDirectoryString;
 
 		private static final String MODULE_PROPERTY_FILE = "module.properties.xml";
 
 		HashMap<String, ModuleDescriptor> availableModuleClassesMap = null;
 
-		private File $moduleDirectory;
+		private File _moduleDirectory;
 
-		private InstalledModules(File moduleDirectory)
+		private ModuleRegistry _moduleRegistry;
+
+		private InstalledModules(ModuleRegistry moduleRegistry, File moduleDirectory)
 		{
+			_installedModulesLogger.entering(this.getClass().getName(), "InstalledModules");
+
 			this.availableModuleClassesMap = new HashMap<String, ModuleDescriptor>();
 
-			this.$moduleDirectory = moduleDirectory;
+			this._moduleRegistry = moduleRegistry;
+
+			this._moduleDirectory = moduleDirectory;
+
+			_installedModulesLogger.exiting(this.getClass().getName(), "InstalledModules");
 
 		}
 
 		void initialize() throws ModuleClassLoaderInitializationException
 		{
+			_installedModulesLogger.entering(this.getClass().getName(), "initialize");
+
 			// is the parameter not null?
-			if (this.$moduleDirectory == null)
+			if (this._moduleDirectory == null)
 			{
 				throw new ModuleClassLoaderInitializationException(
 						"The provided module directory path is \"null\".");
 			}
 
 			// does the file exist and is it a directory?
-			if (!this.$moduleDirectory.exists() || !this.$moduleDirectory.isDirectory())
+			if (!this._moduleDirectory.exists() || !this._moduleDirectory.isDirectory())
 			{
 				throw new ModuleClassLoaderInitializationException(
 						"The module directory does not exist or is not a directory.");
 			}
 
 			// get all filenames in it
-			String[] moduleDirectories = this.$moduleDirectory.list();
+			String[] moduleDirectories = this._moduleDirectory.list();
 
 			// assert no IO-Error has occurred
 			if (moduleDirectories == null)
@@ -227,20 +268,20 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 			for (int i = 0; i < length; i++)
 			{
 
-				this.currentModuleDirectoryString = this.$moduleDirectory + File.separator + moduleDirectories[i];
+				this._currentModuleDirectoryString = this._moduleDirectory + File.separator + moduleDirectories[i];
 
 				File currentModuleDirectory = new File(
-						this.currentModuleDirectoryString);
+						this._currentModuleDirectoryString);
 
 				// skip all simple files
 				if (!currentModuleDirectory.isDirectory())
 				{
-					getLogger().log(Level.WARNING, "Skipping simple file in module directory: " + currentModuleDirectory.getAbsolutePath());
+					_installedModulesLogger.log(Level.WARNING, "Skipping simple file in module directory: " + currentModuleDirectory.getAbsolutePath());
 
 					continue;
 				}
 
-				String modulePropertyFileString = this.currentModuleDirectoryString + File.separator + MODULE_PROPERTY_FILE;
+				String modulePropertyFileString = this._currentModuleDirectoryString + File.separator + MODULE_PROPERTY_FILE;
 
 				File modulePropertyFile = new File(modulePropertyFileString);
 
@@ -248,7 +289,7 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 				if (!modulePropertyFile.exists() || !modulePropertyFile.isFile())
 				{
 
-					getLogger().log(Level.WARNING, "The module property file does not exist or is not a file: " + modulePropertyFileString);
+					_installedModulesLogger.log(Level.WARNING, "The module property file does not exist or is not a file: " + modulePropertyFileString);
 
 					continue;
 
@@ -261,63 +302,71 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 				}
 				catch (ClassLoadingException e)
 				{
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					_installedModulesLogger.log(Level.WARNING, "Error while loading the module: " + modulePropertyFileString);
+
 					continue;
 				}
 				catch (MicroSensorDataTypeException e)
 				{
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					_installedModulesLogger.log(Level.WARNING, "Error while loading the module: " + modulePropertyFileString);
+				
 					continue;
 				}
 				catch (PropertyException e)
 				{
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					_installedModulesLogger.log(Level.WARNING, "Error while loading the module: " + modulePropertyFileString);
+
 					continue;
 				}
 				catch (SAXException e)
 				{
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					_installedModulesLogger.log(Level.WARNING, "Error while loading the module: " + modulePropertyFileString);
+
+					_installedModulesLogger.log(Level.FINEST, e.getMessage());
+
 					continue;
 				}
 				catch (IOException e)
 				{
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					_installedModulesLogger.log(Level.WARNING, "Error while loading the module: " + modulePropertyFileString);
+
+					_installedModulesLogger.log(Level.FINEST, e.getMessage());
+
 					continue;
 				}
 				catch (ModuleSetupLoadException e)
 				{
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					_installedModulesLogger.log(Level.WARNING, "Error while loading the module: " + modulePropertyFileString);
+
 					continue;
 				}
 
 				if (moduleDescriptor == null)
 				{
+					_installedModulesLogger.log(Level.WARNING, "Error while loading the module: " + modulePropertyFileString);
+
 					continue;
 				}
 
 				if (this.availableModuleClassesMap.containsKey(moduleDescriptor.getId()))
 				{
-					getLogger().log(Level.SEVERE, "A module with the id " + moduleDescriptor.getId() + " is allready loaded.");
+					_installedModulesLogger.log(Level.SEVERE, "A module with the id " + moduleDescriptor.getId() + " is allready loaded.");
+
+					_installedModulesLogger.log(Level.FINEST, "The ModuleDescriptor was null.");
 
 					continue;
 				}
 
 				// put the ModuleDescriptor into the HashMap
 				this.availableModuleClassesMap.put(moduleDescriptor.getId(), moduleDescriptor);
-											
-				getLogger().log(Level.INFO, "Loaded additional module class with id: " + moduleDescriptor.getId() + " " + moduleDescriptor.getClazz().getName());
-				
-				getLogger().log(Level.FINEST, "Loaded additional module class with id: " + moduleDescriptor.getId() + " " + moduleDescriptor.getClazz().getName());
 
-				notifyOfNewModuleDecriptor(moduleDescriptor);
+				_installedModulesLogger.log(Level.INFO, "Loaded additional module class with id: " + moduleDescriptor.getId() + " " + moduleDescriptor.getClazz().getName());
+
+				this._moduleRegistry.notifyOfNewModuleDecriptor(moduleDescriptor);
 
 			}
+
+			_installedModulesLogger.exiting(this.getClass().getName(), "initialize");
 		}
 
 	}
@@ -327,21 +376,27 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 	 */
 	public void registerRunningModule(Module module)
 	{
+		_logger.entering(this.getClass().getName(), "registerRunningModule");
+
 		// check parameter
 		if (module == null)
 		{
+			_logger.log(Level.WARNING, "module is null");
+
 			return;
 		}
 
-		if (this.runningModules.runningModuleMap.containsKey(new Integer(
+		if (this._runningModules.runningModuleMap.containsKey(new Integer(
 				module.getId())))
 		{
+			_logger.log(Level.WARNING, "module is allready registered");
+
 			return;
 		}
 
-		this.runningModules.runningModuleMap.put(new Integer(module.getId()), module);
+		this._runningModules.runningModuleMap.put(new Integer(module.getId()), module);
 
-		this.logger.log(Level.INFO, "Registered module " + module.getName());
+		_logger.log(Level.INFO, "Registered new module " + module.getName());
 
 		SystemRoot.getSystemInstance().addSystemObserver(module.getSystemObserver());
 
@@ -351,6 +406,8 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 
 		clearChanged();
 
+		_logger.exiting(this.getClass().getName(), "registerRunningModule");
+
 	}
 
 	/**
@@ -358,7 +415,8 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 	 */
 	public Module getRunningModule(int moduleId) throws ModuleInstanceException
 	{
-		
+		_logger.entering(this.getClass().getName(), "getRunningModule");
+
 		if (!(moduleId > 0))
 		{
 			throw new ModuleInstanceException("The module id is invalid.");
@@ -366,13 +424,15 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 
 		assert (moduleId > 0);
 
-		if (!(this.runningModules.runningModuleMap.containsKey(new Integer(
+		if (!(this._runningModules.runningModuleMap.containsKey(new Integer(
 				moduleId))))
 		{
 			throw new ModuleInstanceException("The module id is unknown.");
 		}
 
-		return this.runningModules.runningModuleMap.get(new Integer(moduleId));
+		_logger.exiting(this.getClass().getName(), "getRunningModule");
+
+		return this._runningModules.runningModuleMap.get(new Integer(moduleId));
 	}
 
 	/**
@@ -381,9 +441,20 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 	 */
 	public int createRunningModule(String id, String name) throws ModuleInstantiationException, ModuleClassException
 	{
+		_logger.entering(this.getClass().getName(), "createRunningModule");
+
 		if (id == null || id.equals(""))
 		{
-			throw new ModuleClassException("The module id is empty.");
+			_logger.log(Level.WARNING, "The module id is null or empty.");
+
+			throw new ModuleClassException("The module id is null or empty.");
+		}
+
+		if (name == null || name.equals(""))
+		{
+			_logger.log(Level.WARNING, "The module name is null or empty.");
+
+			throw new ModuleClassException("The module name is null or empty.");
 		}
 
 		Class moduleClass = getModuleClassForId(id);
@@ -404,11 +475,14 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 
 			Module module = (Module) o;
 
+			_logger.exiting(this.getClass().getName(), "createRunningModule");
+
 			return module.getId();
 
 		}
 		catch (InstantiationException e)
 		{
+			_logger.log(Level.SEVERE, "Error while creating a new Module.");
 
 			throw new ModuleInstantiationException(e.getMessage());
 
@@ -416,16 +490,23 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 		catch (IllegalAccessException e)
 		{
 
+			_logger.log(Level.SEVERE, "Error while creating a new Module.");
+
 			throw new ModuleInstantiationException(e.getMessage());
 		}
 		catch (IllegalArgumentException e)
 		{
+			_logger.log(Level.SEVERE, "Error while creating a new Module.");
+
 			throw new ModuleInstantiationException(e.getMessage());
 		}
 		catch (InvocationTargetException e)
 		{
+			_logger.log(Level.SEVERE, "Error while creating a new Module.");
+
 			throw new ModuleInstantiationException(e.getMessage());
 		}
+
 	}
 
 	/**
@@ -433,6 +514,8 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 	 */
 	public void deregisterRunningModule(int id) throws ModuleInstanceException
 	{
+		_logger.entering(this.getClass().getName(), "deregisterRunningModule");
+
 		if (!(id > 0))
 		{
 			throw new ModuleInstanceException("The module id is invalid.");
@@ -442,9 +525,9 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 
 		Module module = getRunningModule(id);
 
-		this.runningModules.runningModuleMap.remove(new Integer(id));
+		this._runningModules.runningModuleMap.remove(new Integer(id));
 
-		this.logger.log(Level.INFO, "Deregestered module " + module.getName());
+		_logger.log(Level.INFO, "Deregestered module " + module.getName());
 
 		SystemRoot.getSystemInstance().deleteSystemObserver(module.getSystemObserver());
 
@@ -454,6 +537,8 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 
 		clearChanged();
 
+		_logger.exiting(this.getClass().getName(), "deregisterRunningModule");
+
 	}
 
 	/**
@@ -461,22 +546,27 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 	 */
 	public ModuleDescriptor getModuleDescriptor(String moduleClassId) throws ModuleClassException
 	{
+		_logger.entering(this.getClass().getName(), "getModuleDescriptor");
+
 		if (moduleClassId == null || moduleClassId.equals(""))
 		{
-			throw new ModuleClassException("The module id is empty.");
+
+			throw new ModuleClassException("The module id is null or empty.");
 		}
 
-		if (this.installedModules == null)
+		if (this._installedModules == null)
 		{
 			throw new ModuleClassException("The module id is unknown.");
 		}
 
-		if (!this.installedModules.availableModuleClassesMap.containsKey(moduleClassId))
+		if (!this._installedModules.availableModuleClassesMap.containsKey(moduleClassId))
 		{
 			throw new ModuleClassException("The module id is unknown.");
 		}
 
-		return this.installedModules.availableModuleClassesMap.get(moduleClassId);
+		_logger.exiting(this.getClass().getName(), "getModuleDescriptor");
+
+		return this._installedModules.availableModuleClassesMap.get(moduleClassId);
 
 	}
 
@@ -485,21 +575,17 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 	 */
 	public void storeModuleSetup(File file) throws ModuleSetupStoreException
 	{
-		this.getLogger().entering(this.getClass().getName(),"storeModuleSetup");
-		
+		_logger.entering(this.getClass().getName(), "storeModuleSetup");
+
 		if (file == null)
 		{
-			this.getLogger().log(Level.SEVERE,"The given file is null");
-			
 			throw new ModuleSetupStoreException("The given file is null");
 		}
 
-		this.getLogger().log(Level.INFO,"Storing module setup in file " + file.getAbsolutePath());
-		
-		if (this.runningModules.runningModuleMap == null)
-		{
-			this.logger.log(Level.WARNING, "No modules are currently running.");
+		_logger.log(Level.INFO, "Storing module setup in file " + file.getAbsolutePath());
 
+		if (this._runningModules.runningModuleMap == null)
+		{
 			throw new ModuleSetupStoreException(
 					"No modules are currently running.");
 
@@ -513,25 +599,23 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 		}
 		catch (FileNotFoundException e)
 		{
-			this.logger.log(Level.SEVERE, "The given file " + file.getAbsolutePath() + "could not be found.");
-
 			throw new ModuleSetupStoreException(
 					"The given file " + file.getAbsolutePath() + "could not be found.");
 		}
 
 		writer.flush();
 
-		Module[] modules = this.runningModules.runningModuleMap.values().toArray(new Module[0]);
+		Module[] modules = this._runningModules.runningModuleMap.values().toArray(new Module[0]);
 
-		this.logger.log(Level.INFO,"Found " + modules.length + " module(s) to store");
-		
+		_logger.log(Level.INFO, "Found " + modules.length + " module(s) to store");
+
 		writer.println("<?xml version=\"1.0\"?>");
 
 		writer.println("<modulesetup>");
 
 		for (Module module : modules)
 		{
-			this.logger.log(Level.INFO, "Storing module " + module.getName());
+			_logger.log(Level.INFO, "Storing module " + module.getName());
 
 			writer.println("<module id=\"" + module.getId() + "\" active=\"" + module.isActive() + "\">");
 
@@ -551,11 +635,11 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 
 			if (module.getReceivingModuleCount() > 0)
 			{
-								
+
 				Module[] receivingModules = module.getReceivingModules();
 
-				this.logger.log(Level.INFO,"Module " + module.getName() + " is connected to " + receivingModules.length + " other modules.");
-				
+				_logger.log(Level.FINEST, "Module " + module.getName() + " is connected to " + receivingModules.length + " other modules.");
+
 				for (Module receivingModule : receivingModules)
 				{
 					writer.println("<id>");
@@ -564,82 +648,78 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 
 					writer.println("</id>");
 
-					this.logger.log(Level.INFO,"Connection to module " + receivingModule.getId() + " stored.");
+					_logger.log(Level.INFO, "Connection to module " + receivingModule.getId() + " stored.");
 				}
 
 			}
 			else
 			{
-				this.logger.log(Level.INFO,"Module " + module.getName() + " is not connected to other modules.");
-				
+				_logger.log(Level.FINEST, "Module " + module.getName() + " is not connected to other modules.");
+
 			}
 			writer.println("</connectedTo>");
 
 			writer.println("<properties>");
 
-			
-				ModuleProperty[] moduleProperties = module.getRuntimeProperties();
+			ModuleProperty[] moduleProperties = module.getRuntimeProperties();
 
-				if (moduleProperties != null && moduleProperties.length > 0)
+			if (moduleProperties != null && moduleProperties.length > 0)
+			{
+
+				_logger.log(Level.FINEST, "Found " + moduleProperties.length + " properties for module " + module.getName());
+
+				for (ModuleProperty moduleProperty : moduleProperties)
 				{
-					
-					this.logger.log(Level.INFO,"Found " + moduleProperties.length + " properties for module " + module.getName());
-					
-					for (ModuleProperty moduleProperty : moduleProperties)
+					String propertyName = moduleProperty.getName();
+
+					_logger.log(Level.FINEST, "Property name " + moduleProperty.getName());
+
+					String propertyValue = moduleProperty.getValue();
+
+					_logger.log(Level.FINEST, "Property value " + propertyValue);
+
+					String propertyType = moduleProperty.getType().getName();
+
+					_logger.log(Level.FINEST, "Property type " + propertyType);
+
+					if (propertyValue != null)
 					{
-						String propertyName = moduleProperty.getName();
+						writer.println("<property>");
 
-						this.logger.log(Level.INFO,"Property name " + moduleProperty.getName());
-						
-						String propertyValue = moduleProperty.getValue();
+						writer.println("<name>");
 
-						this.logger.log(Level.INFO,"Property value " + propertyValue);
-						
-						String propertyType = moduleProperty.getType().getName();
-						
-						this.logger.log(Level.INFO,"Property type " + propertyType);
-						
-						if (propertyValue != null)
-						{
-							writer.println("<property>");
+						writer.println(propertyName);
 
-							writer.println("<name>");
+						writer.println("</name>");
 
-							writer.println(propertyName);
+						writer.println("<value>");
 
-							writer.println("</name>");
+						writer.println(propertyValue);
 
-							writer.println("<value>");
+						writer.println("</value>");
 
-							writer.println(propertyValue);
+						writer.println("<type>");
 
-							writer.println("</value>");
+						writer.println(propertyType);
 
-							writer.println("<type>");
+						writer.println("</type>");
 
-							writer.println(propertyType);
+						writer.println("</property>");
 
-							writer.println("</type>");
-
-							
-							writer.println("</property>");
-							
-							this.logger.log(Level.INFO,"Property value was stored");
-						}
-						else
-						{
-							this.logger.log(Level.INFO,"Property value is null and not stored");
-						}
-
+						_logger.log(Level.FINEST, "Property value was stored");
+					}
+					else
+					{
+						_logger.log(Level.FINEST, "Property value is null and not stored");
 					}
 
 				}
-				else
-				{
-					this.logger.log(Level.INFO,"Did not find any properties for module " + module.getName());
-				}
-			
-			
+
+			}
+			else
+			{
+				_logger.log(Level.FINEST, "Did not find any properties for module " + module.getName());
+			}
 
 			writer.println("</properties>");
 
@@ -655,6 +735,8 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 
 		writer.close();
 
+		_logger.exiting(this.getClass().getName(), "storeModuleSetup");
+
 	}
 
 	/**
@@ -662,32 +744,33 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 	 */
 	public void loadModuleSetup(File file) throws ModuleSetupLoadException
 	{
+		_logger.entering(this.getClass().getName(), "loadModuleSetup");
+
+		if (file == null)
+		{
+			throw new ModuleSetupLoadException("The given File is null");
+		}
+
 		HashMap<Integer, Integer> moduleIdTransformationMap = new HashMap<Integer, Integer>();
 
 		HashMap<Integer, Integer[]> moduleConnectionMap = new HashMap<Integer, Integer[]>();
-		
+
 		ArrayList<Integer> moduleActivationList = new ArrayList<Integer>();
 
 		if (!file.exists())
 		{
-			this.logger.log(Level.SEVERE, "The file " + file.getAbsolutePath() + " does not exist.");
-
 			throw new ModuleSetupLoadException(
 					"The file " + file.getAbsolutePath() + " does not exist.");
 		}
 
 		if (file.isDirectory())
 		{
-			this.logger.log(Level.SEVERE, file.getAbsolutePath() + " is a directory, not a file.");
-
 			throw new ModuleSetupLoadException(
 					file.getAbsolutePath() + " is a directory, not a file.");
 		}
 
 		if (!file.canRead())
 		{
-			this.logger.log(Level.SEVERE, "The file " + file.getAbsolutePath() + " can not be read.");
-
 			throw new ModuleSetupLoadException(
 					"The file " + file.getAbsolutePath() + " can not be read.");
 		}
@@ -705,8 +788,6 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 			for (ModuleConfiguration moduleConfiguration : moduleConfigurations)
 			{
 
-				
-				
 				int assignedModuleId = createRunningModule(moduleConfiguration.getFromClassId(), moduleConfiguration.getModuleName());
 
 				ModuleProperty[] moduleProperties = moduleConfiguration.getModuleProperties();
@@ -715,32 +796,36 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 				{
 					for (ModuleProperty moduleProperty : moduleProperties)
 					{
-						if(moduleProperty.getType().equals(Class.forName("java.lang.reflect.Method")))
+						if (moduleProperty.getType().equals(Class.forName("java.lang.reflect.Method")))
 						{
 							continue;
 						}
-						
+
 						getRunningModule(assignedModuleId).setProperty(moduleProperty.getName(), moduleProperty.getValue());
 
 					}
 				}
 
-				if(moduleConfiguration.isActive())
+				if (moduleConfiguration.isActive())
 				{
 					moduleActivationList.add(new Integer(assignedModuleId));
 				}
-				
-				if(moduleIdTransformationMap.containsKey(new Integer(moduleConfiguration.getModuleId())))
+
+				if (moduleIdTransformationMap.containsKey(new Integer(
+						moduleConfiguration.getModuleId())))
 				{
-					throw new ModuleSetupLoadException("Duplicate module id found " + moduleConfiguration.getModuleId());
+					throw new ModuleSetupLoadException(
+							"Duplicate module id found " + moduleConfiguration.getModuleId());
 				}
-				
-				moduleIdTransformationMap.put(moduleConfiguration.getModuleId(), new Integer(
+
+				moduleIdTransformationMap.put(new Integer(
+						moduleConfiguration.getModuleId()), new Integer(
 						assignedModuleId));
 
 				if (moduleConfiguration.getConnectedTo() != null)
 				{
-					moduleConnectionMap.put(moduleConfiguration.getModuleId(), moduleConfiguration.getConnectedTo());
+					moduleConnectionMap.put(new Integer(
+							moduleConfiguration.getModuleId()), moduleConfiguration.getConnectedTo());
 				}
 			}
 
@@ -761,9 +846,10 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 
 					Integer assignedReceivingModuleId = moduleIdTransformationMap.get(storedReceivingModuleId);
 
-					if(assignedReceivingModuleId == null)
+					if (assignedReceivingModuleId == null)
 					{
-						throw new ModuleSetupLoadException("An unknown connected to id was found for module id: " + storedModuleId);
+						throw new ModuleSetupLoadException(
+								"An unknown connected to id was found for module id: " + storedModuleId);
 					}
 					Module module = getRunningModule(assignedModuleId.intValue());
 
@@ -774,11 +860,11 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 				}
 			}
 
-			for(Integer moduleId : moduleActivationList)
+			for (Integer moduleId : moduleActivationList)
 			{
 				Module module = this.getRunningModule(moduleId.intValue());
-				
-				if(module.isModuleType(ModuleType.TARGET_MODULE))
+
+				if (module.isModuleType(ModuleType.TARGET_MODULE))
 				{
 					try
 					{
@@ -787,17 +873,17 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 					catch (ModuleActivationException e)
 					{
 						clearLab();
-						
+
 						throw new ModuleSetupLoadException(e.getMessage());
 					}
 				}
 			}
-			
-			for(Integer moduleId : moduleActivationList)
+
+			for (Integer moduleId : moduleActivationList)
 			{
 				Module module = this.getRunningModule(moduleId.intValue());
-				
-				if(module.isModuleType(ModuleType.INTERMEDIATE_MODULE))
+
+				if (module.isModuleType(ModuleType.INTERMEDIATE_MODULE))
 				{
 					try
 					{
@@ -806,17 +892,17 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 					catch (ModuleActivationException e)
 					{
 						clearLab();
-						
+
 						throw new ModuleSetupLoadException(e.getMessage());
 					}
 				}
 			}
-			
-			for(Integer moduleId : moduleActivationList)
+
+			for (Integer moduleId : moduleActivationList)
 			{
 				Module module = this.getRunningModule(moduleId.intValue());
-				
-				if(module.isModuleType(ModuleType.SOURCE_MODULE))
+
+				if (module.isModuleType(ModuleType.SOURCE_MODULE))
 				{
 					try
 					{
@@ -825,12 +911,13 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 					catch (ModuleActivationException e)
 					{
 						clearLab();
-						
+
 						throw new ModuleSetupLoadException(e.getMessage());
 					}
 				}
 			}
-			
+
+			_logger.exiting(this.getClass().getName(), "loadModuleSetup");
 		}
 		catch (SAXException e)
 		{
@@ -884,7 +971,9 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 	 */
 	private void clearLab()
 	{
-		Module[] modules = this.runningModules.runningModuleMap.values().toArray(new Module[0]);
+		_logger.entering(this.getClass().getName(), "clearLab");
+
+		Module[] modules = this._runningModules.runningModuleMap.values().toArray(new Module[0]);
 
 		for (Module module : modules)
 		{
@@ -894,11 +983,13 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 			}
 			catch (ModuleInstanceException e)
 			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				_logger.log(Level.WARNING, "An Exception occured while deregistering the module: " + module.getName());
+
 			}
 		}
-		
-		this.logger.log(Level.INFO, "All running modules are deregistered. ECG Lab is cleared.");
+
+		_logger.log(Level.INFO, "All running modules are deregistered. ECG Lab is cleared.");
+
+		_logger.exiting(this.getClass().getName(), "clearLab");
 	}
 }

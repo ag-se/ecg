@@ -1,6 +1,9 @@
 package org.electrocodeogram.module.target;
 
+import java.util.logging.Logger;
+
 import org.electrocodeogram.event.TypedValidEventPacket;
+import org.electrocodeogram.logging.LogHelper;
 import org.electrocodeogram.module.Module;
 
 /**
@@ -12,7 +15,8 @@ import org.electrocodeogram.module.Module;
 public abstract class TargetModule extends Module
 {
 	
-
+	private static Logger _logger = LogHelper.createLogger(TargetModule.class.getName()); 
+	
 	/**
 	 * This creates the module.
 	 * @param moduleClassId Is the id of this module's class as declare din the ModuleRegistry
@@ -23,9 +27,11 @@ public abstract class TargetModule extends Module
 	{
 		super(ModuleType.TARGET_MODULE, moduleClassId, name);
 		
+		_logger.entering(this.getClass().getName(),"TargetModule");
+		
 		initialize();
 		
-		this.getLogger().exiting(this.getClass().getName(),"TargetModule");
+		_logger.exiting(this.getClass().getName(),"TargetModule");
 	}
 
 	/**
@@ -36,14 +42,14 @@ public abstract class TargetModule extends Module
 	@Override
 	public void receiveEventPacket(TypedValidEventPacket eventPacket)
 	{
-		this.getLogger().entering(this.getClass().getName(),"receiveEventPacket");
+		_logger.entering(this.getClass().getName(),"receiveEventPacket");
 		
 		if (eventPacket != null)
 		{
 			write(eventPacket);
 		}
 		
-		this.getLogger().exiting(this.getClass().getName(),"receiveEventPacket");
+		_logger.exiting(this.getClass().getName(),"receiveEventPacket");
 	}
 
 	/**

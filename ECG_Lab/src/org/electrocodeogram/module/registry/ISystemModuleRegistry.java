@@ -80,5 +80,5 @@ public interface ISystemModuleRegistry
 	
 	public abstract void loadModuleSetup(File file) throws ModuleSetupLoadException;
 	
-	public abstract void setModuleDirectory(File file) throws ModuleClassLoaderInitializationException;
+	public abstract void setModuleDirectory(File moduleDirectory) throws ModuleClassLoaderInitializationException;
 }

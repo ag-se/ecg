@@ -8,6 +8,7 @@ import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.electrocodeogram.logging.LogHelper;
 import org.electrocodeogram.system.SystemRoot;
 
 /**
@@ -21,11 +22,12 @@ import org.electrocodeogram.system.SystemRoot;
 public class ModuleClassLoader extends java.lang.ClassLoader
 {
 
-	private Logger logger = null;
+	private static Logger _logger = LogHelper.createLogger(ModuleClassLoader.class.getName());
 
 	private static ArrayList<String> _moduleClassPaths;
 
 	private static ModuleClassLoader _theInstance;
+
 	/**
 	 * This creates the ModuleClassLoader and sets the given ClassLoader to be the parent
 	 * ClassLoader oh the ModuleClassLoader in the ClassLoader hierarchy.
@@ -35,7 +37,9 @@ public class ModuleClassLoader extends java.lang.ClassLoader
 	{
 		super(cl);
 
-		this.logger = Logger.getLogger(this.getClass().getName());
+		_logger.entering(this.getClass().getName(), "ModuleClassLoader");
+
+		_logger.exiting(this.getClass().getName(), "ModuleClassLoader");
 	}
 
 	/**
@@ -46,11 +50,20 @@ public class ModuleClassLoader extends java.lang.ClassLoader
 	@Override
 	protected Class<?> findClass(String className)
 	{
+		_logger.entering(this.getClass().getName(), "findClass");
+
+		if (className == null)
+		{
+			_logger.log(Level.WARNING, "className is null");
+
+			return null;
+		}
+
 		Class<?> toReturn = null;
 
-		if (this._moduleClassPaths == null)
+		if (_moduleClassPaths == null)
 		{
-			this.logger.log(Level.SEVERE, "No module class paths defined.");
+			_logger.log(Level.SEVERE, "No module class paths are defined.");
 
 			return null;
 		}
@@ -59,12 +72,12 @@ public class ModuleClassLoader extends java.lang.ClassLoader
 
 		if (normalizedClassName == null)
 		{
-			this.logger.log(Level.SEVERE, "Class path is invalid: " + className);
+			_logger.log(Level.SEVERE, "Class path is invalid: " + className);
 
 			return null;
 		}
 
-		for (String moduleClassPath : this._moduleClassPaths)
+		for (String moduleClassPath : _moduleClassPaths)
 		{
 
 			String pathToModuleClass = moduleClassPath + normalizedClassName + ".class";
@@ -73,17 +86,21 @@ public class ModuleClassLoader extends java.lang.ClassLoader
 
 			if (!classFile.exists())
 			{
+				_logger.log(Level.WARNING, "Class is not found here: " + classFile.getAbsolutePath());
 
 				continue;
 			}
 
 			if (!classFile.isFile())
 			{
+				_logger.log(Level.WARNING, "Class is not found here: " + classFile.getAbsolutePath());
 
 				continue;
 			}
 
 			FileInputStream fis = null;
+
+			_logger.log(Level.INFO, "Class is found here: " + classFile.getAbsolutePath());
 
 			try
 			{
@@ -100,33 +117,48 @@ public class ModuleClassLoader extends java.lang.ClassLoader
 					break;
 
 				}
-				catch (LinkageError e)
+				catch (Error e)
 				{
-					this.logger.log(Level.INFO, "Linkage error: " + e.getMessage());
+					_logger.log(Level.SEVERE, "Error while loading class: " + className);
+
+					_logger.log(Level.FINEST, e.getMessage());
 
 				}
 
-				this.logger.log(Level.INFO, "Successfully loaded module class: " + classFile.getName());
+				_logger.log(Level.INFO, "Successfully loaded module class: " + classFile.getName());
 
 			}
 			catch (IOException e)
 			{
 
-				this.logger.log(Level.WARNING, "Error while loading module class: " + className);
+				_logger.log(Level.WARNING, "Error while loading module class: " + className);
+				
+				_logger.log(Level.FINEST, e.getMessage());
 
 			}
 		}
 
 		if (toReturn == null)
 		{
-			this.logger.log(Level.WARNING, "The desired class could not be found: " + className);
+			_logger.log(Level.WARNING, "The class could not be found: " + className);
 		}
+
+		_logger.exiting(this.getClass().getName(), "findClass");
 
 		return toReturn;
 	}
 
 	private String getNormalizedClassName(String className)
 	{
+		_logger.entering(this.getClass().getName(), "getNormalizedClassName");
+
+		if (className == null)
+		{
+			_logger.log(Level.WARNING, "className is null");
+
+			return null;
+		}
+
 		StringTokenizer stringTokenizer = new StringTokenizer(className, ".");
 
 		String normalizedClassName = "";
@@ -136,6 +168,8 @@ public class ModuleClassLoader extends java.lang.ClassLoader
 			normalizedClassName += File.separator + stringTokenizer.nextToken();
 
 		}
+
+		_logger.exiting(this.getClass().getName(), "getNormalizedClassName");
 
 		return normalizedClassName;
 	}
@@ -147,6 +181,15 @@ public class ModuleClassLoader extends java.lang.ClassLoader
 	 */
 	public static void addModuleClassPath(String moduleClassPath)
 	{
+		_logger.entering(ModuleClassLoader.class.getName(), "addModuleClassPath");
+
+		if (moduleClassPath == null)
+		{
+			_logger.log(Level.WARNING, "moduleClassPath is null");
+
+			return;
+		}
+
 		if (_moduleClassPaths == null)
 		{
 			_moduleClassPaths = new ArrayList<String>();
@@ -154,20 +197,26 @@ public class ModuleClassLoader extends java.lang.ClassLoader
 
 		_moduleClassPaths.add(moduleClassPath);
 
+		_logger.exiting(ModuleClassLoader.class.getName(), "addModuleClassPath");
+
 	}
-	
+
 	public static ModuleClassLoader getInstance()
 	{
-		if(_theInstance == null)
+		_logger.entering(ModuleClassLoader.class.getName(), "getInstance");
+
+		if (_theInstance == null)
 		{
 			Class clazz = SystemRoot.getSystemInstance().getClass();
 
 			ClassLoader currentClassLoader = clazz.getClassLoader();
-			
+
 			_theInstance = new ModuleClassLoader(currentClassLoader);
 		}
-		
+
+		_logger.exiting(ModuleClassLoader.class.getName(), "getInstance");
+
 		return _theInstance;
 	}
-	
+
 }

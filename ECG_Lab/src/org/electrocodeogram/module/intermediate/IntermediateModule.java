@@ -1,6 +1,10 @@
 package org.electrocodeogram.module.intermediate;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.electrocodeogram.event.TypedValidEventPacket;
+import org.electrocodeogram.logging.LogHelper;
 import org.electrocodeogram.module.Module;
 
 /**
@@ -10,6 +14,8 @@ import org.electrocodeogram.module.Module;
  */
 public abstract class IntermediateModule extends Module implements IIntermediateModule
 {
+
+	private static Logger _logger = LogHelper.createLogger(IntermediateModule.class.getName());
 
 	/**
 	 * If an intermediate module is operating in annotation mode, the AnnotationStyle
@@ -47,11 +53,11 @@ public abstract class IntermediateModule extends Module implements IIntermediate
 		FILTER
 	}
 
-	private String $separator = "";
+	private String _separator = "";
 
-	private ProcessingMode $processingMode;
+	private ProcessingMode _processingMode;
 
-	private AnnotationStyle $annotationStyle;
+	private AnnotationStyle _annotationStyle;
 
 	/**
 	 * This creates a new IntermediateModule with the given processing mode.
@@ -62,11 +68,15 @@ public abstract class IntermediateModule extends Module implements IIntermediate
 	{
 		super(ModuleType.INTERMEDIATE_MODULE, moduleClassId, name);
 
-		this.$processingMode = ProcessingMode.ANNOTATOR;
+		_logger.entering(this.getClass().getName(), "IntermediateModule");
 
-		this.$annotationStyle = AnnotationStyle.POST_ANNOTATION;
+		this._processingMode = ProcessingMode.ANNOTATOR;
+
+		this._annotationStyle = AnnotationStyle.POST_ANNOTATION;
 
 		initialize();
+
+		_logger.exiting(this.getClass().getName(), "IntermediateModule");
 
 	}
 
@@ -76,7 +86,11 @@ public abstract class IntermediateModule extends Module implements IIntermediate
 	 */
 	public AnnotationStyle getAnnnotationStyle()
 	{
-		return this.$annotationStyle;
+		_logger.entering(this.getClass().getName(), "getAnnnotationStyle");
+
+		_logger.exiting(this.getClass().getName(), "getAnnnotationStyle");
+
+		return this._annotationStyle;
 	}
 
 	/**
@@ -85,7 +99,18 @@ public abstract class IntermediateModule extends Module implements IIntermediate
 	 */
 	public void setAnnnotationStyle(AnnotationStyle annotationStyle)
 	{
-		this.$annotationStyle = annotationStyle;
+		_logger.entering(this.getClass().getName(), "setAnnnotationStyle");
+
+		if (annotationStyle == null)
+		{
+			_logger.log(Level.WARNING, "annotationStyle is null");
+
+			return;
+		}
+
+		this._annotationStyle = annotationStyle;
+
+		_logger.exiting(this.getClass().getName(), "setAnnnotationStyle");
 	}
 
 	/**
@@ -94,7 +119,12 @@ public abstract class IntermediateModule extends Module implements IIntermediate
 	 */
 	public ProcessingMode getProcessingMode()
 	{
-		return this.$processingMode;
+		_logger.entering(this.getClass().getName(), "getProcessingMode");
+
+		_logger.exiting(this.getClass().getName(), "getProcessingMode");
+
+		return this._processingMode;
+
 	}
 
 	/**
@@ -103,7 +133,19 @@ public abstract class IntermediateModule extends Module implements IIntermediate
 	 */
 	public void setProcessingMode(ProcessingMode processingMode)
 	{
-		this.$processingMode = processingMode;
+		_logger.entering(this.getClass().getName(), "setProcessingMode");
+
+		if (processingMode == null)
+		{
+			_logger.log(Level.WARNING, "processingMode is null");
+
+			return;
+		}
+
+		this._processingMode = processingMode;
+
+		_logger.exiting(this.getClass().getName(), "setProcessingMode");
+
 	}
 
 	/**
@@ -112,7 +154,11 @@ public abstract class IntermediateModule extends Module implements IIntermediate
 	 */
 	public String getSeparator()
 	{
-		return this.$separator;
+		_logger.entering(this.getClass().getName(), "getSeparator");
+
+		_logger.exiting(this.getClass().getName(), "getSeparator");
+
+		return this._separator;
 	}
 
 	/**
@@ -121,7 +167,18 @@ public abstract class IntermediateModule extends Module implements IIntermediate
 	 */
 	public void setSeparator(String separator)
 	{
-		this.$separator = separator;
+		_logger.entering(this.getClass().getName(), "setSeparator");
+
+		if (separator == null)
+		{
+			_logger.log(Level.WARNING, "separator is null");
+
+			return;
+		}
+
+		this._separator = separator;
+
+		_logger.exiting(this.getClass().getName(), "setSeparator");
 	}
 
 	/**
@@ -133,11 +190,20 @@ public abstract class IntermediateModule extends Module implements IIntermediate
 	public final void receiveEventPacket(TypedValidEventPacket eventPacket)
 	{
 
-		if (this.$processingMode == ProcessingMode.ANNOTATOR)
+		_logger.entering(this.getClass().getName(), "receiveEventPacket");
+
+		if (eventPacket == null)
+		{
+			_logger.log(Level.WARNING, "eventPacket is null");
+
+			return;
+		}
+
+		if (this._processingMode == ProcessingMode.ANNOTATOR)
 		{
 			TypedValidEventPacket resultPacket = getAnalysisResult(eventPacket);
 
-			if (this.$annotationStyle == AnnotationStyle.PRE_ANNOTATION)
+			if (this._annotationStyle == AnnotationStyle.PRE_ANNOTATION)
 			{
 				sendEventPacket(resultPacket);
 				sendEventPacket(eventPacket);
@@ -154,10 +220,16 @@ public abstract class IntermediateModule extends Module implements IIntermediate
 
 			sendEventPacket(resultPacket);
 		}
+
+		_logger.exiting(this.getClass().getName(), "receiveEventPacket");
 	}
 
 	private TypedValidEventPacket getAnalysisResult(TypedValidEventPacket eventPacket)
 	{
+		_logger.entering(this.getClass().getName(), "getAnalysisResult");
+
+		_logger.exiting(this.getClass().getName(), "getAnalysisResult");
+
 		return analyse(eventPacket);
 	}
 

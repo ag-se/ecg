@@ -1,5 +1,10 @@
 package org.electrocodeogram.module.registry;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.electrocodeogram.logging.LogHelper;
+
 /**
  * If the unique int id that is given to get a reference to a
  * running module is invalid (id < 0) or if a running module
@@ -7,6 +12,8 @@ package org.electrocodeogram.module.registry;
  */
 public class ModuleInstanceException extends Exception
 {
+
+	private static Logger _logger = LogHelper.createLogger(ModuleInstanceException.class.getName());
 
 	private static final long serialVersionUID = 2250598659169570982L;
 
@@ -17,6 +24,10 @@ public class ModuleInstanceException extends Exception
 	public ModuleInstanceException(String message)
 	{
 		super(message);
+
+		_logger.log(Level.WARNING, "An ModuleInstanceException occured");
+
+		_logger.log(Level.WARNING, this.getMessage());
 	}
 
 }

@@ -25,25 +25,22 @@ import org.electrocodeogram.system.ISystemRoot;
 import org.electrocodeogram.system.SystemRoot;
 
 /**
- * This abstract class represents an ECG module. A module is an entity able
- * of receiving events from modules it is connected to and sending events to modules
- * that are connected to it.
- * Additionally a module can be implemented to modify the data of received events
- * and to generate new outgoing events.
- * There are three distinct module types defined:
- * Source modules are not able to be connected to other modules, but other (non-source)
- * modules are able to be connected to it.
- * Intermediate modules are connectable to each other.
- * And target modules are only able to be connected to other modules, but no module
- * can be connected to them.
- * The connection degree, which is the number of modules connected to another module, is
- * not limited by the implementation. 
+ * This abstract class represents an ECG module. A module is an entity able of
+ * receiving events from modules it is connected to and sending events to
+ * modules that are connected to it. Additionally a module can be implemented to
+ * modify the data of received events and to generate new outgoing events. There
+ * are three distinct module types defined: Source modules are not able to be
+ * connected to other modules, but other (non-source) modules are able to be
+ * connected to it. Intermediate modules are connectable to each other. And
+ * target modules are only able to be connected to other modules, but no module
+ * can be connected to them. The connection degree, which is the number of
+ * modules connected to another module, is not limited by the implementation.
  * Each module gets an unique integer id during its object creation.
  */
 public abstract class Module
 {
 
-	private Logger _logger;
+	private static Logger _logger = LogHelper.createLogger(Module.class.getName());
 
 	/**
 	 * This enum contains the three different module types.
@@ -51,23 +48,22 @@ public abstract class Module
 	public enum ModuleType
 	{
 		/**
-		 * This is a module type value that indicates that the module
-		 * is a source module.
-		 * Source modules are not able to be connected to other modules, but other (non-source)
-		 * modules are able to be connected to it.
+		 * This is a module type value that indicates that the module is a
+		 * source module. Source modules are not able to be connected to other
+		 * modules, but other (non-source) modules are able to be connected to
+		 * it.
 		 */
 		SOURCE_MODULE,
 		/**
-		 * This is a module type value that indicates that the module
-		 * is a intermediate module.
-		 * Intermediate modules are connectable to each other.
+		 * This is a module type value that indicates that the module is a
+		 * intermediate module. Intermediate modules are connectable to each
+		 * other.
 		 */
 		INTERMEDIATE_MODULE,
 		/**
-		 * This is a module type value that indicates that the module
-		 * is a target module.
-		 * And target modules are only able to be connected to other modules, but no module
-		 * can be connected to them.
+		 * This is a module type value that indicates that the module is a
+		 * target module. And target modules are only able to be connected to
+		 * other modules, but no module can be connected to them.
 		 */
 		TARGET_MODULE
 	}
@@ -99,23 +95,49 @@ public abstract class Module
 	SystemNotificator _systemNotificator;
 
 	/**
-	 * Each ECG Module can have a set of properties which are declared
-	 * in the "module.properties.xml" file for each module.
-	 * At runtime the module's properties are stored in this field along with their values. 
+	 * Each ECG Module can have a set of properties which are declared in the
+	 * "module.properties.xml" file for each module. At runtime the module's
+	 * properties are stored in this field along with their values.
 	 */
-	protected ModuleProperty[] runtimeProperties; 
-	
+	protected ModuleProperty[] runtimeProperties;
+
 	/**
 	 * The constructor creates a new Module object of the given module type,
 	 * module class id ans module name and registers it with the ModuleRegistry.
-	 * @param moduleType Is the module type
-	 * @param moduleClassId Is the unique id of this module's class as registered with the ModuleRegistry
-	 * @param moduleName Is the name to give to this module instance
+	 * 
+	 * @param moduleType
+	 *            Is the module type
+	 * @param moduleClassId
+	 *            Is the unique id of this module's class as registered with the
+	 *            ModuleRegistry
+	 * @param moduleName
+	 *            Is the name to give to this module instance
 	 */
 	public Module(ModuleType moduleType, String moduleClassId, String moduleName)
 	{
-		this._logger = LogHelper.createLogger(this);
-		
+		_logger.entering(this.getClass().getName(), "Module");
+
+		if (moduleType == null)
+		{
+			_logger.log(Level.SEVERE, "The parameter moduleType is null. Can not create Module");
+
+			return;
+		}
+
+		if (moduleClassId == null)
+		{
+			_logger.log(Level.SEVERE, "The parameter moduleClassId is null. Can not create Module");
+
+			return;
+		}
+
+		if (moduleName == null)
+		{
+			_logger.log(Level.SEVERE, "The parameter moduleName is null. Can not create Module");
+
+			return;
+		}
+
 		this._id = ++_count;
 
 		this._name = moduleName;
@@ -133,7 +155,7 @@ public abstract class Module
 		this._systemObserver = new SystemObserver(this);
 
 		this._systemNotificator = new SystemNotificator(this);
-			
+
 		if (this._moduleType == ModuleType.SOURCE_MODULE)
 		{
 			this._eventSender = new EventSender(this);
@@ -156,84 +178,105 @@ public abstract class Module
 		}
 		catch (ModuleClassException e)
 		{
-			this._logger.log(Level.SEVERE,"An unexpected error occured during the module creation.");
-			
-			this._logger.log(Level.SEVERE,e.getMessage());
-			
+			_logger.log(Level.SEVERE, "An unexpected error occured during Module creation.");
+
+			_logger.log(Level.FINEST, e.getMessage());
+
 			return;
 		}
-		
+
 		registerMSDTs();
 
 		SystemRoot.getModuleInstance().getModuleModuleRegistry().registerRunningModule(this);
-		
-		this.getLogger().exiting(this.getClass().getName(),"Module");
+
+		_logger.exiting(this.getClass().getName(), "Module");
 	}
 
 	/**
-	 * The EventSender is the part of a Module that sends events to other Modules.
-	 * It extends Observable and uses the notfiy method to send events to
-	 * registered Observer Modules.
-	 * Only Modules with the ModuleType of SOURCE_MODULE or INTERMEDIATE_MODULE
-	 * are having a not null EventSender.
+	 * The EventSender is the part of a Module that sends events to other
+	 * Modules. It extends Observable and uses the notfiy method to send events
+	 * to registered Observer Modules. Only Modules with the ModuleType of
+	 * SOURCE_MODULE or INTERMEDIATE_MODULE are having a not null EventSender.
 	 */
 	private static class EventSender extends Observable
 	{
 
 		private Module _module;
-		
-		private Logger _logger = null;
+
+		private static Logger _eventSenderLogger = LogHelper.createLogger(EventSender.class.getName());
 
 		/**
 		 * This creates the EventSender for the given Module.
-		 * @param module Is the Module to which this EventSender is belonging
+		 * 
+		 * @param module
+		 *            Is the Module to which this EventSender is belonging
 		 */
 		public EventSender(Module module)
 		{
+			_eventSenderLogger.entering(this.getClass().getName(), "eventSender");
+
 			this._module = module;
-			
-			this._logger = this._logger = LogHelper.createLogger(this);
-			
-			this._logger.exiting(this.getClass().getName(),"eventSender");
+
+			_eventSenderLogger.exiting(this.getClass().getName(), "eventSender");
 		}
 
 		/**
 		 * This registers a Module with the EventSender for receiving events.
-		 * @param module Id the Module to register
+		 * 
+		 * @param module
+		 *            Id the Module to register
 		 */
 		public void addObserver(Module module)
 		{
-			
-			this._logger.entering(this.getClass().getName(),"addObserver");
-			
+
+			_eventSenderLogger.entering(this.getClass().getName(), "addObserver");
+
+			if (module == null)
+			{
+				_eventSenderLogger.log(Level.WARNING, "module is null");
+
+				return;
+			}
+
 			super.addObserver(module.getEventReceiver());
-			
-			this._logger.exiting(this.getClass().getName(),"addObserver");
+
+			_eventSenderLogger.exiting(this.getClass().getName(), "addObserver");
 		}
 
 		/**
 		 * This deregisters a registered Module.
-		 * @param module Is the Module to deregister
+		 * 
+		 * @param module
+		 *            Is the Module to deregister
 		 */
 		public void deleteObserver(Module module)
 		{
-			this._logger.entering(this.getClass().getName(),"deleteObserver");
-			
+			_eventSenderLogger.entering(this.getClass().getName(), "deleteObserver");
+
+			if (module == null)
+			{
+				_eventSenderLogger.log(Level.WARNING, "module is null");
+
+				return;
+			}
+
 			super.deleteObserver(module.getEventReceiver());
-			
-			this._logger.exiting(this.getClass().getName(),"deleteObserver");
+
+			_eventSenderLogger.exiting(this.getClass().getName(), "deleteObserver");
 		}
 
 		/**
-		 * This method is inherited to all extending modules. It sends the given event to
-		 * all connected modules. The sourceId attribute of the event is changed to the id
-		 * of this the sending module.
-		 * @param eventPacket Is the event to send
+		 * This method is inherited to all extending modules. It sends the given
+		 * event to all connected modules. The sourceId attribute of the event
+		 * is changed to the id of this the sending module.
+		 * 
+		 * @param eventPacket
+		 *            Is the event to send
 		 */
 		public void sendEventPacket(TypedValidEventPacket eventPacket)
 		{
-			this._logger.entering(this.getClass().getName(),"sendEventPacket");
-			
+			_eventSenderLogger.entering(this.getClass().getName(), "sendEventPacket");
+
 			if (this._module.isActive() && (eventPacket != null))
 			{
 				setChanged();
@@ -255,66 +298,82 @@ public abstract class Module
 				catch (IllegalEventParameterException e)
 				{
 
-					// As only the id of a ValidEventPackets is changed, it has to stay valid
+					// As only the id of a ValidEventPackets is changed, it has
+					// to stay valid
 
 					clearChanged();
 
-					e.printStackTrace();
-
-					this._module.getLogger().log(Level.SEVERE, "An unexpected exception has occurred. Please report this at www.electrocodeogram.org");
+					_eventSenderLogger.log(Level.SEVERE, "An unexpected exception has occurred. Please report this at www.electrocodeogram.org");
 
 				}
 				clearChanged();
 			}
-			
-			this._logger.exiting(this.getClass().getName(),"sendEventPacket");
+
+			_eventSenderLogger.exiting(this.getClass().getName(), "sendEventPacket");
 		}
-		
-		
+
 	}
 
 	/**
-	 * The EventReceiver is the part of a Module that receives events from other Modules.
-	 * It implements Observer and uses the update method to receive events from
-	 * Observable Modules it has been registered to.
-	 * Only Modules with the ModuleType of INTERMEDIATE_MODULE or TARGET_MODULE
-	 * are having a not null EventReceiver.
+	 * The EventReceiver is the part of a Module that receives events from other
+	 * Modules. It implements Observer and uses the update method to receive
+	 * events from Observable Modules it has been registered to. Only Modules
+	 * with the ModuleType of INTERMEDIATE_MODULE or TARGET_MODULE are having a
+	 * not null EventReceiver.
 	 */
 	private static class EventReceiver implements Observer
 	{
 
 		private Module _module;
-		
-		private Logger _logger;
+
+		private static Logger _eventReceiverLogger = LogHelper.createLogger(EventReceiver.class.getName());
 
 		/**
 		 * This creates the EventReceiver for the given Module.
-		 * @param module Is the Module that the EventReceiver is belonging to
+		 * 
+		 * @param module
+		 *            Is the Module that the EventReceiver is belonging to
 		 */
 		public EventReceiver(Module module)
 		{
+			_eventReceiverLogger.entering(this.getClass().getName(), "EventReceiver");
+
 			this._module = module;
-			
-			this._logger = this._logger = LogHelper.createLogger(this);
-			
-			this._logger.exiting(this.getClass().getName(),"EventReceiver");
+
+			_eventReceiverLogger.exiting(this.getClass().getName(), "EventReceiver");
 		}
 
 		/**
-		 * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
-		 * As this is the Observer's update method it is called whenever this module is
-		 * notified of a change of state in an Observable this module is observing.
-		 * This mechanism is used in the module communication to transport events.
-		 * When a module is receiving an event its state has changed and it notifies all
-		 * connected modules and passes the event to them as a parameter.
-		 * Additonally this update method is also invoked by a notification from the
-		 * system core because of a statechange of the system.
-		 * This gives the module the chance to react on statechanges of the system. 
+		 * @see java.util.Observer#update(java.util.Observable,
+		 *      java.lang.Object) As this is the Observer's update method it is
+		 *      called whenever this module is notified of a change of state in
+		 *      an Observable this module is observing. This mechanism is used
+		 *      in the module communication to transport events. When a module
+		 *      is receiving an event its state has changed and it notifies all
+		 *      connected modules and passes the event to them as a parameter.
+		 *      Additonally this update method is also invoked by a notification
+		 *      from the system core because of a statechange of the system.
+		 *      This gives the module the chance to react on statechanges of the
+		 *      system.
 		 */
 		public void update(Observable object, Object data)
 		{
-			this._logger.entering(this.getClass().getName(),"update");
-			
+			_eventReceiverLogger.entering(this.getClass().getName(), "update");
+
+			if (object == null)
+			{
+				_eventReceiverLogger.log(Level.WARNING, "object is null");
+
+				return;
+			}
+
+			if (data == null)
+			{
+				_eventReceiverLogger.log(Level.WARNING, "data is null");
+
+				return;
+			}
+
 			if ((object instanceof EventSender) && data instanceof TypedValidEventPacket)
 			{
 				try
@@ -338,141 +397,169 @@ public abstract class Module
 				}
 				catch (IllegalEventParameterException e)
 				{
-					e.printStackTrace();
-
-					this._module.getLogger().log(Level.SEVERE, "An unexpected exception has occurred. Please report this at www.electrocodeogram.org");
+					_eventReceiverLogger.log(Level.SEVERE, "An unexpected exception has occurred. Please report this at www.electrocodeogram.org");
 
 				}
 
 			}
-			
-			this._logger.exiting(this.getClass().getName(),"update");
+
+			_eventReceiverLogger.exiting(this.getClass().getName(), "update");
 
 		}
 
 	}
 
 	/**
-	 * The SystemObserver is the part of each Module that
-	 * gets notifications from the ISystemRoot about system
-	 * statechanges.
-	 *
+	 * The SystemObserver is the part of each Module that gets notifications
+	 * from the ISystemRoot about system statechanges.
+	 * 
 	 */
 	private static class SystemObserver implements Observer
 	{
 
 		private Module _module;
-		
-		private Logger _logger; 
+
+		private static Logger _systemObserverLogger = LogHelper.createLogger(SystemObserver.class.getName());
 
 		/**
 		 * This creates the SystemObserver for the given Module.
-		 * @param module Is the Module that the SystemObserver is belonging to
+		 * 
+		 * @param module
+		 *            Is the Module that the SystemObserver is belonging to
 		 */
 		public SystemObserver(Module module)
 		{
+			_systemObserverLogger.entering(this.getClass().getName(), "SystemObserver");
+
 			this._module = module;
-			
-			this._logger = this._logger = LogHelper.createLogger(this);
-			
-			this._logger.exiting(this.getClass().getName(),"SystemObserver");
+
+			_systemObserverLogger.exiting(this.getClass().getName(), "SystemObserver");
 		}
 
 		/**
-		 * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
+		 * @see java.util.Observer#update(java.util.Observable,
+		 *      java.lang.Object)
 		 */
-		public void update(Observable o, @SuppressWarnings("unused")
+		public void update(Observable object, @SuppressWarnings("unused")
 		Object arg)
 		{
-			this._logger.entering(this.getClass().getName(),"update");
-			
-			if (o instanceof ISystemRoot)
+			_systemObserverLogger.entering(this.getClass().getName(), "update");
+
+			if (object == null)
+			{
+				_systemObserverLogger.log(Level.WARNING, "object is null");
+
+				return;
+			}
+
+			if (object instanceof ISystemRoot)
 			{
 				this._module.analyseCoreNotification();
 			}
-			
-			this._logger.exiting(this.getClass().getName(),"update");
+
+			_systemObserverLogger.exiting(this.getClass().getName(), "update");
 
 		}
 
 	}
 
 	/**
-	 * The SystemNotificator is used by the Module to notify registered Observers
-	 * about statechanges in the Module.
-	 *
+	 * The SystemNotificator is used by the Module to notify registered
+	 * Observers about statechanges in the Module.
+	 * 
 	 */
 	private static class SystemNotificator extends Observable
 	{
-		
+
 		private Module _module;
-		
-		private Logger _logger; 
+
+		private static Logger _systemNotificatorlogger = LogHelper.createLogger(SystemNotificator.class.getName());
 
 		/**
-		 * The constructor registers the ECG GUI component with the SystemNotificator
-		 * @param module Is the surrounding module 
-		 *
+		 * The constructor registers the ECG GUI component with the
+		 * SystemNotificator
+		 * 
+		 * @param module
+		 *            Is the surrounding module
+		 * 
 		 */
 		public SystemNotificator(Module module)
 		{
+			_systemNotificatorlogger.entering(this.getClass().getName(), "SystemNotificator");
+
 			this._module = module;
-			
-			this._logger = this._logger = LogHelper.createLogger(this);
-			
-			if(SystemRoot.getSystemInstance().getGui() != null)
+
+			if (SystemRoot.getSystemInstance().getGui() != null)
 			{
 				this.addObserver(SystemRoot.getSystemInstance().getGui());
 			}
-			
-			this._logger.exiting(this.getClass().getName(),"SystemNotificator");
+
+			_systemNotificatorlogger.exiting(this.getClass().getName(), "SystemNotificator");
 
 		}
 
 		/**
-		 * The method is called to notify the ECG system of a new event beeing processed by thie module.
-		 * @param packet Is the last sent event packet.
+		 * The method is called to notify the ECG system of a new event beeing
+		 * processed by thie module.
+		 * 
+		 * @param packet
+		 *            Is the last sent event packet.
 		 */
 		public void fireEventNotification(TypedValidEventPacket packet)
 		{
-			this._logger.entering(this.getClass().getName(),"fireEventNotification");
-			
+			_systemNotificatorlogger.entering(this.getClass().getName(), "fireEventNotification");
+
+			if (packet == null)
+			{
+				_systemNotificatorlogger.log(Level.WARNING, "packet is null");
+
+				return;
+			}
+
 			setChanged();
 
 			notifyObservers(packet);
 
 			clearChanged();
-			
-			this._logger.exiting(this.getClass().getName(),"fireEventNotification");
+
+			_systemNotificatorlogger.exiting(this.getClass().getName(), "fireEventNotification");
 
 		}
 
 		/**
-		 * The method is called to notify the ECG system of state changes in the module.
+		 * The method is called to notify the ECG system of state changes in the
+		 * module.
 		 */
 		public void fireStatechangeNotification()
 		{
-			this._logger.entering(this.getClass().getName(),"fireStatechangeNotification");
-			
+			_systemNotificatorlogger.entering(this.getClass().getName(), "fireStatechangeNotification");
+
 			setChanged();
 
-			notifyObservers(_module);
+			notifyObservers(this._module);
 
 			clearChanged();
-			
-			this._logger.exiting(this.getClass().getName(),"fireStatechangeNotification");
+
+			_systemNotificatorlogger.exiting(this.getClass().getName(), "fireStatechangeNotification");
 		}
 
 	}
 
 	private void registerMSDTs()
 	{
-		this._logger.entering(this.getClass().getName(),"registerMSDTs");
-		
+		_logger.entering(this.getClass().getName(), "registerMSDTs");
+
 		if (this instanceof SourceModule)
 		{
 
+			_logger.log(Level.INFO, "Registering predefined MSDTs dor SourceModule.");
+
 			MicroSensorDataType[] msdts = SystemRoot.getModuleInstance().getModuleMsdtRegistry().getPredefinedMicroSensorDataTypes();
+
+			if (msdts == null)
+			{
+				return;
+			}
 
 			for (MicroSensorDataType msdt : msdts)
 			{
@@ -484,24 +571,34 @@ public abstract class Module
 				}
 				catch (MicroSensorDataTypeRegistrationException e)
 				{
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					_logger.log(Level.SEVERE, "An Exception occured while registering predefined MSDTs for this SourceModule: " + this.getName());
+
+					return;
 				}
 			}
 
-			
-			
 		}
 
 		ModuleDescriptor moduleDescriptor = null;
+
+		_logger.log(Level.INFO, "Going to register additional MSDTs...");
+
 		try
 		{
 			moduleDescriptor = SystemRoot.getModuleInstance().getModuleModuleRegistry().getModuleDescriptor(this._moduleClassId);
+
+			if (moduleDescriptor == null)
+			{
+				_logger.log(Level.WARNING, "ModuleDescriptor was null for: " + this.getName());
+
+				return;
+			}
 
 			MicroSensorDataType[] microSensorDataTypes = moduleDescriptor.getMicroSensorDataTypes();
 
 			if (microSensorDataTypes != null)
 			{
+				_logger.log(Level.INFO, "Found " + microSensorDataTypes.length + " additional MSDTs for: " + this.getName());
 
 				for (MicroSensorDataType msdt : microSensorDataTypes)
 				{
@@ -509,149 +606,148 @@ public abstract class Module
 
 					SystemRoot.getModuleInstance().getModuleMsdtRegistry().requestMsdtRegistration(msdt, this);
 				}
+
+				_logger.log(Level.INFO, "Registered " + microSensorDataTypes.length + " additional MSDTs for: " + this.getName());
+
 			}
 		}
 		catch (ModuleClassException e)
 		{
-			this._logger.log(Level.INFO, "No ModuleDescriptor was found for the module " + this.getName());
+			_logger.log(Level.INFO, "No ModuleDescriptor was found for the module " + this.getName());
 		}
 
 		catch (MicroSensorDataTypeRegistrationException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			_logger.log(Level.SEVERE, "An Exception occured while registering predefined MSDTs for this SourceModule: " + this.getName());
 		}
-		
-		this._logger.exiting(this.getClass().getName(),"registerMSDTs");
-	}
 
-	/**
-	 * Returns the module's logger.
-	 * @return The module's logger
-	 */
-	protected Logger getLogger()
-	{
-		this._logger.entering(this.getClass().getName(),"getLogger");
-		
-		this._logger.exiting(this.getClass().getName(),"getLogger");
-		
-		return this._logger;
+		this._logger.exiting(this.getClass().getName(), "registerMSDTs");
 	}
 
 	/**
 	 * This method returns the EventReceiver of the module.
+	 * 
 	 * @return The EventReceiver of the module
 	 */
 	EventReceiver getEventReceiver()
 	{
-		this._logger.entering(this.getClass().getName(),"getEventReceiver");
-		
-		this._logger.exiting(this.getClass().getName(),"getEventReceiver");
-		
+		_logger.entering(this.getClass().getName(), "getEventReceiver");
+
+		_logger.exiting(this.getClass().getName(), "getEventReceiver");
+
 		return this._eventReceiver;
 	}
 
 	/**
-	 * This method returns the module's SystemObserver, which is an Observer that
-	 * handles notifications from the ISystemRoot Observable.
+	 * This method returns the module's SystemObserver, which is an Observer
+	 * that handles notifications from the ISystemRoot Observable.
+	 * 
 	 * @return The module's SystemObserver
 	 */
 	public SystemObserver getSystemObserver()
 	{
-		this._logger.entering(this.getClass().getName(),"getSystemObserver");
-		
-		this._logger.exiting(this.getClass().getName(),"getSystemObserver");
-		
+		_logger.entering(this.getClass().getName(), "getSystemObserver");
+
+		_logger.exiting(this.getClass().getName(), "getSystemObserver");
+
 		return this._systemObserver;
 	}
 
 	/**
 	 * This method returns the unique id of this module.
+	 * 
 	 * @return The unique id of this module
 	 */
 	public int getId()
 	{
-		this._logger.entering(this.getClass().getName(),"getId");
-		
-		this._logger.exiting(this.getClass().getName(),"getId");
-		
+		_logger.entering(this.getClass().getName(), "getId");
+
+		_logger.exiting(this.getClass().getName(), "getId");
+
 		return this._id;
 	}
 
 	/**
 	 * This method returns the ModuleType of this module.
+	 * 
 	 * @return The ModuleType of this module
 	 */
 	public ModuleType getModuleType()
 	{
-		this._logger.entering(this.getClass().getName(),"getModuleType");
-		
-		this._logger.exiting(this.getClass().getName(),"getModuleType");
-		
+		_logger.entering(this.getClass().getName(), "getModuleType");
+
+		_logger.exiting(this.getClass().getName(), "getModuleType");
+
 		return this._moduleType;
 	}
 
 	/**
 	 * This method returns the name of this module.
+	 * 
 	 * @return The name of this module
 	 */
 	public String getName()
 	{
-		this._logger.entering(this.getClass().getName(),"getName");
-		
-		this._logger.exiting(this.getClass().getName(),"getName");
-		
+		_logger.entering(this.getClass().getName(), "getName");
+
+		_logger.exiting(this.getClass().getName(), "getName");
+
 		return this._name;
 	}
 
 	/**
 	 * This method returns the number of connected modules.
+	 * 
 	 * @return The number of connected modules
 	 */
 	public int getReceivingModuleCount()
 	{
-		this._logger.entering(this.getClass().getName(),"getReceivingModuleMap");
-		
-		this._logger.exiting(this.getClass().getName(),"getReceivingModuleMap");
-		
+		_logger.entering(this.getClass().getName(), "getReceivingModuleMap");
+
+		_logger.exiting(this.getClass().getName(), "getReceivingModuleMap");
+
 		return this._receiverModuleMap.size();
 	}
 
 	/**
-	 * This method returns an Array of all modules that are connected to this module.
+	 * This method returns an Array of all modules that are connected to this
+	 * module.
+	 * 
 	 * @return An Array of all modules that are connected to this module
 	 */
 	public Module[] getReceivingModules()
 	{
-		this._logger.entering(this.getClass().getName(),"getReceivingModules");
-		
+		_logger.entering(this.getClass().getName(), "getReceivingModules");
+
 		Collection<Module> receivingModules = this._receiverModuleMap.values();
 
-		this._logger.exiting(this.getClass().getName(),"getReceivingModules");
-		
+		_logger.exiting(this.getClass().getName(), "getReceivingModules");
+
 		return receivingModules.toArray(new Module[0]);
 	}
 
 	private Module[] getSendingModules()
 	{
-		this._logger.entering(this.getClass().getName(),"getSendingModules");
-		
+		_logger.entering(this.getClass().getName(), "getSendingModules");
+
 		Collection<Module> sendingModules = this._senderModuleMap.values();
 
-		this._logger.exiting(this.getClass().getName(),"getSendingModules");
-		
+		_logger.exiting(this.getClass().getName(), "getSendingModules");
+
 		return sendingModules.toArray(new Module[0]);
 	}
 
 	/**
-	 * This method collects detailed information about the module and returns them as a String.
+	 * This method collects detailed information about the module and returns
+	 * them as a String.
+	 * 
 	 * @return A String of detailed information about the module
 	 */
 	public String getDetails()
 	{
-		
-		this._logger.entering(this.getClass().getName(),"getDetails");
-		
+
+		_logger.entering(this.getClass().getName(), "getDetails");
+
 		String text = "Name: \t" + getName() + "\nID: \t " + getId() + "\nTyp: \t";
 
 		ModuleType type = getModuleType();
@@ -699,8 +795,7 @@ public abstract class Module
 		}
 		catch (ModuleClassException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			_logger.log(Level.WARNING, "An Exception has occured while reading the module description of: " + this.getName());
 		}
 
 		moduleDescription = moduleDescriptor.getDescription();
@@ -713,136 +808,143 @@ public abstract class Module
 
 		}
 
-		this._logger.exiting(this.getClass().getName(),"getDetails");
-		
+		_logger.exiting(this.getClass().getName(), "getDetails");
+
 		return text;
 
 	}
 
 	/**
-	 * This method returns the MicroSensorDataTypes that are provided by this module.
+	 * This method returns the MicroSensorDataTypes that are provided by this
+	 * module.
+	 * 
 	 * @return The MicroSensorDataTypes that are provided by this module
 	 */
 	public MicroSensorDataType[] getProvidedMicroSensorDataType()
 	{
-		this._logger.entering(this.getClass().getName(),"getProvidedMicroSensorDataType");
-		
-		this._logger.exiting(this.getClass().getName(),"getProvidedMicroSensorDataType");
-		
+		_logger.entering(this.getClass().getName(), "getProvidedMicroSensorDataType");
+
+		_logger.exiting(this.getClass().getName(), "getProvidedMicroSensorDataType");
+
 		return this._providedMsdtList.toArray(new MicroSensorDataType[0]);
 	}
 
 	/**
-	 * This method returns the unique id of the module's class as
-	 * registered with the ModuleRegistry.
+	 * This method returns the unique id of the module's class as registered
+	 * with the ModuleRegistry.
+	 * 
 	 * @return The unique id of the module's class
 	 */
 	public String getClassId()
 	{
-		this._logger.entering(this.getClass().getName(),"getClassId");
-		
-		this._logger.exiting(this.getClass().getName(),"getClassId");
-		
+		_logger.entering(this.getClass().getName(), "getClassId");
+
+		_logger.exiting(this.getClass().getName(), "getClassId");
+
 		return this._moduleClassId;
 	}
 
 	/**
 	 * This method returns "true" if the module is active and "false" if not.
+	 * 
 	 * @return "true" if the module is active and "false" if not
 	 */
 	public boolean isActive()
 	{
-		this._logger.entering(this.getClass().getName(),"isActive");
-		
-		this._logger.exiting(this.getClass().getName(),"isActive");
-		
+		_logger.entering(this.getClass().getName(), "isActive");
+
+		_logger.exiting(this.getClass().getName(), "isActive");
+
 		return this._activeFlag;
 	}
 
 	/**
 	 * This checks if the module is of the given ModuleType
+	 * 
 	 * @param moduleType
-	 * @return "true" If the module is of the given ModuleType and "false" if not
+	 * @return "true" If the module is of the given ModuleType and "false" if
+	 *         not
 	 */
 	public boolean isModuleType(ModuleType moduleType)
 	{
-		this._logger.entering(this.getClass().getName(),"isModuleType");
-		
+		_logger.entering(this.getClass().getName(), "isModuleType");
+
 		if (this._moduleType == moduleType)
 		{
 			return true;
 		}
-		
-		this._logger.exiting(this.getClass().getName(),"isModuleType");
+
+		_logger.exiting(this.getClass().getName(), "isModuleType");
 
 		return false;
 
 	}
 
 	/**
-	 * This method deactivates the module. The module might be already deactivated.
-	 *
+	 * This method deactivates the module. The module might be already
+	 * deactivated.
+	 * 
 	 */
 	public void deactivate()
 	{
 
-		this._logger.entering(this.getClass().getName(),"deactivate");
-		
+		_logger.entering(this.getClass().getName(), "deactivate");
+
 		if (this._activeFlag == false)
 		{
-			
-			this._logger.exiting(this.getClass().getName(),"deactivate");
-			
-			this._logger.log(Level.INFO,"Module allready inactive " + this.getName());
-			
+
+			_logger.exiting(this.getClass().getName(), "deactivate");
+
+			_logger.log(Level.INFO, "Module allready inactive " + this.getName());
+
 			return;
-			
+
 		}
 
-		if(this instanceof SourceModule)
+		if (this instanceof SourceModule)
 		{
 			SourceModule module = (SourceModule) this;
-			
+
 			module.stopReader();
 		}
-		
-		if(this instanceof TargetModule)
+
+		if (this instanceof TargetModule)
 		{
 			TargetModule module = (TargetModule) this;
-			
+
 			module.stopWriter();
 		}
-		
+
 		this._activeFlag = false;
 
-		
-		this._logger.log(Level.INFO,"Module deactivated " + this.getName());
-		
-		this._logger.exiting(this.getClass().getName(),"deactivate");
+		_logger.log(Level.INFO, "Module deactivated " + this.getName());
+
+		_logger.exiting(this.getClass().getName(), "deactivate");
 	}
 
 	/**
 	 * This method activates the module. The module might be already activated.
-	 * @throws ModuleActivationException 
-	 *
+	 * 
+	 * @throws ModuleActivationException
+	 * 
 	 */
 	public void activate() throws ModuleActivationException
 	{
-		this._logger.entering(this.getClass().getName(),"activate");
-		
+		_logger.entering(this.getClass().getName(), "activate");
+
 		if (this._activeFlag == true)
 		{
-			this._logger.exiting(this.getClass().getName(),"activate");
-			
-			this._logger.log(Level.INFO,"Module allready active " + this.getName());
-			
+			_logger.exiting(this.getClass().getName(), "activate");
+
+			_logger.log(Level.INFO, "Module allready active " + this.getName());
+
 			return;
 		}
-		
-		if(this instanceof SourceModule)
+
+		if (this instanceof SourceModule)
 		{
 			SourceModule module = (SourceModule) this;
-			
+
 			try
 			{
 				module.startReader(module);
@@ -852,11 +954,11 @@ public abstract class Module
 				throw new ModuleActivationException(e.getMessage());
 			}
 		}
-		
-		if(this instanceof TargetModule)
+
+		if (this instanceof TargetModule)
 		{
 			TargetModule module = (TargetModule) this;
-			
+
 			try
 			{
 				module.startWriter();
@@ -868,35 +970,20 @@ public abstract class Module
 		}
 
 		this._activeFlag = true;
-		
-		this._logger.log(Level.INFO,"Module activated " + this.getName());
-		
-		this._logger.exiting(this.getClass().getName(),"activate");
-	}
 
-	/**
-	 * @see java.lang.Object#toString()
-	 * This implementation of the toString method returns the module-name.
-	 */
-	@Override
-	public String toString()
-	{
-		this._logger.entering(this.getClass().getName(),"toString");
-		
-		this._logger.exiting(this.getClass().getName(),"toString");
-		
-		return this._name;
+		_logger.log(Level.INFO, "Module activated " + this.getName());
 
+		_logger.exiting(this.getClass().getName(), "activate");
 	}
 
 	/**
 	 * This method is called hen the module is to be removed from the ECG Lab.
-	 *
+	 * 
 	 */
 	public void remove()
 	{
-		this._logger.entering(this.getClass().getName(),"remove");
-		
+		_logger.entering(this.getClass().getName(), "remove");
+
 		if (this._senderModuleMap.size() != 0)
 		{
 
@@ -913,8 +1000,7 @@ public abstract class Module
 				}
 				catch (ModuleInstanceException e)
 				{
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					_logger.log(Level.WARNING, "An Exception occured while disconnecting the module: " + this.getName());
 				}
 			}
 		}
@@ -927,82 +1013,85 @@ public abstract class Module
 			}
 			catch (MicroSensorDataTypeRegistrationException e)
 			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				_logger.log(Level.WARNING, "An Exception occured while deregistering the module's MSDTs for: " + this.getName());
+
 			}
 		}
-
 		try
 		{
 			SystemRoot.getModuleInstance().getModuleModuleRegistry().deregisterRunningModule(this.getId());
 		}
 		catch (ModuleInstanceException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			_logger.log(Level.WARNING, "An Exception occured while deregistering the module: " + this.getName());
 		}
 
-		this._logger.exiting(this.getClass().getName(),"remove");
-		
+		_logger.exiting(this.getClass().getName(), "remove");
+
 	}
 
 	/**
-	 * Actual module implementations use this method to send analysis results
-	 * or other events.
-	 * @param packet Is the event packet that contains the analysis result
+	 * Actual module implementations use this method to send analysis results or
+	 * other events.
+	 * 
+	 * @param packet
+	 *            Is the event packet that contains the analysis result
 	 */
 	protected void sendEventPacket(TypedValidEventPacket packet)
 	{
-		this._logger.entering(this.getClass().getName(),"sendEventPacket");
-		
+		_logger.entering(this.getClass().getName(), "sendEventPacket");
+
 		this._eventSender.sendEventPacket(packet);
-		
-		this._logger.exiting(this.getClass().getName(),"sendEventPacket");
+
+		_logger.exiting(this.getClass().getName(), "sendEventPacket");
 	}
 
 	/**
-	 * This abstract method is to be implemented by all actual modules.
-	 * Its implementation tells what to do with a received event.
-	 * @param eventPacket Is the received event
+	 * This abstract method is to be implemented by all actual modules. Its
+	 * implementation tells what to do with a received event.
+	 * 
+	 * @param eventPacket
+	 *            Is the received event
 	 */
 	protected abstract void receiveEventPacket(TypedValidEventPacket eventPacket);
 
 	/**
-	 * This method is called whenever this module gets a notification of
-	 * a statechange form the sytem core.
-	 * It is left to the actual module implementation to react on such an event.
-	 *
+	 * This method is called whenever this module gets a notification of a
+	 * statechange form the sytem core. It is left to the actual module
+	 * implementation to react on such an event.
+	 * 
 	 */
 	public abstract void analyseCoreNotification();
 
 	/**
 	 * @param currentPropertyName
 	 * @param propertyValue
-	 * @throws ModulePropertyException 
+	 * @throws ModulePropertyException
 	 */
 	public abstract void setProperty(String currentPropertyName, String propertyValue) throws ModulePropertyException;
 
-	//public abstract String getProperty(String currentPropertyName);
-	
-	
 	/**
-	 * This method initializes the actual module. It must be implementes by all module
-	 * subclasses.
-	 *
+	 * This method initializes the actual module. It must be implementes by all
+	 * module subclasses.
+	 * 
 	 */
 	public abstract void initialize();
 
 	/**
 	 * This method is used to connect a given module to this module.
-	 * @param module Is the module that should be connected to this module.
+	 * 
+	 * @param module
+	 *            Is the module that should be connected to this module.
 	 * @return The id of the connected module
-	 * @throws ModuleConnectionException If the given module could not be connected to this module.
-	 * This happens if this module is a target module or if the given module is already connected to this module.
+	 * @throws ModuleConnectionException
+	 *             If the given module could not be connected to this module.
+	 *             This happens if this module is a target module or if the
+	 *             given module is already connected to this module.
 	 */
 	public int connectReceiverModule(Module module) throws ModuleConnectionException
 	{
-		
-		this._logger.entering(this.getClass().getName(),"connectReceivingModules");
+
+		_logger.entering(this.getClass().getName(), "connectReceivingModules");
 
 		if (this._moduleType == ModuleType.TARGET_MODULE)
 		{
@@ -1025,32 +1114,38 @@ public abstract class Module
 
 			this._systemNotificator.fireStatechangeNotification();
 
-			this._logger.exiting(this.getClass().getName(),"connectReceivingModules");
-			
+			_logger.exiting(this.getClass().getName(), "connectReceivingModules");
+
 			return module._id;
 
 		}
-		
-		
 
 	}
 
 	public ModuleProperty[] getRuntimeProperties()
 	{
+		_logger.entering(this.getClass().getName(), "getRuntimeProperties");
+
+		_logger.exiting(this.getClass().getName(), "getRuntimeProperties");
+
 		return this.runtimeProperties;
 	}
-	
+
 	/**
 	 * This method disconnects a connected module.
-	 * @param module The module to disconnect
-	 * @throws ModuleInstanceException 
+	 * 
+	 * @param module
+	 *            The module to disconnect
+	 * @throws ModuleInstanceException
 	 */
 	public void disconnectReceiverModule(Module module) throws ModuleInstanceException
 	{
-		this._logger.entering(this.getClass().getName(),"disconnectReceivingModules");
-		
+		_logger.entering(this.getClass().getName(), "disconnectReceivingModules");
+
 		if (module == null)
 		{
+			_logger.log(Level.WARNING, "module is null");
+
 			return;
 		}
 
@@ -1066,15 +1161,15 @@ public abstract class Module
 
 		this._systemNotificator.fireStatechangeNotification();
 
-		this._logger.exiting(this.getClass().getName(),"disconnectReceivingModules");
+		_logger.exiting(this.getClass().getName(), "disconnectReceivingModules");
 	}
 
 	private void addParentModule(Module module)
 	{
-		this._logger.entering(this.getClass().getName(),"addParentModule");
-		
+		_logger.entering(this.getClass().getName(), "addParentModule");
+
 		this._senderModuleMap.put(new Integer(module.getId()), module);
-		
-		this._logger.exiting(this.getClass().getName(),"addParentModule");
+
+		_logger.exiting(this.getClass().getName(), "addParentModule");
 	}
 }
