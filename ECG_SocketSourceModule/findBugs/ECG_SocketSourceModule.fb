@@ -1,7 +1,8 @@
 [Jar files]
-D:\UserDocuments\7oas7er\studium\Informatik\Diplomarbeit\Projektordner\ECG_SocketSourceModule\bin
+D:\UserDocuments\7oas7er\studium\Informatik\Diplomarbeit\Projektordner\ECG_SocketSourceModule
 [Source dirs]
 D:\UserDocuments\7oas7er\studium\Informatik\Diplomarbeit\Projektordner\ECG_SocketSourceModule\src
 [Aux classpath entries]
 D:\UserDocuments\7oas7er\studium\Informatik\Diplomarbeit\Projektordner\ECG_SocketSourceModule\lib\ecg\event.jar
 D:\UserDocuments\7oas7er\studium\Informatik\Diplomarbeit\Projektordner\ECG_SocketSourceModule\lib\ecg\moduleapi.jar
+E:\Programme\eclipse 3.1\plugins\org.junit_3.8.1\junit.jar

@@ -142,7 +142,7 @@ public class SocketServer extends Thread implements ISocketServer
         String[] toReturn = null;
         
         try {
-            toReturn = new String[] {InetAddress.getLocalHost().toString(),new Integer(this._port).toString()};
+            toReturn = new String[] {InetAddress.getLocalHost().toString(),Integer.toString(this._port)};
         }
         catch (UnknownHostException e) {
             
