@@ -229,8 +229,7 @@ public class EventPacket implements Serializable
 	 * @param packet Is the EventPacket to compare
 	 * @return "true" if the two EventPackets have identical timeStamps, SensorDataTypes and argLists; "false" otherwise
 	 */
-	@Override
-	public boolean equals(Object packet)
+	public boolean isEqual(Object packet)
 	{
 		_logger.entering(this.getClass().getName(), "equals");
 

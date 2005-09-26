@@ -40,18 +40,18 @@ public class ValidEventPacket extends EventPacket
 	/**
 	 * This String constant is used to separate the components of the string representation of this event.
 	 */
-	public static String EVENT_SEPARATOR = "#";
+	public static final String EVENT_SEPARATOR = "#";
 
 	/**
 	 * This String separates the argList entrys in teh string representation of this event.
 	 */
-	public static String ARGLIST_SEPARATOR = ";";
+	public static final String ARGLIST_SEPARATOR = ";";
 
 	/**
 	 * This is the pattern used to format the timeStamp Date values. The pattern symbols are
 	 * accroding to the java.text.DataFormatSymbols class.
 	 */
-	public static String DATE_FORMAT_PATTERN = "EE dd.MM.yyyy HH:mm:ss z";
+	public static final String DATE_FORMAT_PATTERN = "EE dd.MM.yyyy HH:mm:ss z";
 
 	private static final long serialVersionUID = 2507406265346291700L;
 
