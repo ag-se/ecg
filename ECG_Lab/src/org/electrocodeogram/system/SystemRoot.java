@@ -32,7 +32,7 @@ import org.electrocodeogram.ui.IGui;
  * commands. SystemRoot is implemented as a singleton class that provides global
  * centralized access to all ECG system components and ECG modules.
  */
-public class SystemRoot extends Observable implements ISystemRoot, IModuleSystemRoot
+public final class SystemRoot extends Observable implements ISystemRoot, IModuleSystemRoot
 {
 
 	/**
@@ -82,29 +82,7 @@ public class SystemRoot extends Observable implements ISystemRoot, IModuleSystem
 		{
 			_logger.log(Level.INFO, "Starting ECG Lab without GUI.");
 
-			Thread workerThread = new Thread(new Runnable()
-			{
-
-				public void run()
-				{
-					while (true)
-					{
-						try
-						{
-							synchronized (this)
-							{
-								wait();
-							}
-
-						}
-						catch (InterruptedException e)
-						{
-							_logger.log(Level.WARNING, "The SystemRoot's WorkerThread has been interrupted.");
-						}
-					}
-
-				}
-			});
+			Thread workerThread = new WorkerThread();
 
 			workerThread.start();
 		}
@@ -654,5 +632,28 @@ public class SystemRoot extends Observable implements ISystemRoot, IModuleSystem
 
 		}
 
+	}
+	
+	private static class WorkerThread extends Thread
+	{
+		public void run()
+		{
+			while (true)
+			{
+				try
+				{
+					synchronized (this)
+					{
+						wait();
+					}
+
+				}
+				catch (InterruptedException e)
+				{
+					_logger.log(Level.WARNING, "The SystemRoot's WorkerThread has been interrupted.");
+				}
+			}
+
+		}
 	}
 }

@@ -145,7 +145,7 @@ public class MsdtRegistry implements ISystemMsdtRegistry, IModuleMsdtRegistry
 
 		_logger.exiting(this.getClass().getName(), "getMicroSensorDataTypes");
 
-		return this.registeredMsdt.values().toArray(new MicroSensorDataType[0]);
+		return this.registeredMsdt.values().toArray(new MicroSensorDataType[this.registeredMsdt.size()]);
 
 	}
 
@@ -235,7 +235,7 @@ public class MsdtRegistry implements ISystemMsdtRegistry, IModuleMsdtRegistry
 
 		_logger.exiting(this.getClass().getName(), "getPredefinedMicroSensorDataTypes");
 
-		return this.predefinedMsdt.values().toArray(new MicroSensorDataType[0]);
+		return this.predefinedMsdt.values().toArray(new MicroSensorDataType[this.predefinedMsdt.size()]);
 	}
 
 	/**

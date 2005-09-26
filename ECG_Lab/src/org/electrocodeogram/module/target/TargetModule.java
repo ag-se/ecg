@@ -12,7 +12,7 @@ import org.electrocodeogram.module.Module;
  * The abstract method write is to be implemented to do the actual writing
  *
  */
-public abstract class TargetModule extends Module
+public abstract class TargetModule extends Module implements ITargetModule
 {
 	
 	private static Logger _logger = LogHelper.createLogger(TargetModule.class.getName()); 
@@ -64,8 +64,14 @@ public abstract class TargetModule extends Module
 	@Override
 	public abstract void initialize();
 
+	/* (non-Javadoc)
+	 * @see org.electrocodeogram.module.target.ITargetModule#startWriter()
+	 */
 	public abstract void startWriter() throws TargetModuleException;
 	
+	/* (non-Javadoc)
+	 * @see org.electrocodeogram.module.target.ITargetModule#stopWriter()
+	 */
 	public abstract void stopWriter();
 	
 }

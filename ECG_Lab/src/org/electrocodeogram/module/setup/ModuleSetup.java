@@ -23,6 +23,6 @@ public class ModuleSetup
 	
 	public ModuleConfiguration[] getModuleConfigurations()
 	{
-		return this._moduleSetup.toArray(new ModuleConfiguration[0]);
+		return this._moduleSetup.toArray(new ModuleConfiguration[this._moduleSetup.size()]);
 	}
 }

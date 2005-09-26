@@ -23,8 +23,6 @@ public class ModuleRegistryModuleSetupLoadTest extends TestCase
 
 	private static ISystemRoot _systemRoot = SystemRoot.getSystemInstance();
 
-	private boolean result = false;
-
 	protected void setUp()
 	{
 		this._moduleRegistry = _systemRoot.getSystemModuleRegistry();

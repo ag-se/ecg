@@ -136,6 +136,20 @@ public class ModuleClassLoader extends java.lang.ClassLoader
 				_logger.log(Level.FINEST, e.getMessage());
 
 			}
+			finally
+			{
+				try
+				{
+					if(fis != null)
+					{
+						fis.close();
+					}
+				}
+				catch (IOException e)
+				{
+					_logger.log(Level.WARNING, "Error while closing the stream.");
+				}
+			}
 		}
 
 		if (toReturn == null)

@@ -150,7 +150,7 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 
 		if (this._installedModules.availableModuleClassesMap.size() > 0)
 		{
-			return this._installedModules.availableModuleClassesMap.keySet().toArray(new String[0]);
+			return this._installedModules.availableModuleClassesMap.keySet().toArray(new String[this._installedModules.availableModuleClassesMap.size()]);
 		}
 
 		_logger.exiting(this.getClass().getName(), "setModuleDirectory");
@@ -605,7 +605,7 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 
 		writer.flush();
 
-		Module[] modules = this._runningModules.runningModuleMap.values().toArray(new Module[0]);
+		Module[] modules = this._runningModules.runningModuleMap.values().toArray(new Module[this._runningModules.runningModuleMap.size()]);
 
 		_logger.log(Level.INFO, "Found " + modules.length + " module(s) to store");
 
@@ -829,7 +829,7 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 				}
 			}
 
-			Integer[] storedModuleIds = moduleConnectionMap.keySet().toArray(new Integer[0]);
+			Integer[] storedModuleIds = moduleConnectionMap.keySet().toArray(new Integer[moduleConnectionMap.size()]);
 
 			for (Integer storedModuleId : storedModuleIds)
 			{
@@ -973,7 +973,7 @@ public class ModuleRegistry extends Observable implements ISystemModuleRegistry,
 	{
 		_logger.entering(this.getClass().getName(), "clearLab");
 
-		Module[] modules = this._runningModules.runningModuleMap.values().toArray(new Module[0]);
+		Module[] modules = this._runningModules.runningModuleMap.values().toArray(new Module[this._runningModules.runningModuleMap.size()]);
 
 		for (Module module : modules)
 		{

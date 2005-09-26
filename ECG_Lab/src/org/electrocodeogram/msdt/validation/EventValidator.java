@@ -276,7 +276,7 @@ public class EventValidator
 
 		MicroSensorDataType[] microSensorDataTypes = this._msdtRegistry.getMicroSensorDataTypes();
 
-		if (microSensorDataTypes != null && microSensorDataTypes.length == 0)
+		if (microSensorDataTypes == null || microSensorDataTypes.length == 0)
 		{
 
 			_logger.log(Level.INFO, "No MicroSensorDataTypes are found.");

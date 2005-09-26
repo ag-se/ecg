@@ -11,21 +11,21 @@ import org.electrocodeogram.msdt.MicroSensorDataType;
 public class ModuleDescriptor
 {
 
-    private String $id;
+    private String _id;
 
-    private String $name;
+    private String _name;
 
-    private String $provider_name;
+    private String _provider_name;
     
-    private String $version;
+    private String _version;
     
-    private Class $clazz;
+    private Class _clazz;
 
-    private ModuleProperty[] $moduleProperties;
+    private ModuleProperty[] _moduleProperties;
     
-    private MicroSensorDataType[] $microSensorDataTypes;
+    private MicroSensorDataType[] _microSensorDataTypes;
 
-    private String $description;
+    private String _description;
 
     /**
      * This creates a new ModuleDescriptor with the given values.
@@ -41,21 +41,41 @@ public class ModuleDescriptor
      */
     public ModuleDescriptor(String id, String name, String provider_name, String version, Class clazz, String moduleDescription, ModuleProperty[] moduleProperties, MicroSensorDataType[] microSensorDataTypes)
     {
-        this.$id = id;
+        this._id = id;
         
-        this.$moduleProperties = moduleProperties;
+        this._name = name;
+        
+        this._provider_name = provider_name;
+        
+        this._version = version;
 
-        this.$name = name;
-        
-        this.$provider_name = provider_name;
-        
-        this.$version = version;
+        this._clazz = clazz;
 
-        this.$clazz = clazz;
-
-        this.$description = moduleDescription;
+        this._description = moduleDescription;
         
-        this.$microSensorDataTypes = microSensorDataTypes;
+        if(moduleProperties != null)
+        {
+        	int size = moduleProperties.length;
+        	
+        	this._moduleProperties = new ModuleProperty[size];
+        	
+        	for(int i=0;i<size;i++)
+        	{
+        		this._moduleProperties[i] = moduleProperties[i];
+        	}
+        }
+                
+        if(microSensorDataTypes != null)
+        {
+        	int size = microSensorDataTypes.length;
+        	
+        	this._microSensorDataTypes = new MicroSensorDataType[size];
+        	
+        	for(int i=0;i<size;i++)
+        	{
+        		this._microSensorDataTypes[i] = microSensorDataTypes[i];
+        	}
+        }
 
     }
 
@@ -65,7 +85,7 @@ public class ModuleDescriptor
      */
     public String getDescription()
     {
-        return this.$description;
+        return this._description;
     }
 
     /**
@@ -74,7 +94,7 @@ public class ModuleDescriptor
      */
     public Class getClazz()
     {
-        return this.$clazz;
+        return this._clazz;
     }
 
     /**
@@ -83,7 +103,7 @@ public class ModuleDescriptor
      */
     public String getName()
     {
-        return this.$name;
+        return this._name;
     }
 
     /**
@@ -92,7 +112,21 @@ public class ModuleDescriptor
      */
     public ModuleProperty[] getProperties()
     {
-        return this.$moduleProperties;
+    	if(this._moduleProperties == null)
+    	{
+    		return null;
+    	}
+    	
+    	int size = this._moduleProperties.length;
+    	
+    	ModuleProperty[] toReturn = new ModuleProperty[size];
+    	
+    	for(int i=0;i<size;i++)
+    	{
+    		toReturn[i] = this._moduleProperties[i];
+    	}
+    	
+        return toReturn;
     }
 
     /**
@@ -101,7 +135,7 @@ public class ModuleDescriptor
      */
     public String getId()
     {
-        return this.$id;
+        return this._id;
     }
     
     /**
@@ -110,7 +144,21 @@ public class ModuleDescriptor
      */
     public MicroSensorDataType[] getMicroSensorDataTypes()
     {
-        return this.$microSensorDataTypes;
+    	if(this._microSensorDataTypes == null)
+    	{
+    		return null;
+    	}
+    	
+    	int size = this._microSensorDataTypes.length;
+    	
+    	MicroSensorDataType[] toReturn = new MicroSensorDataType[size];
+    	
+    	for(int i=0;i<size;i++)
+    	{
+    		toReturn[i] = this._microSensorDataTypes[i];
+    	}
+    	
+        return toReturn;
     }
 
 	
@@ -120,7 +168,7 @@ public class ModuleDescriptor
      */
     public String getProvider_name()
 	{
-		return this.$provider_name;
+		return this._provider_name;
 	}
     
     /**
@@ -130,6 +178,6 @@ public class ModuleDescriptor
 
 	public String getVersion()
 	{
-		return this.$version;
+		return this._version;
 	}
 }

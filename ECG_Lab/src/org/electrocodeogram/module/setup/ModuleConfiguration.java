@@ -38,17 +38,67 @@ public class ModuleConfiguration
 	 */
 	public ModuleConfiguration(Integer[] to, int id, String name, boolean active,ModuleProperty[] properties,String fromClassId)
 	{
-		this._connectedTo = to;
+		
 		this._moduleId = id;
+		
 		this._moduleName = name;
-		this._moduleProperties = properties;
+		
 		this._fromClassId = fromClassId;
+		
 		this._active = active;
+		
+		if(properties != null)
+		{
+		
+			int size = properties.length;
+
+			this._moduleProperties = new ModuleProperty[size];
+			
+			for(int i=0;i<size;i++)
+			{
+				this._moduleProperties[i] = properties[i];
+			}
+			
+			
+		}
+		
+		
+		if(to != null)
+		{
+		
+			int size = to.length;
+
+			this._connectedTo = new Integer[size];
+			
+			for(int i=0;i<size;i++)
+			{
+				this._connectedTo[i] = to[i];
+			}
+			
+			
+		}
+		
+		
+		
 	}
 
 	public Integer[] getConnectedTo()
 	{
-		return this._connectedTo;
+		if(this._connectedTo == null)
+		{
+			return null;
+		}
+		
+		int size = this._connectedTo.length;
+		
+		Integer[] toReturn = new Integer[size];
+		
+		for(int i=0;i<size;i++)
+		{
+			toReturn[i] = this._connectedTo[i];
+		}
+		
+		return toReturn;
 	}
 
 	public int getModuleId()
@@ -63,7 +113,21 @@ public class ModuleConfiguration
 
 	public ModuleProperty[] getModuleProperties()
 	{
-		return this._moduleProperties;
+		if(this._moduleProperties == null)
+		{
+			return null;
+		}
+		
+		int size = this._moduleProperties.length;
+		
+		ModuleProperty[] toReturn = new ModuleProperty[size];
+		
+		for(int i=0;i<size;i++)
+		{
+			toReturn[i] = this._moduleProperties[i];
+		}
+		
+		return toReturn;
 	}
 	
 	public boolean isActive()

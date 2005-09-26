@@ -158,30 +158,30 @@ public class Gui extends JFrame implements IGui
 			{
 				try
 				{
-//					JFileChooser fileChooser = new JFileChooser();
-//					
-//					fileChooser.setDialogTitle("Select the file to store the module setup in");
-//					
-//					fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
-//					
-//					File file = null;
-//					
-//                    int result = fileChooser.showOpenDialog(Gui.this);
-//                    
-//                    switch(result)
-//                    {
-//                    case JFileChooser.CANCEL_OPTION:
-//                        break;
-//                    case JFileChooser.ERROR_OPTION:
-//                        break;
-//                    case JFileChooser.APPROVE_OPTION:
-//                        
-//                        file = new File(fileChooser.getSelectedFile().getAbsolutePath());
-//                        
-//                        break;
-//                    }
+					JFileChooser fileChooser = new JFileChooser();
 					
-					SystemRoot.getSystemInstance().getSystemModuleRegistry().storeModuleSetup(new File("foo.txt"));
+					fileChooser.setDialogTitle("Select the file to store the module setup in");
+					
+					fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
+					
+					File file = null;
+					
+                    int result = fileChooser.showOpenDialog(Gui.this);
+                    
+                    switch(result)
+                    {
+                    case JFileChooser.CANCEL_OPTION:
+                        return;
+                    case JFileChooser.ERROR_OPTION:
+                        return;
+                    case JFileChooser.APPROVE_OPTION:
+                        
+                        file = new File(fileChooser.getSelectedFile().getAbsolutePath());
+                        
+                        break;
+                    }
+					
+					SystemRoot.getSystemInstance().getSystemModuleRegistry().storeModuleSetup(file);
 				}
 				catch (ModuleSetupStoreException e1)
 				{
@@ -197,7 +197,30 @@ public class Gui extends JFrame implements IGui
 			{
 				try
 				{
-					SystemRoot.getSystemInstance().getSystemModuleRegistry().loadModuleSetup(new File("foo.txt"));
+					JFileChooser fileChooser = new JFileChooser();
+					
+					fileChooser.setDialogTitle("Select the file to load the module setup from");
+					
+					fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
+					
+					File file = null;
+					
+                    int result = fileChooser.showOpenDialog(Gui.this);
+                    
+                    switch(result)
+                    {
+                    case JFileChooser.CANCEL_OPTION:
+                        return;
+                    case JFileChooser.ERROR_OPTION:
+                        return;
+                    case JFileChooser.APPROVE_OPTION:
+                        
+                        file = new File(fileChooser.getSelectedFile().getAbsolutePath());
+                        
+                        break;
+                    }
+					
+					SystemRoot.getSystemInstance().getSystemModuleRegistry().loadModuleSetup(file);
 				}
 				catch (ModuleSetupLoadException e1)
 				{

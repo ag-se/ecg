@@ -17,6 +17,7 @@ import org.electrocodeogram.module.registry.ModuleClassException;
 import org.electrocodeogram.module.registry.ModuleInstanceException;
 import org.electrocodeogram.module.source.SourceModule;
 import org.electrocodeogram.module.source.SourceModuleException;
+import org.electrocodeogram.module.target.ITargetModule;
 import org.electrocodeogram.module.target.TargetModule;
 import org.electrocodeogram.module.target.TargetModuleException;
 import org.electrocodeogram.msdt.MicroSensorDataType;
@@ -681,6 +682,11 @@ public abstract class Module
 		return this._moduleType;
 	}
 
+	public static Logger getLogger()
+	{
+		return _logger;
+	}
+
 	/**
 	 * This method returns the name of this module.
 	 * 
@@ -723,7 +729,7 @@ public abstract class Module
 
 		_logger.exiting(this.getClass().getName(), "getReceivingModules");
 
-		return receivingModules.toArray(new Module[0]);
+		return receivingModules.toArray(new Module[receivingModules.size()]);
 	}
 
 	private Module[] getSendingModules()
@@ -734,7 +740,7 @@ public abstract class Module
 
 		_logger.exiting(this.getClass().getName(), "getSendingModules");
 
-		return sendingModules.toArray(new Module[0]);
+		return sendingModules.toArray(new Module[sendingModules.size()]);
 	}
 
 	/**
@@ -792,22 +798,24 @@ public abstract class Module
 		try
 		{
 			moduleDescriptor = SystemRoot.getModuleInstance().getModuleModuleRegistry().getModuleDescriptor(this._moduleClassId);
+			
+			moduleDescription = moduleDescriptor.getDescription();
+
+			if (moduleDescription != null)
+			{
+				text += "\nBeschreibung: \t";
+
+				text += moduleDescription;
+
+			}
+
 		}
 		catch (ModuleClassException e)
 		{
 			_logger.log(Level.WARNING, "An Exception has occured while reading the module description of: " + this.getName());
 		}
 
-		moduleDescription = moduleDescriptor.getDescription();
-
-		if (moduleDescription != null)
-		{
-			text += "\nBeschreibung: \t";
-
-			text += moduleDescription;
-
-		}
-
+	
 		_logger.exiting(this.getClass().getName(), "getDetails");
 
 		return text;
@@ -826,7 +834,7 @@ public abstract class Module
 
 		_logger.exiting(this.getClass().getName(), "getProvidedMicroSensorDataType");
 
-		return this._providedMsdtList.toArray(new MicroSensorDataType[0]);
+		return this._providedMsdtList.toArray(new MicroSensorDataType[this._providedMsdtList.size()]);
 	}
 
 	/**
@@ -910,7 +918,7 @@ public abstract class Module
 
 		if (this instanceof TargetModule)
 		{
-			TargetModule module = (TargetModule) this;
+			ITargetModule module = (ITargetModule) this;
 
 			module.stopWriter();
 		}
@@ -955,9 +963,9 @@ public abstract class Module
 			}
 		}
 
-		if (this instanceof TargetModule)
+		if (this instanceof ITargetModule)
 		{
-			TargetModule module = (TargetModule) this;
+			ITargetModule module = (ITargetModule) this;
 
 			try
 			{
@@ -1128,7 +1136,16 @@ public abstract class Module
 
 		_logger.exiting(this.getClass().getName(), "getRuntimeProperties");
 
-		return this.runtimeProperties;
+		int size = this.runtimeProperties.length;
+
+		ModuleProperty[] toReturn = new ModuleProperty[size];
+
+		for (int i = 0; i < size; i++)
+		{
+			toReturn[i] = this.runtimeProperties[i];
+		}
+
+		return toReturn;
 	}
 
 	/**
