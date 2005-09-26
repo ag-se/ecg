@@ -119,10 +119,10 @@ public class FileSystemTargetModule extends TargetModule
 		if (propertyName == null)
 		{
 
-			_logger.log(Level.WARNING, "The module does not support a property with the given name: " + propertyName);
+			_logger.log(Level.WARNING, "The module does not support a property with a null name.");
 
 			throw new ModulePropertyException(
-					"The module does not support a property with the given name: " + propertyName);
+					"The module does not support a property with a null name");
 
 		}
 
