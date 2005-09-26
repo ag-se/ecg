@@ -6,22 +6,25 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.electrocodeogram.event.TypedValidEventPacket;
+import org.electrocodeogram.logging.LogHelper;
 import org.electrocodeogram.module.ModuleProperty;
 import org.electrocodeogram.module.ModulePropertyException;
 
 /**
+ * This class is an ECG module used to write ECG events into the file system.
  *
  */
 public class FileSystemTargetModule extends TargetModule
 {
 
-	private String outputFileName;
+	private static Logger _logger = LogHelper.createLogger(FileSystemTargetModule.class.getName());
 
-	private File outputFile;
+	private File _outputFile;
 
-	private PrintWriter writer;
+	private PrintWriter _writer;
 
 	private static final String DEFAULT_FILENAME_PREFIX = "out";
 
@@ -29,25 +32,33 @@ public class FileSystemTargetModule extends TargetModule
 
 	private static final String LOG_SUBDIR = "ecg_log";
 
-	private int count = 0;
+	private static final int DEFAULT_FILE_SIZE = 1024 * 1024 * 10;
 
-	private int fileSize = 1024 * 1024 * 10;
+	private int _count = 0;
 
-	private boolean splitFiles = true;
+	private int _fileSize = DEFAULT_FILE_SIZE;
 
-	private String homeDir;
+	private boolean _splitFiles = false;
 
-	private File logDir;
+	private String _homeDir;
+
+	private File _logDir;
 
 	/**
-	 * @param arg0
-	 * @param arg1
+	 * The constructor creates the module instance.
+	 * It is not to be called by developers, instead it is called
+	 * from the ECG ModuleRegistry when the user requested
+	 * a new instance of this module.
+	 * @param id This is the unique String id of the module  
+	 * @param name This is the name which is given to the module instance
 	 */
-	public FileSystemTargetModule(String arg0, String arg1)
+	public FileSystemTargetModule(String id, String name)
 	{
-		super(arg0, arg1);
+		super(id, name);
 
-		this.getLogger().exiting(this.getClass().getName(), "FileSystemTargetModule");
+		_logger.entering(this.getClass().getName(), "FileSystemTargetModule");
+
+		_logger.exiting(this.getClass().getName(), "FileSystemTargetModule");
 
 	}
 
@@ -55,67 +66,98 @@ public class FileSystemTargetModule extends TargetModule
 	 * @see org.electrocodeogram.module.target.TargetModule#write(org.electrocodeogram.event.TypedValidEventPacket)
 	 */
 	@Override
-	public void write(TypedValidEventPacket arg0)
+	public void write(TypedValidEventPacket packet)
 	{
+
+		_logger.entering(this.getClass().getName(), "write");
+
+		if (packet == null)
+		{
+			_logger.log(Level.WARNING, "packet is null");
+
+			return;
+		}
 
 		try
 		{
-			this.getLogger().entering(this.getClass().getName(), "write");
+			this._writer.println(packet.toString());
 
-			this.writer.println(arg0.toString());
+			this._writer.flush();
 
-			this.writer.flush();
+			_logger.log(Level.INFO, "Event packet written to " + this._outputFile.getAbsolutePath());
 
-			this.getLogger().log(Level.INFO, "Event packet written to " + this.outputFile.getAbsolutePath());
-
-			if (this.outputFile.length() >= this.fileSize && this.splitFiles)
+			if (this._outputFile.length() >= this._fileSize && this._splitFiles)
 			{
-				this.writer.close();
+				_logger.log(Level.INFO, "Logfile reached maximum file size of " + this._fileSize);
 
-				this.outputFile = new File(
-						this.logDir.getAbsoluteFile() + File.separator + ++this.count + "_" + this.outputFileName);
+				this._writer.close();
 
-				this.writer = new PrintWriter(new FileWriter(this.outputFile));
-				
-				this.getLogger().log(Level.INFO, "New logfile created: " + this.outputFile.getAbsolutePath());
+				this._outputFile = new File(
+						this._logDir.getAbsoluteFile() + File.separator + ++this._count + "_" + this._outputFile.getAbsolutePath());
+
+				this._writer = new PrintWriter(new FileWriter(this._outputFile));
+
+				_logger.log(Level.INFO, "New logfile created: " + this._outputFile.getAbsolutePath());
 			}
 
-			this.getLogger().exiting(this.getClass().getName(), "write");
+			_logger.exiting(this.getClass().getName(), "write");
 		}
 		catch (IOException e)
 		{
-			this.getLogger().log(Level.SEVERE, "Error while writing to logfile: " + this.outputFile.getAbsolutePath() + "\nThe disk might be full.");
+			_logger.log(Level.SEVERE, "Error while writing to logfile: " + this._outputFile.getAbsolutePath() + "\nThe disk might be full.");
 		}
 	}
 
 	/**
-	 * @param propertyName 
-	 * @param propertyValue 
-	 * @throws ModulePropertyException 
-	 * 
+	 * @see org.electrocodeogram.module.Module#setProperty(java.lang.String, java.lang.String)
 	 */
 	@Override
 	public void setProperty(String propertyName, String propertyValue) throws ModulePropertyException
 	{
+		_logger.entering(this.getClass().getName(), "setProperty");
+
+		if (propertyName == null)
+		{
+
+			_logger.log(Level.WARNING, "The module does not support a property with the given name: " + propertyName);
+
+			throw new ModulePropertyException(
+					"The module does not support a property with the given name: " + propertyName);
+
+		}
+
 		if (propertyName.equals("Output File"))
 		{
 
+			_logger.log(Level.INFO, "Request to set the property: " + propertyName);
+
+			if (propertyValue == null)
+			{
+				_logger.log(Level.WARNING, "The property value is null for: " + propertyName);
+
+				throw new ModulePropertyException(
+						"The property value is null for: " + propertyName);
+			}
+
 			File propertyValueFile = new File(propertyValue);
 
-			this.outputFile = propertyValueFile;
+			this._outputFile = propertyValueFile;
 
-			this.writer.close();
+			this._writer.close();
 
 			try
 			{
-				this.writer = new PrintWriter(new FileWriter(this.outputFile));
+				this._writer = new PrintWriter(new FileWriter(this._outputFile));
+
+				_logger.log(Level.INFO, "Set the property: " + propertyName + " to " + this._outputFile.getAbsolutePath());
 			}
 			catch (IOException e)
 			{
 
-				System.out.println("C");
+				_logger.log(Level.SEVERE, "The file could not be opened for writing: " + propertyValue);
+
 				throw new ModulePropertyException(
-						"The file could not be opened for writing.");
+						"The file could not be opened for writing: " + propertyValue);
 			}
 
 			for (ModuleProperty property : this.runtimeProperties)
@@ -127,125 +169,163 @@ public class FileSystemTargetModule extends TargetModule
 			}
 
 		}
-		else if(propertyName.equals("Split Files"))
+		else if (propertyName.equals("Split Files"))
 		{
-			if(propertyValue.equals("true"))
+			_logger.log(Level.INFO, "Request to set the property: " + propertyName);
+
+			if (propertyValue.equals("true"))
 			{
-				this.splitFiles = true;
-				
+				this._splitFiles = true;
+
+				_logger.log(Level.INFO, "Set the property: " + propertyName + " to true");
 			}
-			else if(propertyValue.equals("false"))
+			else if (propertyValue.equals("false"))
 			{
-				this.splitFiles = false;
+				this._splitFiles = false;
+
+				_logger.log(Level.INFO, "Set the property: " + propertyName + " to false");
 			}
 			else
 			{
+				_logger.log(Level.WARNING, "The module does not support a property value of " + propertyValue + " with the given name: " + propertyName);
+
 				throw new ModulePropertyException(
 						"The module does not support a property value of " + propertyValue + " with the given name: " + propertyName);
 			}
-			
-		
+
+			for (ModuleProperty property : this.runtimeProperties)
+			{
+				if (property.getName().equals(propertyName))
+				{
+					property.setValue(propertyValue);
+				}
+			}
+
 		}
-		else if(propertyName.equals("File Size"))
+		else if (propertyName.equals("File Size"))
 		{
+			_logger.log(Level.INFO, "Request to set the property: " + propertyName);
+
 			try
 			{
-				Integer intObj = Integer.parseInt(propertyValue);
-				
-				this.fileSize = intObj.intValue();
+				this._fileSize = Integer.parseInt(propertyValue);
+
+				_logger.log(Level.INFO, "Set the property: " + propertyName + " to " + this._fileSize);
+
 			}
-			catch(NumberFormatException e)
+			catch (NumberFormatException e)
 			{
+				_logger.log(Level.WARNING, "The module does not support a property value of " + propertyValue + " with the given name: " + propertyName);
+
 				throw new ModulePropertyException(
 						"The module does not support a property value of " + propertyValue + " with the given name: " + propertyName);
+			}
+
+			for (ModuleProperty property : this.runtimeProperties)
+			{
+				if (property.getName().equals(propertyName))
+				{
+					property.setValue(propertyValue);
+				}
 			}
 		}
 		else
 		{
+			_logger.log(Level.WARNING, "The module does not support a property with the given name: " + propertyName);
+
 			throw new ModulePropertyException(
 					"The module does not support a property with the given name: " + propertyName);
 
 		}
-		
-		this.getLogger().log(Level.INFO,"The " + propertyName + " property has been set to " + propertyValue);
+
+		_logger.exiting(this.getClass().getName(), "setProperty");
 	}
 
+	/**
+	 *  @see org.electrocodeogram.module.Module#analyseCoreNotification()
+	 *  This method is not implemented in this module.
+	 */
+	@Override
 	public void analyseCoreNotification()
 	{
+		_logger.entering(this.getClass().getName(), "analyseCoreNotification");
 
+		_logger.exiting(this.getClass().getName(), "analyseCoreNotification");
+
+		// not implemented
 	}
 
 	/**
 	 * @see org.electrocodeogram.module.Module#initialize()
+	 * The method creates the default output file and a PrintWriter and FileWriter object to write to it. 
 	 */
 	@Override
 	public void initialize()
 	{
-		this.getLogger().entering(this.getClass().getName(), "initialize");
+		_logger.entering(this.getClass().getName(), "initialize");
 
-		this.homeDir = System.getProperty("user.home");
+		this._homeDir = System.getProperty("user.home");
 
-		if (this.homeDir == null)
+		if (this._homeDir == null)
 		{
-			this.homeDir = ".";
+			this._homeDir = ".";
 		}
 
-		this.logDir = new File(this.homeDir + File.separator + LOG_SUBDIR);
+		this._logDir = new File(this._homeDir + File.separator + LOG_SUBDIR);
 
-		if (!logDir.exists())
+		if (!this._logDir.exists())
 		{
-			logDir.mkdir();
+			this._logDir.mkdir();
 		}
 
-		this.outputFileName = DEFAULT_FILENAME_PREFIX + DEFAULT_FILENAME_SUFFIX;
+		String outputFileName = DEFAULT_FILENAME_PREFIX + DEFAULT_FILENAME_SUFFIX;
 
-		this.outputFile = new File(
-				logDir.getAbsolutePath() + File.separator + this.outputFileName);
+		this._outputFile = new File(
+				this._logDir.getAbsolutePath() + File.separator + outputFileName);
 
 		try
 		{
-			this.writer = new PrintWriter(new BufferedWriter(new FileWriter(
-					this.outputFile, true)));
+			this._writer = new PrintWriter(new BufferedWriter(new FileWriter(
+					this._outputFile, true)));
 
 		}
 		catch (IOException e)
 		{
-			this.getLogger().log(Level.SEVERE, "Error while opening the output file.");
+			_logger.log(Level.SEVERE, "Error while opening the output file: " + this._outputFile.getAbsolutePath());
+
+			_logger.log(Level.FINEST, e.getMessage());
 		}
 
-		this.getLogger().exiting(this.getClass().getName(), "initialize");
+		_logger.exiting(this.getClass().getName(), "initialize");
 	}
 
 	/**
-	 * @see org.electrocodeogram.module.Module#getProperty(java.lang.String)
-	 */
-	@Override
-	public String getProperty(String propertyName)
-	{
-		this.getLogger().entering(this.getClass().getName(), "getProperty");
-
-		this.getLogger().exiting(this.getClass().getName(), "getProperty");
-
-		return null;
-	}
-
-	/* (non-Javadoc)
 	 * @see org.electrocodeogram.module.target.TargetModule#startWriter()
+	 *  This method is not implemented in this module.
 	 */
+	@SuppressWarnings("unused")
 	@Override
 	public void startWriter() throws TargetModuleException
 	{
-		// TODO Auto-generated method stub
-		
+		_logger.entering(this.getClass().getName(), "startWriter");
+
+		// not implemented
+
+		_logger.exiting(this.getClass().getName(), "startWriter");
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see org.electrocodeogram.module.target.TargetModule#stopWriter()
+	 *  This method is not implemented in this module.
 	 */
 	@Override
 	public void stopWriter()
 	{
-		// TODO Auto-generated method stub
-		
+		_logger.entering(this.getClass().getName(), "stopWriter");
+
+		// not implemented
+
+		_logger.exiting(this.getClass().getName(), "stopWriter");
+
 	}
 }
