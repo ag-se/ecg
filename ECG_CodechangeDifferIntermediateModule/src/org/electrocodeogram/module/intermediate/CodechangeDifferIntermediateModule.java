@@ -42,6 +42,7 @@ public class CodechangeDifferIntermediateModule extends IntermediateModule
     
     private String lastCode; 
     
+    
     /**
      * @param arg0
      * @param arg1
@@ -195,13 +196,4 @@ public class CodechangeDifferIntermediateModule extends IntermediateModule
         
     }
     
-    /**
-	 * @see org.electrocodeogram.module.Module#getProperty(java.lang.String)
-	 */
-	@Override
-	public String getProperty(String propertyName)
-	{
-		return null;
-	}
-
-}
+   }
