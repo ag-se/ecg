@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<module>
+	<id>
+		org.electrocodeogram.module.source.IOSourceModule
+	</id>
+	<provider-name>
+		Frank Schlesinger (Frank@Schlesinger.com)
+	</provider-name>
+	<version>
+		0.6
+	</version>
+	<name>
+		Standard Input Reader
+	</name>
+	<class>
+		org.electrocodeogram.module.source.IOSourceModule
+	</class>
+	<description>
+		This module is able to read events from the standard input.
+	</description>
+	<type>
+		SOURCE
+	</type>
+</module>

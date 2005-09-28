@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<module>
+	<id>
+		org.electrocodeogram.module.source.ManualAnnotatorSourceModule
+	</id>
+	<provider-name>
+		Frank Schlesinger (Frank@Schlesinger.com)
+	</provider-name>
+	<version>
+		0.6
+	</version>
+	<name>
+		Manual Annotator
+	</name>
+	<class>
+		org.electrocodeogram.module.source.ManualAnnotatorSourceModule
+	</class>
+	<description>
+		This module enables the user to manually generate events.
+	</description>
+	<type>
+		SOURCE
+	</type>
+	<properties>
+		<property>
+			<propertyName>
+				Show Dialog
+			</propertyName>
+			<propertyType>
+				java.lang.reflect.Method
+			</propertyType>
+			<propertyValue>
+				Show Dialog
+			</propertyValue>
+		</property>
+		<property>
+			<propertyName>
+				Events
+			</propertyName>
+			<propertyType>
+				org.electrocodeogram.module.source.ManualAnnotatorEvents
+			</propertyType>
+			<propertyValue>
+				Unterbrechung beobachtet,Beginn einer Pause, Ende einer Pause
+			</propertyValue>
+		</property>
+	</properties>
+	<microsensordatatypes>
+		<microsensordatatype>
+			<msdtName>
+				msdt.manual.xsd
+			</msdtName>
+			<msdtFile>
+				msdt\\msdt.manual.xsd
+			</msdtFile>
+		</microsensordatatype>
+	</microsensordatatypes>
+</module>

@@ -1,0 +1,1 @@
+java -jar ECGLab.jar --log-level info --log-file ECGLab.log -s module.setup
