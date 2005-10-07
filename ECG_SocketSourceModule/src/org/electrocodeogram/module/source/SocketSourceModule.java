@@ -3,8 +3,12 @@ package org.electrocodeogram.module.source;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+
 import org.electrocodeogram.logging.LogHelper;
 import org.electrocodeogram.module.ModulePropertyException;
+import org.electrocodeogram.system.SystemRoot;
 
 /**
  * This module receives event data from multiple client sensors.
@@ -94,6 +98,31 @@ public class SocketSourceModule extends SourceModule
 
 		}
 
+		if(propertyName.equals("Show Clients"))
+		{
+			JFrame frame = SystemRoot.getModuleInstance().getRootFrame();
+			
+			if(this._socketServer == null)
+			{
+				JOptionPane.showMessageDialog(frame,"The module has not been started yet.","Show Clients",JOptionPane.ERROR_MESSAGE);
+			}
+			else
+			{
+			String message = "";
+			
+			int count = this._socketServer.getSensorCount();
+			
+			message += "Connected to " + count + " ECG clients.\n";
+			
+			for(int i=0;i<count;i++)
+			{
+				message += "Client " + i + ": " + this._socketServer.getSensorNames()[i] + " at " + this._socketServer.getSensorAddresses()[i].toString() + "\n";
+			}
+			
+			JOptionPane.showMessageDialog(frame,message,"ECG Clients",JOptionPane.INFORMATION_MESSAGE);
+			}
+		}
+		
 		if (propertyName.equals("port"))
 		{
 			_logger.log(Level.INFO, "Request to set the property: " + propertyName);

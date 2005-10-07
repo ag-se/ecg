@@ -18,6 +18,9 @@
 	<description>
 		This module is listening on TCP port 22222 for incoming ECG Sensor events.
 	</description>
+	<type>
+		SOURCE
+	</type>
 	<properties>
 		<property>
 			<propertyName>
@@ -27,7 +30,18 @@
 				java.lang.Integer
 			</propertyType>
 			<propertyValue>
-				10557
+				22222
+			</propertyValue>
+		</property>
+		<property>
+			<propertyName>
+				Show Clients
+			</propertyName>
+			<propertyType>
+				java.lang.reflect.Method
+			</propertyType>
+			<propertyValue>
+				Show Clients
 			</propertyValue>
 		</property>
 	</properties>

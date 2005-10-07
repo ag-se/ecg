@@ -9,7 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.electrocodeogram.event.IllegalEventParameterException;
-import org.electrocodeogram.event.ValidEventPacket;
+import org.electrocodeogram.event.WellFormedEventPacket;
 import org.electrocodeogram.logging.LogHelper;
 
 /**
@@ -38,7 +38,7 @@ public class SocketServerThread extends Thread
 
 	private Object _object;
 
-	private ValidEventPacket _packet;
+	private WellFormedEventPacket _packet;
 
 	/**
 	 * This method returns the name of the currently connected ECG sensor.
@@ -180,9 +180,9 @@ public class SocketServerThread extends Thread
 
 				this._object = this._ois.readObject();
 
-				this._packet = (ValidEventPacket) this._object;
+				this._packet = (WellFormedEventPacket) this._object;
 
-				ValidEventPacket packet = new ValidEventPacket(0,
+				WellFormedEventPacket packet = new WellFormedEventPacket(0,
 						this._packet.getTimeStamp(),
 						this._packet.getSensorDataType(),
 						this._packet.getArglist());

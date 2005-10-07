@@ -86,7 +86,7 @@ public class SocketServer extends Thread implements ISocketServer
         
         if (this._serverThreadPool.values() == null)
         {
-        	return null;
+        	return new InetAddress[0];
         }
         
         Object[] sensorThreads = this._serverThreadPool.values().toArray();
