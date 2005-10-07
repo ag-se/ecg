@@ -14,7 +14,7 @@ import java.util.Random;
 
 import org.electrocodeogram.event.EventPacket;
 import org.electrocodeogram.event.IllegalEventParameterException;
-import org.electrocodeogram.event.ValidEventPacket;
+import org.electrocodeogram.event.WellFormedEventPacket;
 
 /**
  * This class is a test data generator. It provides methods to create many types
@@ -190,10 +190,10 @@ public class EventGenerator
      *             is not available or if the requested String size is to higher
      *             then available
      */
-    public ValidEventPacket createValidEventPacket(boolean syntValidDate, boolean syntValidCommandName, int line, boolean argListNotNull, boolean argListOfString, int argListLength, int argListEntrySize) throws IllegalEventParameterException, NoTestDataException
+    public WellFormedEventPacket createValidEventPacket(boolean syntValidDate, boolean syntValidCommandName, int line, boolean argListNotNull, boolean argListOfString, int argListLength, int argListEntrySize) throws IllegalEventParameterException, NoTestDataException
     {
-        ValidEventPacket eventPacket = null;
-        eventPacket = new ValidEventPacket(
+    	WellFormedEventPacket eventPacket = null;
+        eventPacket = new WellFormedEventPacket(
                 0,
                 createDate(syntValidDate),
                 createCommandName(syntValidCommandName, line),
@@ -217,10 +217,10 @@ public class EventGenerator
      *             is not available or if the requested String size is to higher
      *             then available
      */
-    public ValidEventPacket createPayloadEventPacket(int size) throws IllegalEventParameterException, NoTestDataException
+    public WellFormedEventPacket createPayloadEventPacket(int size) throws IllegalEventParameterException, NoTestDataException
     {
-        ValidEventPacket eventPacket = null;
-        eventPacket = new ValidEventPacket(0, createDate(true),
+    	WellFormedEventPacket eventPacket = null;
+        eventPacket = new WellFormedEventPacket(0, createDate(true),
                 createCommandName(true, 0),
                 createNonDeterministicArgList(10, size / 10));
 
@@ -241,14 +241,14 @@ public class EventGenerator
      *             is not available or if the requested String size is to higher
      *             then available
      */
-    public ValidEventPacket createHackyStatEventPacket(SensorDataType type, int line) throws NoTestDataException
+    public WellFormedEventPacket createHackyStatEventPacket(SensorDataType type, int line) throws NoTestDataException
     {
 
         if (line < 0 || line > this.lineCount) {
             throw new NoTestDataException();
         }
 
-        ValidEventPacket eventPacket = null;
+        WellFormedEventPacket eventPacket = null;
 
         String[] args = null;
 
@@ -259,7 +259,7 @@ public class EventGenerator
             args = new String[] { "add", this.randomStrings[line] };
 
             try {
-                eventPacket = new ValidEventPacket(0, createDate(true),
+                eventPacket = new WellFormedEventPacket(0, createDate(true),
                         "Activity", Arrays.asList(args));
             }
             catch (IllegalEventParameterException e) {
@@ -270,10 +270,10 @@ public class EventGenerator
 
         case BUFFTRANS:
 
-            args = new String[] { "add", this.randomStrings[line], this.randomStrings[line], this.randomStrings[line] };
+            args = new String[] { "add", this.randomStrings[line], this.randomStrings[line] };
 
             try {
-                eventPacket = new ValidEventPacket(0, createDate(true),
+                eventPacket = new WellFormedEventPacket(0, createDate(true),
                         "BuffTrans", Arrays.asList(args));
             }
             catch (IllegalEventParameterException e) {
@@ -284,10 +284,10 @@ public class EventGenerator
 
         case BUILD:
 
-            args = new String[] { "add", this.randomStrings[line], this.randomStrings[line], this.randomStrings[line], this.randomStrings[line], this.randomStrings[line], this.randomStrings[line], this.randomStrings[line], this.randomStrings[line], this.randomStrings[line], this.randomStrings[line] };
+            args = new String[] { "add", this.randomStrings[line], this.randomStrings[line], this.randomStrings[line] };
 
             try {
-                eventPacket = new ValidEventPacket(0, createDate(true),
+                eventPacket = new WellFormedEventPacket(0, createDate(true),
                         "Build", Arrays.asList(args));
             }
             catch (IllegalEventParameterException e) {
@@ -301,7 +301,7 @@ public class EventGenerator
             args = new String[] { "add", this.randomStrings[line], this.randomStrings[line], this.randomStrings[line], this.randomStrings[line] };
 
             try {
-                eventPacket = new ValidEventPacket(0, createDate(true), "CLI",
+                eventPacket = new WellFormedEventPacket(0, createDate(true), "CLI",
                         Arrays.asList(args));
             }
             catch (IllegalEventParameterException e) {
@@ -312,10 +312,10 @@ public class EventGenerator
 
         case COMMIT:
 
-            args = new String[] { "add", this.randomStrings[line], this.randomStrings[line], this.randomStrings[line], this.randomStrings[line], this.randomStrings[line], this.randomStrings[line], "" + line, "" + line, "" + line, this.randomStrings[line] };
+            args = new String[] { "add", this.randomStrings[line], this.randomStrings[line], this.randomStrings[line], this.randomStrings[line], this.randomStrings[line], "" + line, "" + line, "" + line, this.randomStrings[line] };
 
             try {
-                eventPacket = new ValidEventPacket(0, createDate(true),
+                eventPacket = new WellFormedEventPacket(0, createDate(true),
                         "Commit", Arrays.asList(args));
             }
             catch (IllegalEventParameterException e) {
@@ -326,10 +326,10 @@ public class EventGenerator
 
         case FILEMETRIC:
 
-            args = new String[] { "addFileMetric", "bcml", "C:\\cvs\\foobarproject\\src\foo\\bar\\Bar.java", "foo.bar.Bar", "cbo=1,loc=2", "1049798488530" };
+            args = new String[] { "C:\\cvs\\foobarproject\\src\foo\\bar\\Bar.java", "foo.bar.Bar", "cbo=1,loc=2", "1049798488530" };
 
             try {
-                eventPacket = new ValidEventPacket(0, createDate(true),
+                eventPacket = new WellFormedEventPacket(0, createDate(true),
                         "FileMetric", Arrays.asList(args));
             }
             catch (IllegalEventParameterException e) {
@@ -340,10 +340,10 @@ public class EventGenerator
 
         case UNITTEST:
 
-            args = new String[] { "add", this.randomStrings[line], this.randomStrings[line], "3000", this.randomStrings[line], this.randomStrings[line] };
+            args = new String[] { this.randomStrings[line], this.randomStrings[line], "3", this.randomStrings[line], this.randomStrings[line] };
 
             try {
-                eventPacket = new ValidEventPacket(0, createDate(true),
+                eventPacket = new WellFormedEventPacket(0, createDate(true),
                         "UnitTest", Arrays.asList(args));
             }
             catch (IllegalEventParameterException e) {
@@ -365,10 +365,10 @@ public class EventGenerator
      *            Is the MicroSensorDataType to create
      * @return A valid ECG event.
      */
-    public ValidEventPacket createECGEventPacket(MicroSensorDataType type)
+    public WellFormedEventPacket createECGEventPacket(MicroSensorDataType type)
     {
 
-        ValidEventPacket eventPacket = null;
+    	WellFormedEventPacket eventPacket = null;
 
         String[] args = null;
 
@@ -380,10 +380,10 @@ public class EventGenerator
 
             activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><resource><activity>added</activity><resourcename>testResourceName</resourcename><resourcetype>testResourceType</resourcetype></resource></microActivity>";
 
-            args = new String[] { "add", "MicroActivity", activity };
+            args = new String[] { "add", WellFormedEventPacket.MICRO_ACTIVITY_PREFIX+"msdt.resource.xsd", activity };
 
             try {
-                eventPacket = new ValidEventPacket(0, createDate(true),
+                eventPacket = new WellFormedEventPacket(0, createDate(true),
                         "Activity", Arrays.asList(args));
             }
             catch (IllegalEventParameterException e) {
@@ -396,10 +396,10 @@ public class EventGenerator
 
             activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><resource><activity>removed</activity><resourcename>testResourceName</resourcename><resourcetype>testResourceType</resourcetype></resource></microActivity>";
 
-            args = new String[] { "add", "MicroActivity", activity };
+            args = new String[] { "add", WellFormedEventPacket.MICRO_ACTIVITY_PREFIX+"msdt.resource.xsd", activity };
 
             try {
-                eventPacket = new ValidEventPacket(0, createDate(true),
+                eventPacket = new WellFormedEventPacket(0, createDate(true),
                         "Activity", Arrays.asList(args));
             }
             catch (IllegalEventParameterException e) {
@@ -412,10 +412,10 @@ public class EventGenerator
 
             activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><resource><activity>changed</activity><resourcename>testResourceName</resourcename><resourcetype>testResourceType</resourcetype></resource></microActivity>";
 
-            args = new String[] { "add", "MicroActivity", activity };
+            args = new String[] { "add", WellFormedEventPacket.MICRO_ACTIVITY_PREFIX+"msdt.resource.xsd", activity };
 
             try {
-                eventPacket = new ValidEventPacket(0, createDate(true),
+                eventPacket = new WellFormedEventPacket(0, createDate(true),
                         "Activity", Arrays.asList(args));
             }
             catch (IllegalEventParameterException e) {
@@ -428,10 +428,10 @@ public class EventGenerator
 
             activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><resource><activity>unknownTestActivity</activity><resourcename>testResourceName</resourcename><resourcetype>testResourceType</resourcetype></resource></microActivity>";
 
-            args = new String[] { "add", "MicroActivity", activity };
+            args = new String[] { "add", WellFormedEventPacket.MICRO_ACTIVITY_PREFIX+"msdt.resource.xsd", activity };
 
             try {
-                eventPacket = new ValidEventPacket(0, createDate(true),
+                eventPacket = new WellFormedEventPacket(0, createDate(true),
                         "Activity", Arrays.asList(args));
             }
             catch (IllegalEventParameterException e) {
@@ -444,10 +444,10 @@ public class EventGenerator
 
             activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><codechange><document>testDocument</document><documentname>testDocumentName</documentname></codechange></microActivity>";
 
-            args = new String[] { "add", "MicroActivity", activity };
+            args = new String[] { "add", WellFormedEventPacket.MICRO_ACTIVITY_PREFIX+"msdt.codechange.xsd", activity };
 
             try {
-                eventPacket = new ValidEventPacket(0, createDate(true),
+                eventPacket = new WellFormedEventPacket(0, createDate(true),
                         "Activity", Arrays.asList(args));
             }
             catch (IllegalEventParameterException e) {
@@ -460,10 +460,10 @@ public class EventGenerator
 
             activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><editor><activity>opened</activity><editorname>testEditorName</editorname></editor></microActivity>";
 
-            args = new String[] { "add", "MicroActivity", activity };
+            args = new String[] { "add", WellFormedEventPacket.MICRO_ACTIVITY_PREFIX+"msdt.editor.xsd", activity };
 
             try {
-                eventPacket = new ValidEventPacket(0, createDate(true),
+                eventPacket = new WellFormedEventPacket(0, createDate(true),
                         "Activity", Arrays.asList(args));
             }
             catch (IllegalEventParameterException e) {
@@ -476,10 +476,10 @@ public class EventGenerator
 
             activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><editor><activity>closed</activity><editorname>testEditorName</editorname></editor></microActivity>";
 
-            args = new String[] { "add", "MicroActivity", activity };
+            args = new String[] { "add", WellFormedEventPacket.MICRO_ACTIVITY_PREFIX+"msdt.editor.xsd", activity };
 
             try {
-                eventPacket = new ValidEventPacket(0, createDate(true),
+                eventPacket = new WellFormedEventPacket(0, createDate(true),
                         "Activity", Arrays.asList(args));
             }
             catch (IllegalEventParameterException e) {
@@ -491,10 +491,10 @@ public class EventGenerator
 
             activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><editor><activity>activated</activity><editorname>testEditorName</editorname></editor></microActivity>";
 
-            args = new String[] { "add", "MicroActivity", activity };
+            args = new String[] { "add", WellFormedEventPacket.MICRO_ACTIVITY_PREFIX+"msdt.editor.xsd", activity };
 
             try {
-                eventPacket = new ValidEventPacket(0, createDate(true),
+                eventPacket = new WellFormedEventPacket(0, createDate(true),
                         "Activity", Arrays.asList(args));
             }
             catch (IllegalEventParameterException e) {
@@ -507,10 +507,10 @@ public class EventGenerator
 
             activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><editor><activity>deactivated</activity><editorname>testEditorName</editorname></editor></microActivity>";
 
-            args = new String[] { "add", "MicroActivity", activity };
+            args = new String[] { "add", WellFormedEventPacket.MICRO_ACTIVITY_PREFIX+"msdt.editor.xsd", activity };
 
             try {
-                eventPacket = new ValidEventPacket(0, createDate(true),
+                eventPacket = new WellFormedEventPacket(0, createDate(true),
                         "Activity", Arrays.asList(args));
             }
             catch (IllegalEventParameterException e) {
@@ -523,10 +523,10 @@ public class EventGenerator
 
             activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><editor><activity>unknownTestActivity</activity><editorname>testEditorName</editorname></editor></microActivity>";
 
-            args = new String[] { "add", "MicroActivity", activity };
+            args = new String[] { "add", WellFormedEventPacket.MICRO_ACTIVITY_PREFIX+"msdt.editor.xsd", activity };
 
             try {
-                eventPacket = new ValidEventPacket(0, createDate(true),
+                eventPacket = new WellFormedEventPacket(0, createDate(true),
                         "Activity", Arrays.asList(args));
             }
             catch (IllegalEventParameterException e) {
@@ -540,10 +540,10 @@ public class EventGenerator
 
             activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><part><activity>opened</activity><partname>testPartName</partname></part></microActivity>";
 
-            args = new String[] { "add", "MicroActivity", activity };
+            args = new String[] { "add", WellFormedEventPacket.MICRO_ACTIVITY_PREFIX+"msdt.part.xsd", activity };
 
             try {
-                eventPacket = new ValidEventPacket(0, createDate(true),
+                eventPacket = new WellFormedEventPacket(0, createDate(true),
                         "Activity", Arrays.asList(args));
             }
             catch (IllegalEventParameterException e) {
@@ -556,10 +556,10 @@ public class EventGenerator
 
             activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><part><activity>closed</activity><partname>testPartName</partname></part></microActivity>";
 
-            args = new String[] { "add", "MicroActivity", activity };
+            args = new String[] { "add", WellFormedEventPacket.MICRO_ACTIVITY_PREFIX+"msdt.part.xsd", activity };
 
             try {
-                eventPacket = new ValidEventPacket(0, createDate(true),
+                eventPacket = new WellFormedEventPacket(0, createDate(true),
                         "Activity", Arrays.asList(args));
             }
             catch (IllegalEventParameterException e) {
@@ -571,10 +571,10 @@ public class EventGenerator
 
             activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><part><activity>activated</activity><partname>testPartName</partname></part></microActivity>";
 
-            args = new String[] { "add", "MicroActivity", activity };
+            args = new String[] { "add", WellFormedEventPacket.MICRO_ACTIVITY_PREFIX+"msdt.part.xsd", activity };
 
             try {
-                eventPacket = new ValidEventPacket(0, createDate(true),
+                eventPacket = new WellFormedEventPacket(0, createDate(true),
                         "Activity", Arrays.asList(args));
             }
             catch (IllegalEventParameterException e) {
@@ -587,10 +587,10 @@ public class EventGenerator
 
             activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><part><activity>deactivated</activity><partname>testPartName</partname></part></microActivity>";
 
-            args = new String[] { "add", "MicroActivity", activity };
+            args = new String[] { "add", WellFormedEventPacket.MICRO_ACTIVITY_PREFIX+"msdt.part.xsd", activity };
 
             try {
-                eventPacket = new ValidEventPacket(0, createDate(true),
+                eventPacket = new WellFormedEventPacket(0, createDate(true),
                         "Activity", Arrays.asList(args));
             }
             catch (IllegalEventParameterException e) {
@@ -603,10 +603,10 @@ public class EventGenerator
 
             activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><part><activity>unknownTestActivity</activity><partname>testPartName</partname></part></microActivity>";
 
-            args = new String[] { "add", "MicroActivity", activity };
+            args = new String[] { "add", WellFormedEventPacket.MICRO_ACTIVITY_PREFIX+"msdt.part.xsd", activity };
 
             try {
-                eventPacket = new ValidEventPacket(0, createDate(true),
+                eventPacket = new WellFormedEventPacket(0, createDate(true),
                         "Activity", Arrays.asList(args));
             }
             catch (IllegalEventParameterException e) {
@@ -619,10 +619,10 @@ public class EventGenerator
 
             activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><run debug=\"false\"></run></microActivity>";
 
-            args = new String[] { "add", "MicroActivity", activity };
+            args = new String[] { "add", WellFormedEventPacket.MICRO_ACTIVITY_PREFIX+"msdt.rundebug.xsd", activity };
 
             try {
-                eventPacket = new ValidEventPacket(0, createDate(true),
+                eventPacket = new WellFormedEventPacket(0, createDate(true),
                         "Activity", Arrays.asList(args));
             }
             catch (IllegalEventParameterException e) {
@@ -635,10 +635,10 @@ public class EventGenerator
 
             activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><run debug=\"true\"></run></microActivity>";
 
-            args = new String[] { "add", "MicroActivity", activity };
+            args = new String[] { "add", WellFormedEventPacket.MICRO_ACTIVITY_PREFIX+"msdt.rundebug.xsd", activity };
 
             try {
-                eventPacket = new ValidEventPacket(0, createDate(true),
+                eventPacket = new WellFormedEventPacket(0, createDate(true),
                         "Activity", Arrays.asList(args));
             }
             catch (IllegalEventParameterException e) {
@@ -651,10 +651,10 @@ public class EventGenerator
 
             activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><run debug=\"illegalTestValue\"></run></microActivity>";
 
-            args = new String[] { "add", "MicroActivity", activity };
+            args = new String[] { "add", WellFormedEventPacket.MICRO_ACTIVITY_PREFIX+"msdt.rundebug.xsd", activity };
 
             try {
-                eventPacket = new ValidEventPacket(0, createDate(true),
+                eventPacket = new WellFormedEventPacket(0, createDate(true),
                         "Activity", Arrays.asList(args));
             }
             catch (IllegalEventParameterException e) {
@@ -667,10 +667,10 @@ public class EventGenerator
 
             activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><window><activity>opened</activity><windowname>testWindowName</windowname></window></microActivity>";
 
-            args = new String[] { "add", "MicroActivity", activity };
+            args = new String[] { "add", WellFormedEventPacket.MICRO_ACTIVITY_PREFIX+"msdt.window.xsd", activity };
 
             try {
-                eventPacket = new ValidEventPacket(0, createDate(true),
+                eventPacket = new WellFormedEventPacket(0, createDate(true),
                         "Activity", Arrays.asList(args));
             }
             catch (IllegalEventParameterException e) {
@@ -683,10 +683,10 @@ public class EventGenerator
 
             activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><window><activity>closed</activity><windowname>testWindowName</windowname></window></microActivity>";
 
-            args = new String[] { "add", "MicroActivity", activity };
+            args = new String[] { "add", WellFormedEventPacket.MICRO_ACTIVITY_PREFIX+"msdt.window.xsd", activity };
 
             try {
-                eventPacket = new ValidEventPacket(0, createDate(true),
+                eventPacket = new WellFormedEventPacket(0, createDate(true),
                         "Activity", Arrays.asList(args));
             }
             catch (IllegalEventParameterException e) {
@@ -698,10 +698,10 @@ public class EventGenerator
 
             activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><window><activity>activated</activity><windowname>testWindowName</windowname></window></microActivity>";
 
-            args = new String[] { "add", "MicroActivity", activity };
+            args = new String[] { "add", WellFormedEventPacket.MICRO_ACTIVITY_PREFIX+"msdt.window.xsd", activity };
 
             try {
-                eventPacket = new ValidEventPacket(0, createDate(true),
+                eventPacket = new WellFormedEventPacket(0, createDate(true),
                         "Activity", Arrays.asList(args));
             }
             catch (IllegalEventParameterException e) {
@@ -714,10 +714,10 @@ public class EventGenerator
 
             activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><window><activity>deactivated</activity><windowname>testWindowName</windowname></window></microActivity>";
 
-            args = new String[] { "add", "MicroActivity", activity };
+            args = new String[] { "add", WellFormedEventPacket.MICRO_ACTIVITY_PREFIX+"msdt.window.xsd", activity };
 
             try {
-                eventPacket = new ValidEventPacket(0, createDate(true),
+                eventPacket = new WellFormedEventPacket(0, createDate(true),
                         "Activity", Arrays.asList(args));
             }
             catch (IllegalEventParameterException e) {
@@ -730,10 +730,10 @@ public class EventGenerator
 
             activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><window><activity>unknownTestActivity</activity><windowname>testWindowName</windowname></window></microActivity>";
 
-            args = new String[] { "add", "MicroActivity", activity };
+            args = new String[] { "add", WellFormedEventPacket.MICRO_ACTIVITY_PREFIX+"msdt.window.xsd", activity };
 
             try {
-                eventPacket = new ValidEventPacket(0, createDate(true),
+                eventPacket = new WellFormedEventPacket(0, createDate(true),
                         "Activity", Arrays.asList(args));
             }
             catch (IllegalEventParameterException e) {
