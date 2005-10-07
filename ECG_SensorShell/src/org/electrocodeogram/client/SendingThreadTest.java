@@ -3,7 +3,7 @@ package org.electrocodeogram.client;
 import java.util.ArrayList;
 
 import org.electrocodeogram.event.EventPacket;
-import org.electrocodeogram.event.ValidEventPacket;
+import org.electrocodeogram.event.WellFormedEventPacket;
 
 /**
  * This class contains methods to access the protected fields of the SendingThread
@@ -29,7 +29,7 @@ public class SendingThreadTest
      */
     public int getBufferSize()
     {
-        ArrayList<ValidEventPacket> bufferCopy = createBufferCopy();
+        ArrayList<WellFormedEventPacket> bufferCopy = createBufferCopy();
         
         return bufferCopy.size();
     }
@@ -41,7 +41,7 @@ public class SendingThreadTest
      */
     public boolean testBufferSize(int size)
     {
-        ArrayList<ValidEventPacket> bufferCopy = createBufferCopy();
+        ArrayList<WellFormedEventPacket> bufferCopy = createBufferCopy();
         
         if(bufferCopy.size() == size)
         {
@@ -86,9 +86,9 @@ public class SendingThreadTest
      */
     public boolean testLastElement(EventPacket eventPacket)
     {
-        ArrayList<ValidEventPacket> bufferCopy = createBufferCopy();
+        ArrayList<WellFormedEventPacket> bufferCopy = createBufferCopy();
         
-        ValidEventPacket lastAdded = bufferCopy.get(bufferCopy.size()-1);
+        WellFormedEventPacket lastAdded = bufferCopy.get(bufferCopy.size()-1);
         
         if(lastAdded.getSourceId() == eventPacket.getSourceId() && lastAdded.getTimeStamp().equals(eventPacket.getTimeStamp()) && lastAdded.getSensorDataType().equals(eventPacket.getSensorDataType()) && lastAdded.getArglist().equals(eventPacket.getArglist()))
         {
@@ -99,11 +99,11 @@ public class SendingThreadTest
         
     }
     
-    private ArrayList<ValidEventPacket> createBufferCopy()
+    private ArrayList<WellFormedEventPacket> createBufferCopy()
     {
-        ArrayList<ValidEventPacket> bufferCopy = new ArrayList<ValidEventPacket>(); 
+        ArrayList<WellFormedEventPacket> bufferCopy = new ArrayList<WellFormedEventPacket>(); 
         
-        for(ValidEventPacket elem : this.sendingThread.queue)
+        for(WellFormedEventPacket elem : this.sendingThread.queue)
         {
             bufferCopy.add(elem);
         }

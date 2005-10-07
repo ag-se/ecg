@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.electrocodeogram.event.ValidEventPacket;
+import org.electrocodeogram.event.WellFormedEventPacket;
 import org.electrocodeogram.logging.LogHelper;
 
 /**
@@ -82,7 +82,8 @@ public class SendingThread extends Thread
 	protected int connectionDelay = 5000;
 
 	private boolean run = false;
-
+	
+	
 	/**
 	 * This creates the instance of the SendingThread.
 	 * 
@@ -141,8 +142,9 @@ public class SendingThread extends Thread
 	 *            This is the EventPacket to transmit.
 	 * @return "true" if adding the EventPacket was successful and "false"
 	 *         otherwise
+	 * @throws EventPacketQueueOverflowException 
 	 */
-	public boolean addEventPacket(ValidEventPacket packet)
+	public boolean addEventPacket(WellFormedEventPacket packet) throws EventPacketQueueOverflowException
 	{
 		_logger.entering(this.getClass().getName(), "addEventPacket");
 
@@ -155,7 +157,11 @@ public class SendingThread extends Thread
 			return false;
 		}
 
-		boolean result = this.queue.addToTail(packet);
+		boolean result = false;
+		
+		
+		result = this.queue.addToTail(packet);
+		
 
 		_logger.exiting(this.getClass().getName(), "addEventPacket");
 
@@ -228,7 +234,7 @@ public class SendingThread extends Thread
 		
 		this.run = true;
 
-		ValidEventPacket packet;
+		WellFormedEventPacket packet;
 
 		// first attempt to connect to server
 		connect();
@@ -319,10 +325,12 @@ public class SendingThread extends Thread
 	 * it to wait if the buffer is empty and notifying it if new EventPackets
 	 * are added.
 	 */
-	private static class EventPacketQueue extends ArrayList<ValidEventPacket>
+	private static class EventPacketQueue extends ArrayList<WellFormedEventPacket>
 	{
+		private static int MAX_QUEUE_SIZE = 1000000;
+		
 		private static final long serialVersionUID = -7457045862890074109L;
-
+		
 		/**
 		 * This method add a single EventPacket to the tail of the queue and
 		 * notifies the SendingThread.
@@ -330,18 +338,34 @@ public class SendingThread extends Thread
 		 * @param packet
 		 *            The EventPacket to queue
 		 * @return "true if cuing succeeded and "false" otherwise
+		 * @throws EventPacketQueueOverflowException 
 		 */
-		public synchronized boolean addToTail(ValidEventPacket packet)
+		public boolean addToTail(WellFormedEventPacket packet) throws EventPacketQueueOverflowException
 		{
 			_logger.entering(this.getClass().getName(), "addToTail");
 			
-			boolean result = this.add(packet);
-
-			this.notifyAll();
-
-			_logger.exiting(this.getClass().getName(), "addToTail");
+			_logger.log(Level.INFO,"add: waiting to enter...");
 			
-			return result;
+			synchronized (this)
+			{
+				
+				_logger.log(Level.INFO,"add: proceeding...");
+				
+				_logger.log(Level.INFO,"add: Queue size is " + this.size());
+			
+//				if(this.size() > MAX_QUEUE_SIZE)
+//				{
+//					throw new EventPacketQueueOverflowException();
+//				}
+				
+				boolean result = this.add(packet);
+		
+				this.notifyAll();
+		
+				_logger.exiting(this.getClass().getName(), "addToTail");
+				
+				return result;
+			}
 		}
 
 		/**
@@ -352,32 +376,42 @@ public class SendingThread extends Thread
 		 * @throws EventPacketQueueUnderflowException
 		 *             If the queue is empty already
 		 */
-		public synchronized ValidEventPacket removeFromHead() throws EventPacketQueueUnderflowException
+		public WellFormedEventPacket removeFromHead() throws EventPacketQueueUnderflowException
 		{
 			
 			_logger.entering(this.getClass().getName(), "removeFromHead");
 			
-			int sizeBefore;
-
-			if ((sizeBefore = this.size()) > 0)
+			_logger.log(Level.INFO,"remove: waiting...");
+			
+			synchronized(this)
 			{
-
-				ValidEventPacket packet = this.get(0);
+			
+				_logger.log(Level.INFO,"remove: proceeding...");
+				
+				int sizeBefore = this.size();
+	
+				_logger.log(Level.INFO,"remove: Queue size is " + this.size());
+				
+				if (sizeBefore <= 0)
+				{
+					_logger.log(Level.SEVERE,"An EventPacketQueueUnderflowException has occured.");
+					
+					throw new EventPacketQueueUnderflowException();
+				}
+	
+				WellFormedEventPacket packet = this.get(0);
 
 				this.remove(0);
 
 				assert (this.size() == sizeBefore - 1);
 
+				this.notifyAll();
+				
 				_logger.exiting(this.getClass().getName(), "removeFromHead");
 				
 				return packet;
-
+	
 			}
-
-			_logger.log(Level.SEVERE,"An EventPacketQueueUnderflowException has occured.");
-			
-			throw new EventPacketQueueUnderflowException();
-
 			
 		}
 
@@ -459,4 +493,7 @@ public class SendingThread extends Thread
 		private static final long serialVersionUID = 870916601241806158L;
 
 	}
+	
+	
+	
 }

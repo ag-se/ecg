@@ -5,7 +5,7 @@ import junit.framework.TestCase;
 import org.electrocodeogram.client.SendingThreadTest;
 import org.electrocodeogram.event.EventPacket;
 import org.electrocodeogram.event.IllegalEventParameterException;
-import org.electrocodeogram.event.ValidEventPacket;
+import org.electrocodeogram.event.WellFormedEventPacket;
 import org.electrocodeogram.test.EventGenerator;
 import org.electrocodeogram.test.NoTestDataException;
 import org.electrocodeogram.test.EventGenerator.SensorDataType;
@@ -31,7 +31,7 @@ public class ClientsideTests extends TestCase
     
     int _bufferSizeBefore;
     
-    ValidEventPacket _eventPacket;
+    WellFormedEventPacket _eventPacket;
 
     /**
      * This creates the testcases of this collection.
@@ -78,7 +78,7 @@ public class ClientsideTests extends TestCase
      */
     public void testValidEventIsAccepted() throws IllegalEventParameterException, NoTestDataException
     {
-        ValidEventPacket eventPacket;
+        WellFormedEventPacket eventPacket;
 
         eventPacket = this._eventGenerator.createValidEventPacket(true, true, this._line, true, true, 10, 10);
 
@@ -290,7 +290,7 @@ public class ClientsideTests extends TestCase
      */
     public void testHackyStatActivityEventsAccepted() throws NoTestDataException
     {
-        ValidEventPacket eventPacket = this._eventGenerator.createHackyStatEventPacket(SensorDataType.ACTIVITY,this._line);
+        WellFormedEventPacket eventPacket = this._eventGenerator.createHackyStatEventPacket(SensorDataType.ACTIVITY,this._line);
 
         boolean result = this._testSensor.sendEvent(eventPacket);
 
@@ -308,7 +308,7 @@ public class ClientsideTests extends TestCase
      */
     public void testHackyStatBuildEventsAccepted() throws NoTestDataException
     {
-        ValidEventPacket eventPacket = this._eventGenerator.createHackyStatEventPacket(SensorDataType.BUILD,this._line);
+        WellFormedEventPacket eventPacket = this._eventGenerator.createHackyStatEventPacket(SensorDataType.BUILD,this._line);
 
         boolean result = this._testSensor.sendEvent(eventPacket);
 
@@ -326,7 +326,7 @@ public class ClientsideTests extends TestCase
      */
     public void testHackyStatBuffTransEventsAccepted() throws NoTestDataException
     {
-        ValidEventPacket eventPacket = this._eventGenerator.createHackyStatEventPacket(SensorDataType.BUFFTRANS,this._line);
+        WellFormedEventPacket eventPacket = this._eventGenerator.createHackyStatEventPacket(SensorDataType.BUFFTRANS,this._line);
 
         boolean result = this._testSensor.sendEvent(eventPacket);
 
@@ -344,7 +344,7 @@ public class ClientsideTests extends TestCase
      */
     public void testHackyStatCommitEventsAccepted() throws NoTestDataException
     {
-        ValidEventPacket eventPacket = this._eventGenerator.createHackyStatEventPacket(SensorDataType.COMMIT,this._line);
+        WellFormedEventPacket eventPacket = this._eventGenerator.createHackyStatEventPacket(SensorDataType.COMMIT,this._line);
 
         boolean result = this._testSensor.sendEvent(eventPacket);
 
@@ -362,7 +362,7 @@ public class ClientsideTests extends TestCase
      */
     public void testHackyStatFileMetricEventsAccepted() throws NoTestDataException
     {
-        ValidEventPacket eventPacket = this._eventGenerator.createHackyStatEventPacket(SensorDataType.FILEMETRIC,this._line);
+        WellFormedEventPacket eventPacket = this._eventGenerator.createHackyStatEventPacket(SensorDataType.FILEMETRIC,this._line);
 
         boolean result = this._testSensor.sendEvent(eventPacket);
 
@@ -380,7 +380,7 @@ public class ClientsideTests extends TestCase
      */
     public void testHackyStatUnitTestEventsAccepted() throws NoTestDataException
     {
-        ValidEventPacket eventPacket = this._eventGenerator.createHackyStatEventPacket(SensorDataType.UNITTEST,this._line);
+        WellFormedEventPacket eventPacket = this._eventGenerator.createHackyStatEventPacket(SensorDataType.UNITTEST,this._line);
 
         boolean result = this._testSensor.sendEvent(eventPacket);
 

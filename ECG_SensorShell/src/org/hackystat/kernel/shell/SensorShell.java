@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.lang.Thread.UncaughtExceptionHandler;
@@ -18,49 +19,59 @@ import java.util.logging.Logger;
 
 import org.electrocodeogram.client.IllegalHostOrPortException;
 import org.electrocodeogram.client.SendingThread;
+import org.electrocodeogram.client.EventPacketQueueOverflowException;
 import org.electrocodeogram.event.IllegalEventParameterException;
-import org.electrocodeogram.event.ValidEventPacket;
+import org.electrocodeogram.event.WellFormedEventPacket;
 import org.electrocodeogram.logging.LogHelper;
 import org.hackystat.kernel.admin.SensorProperties;
 
 /**
- * This class is the ECG SensorShell. It is named org.hackystat.kernel.shell.SensorShell
- * after the class provided by the HackyStat project (please visit www.hackystat.org for more information).
+ * This class is the ECG SensorShell. It is named
+ * org.hackystat.kernel.shell.SensorShell after the class provided by the
+ * HackyStat project (please visit www.hackystat.org for more information).
  * 
- * It's purpose is to be used by every ECG sensor for recorded data to be sended to the ECG Server & Lab.
- * So a sensor developer must not implement the functionality of sending data to the ECG server himself.
+ * It's purpose is to be used by every ECG sensor for recorded data to be sended
+ * to the ECG Server & Lab. So a sensor developer must not implement the
+ * functionality of sending data to the ECG server himself.
  * 
- * Because the ECG framework directly supports the usage of original HackyStat sensors
- * this class acts like the original HackyStat SensorShell class including the naming.
- * That means that every original HackyStat sensor is able to collect data for the ECG
- * framework by simply replacing the HackyStat's sensorshell.jar library with the ECG sensorshell.jar.
+ * Because the ECG framework directly supports the usage of original HackyStat
+ * sensors this class acts like the original HackyStat SensorShell class
+ * including the naming. That means that every original HackyStat sensor is able
+ * to collect data for the ECG framework by simply replacing the HackyStat's
+ * sensorshell.jar library with the ECG sensorshell.jar.
  * 
- * Sensors are able to use this class in to different ways depending on the sensor programming
- * language. If the sensor is written in Java, this class can be instanciated to a SensorShell
- * object. On the SensorShell object the method doCommand is called to send recorded data to the
- * ECG framework. The recorded data must at least conform to a HackyStat SensorDataType.
+ * Sensors are able to use this class in to different ways depending on the
+ * sensor programming language. If the sensor is written in Java, this class can
+ * be instanciated to a SensorShell object. On the SensorShell object the method
+ * doCommand is called to send recorded data to the ECG framework. The recorded
+ * data must at least conform to a HackyStat SensorDataType.
  * 
- * To support even sensors that are not written in Java, this class provides a main method that makes
- * it a process that communicates via standard-input and -output. The process is created via a
- * "java -jar sensorshell.jar" command at the operating system level. Every string that is passed
- * to the standard-input of the SensorShell process, is taken for collected data.   
+ * To support even sensors that are not written in Java, this class provides a
+ * main method that makes it a process that communicates via standard-input and
+ * -output. The process is created via a "java -jar sensorshell.jar" command at
+ * the operating system level. Every string that is passed to the standard-input
+ * of the SensorShell process, is taken for collected data.
  * 
  */
 public class SensorShell
 {
-	private static final String MICRO_ACTIVITY_PREFIX = "MicroActivity#";
 
 	public static final String ECG_LAB_PATH = "ECG_Lab_Path";
 
 	private static final String INLINE_SERVER = "INLINE";
 
 	private static final String REMOTE_SERVER = "REMOTE";
+	
+	private static int RESET_COUNT = 100;
+	
+	private int _count;
 
 	static Logger _logger = LogHelper.createLogger(SensorShell.class.getName());
 
 	/*
-	 * This is a reference to the SensorProperties object, that contains the information of
-	 * the "sensor.properties" file. The file is used to configure all sensors in the system.
+	 * This is a reference to the SensorProperties object, that contains the
+	 * information of the "sensor.properties" file. The file is used to
+	 * configure all sensors in the system.
 	 */
 	private SensorProperties _properties;
 
@@ -83,21 +94,35 @@ public class SensorShell
 
 	protected ServerMode _serverMode;
 
-	protected PrintWriter _toInlineServer;
+	// protected PrintWriter _toInlineServer;
+
+	protected ObjectOutputStream _toInlineServer;
 
 	protected String ecgEclipseSensorPath;
 
+	private boolean _acceptEvents;
+
+	private static InlineServer _inlineServer;
+
 	/**
 	 * This creates a ECG SensorShell instance with the given properties.
-	 * @param properties The properties to configure the ECG SensorShell
-	 * @param interactive Is "true" if the SensorShell is run as a process and "false" if it is
-	 * instantiated to a SensorShell object.
-	 * @param toolName Is the tool name
+	 * 
+	 * @param properties
+	 *            The properties to configure the ECG SensorShell
+	 * @param interactive
+	 *            Is "true" if the SensorShell is run as a process and "false"
+	 *            if it is instantiated to a SensorShell object.
+	 * @param toolName
+	 *            Is the tool name
 	 */
 	public SensorShell(SensorProperties properties, boolean interactive, @SuppressWarnings("unused")
 	String toolName)
 	{
 		_logger.entering(this.getClass().getName(), "SensorShell");
+
+		this._acceptEvents = true;
+		
+		this._count = 0;
 
 		if (properties == null)
 		{
@@ -111,17 +136,20 @@ public class SensorShell
 		this._interactive = interactive;
 
 		initializeLogging();
-		
+
 		initializeCommunication();
-		
+
 		_logger.exiting(this.getClass().getName(), "SensorShell");
 	}
 
 	/**
 	 * This creates a ECG SensorShell instance with the given properties.
-	 * @param properties The properties to configure the ECG SensorShell
-	 * @param interactive Is "true" if the SensorShell is run as a process and "false" if it is
-	 * instantiated to a SensorShell object.
+	 * 
+	 * @param properties
+	 *            The properties to configure the ECG SensorShell
+	 * @param interactive
+	 *            Is "true" if the SensorShell is run as a process and "false"
+	 *            if it is instantiated to a SensorShell object.
 	 */
 	public SensorShell(SensorProperties properties, boolean interactive)
 	{
@@ -130,12 +158,18 @@ public class SensorShell
 
 	/**
 	 * This creates a ECG SensorShell instance with the given properties.
-	 * @param properties The properties to configure the ECG SensorShell
-	 * @param interactive Is "true" if the SensorShell is run as a process and "false" if it is
-	 * @param toolName Is the tool name
-	 * instantiated to a SensorShell object.
-	 * @param enableOfflineData Is not used
-	 * @param commandFile Is not used
+	 * 
+	 * @param properties
+	 *            The properties to configure the ECG SensorShell
+	 * @param interactive
+	 *            Is "true" if the SensorShell is run as a process and "false"
+	 *            if it is
+	 * @param toolName
+	 *            Is the tool name instantiated to a SensorShell object.
+	 * @param enableOfflineData
+	 *            Is not used
+	 * @param commandFile
+	 *            Is not used
 	 */
 	public SensorShell(SensorProperties properties, boolean interactive, String toolName, @SuppressWarnings("unused")
 	boolean enableOfflineData, @SuppressWarnings("unused")
@@ -146,11 +180,16 @@ public class SensorShell
 
 	/**
 	 * This creates a ECG SensorShell instance with the given properties.
-	 * @param properties The properties to configure the ECG SensorShell
-	 * @param interactive Is "true" if the SensorShell is run as a process and "false" if it is
-	 * @param toolName Is the tool name
-	 * instantiated to a SensorShell object.
-	 * @param enableOfflineData Is not used
+	 * 
+	 * @param properties
+	 *            The properties to configure the ECG SensorShell
+	 * @param interactive
+	 *            Is "true" if the SensorShell is run as a process and "false"
+	 *            if it is
+	 * @param toolName
+	 *            Is the tool name instantiated to a SensorShell object.
+	 * @param enableOfflineData
+	 *            Is not used
 	 */
 	public SensorShell(SensorProperties properties, boolean interactive, String toolName, @SuppressWarnings("unused")
 	boolean enableOfflineData)
@@ -162,7 +201,7 @@ public class SensorShell
 	{
 		_logger.entering(this.getClass().getName(), "initializeECGLabCommunication");
 
-		if (this._properties.getECGServerType() != null)
+		if (this._properties.getECGServerType() == null)
 		{
 			_logger.log(Level.INFO, "ECG_SEVER_TYPE is null in sensor.properties.");
 
@@ -204,7 +243,8 @@ public class SensorShell
 
 		try
 		{
-			// Try to create the SendingThread with the given ECG server address information
+			// Try to create the SendingThread with the given ECG server address
+			// information
 
 			this._sendingThread = new SendingThread(
 					this._properties.getECGServerAddress(),
@@ -237,18 +277,32 @@ public class SensorShell
 	{
 		_logger.entering(this.getClass().getName(), "startInlineServer");
 
-		Thread inlineServer = new InlineServer(this);
+		_inlineServer = new InlineServer(this);
 
-		inlineServer.start();
+		_inlineServer.start();
 
 		_logger.exiting(this.getClass().getName(), "startInlineServer");
+	}
+
+	public static void stop()
+	{
+		_logger.log(Level.INFO, "SensorShell is stopping...");
+
+		if (_inlineServer != null)
+		{
+			_logger.log(Level.INFO, "Found InlineServer");
+
+			_inlineServer.stopECGServer();
+		}
+
+		_logger.log(Level.INFO, "No InlineServer found");
 	}
 
 	private void initializeLogging()
 	{
 		String logFile = this._properties.getProperty("ECG_LOG_FILE");
-		
-		if(logFile != null)
+
+		if (logFile != null)
 		{
 			try
 			{
@@ -256,41 +310,50 @@ public class SensorShell
 			}
 			catch (SecurityException e)
 			{
-				_logger.log(Level.SEVERE,"Error while creating the logfile" + logFile);
-				
-				_logger.log(Level.FINEST,e.getMessage());
+				_logger.log(Level.SEVERE, "Error while creating the logfile" + logFile);
+
+				_logger.log(Level.FINEST, e.getMessage());
 			}
 			catch (IOException e)
 			{
-				_logger.log(Level.SEVERE,"Error while creating the logfile" + logFile);
-				
-				_logger.log(Level.FINEST,e.getMessage());
+				_logger.log(Level.SEVERE, "Error while creating the logfile" + logFile);
+
+				_logger.log(Level.FINEST, e.getMessage());
 			}
 		}
-		
+
 		Level logLevel = LogHelper.getLogLevel(this._properties.getProperty("ECG_LOG_LEVEL"));
-		
+
 		LogHelper.setLogLevel(logLevel);
-		
-		
+
 	}
 
-	
 	/**
-	 * This method is called by the ECG sensors that are able to have an object reference to the
-	 * SensorShell. Whenever they record an event they call the doCommand method and pass
-	 * the parameters according to the HackyStat SensorDataType and ECG MicroSensorDataType
-	 * definitions.
-	 * @param timeStamp The timeStamp of the event
-	 * @param commandType The HackyStat SensorDataType or of the event
-	 * @param argList The argList of the event that contains additional data or an ECG MicroSensorDataType
-	 * @return "true" if the event's data is syntactically correct and "false" otherwise
+	 * This method is called by the ECG sensors that are able to have an object
+	 * reference to the SensorShell. Whenever they record an event they call the
+	 * doCommand method and pass the parameters according to the HackyStat
+	 * SensorDataType and ECG MicroSensorDataType definitions.
+	 * 
+	 * @param timeStamp
+	 *            The timeStamp of the event
+	 * @param commandType
+	 *            The HackyStat SensorDataType or of the event
+	 * @param argList
+	 *            The argList of the event that contains additional data or an
+	 *            ECG MicroSensorDataType
+	 * @return "true" if the event's data is syntactically correct and "false"
+	 *         otherwise
 	 */
 	public boolean doCommand(Date timeStamp, String commandType, List argList)
 	{
 		_logger.entering(this.getClass().getName(), "doCommand");
 
 		boolean result;
+
+		if (this._acceptEvents == false)
+		{
+			return false;
+		}
 
 		if (commandType != null && commandType.equals(ECG_LAB_PATH))
 		{
@@ -319,11 +382,11 @@ public class SensorShell
 	{
 		_logger.entering(this.getClass().getName(), "analyseEvent");
 
-		ValidEventPacket packet;
+		WellFormedEventPacket packet;
 
 		try
 		{
-			packet = new ValidEventPacket(0, timeStamp, commandType, argList);
+			packet = new WellFormedEventPacket(0, timeStamp, commandType, argList);
 
 			_logger.log(Level.INFO, "The packet is valid.");
 
@@ -343,7 +406,16 @@ public class SensorShell
 			if (this._sendingThread != null)
 			{
 				// pass EventPacket to SendingThread
-				this._sendingThread.addEventPacket(packet);
+				try
+				{
+					this._sendingThread.addEventPacket(packet);
+				}
+				catch (EventPacketQueueOverflowException e)
+				{
+					_logger.log(Level.SEVERE, "A QueueOverflowException had occured.");
+
+					this._acceptEvents = false;
+				}
 
 				_logger.log(Level.INFO, "Event packet passed to SendingThread.");
 
@@ -353,15 +425,37 @@ public class SensorShell
 		{
 			if (this._toInlineServer != null)
 			{
-				this._toInlineServer.flush();
+				try
+				{
+					this._toInlineServer.flush();
 
-				this._toInlineServer.print(MICRO_ACTIVITY_PREFIX);
+					// this._toInlineServer.print(ValidEventPacket.MICRO_ACTIVITY_PREFIX);
 
-				this._toInlineServer.println(packet.toString());
+					this._toInlineServer.writeObject(packet);
 
-				this._toInlineServer.flush();
+					// this._toInlineServer.print(ValidEventPacket.MICRO_ACTIVITY_SUFFIX);
 
-				_logger.log(Level.INFO, "Event packet passed to InlineServer.");
+					this._toInlineServer.flush();
+
+					this._count++;
+					
+					if(this._count == RESET_COUNT)
+					{
+						this._toInlineServer.reset();
+						
+						this._count = 0;
+					}
+					
+					_logger.log(Level.INFO, "Event packet passed to InlineServer.");
+
+					_logger.log(Level.INFO, packet.toString());
+
+				}
+				catch (IOException e)
+				{
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		}
 
@@ -396,10 +490,13 @@ public class SensorShell
 		return true;
 	}
 
-	// Here begins the list of methods that are only implemented for compatibility issues to HackyStat sensors
+	// Here begins the list of methods that are only implemented for
+	// compatibility issues to HackyStat sensors
 
 	/**
-	 * This method returns the SensorProperties that are declared in the "sensor.properties" file.
+	 * This method returns the SensorProperties that are declared in the
+	 * "sensor.properties" file.
+	 * 
 	 * @return The SensorProperties
 	 */
 	public SensorProperties getSensorProperties()
@@ -412,8 +509,11 @@ public class SensorShell
 	}
 
 	/**
-	 * This method is not implemented and only declared for compatibility reasons.
-	 * @return Is allways true to to tell the hackyStat sensors sending was successfull
+	 * This method is not implemented and only declared for compatibility
+	 * reasons.
+	 * 
+	 * @return Is allways true to to tell the hackyStat sensors sending was
+	 *         successfull
 	 */
 	public boolean send()
 	{
@@ -425,8 +525,11 @@ public class SensorShell
 	}
 
 	/**
-	 * This method is not implemented and only declared for compatibility reasons.
-	 * @param str not used
+	 * This method is not implemented and only declared for compatibility
+	 * reasons.
+	 * 
+	 * @param str
+	 *            not used
 	 */
 	public void println(@SuppressWarnings("unused")
 	String str)
@@ -439,8 +542,11 @@ public class SensorShell
 	}
 
 	/**
-	 * This method is not implemented and only declared for compatibility reasons.
-	 * @return Is always true to tell HacyStat sensors that the server is pingable
+	 * This method is not implemented and only declared for compatibility
+	 * reasons.
+	 * 
+	 * @return Is always true to tell HacyStat sensors that the server is
+	 *         pingable
 	 */
 	public boolean isServerPingable()
 	{
@@ -452,9 +558,13 @@ public class SensorShell
 	}
 
 	/**
-	 * This method is not implemented and only declared for compatibility reasons.
-	 * @param milliSecondsToWait Is not used
-	 * @return s always true to tell HacyStat sensors that the server is pingable
+	 * This method is not implemented and only declared for compatibility
+	 * reasons.
+	 * 
+	 * @param milliSecondsToWait
+	 *            Is not used
+	 * @return s always true to tell HacyStat sensors that the server is
+	 *         pingable
 	 */
 	public boolean isServerPingable(@SuppressWarnings("unused")
 	int milliSecondsToWait)
@@ -467,7 +577,9 @@ public class SensorShell
 	}
 
 	/**
-	 * This method is not implemented and only declared for compatibility reasons.
+	 * This method is not implemented and only declared for compatibility
+	 * reasons.
+	 * 
 	 * @return An empty String
 	 */
 	public String getResultMessage()
@@ -540,9 +652,13 @@ public class SensorShell
 	}
 
 	/**
-	 * The main method makes this class a process that continuously reads from standard-input.
-	 * Every string that is passed to its standard-input is handled as recorded event data.
-	 * @param args The first parameter shall be the tool name string and the second shall be the path to the "sensor.properties" file.
+	 * The main method makes this class a process that continuously reads from
+	 * standard-input. Every string that is passed to its standard-input is
+	 * handled as recorded event data.
+	 * 
+	 * @param args
+	 *            The first parameter shall be the tool name string and the
+	 *            second shall be the path to the "sensor.properties" file.
 	 */
 	public static void main(String args[])
 	{
@@ -669,7 +785,8 @@ public class SensorShell
 
 				while ((line = br.readLine()) != null)
 				{
-					SensorShell._logger.log(Level.INFO, this._type + ">" + line);
+					// SensorShell._logger.log(Level.INFO, this._type + ">" +
+					// line);
 				}
 			}
 			catch (IOException e)
@@ -714,10 +831,9 @@ public class SensorShell
 
 	private static class InlineServer extends Thread
 	{
-		/**
-		 * 
-		 */
 		private static final int WAIT_FOR_PATH_DELAY = 1000;
+
+		private Process _ecgLab;
 
 		private SensorShell _shell;
 
@@ -728,6 +844,41 @@ public class SensorShell
 			this._shell = shell;
 
 			_logger.exiting(this.getClass().getName(), "InlineServer");
+		}
+
+		public void stopECGServer()
+		{
+			if (this._ecgLab == null)
+			{
+				_logger.log(Level.WARNING, "The ECG Lab process in null.");
+
+				return;
+			}
+			try
+			{
+				if (this._shell._toInlineServer == null)
+				{
+
+					this._shell._toInlineServer = new ObjectOutputStream(
+							this._ecgLab.getOutputStream());
+
+					_logger.log(Level.INFO, "The stream to the ECG Lab has been reopened.");
+				}
+
+				this._shell._toInlineServer.writeObject(new String("quit"));
+
+				_logger.log(Level.INFO, "The command \"quit\" has been sent to the ECG Lab.");
+
+				this._shell._toInlineServer.flush();
+
+				this._shell._toInlineServer.close();
+
+			}
+			catch (IOException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 
 		public void run()
@@ -763,20 +914,24 @@ public class SensorShell
 					ProcessBuilder pb = new ProcessBuilder("cmd.exe", "/C",
 							"ecg.bat");
 
-					pb.directory(new File(this._shell.ecgEclipseSensorPath));
+					File ecgDir = new File(
+							"." + File.separator + this._shell.ecgEclipseSensorPath);
 
-					Process p = pb.start();
+					SensorShell._logger.log(Level.INFO, "ECG Lab directory is: " + ecgDir.getAbsolutePath());
+
+					pb.directory(ecgDir);
+
+					this._ecgLab = pb.start();
 
 					SensorShell._logger.log(Level.INFO, "ECG Lab process started.");
 
-					this._shell._toInlineServer = new PrintWriter(
-							new OutputStreamWriter(p.getOutputStream()));
+					this._shell._toInlineServer = new ObjectOutputStream(this._ecgLab.getOutputStream());
 
 					StreamGobbler errorGobbler = new StreamGobbler(
-							p.getErrorStream(), "ERROR");
+							this._ecgLab.getErrorStream(), "ERROR");
 
 					StreamGobbler outputGobbler = new StreamGobbler(
-							p.getInputStream(), "OUTPUT");
+							this._ecgLab.getInputStream(), "OUTPUT");
 
 					errorGobbler.start();
 
@@ -798,5 +953,26 @@ public class SensorShell
 
 			_logger.exiting(this.getClass().getName(), "run");
 		}
+
+		/**
+		 * @see java.lang.Object#finalize()
+		 */
+		@Override
+		protected void finalize() throws Throwable
+		{
+
+			_logger.log(Level.INFO, "Finalizing InlineServer...");
+
+			try
+			{
+				stopECGServer();
+			}
+			finally
+			{
+				super.finalize();
+			}
+
+		}
 	}
+
 }

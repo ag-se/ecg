@@ -112,82 +112,7 @@ public class EventPacket implements Serializable
 		return this._argList;
 	}
 
-	/**
-	 * This method checks the syntactically correctness of an EventPacket.
-	 * @param timeStamp The timeStamp tells when the event was recorded
-	 * @param commandName The HackyStat The HackyStat SensorDataType of the event
-	 * @param argList The argList of parameters containing all the relevant event data
-	 * @return "true" if the EventPacket is syntactically correct and "false" if not
-	 */
-	public static boolean isValid(Date timeStamp, String commandName, List argList)
-	{
-		_logger.entering(EventPacket.class.getName(), "isValid");
-
-		if (timeStamp == null)
-		{
-			_logger.log(Level.INFO, "Packet is not valid");
-
-			_logger.log(Level.FINEST, "timeStamp is null");
-
-			_logger.exiting(EventPacket.class.getName(), "isValid");
-
-			return false;
-		}
-
-		if (commandName == null)
-		{
-			_logger.log(Level.INFO, "Packet is not valid");
-
-			_logger.log(Level.FINEST, "commandName is null");
-
-			_logger.exiting(EventPacket.class.getName(), "isValid");
-
-			return false;
-		}
-
-		if (argList == null)
-		{
-
-			_logger.log(Level.INFO, "Packet is not valid");
-
-			_logger.log(Level.FINEST, "argList is null");
-
-			_logger.exiting(EventPacket.class.getName(), "isValid");
-
-			return false;
-		}
-
-		if (argList.isEmpty())
-		{
-
-			_logger.log(Level.INFO, "Packet is not valid");
-
-			_logger.log(Level.FINEST, "argList is empty");
-
-			_logger.exiting(EventPacket.class.getName(), "isValid");
-
-			return false;
-		}
-
-		if (!(argList.get(0) instanceof String))
-		{
-			_logger.log(Level.INFO, "Packet is not valid");
-
-			_logger.log(Level.FINEST, "argList is not of type String");
-
-			_logger.exiting(EventPacket.class.getName(), "isValid");
-
-			return false;
-
-		}
-
-		_logger.log(Level.INFO, "Packet is valid");
-
-		_logger.exiting(EventPacket.class.getName(), "isValid");
-
-		return true;
-
-	}
+	
 
 	/**
 	 * This method returns a String representation of the EventPacket.
@@ -200,25 +125,36 @@ public class EventPacket implements Serializable
 		_logger.entering(this.getClass().getName(), "isValid");
 
 		String string = "";
+		
+		String dateString = "";
 
-		SimpleDateFormat dateFormat = new SimpleDateFormat(
-				ValidEventPacket.DATE_FORMAT_PATTERN);
+		if(this.getTimeStamp() != null)
+		{
+		
+			SimpleDateFormat dateFormat = new SimpleDateFormat(
+					WellFormedEventPacket.DATE_FORMAT_PATTERN);
+	
+			dateString = dateFormat.format(this.getTimeStamp());
 
-		String dateString = dateFormat.format(this.getTimeStamp());
-
+		}
+		
 		string += dateString + "#";
 
+		
+		
 		string += this.getSensorDataType() + "#";
 
 		StringBuffer stringBuffer = new StringBuffer();
 
-		for (int i = 0; i < this.getArglist().size(); i++)
+		if(this.getArglist() != null)
 		{
-			stringBuffer.append(";");
-
-			stringBuffer.append((String) this.getArglist().get(i));
+			for (int i = 0; i < this.getArglist().size(); i++)
+			{
+				stringBuffer.append(";");
+	
+				stringBuffer.append((String) this.getArglist().get(i));
+			}
 		}
-
 		_logger.exiting(this.getClass().getName(), "isValid");
 
 		return string + stringBuffer.toString();

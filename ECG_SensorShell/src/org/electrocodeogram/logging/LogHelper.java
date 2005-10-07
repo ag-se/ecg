@@ -82,6 +82,13 @@ public class LogHelper
 			homeDir = ".";
 		}
 
+		File logDir = new File(homeDir + File.separator + LOG_DIR);
+		
+		if(!logDir.exists() || logDir.isFile())
+		{
+			logDir.mkdir();
+		}
+		
 		filename = homeDir + File.separator + LOG_DIR + File.separator + filename;
 
 		// Create a file handler that write log record to a file called my.log

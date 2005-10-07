@@ -14,9 +14,11 @@ public class IllegalEventParameterException extends Exception
     private static final long serialVersionUID = 1871343961009715536L;
 
     private static Logger _logger = LogHelper.createLogger(IllegalEventParameterException.class.getName());
-    
-    public IllegalEventParameterException()
+       
+    public IllegalEventParameterException(String message)
     {
+    	super(message);
+    	
     	_logger.log(Level.WARNING,"An IllegalEventParameterException occured");
     	
     	_logger.log(Level.WARNING,this.getMessage());
