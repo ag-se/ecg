@@ -3,16 +3,23 @@ package org.electrocodeogram.module.source;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.nio.CharBuffer;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.electrocodeogram.event.IllegalEventParameterException;
-import org.electrocodeogram.event.ValidEventPacket;
+import org.electrocodeogram.event.WellFormedEventPacket;
+import org.electrocodeogram.logging.LogHelper;
 import org.electrocodeogram.module.ModulePropertyException;
+import org.electrocodeogram.moduleapi.system.IModuleSystemRoot;
+import org.electrocodeogram.system.SystemRoot;
 
 /**
  * This class is an ECG nodule that reads in ECG events form standard input.
@@ -23,6 +30,8 @@ import org.electrocodeogram.module.ModulePropertyException;
 public class IOSourceModule extends SourceModule
 {
 
+	static Logger _logger = LogHelper.createLogger(IOSourceModule.class.getName());
+	
 	private Console _console;
 	
 	/**
@@ -77,9 +86,16 @@ public class IOSourceModule extends SourceModule
 	 * @see org.electrocodeogram.module.source.SourceModule#startReader(org.electrocodeogram.module.source.SourceModule)
 	 */
 	@Override
-	public void startReader(SourceModule sourceModule)
+	public void startReader(SourceModule sourceModule) throws SourceModuleException
 	{
-		this._console = new Console(sourceModule);
+		try
+		{
+			this._console = new Console(sourceModule);
+		}
+		catch (IOException e)
+		{
+			throw new SourceModuleException(e.getMessage());
+		}
 
 		this._console.start();
 
@@ -101,7 +117,9 @@ public class IOSourceModule extends SourceModule
 	private class Console extends Thread
 	{
 
-		private BufferedReader bufferedReader = null;
+		//private BufferedReader bufferedReader = null;
+		
+		private ObjectInputStream bufferedReader = null;
 
 		private SourceModule _sourceModule;
 
@@ -113,13 +131,13 @@ public class IOSourceModule extends SourceModule
 		 * This creates the Console Thread to
 		 * continously read in events from standard input.
 		 * @param sourceModule Is the SourceModule to which events are beeing passed
+		 * @throws IOException 
 		 */
-		public Console(SourceModule sourceModule)
+		public Console(SourceModule sourceModule) throws IOException
 		{
 			this._sourceModule = sourceModule;
 
-			this.bufferedReader = new BufferedReader(new InputStreamReader(
-					System.in));
+			this.bufferedReader = new ObjectInputStream(System.in);
 		}
 
 		/**
@@ -156,7 +174,7 @@ public class IOSourceModule extends SourceModule
 			
 			String[] argListStringArray;
 			
-			ValidEventPacket eventPacket;
+			WellFormedEventPacket eventPacket;
 			
 			List argList;
 			
@@ -165,87 +183,55 @@ public class IOSourceModule extends SourceModule
 
 				System.out.println(this.getName() + " >>");
 
-				String inputString = "" + this.readLine();
-
-				System.out.println("Echo: " + inputString);
-
-				if (inputString.startsWith("MicroActivity#"))
+				Object inputObject = null;
+				
+				try
 				{
-					eventString = inputString.substring(new String(
-							"MicroActivty#").length());
-
-					this.stringTokenizer = new StringTokenizer(eventString,
-							ValidEventPacket.EVENT_SEPARATOR);
-
-					eventStrings = new String[this.stringTokenizer.countTokens()];
-
-					i = 0;
-
-					while (this.stringTokenizer.hasMoreTokens())
-					{
-						token = this.stringTokenizer.nextToken();
-
-						if (token == null || token.equals(""))
-						{
-							break;
-						}
-
-						eventStrings[i++] = token;
-					}
-
-					try
-					{
-						timeStamp = new SimpleDateFormat(
-								ValidEventPacket.DATE_FORMAT_PATTERN).parse(eventStrings[0]);
-					}
-					catch (ParseException e)
-					{
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-
-					sensorDataTypeString = eventStrings[1];
-
-					argListString = eventStrings[2];
-
-					argListTokenizer = new StringTokenizer(
-							argListString, ValidEventPacket.ARGLIST_SEPARATOR);
-
-					argListStringArray = new String[argListTokenizer.countTokens()];
-
-					int j = 0;
-
-					while (argListTokenizer.hasMoreTokens())
-					{
-						argListStringArray[j++] = argListTokenizer.nextToken();
-					}
-
-					argList = Arrays.asList(argListStringArray);
+					inputObject = this.readLine();
+				}
+				catch (ClassNotFoundException e)
+				{
+					_logger.log(Level.SEVERE,"An error occurred while receiving data.");
 					
-					eventPacket = null;
-	                
-	                
-                    try
-					{
-						eventPacket = new ValidEventPacket(0,timeStamp,sensorDataTypeString,argList);
-					}
-					catch (IllegalEventParameterException e)
-					{
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+					return;
+				}
+				
+				if (inputObject instanceof WellFormedEventPacket)
+				{
 					
-					this._sourceModule.append(eventPacket);
+					_logger.log(Level.INFO,"Event received");
+					
+					WellFormedEventPacket packet = (WellFormedEventPacket) inputObject;
+					
+					_logger.log(Level.INFO,packet.toString());
+					
+					this._sourceModule.append(packet);
 	                
+				}
+				else if(inputObject instanceof String)
+				{
+					
+					String string = (String) inputObject;
+					
+					_logger.log(Level.INFO,"Input is String");
+					
+					if(string.equals("quit"))
+					{
+						SystemRoot.getModuleInstance().quit();
+					}
 				}
 			}
 		}
 
-		private String readLine()
+		private Object readLine() throws ClassNotFoundException
 		{
+			
 			try
 			{
-				return this.bufferedReader.readLine();
+				Object object = this.bufferedReader.readObject();
+				
+				return object;
+				
 			}
 			catch (IOException e)
 			{
