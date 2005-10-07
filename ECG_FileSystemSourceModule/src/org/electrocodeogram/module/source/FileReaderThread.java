@@ -14,19 +14,24 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.electrocodeogram.event.IllegalEventParameterException;
-import org.electrocodeogram.event.ValidEventPacket;
+import org.electrocodeogram.event.WellFormedEventPacket;
 import org.electrocodeogram.logging.LogHelper;
 import org.electrocodeogram.module.source.FileSystemSourceModule.ReadMode;
 
 /**
- * This Thread is used by the FileSystemSourceModule to read in
- * events from a file asynchroneously.
- *
+ * This Thread is used by the FileSystemSourceModule to read in events from a
+ * file asynchroneously.
+ * 
  */
 public class FileReaderThread extends Thread
 {
 
-	private Logger _logger;
+	/**
+	 * 
+	 */
+	private static final String CODE_REPLACEMENT = "CODE";
+
+	private static Logger _logger = LogHelper.createLogger(FileReader.class.getName());
 
 	private SourceModule _sourceModule;
 
@@ -42,14 +47,18 @@ public class FileReaderThread extends Thread
 
 	/**
 	 * This constrcutor creates the FileReaderThread.
-	 * @param sourceModule Is the SourceModule to which the events shall be passed
-	 * @param inputFile Is the File from which too read the events
-	 * @param readMode Tells the FileReaderThread to run in either "BURST" or "REALTIME" mode
+	 * 
+	 * @param sourceModule
+	 *            Is the SourceModule to which the events shall be passed
+	 * @param inputFile
+	 *            Is the File from which too read the events
+	 * @param readMode
+	 *            Tells the FileReaderThread to run in either "BURST" or
+	 *            "REALTIME" mode
 	 */
 	public FileReaderThread(SourceModule sourceModule, File inputFile, ReadMode readMode)
 	{
-		this._logger = LogHelper.createLogger(this.getClass().getName());
-
+		
 		this._readMode = readMode;
 
 		this._sourceModule = sourceModule;
@@ -73,6 +82,11 @@ public class FileReaderThread extends Thread
 		// Stores the Date when the last event has been read in
 		Date relativeDate = null;
 
+		
+		boolean codechange = false;
+		
+		String code = null;
+		
 		try
 		{
 
@@ -85,29 +99,81 @@ public class FileReaderThread extends Thread
 			String line = null;
 
 			/*
-			 *  The first level Tokenizer used to disassemble the line into
-			 *  the timestamp, the SensorDataType and the argList String.
+			 * The first level Tokenizer used to disassemble the line into the
+			 * timestamp, the SensorDataType and the argList String.
 			 */
 			StringTokenizer eventTokenizer = null;
 
-			//  As long as there are more lines...
+			// As long as there are more lines...
 			while ((line = this._reader.readLine()) != null && this._run)
 			{
 
 				lineNumber++;
+				
+				if (line.contains("<codechange>") && !line.contains("</codechange>"))
+				{
+					
+					codechange = true;
+					
+					int beginOfCode = line.indexOf("![CDATA");
+					
+					_logger.log(Level.FINER, "Begin of a multiline Codechange event at index: " + beginOfCode);
+					
+					int endOfCode = 0;
+					
+					String nextLine;
+
+					while ((nextLine = this._reader.readLine()) != null && this._run)
+					{
+						line += nextLine;
+
+						lineNumber++;
+
+						if (nextLine.contains("</codechange>"))
+						{
+
+							endOfCode = line.lastIndexOf("</document>");
+							
+							_logger.log(Level.FINER, "Codechange event complete at index: " + endOfCode);
+							
+							break;
+						}
+					}
+					
+					if(endOfCode <= beginOfCode)
+					{
+						_logger.log(Level.WARNING, "Error while reading line " + lineNumber + ":");
+
+						_logger.log(Level.WARNING, "This line does not contain a valid codechange event.");
+
+						codechange = false;
+						
+						continue;
+					}
+					
+					code = line.substring(beginOfCode,endOfCode);
+					
+					String preCode = line.substring(0,beginOfCode - 1);
+					
+					String postCode = line.substring(endOfCode,line.length());
+					
+					line = preCode + CODE_REPLACEMENT + postCode;
+					
+				}
 
 				// Get a new Tokenizer.
-				eventTokenizer = new StringTokenizer(line,
-						ValidEventPacket.EVENT_SEPARATOR);
+				eventTokenizer = new StringTokenizer(line,WellFormedEventPacket.EVENT_SEPARATOR);
 
 				// Check if the line is well formed.
-				if (eventTokenizer.countTokens() != 3)
+				
+				int tokens = eventTokenizer.countTokens();
+				if (tokens != 3)
 				{
-					this._logger.log(Level.WARNING, "Error while reading line " + lineNumber + ":");
+						_logger.log(Level.WARNING, "Error while reading line " + lineNumber + ":");
 
-					this._logger.log(Level.WARNING, "This line does not contain valid event data.");
+						_logger.log(Level.WARNING, "This line does not contain valid event data.");
 
-					continue;
+						continue;
 				}
 
 				// Get the timestamp String.
@@ -116,9 +182,9 @@ public class FileReaderThread extends Thread
 				// Check if the timestamp String is well formed.
 				if (timeStampString == null || timeStampString.equals(""))
 				{
-					this._logger.log(Level.WARNING, "Error while reading timeStamp in line " + lineNumber + ":");
+					_logger.log(Level.WARNING, "Error while reading timeStamp in line " + lineNumber + ":");
 
-					this._logger.log(Level.WARNING, "The timeStamp is empty.");
+					_logger.log(Level.WARNING, "The timeStamp is empty.");
 
 					continue;
 				}
@@ -129,9 +195,9 @@ public class FileReaderThread extends Thread
 				// Check if the SensorDataType String is well formed.
 				if (sensorDataTypeString == null || sensorDataTypeString.equals(""))
 				{
-					this._logger.log(Level.WARNING, "Error while reading SensorDataType in line " + lineNumber + ":");
+					_logger.log(Level.WARNING, "Error while reading SensorDataType in line " + lineNumber + ":");
 
-					this._logger.log(Level.WARNING, "The SensorDataType is empty.");
+					_logger.log(Level.WARNING, "The SensorDataType is empty.");
 
 					continue;
 				}
@@ -142,9 +208,9 @@ public class FileReaderThread extends Thread
 				// Check if the argList String is well formed.
 				if (argListString == null || argListString.equals(""))
 				{
-					this._logger.log(Level.WARNING, "Error while reading argList in line " + lineNumber + ":");
+					_logger.log(Level.WARNING, "Error while reading argList in line " + lineNumber + ":");
 
-					this._logger.log(Level.WARNING, "The argList is empty.");
+					_logger.log(Level.WARNING, "The argList is empty.");
 
 					continue;
 				}
@@ -155,23 +221,24 @@ public class FileReaderThread extends Thread
 				try
 				{
 					timeStamp = new SimpleDateFormat(
-							ValidEventPacket.DATE_FORMAT_PATTERN).parse(timeStampString);
+							WellFormedEventPacket.DATE_FORMAT_PATTERN).parse(timeStampString);
 				}
 				catch (ParseException e)
 				{
 
-					this._logger.log(Level.WARNING, "Error while reading timeStamp in line " + lineNumber + ":");
+					_logger.log(Level.WARNING, "Error while reading timeStamp in line " + lineNumber + ":");
 
-					this._logger.log(Level.WARNING, "The timeStamp is invalid.");
+					_logger.log(Level.WARNING, "The timeStamp is invalid.");
 
-					this._logger.log(Level.WARNING, e.getMessage());
+					_logger.log(Level.WARNING, e.getMessage());
 
 					continue;
 				}
 
-				// This second level Tokenizer is used to dissasemble the argList.
+				// This second level Tokenizer is used to dissasemble the
+				// argList.
 				StringTokenizer argListTokenizer = new StringTokenizer(
-						argListString, ValidEventPacket.ARGLIST_SEPARATOR);
+						argListString, WellFormedEventPacket.ARGLIST_SEPARATOR);
 
 				// The Array is used to temprarilly store the argList entries.
 				String[] argListStringArray = new String[argListTokenizer.countTokens()];
@@ -183,51 +250,87 @@ public class FileReaderThread extends Thread
 					argListStringArray[i++] = argListTokenizer.nextToken();
 				}
 
-				// Create a List object from the Array now containing the argList String entries.
+				if(codechange)
+				{
+					if(code == null || code.equals(""))
+					{
+						_logger.log(Level.WARNING, "Error while reading line " + lineNumber + ":");
+
+						_logger.log(Level.WARNING, "This line does not contain a valid codechange event.");
+
+						codechange = false;
+						
+						continue;
+					}
+					
+					String last = argListStringArray[argListStringArray.length - 1];
+					
+					if(!last.contains(CODE_REPLACEMENT))
+					{
+						_logger.log(Level.WARNING, "Error while reading line " + lineNumber + ":");
+
+						_logger.log(Level.WARNING, "This line does not contain a valid codechange event.");
+
+						codechange = false;
+						
+						continue;
+					}
+					
+					last = last.replace(CODE_REPLACEMENT,code);
+				}
+				
+				// Create a List object from the Array now containing the
+				// argList String entries.
 				List argList = Arrays.asList(argListStringArray);
 
 				// Try to create a ValidEventPacket object from the line's data.
-				ValidEventPacket eventPacket = null;
+				WellFormedEventPacket eventPacket = null;
 
 				try
 				{
-					eventPacket = new ValidEventPacket(0, timeStamp,
+					eventPacket = new WellFormedEventPacket(0, timeStamp,
 							sensorDataTypeString, argList);
 				}
 				catch (IllegalEventParameterException e)
 				{
 
-					this._logger.log(Level.WARNING, "Error while generating eventz from line " + lineNumber + ":");
+					_logger.log(Level.WARNING, "Error while generating event from line " + lineNumber + ":");
 
-					this._logger.log(Level.WARNING, e.getMessage());
+					_logger.log(Level.WARNING, e.getMessage());
 
 					continue;
 				}
 
 				/*
-				 * When this module is in "BURST" mode we can continue to parse the next line.
-				 * If not we need to analyse the timestamp of the next line.
+				 * When this module is in "BURST" mode we can continue to parse
+				 * the next line. If not we need to analyse the timestamp of the
+				 * next line.
 				 */
 				if (this._readMode != ReadMode.BURST)
 				{
-					// If this was the first line, then no previous timestamp has been stored.
+					// If this was the first line, then no previous timestamp
+					// has been stored.
 					if (dateOfLastEvent != null)
 					{
-						// Get the time delta of the last event and the current event.
+						// Get the time delta of the last event and the current
+						// event.
 						long eventDelta = eventPacket.getTimeStamp().getTime() - dateOfLastEvent.getTime();
 
 						// Get the current Date
 						Date currentDate = new Date();
 
-						// Get the delta of the time when the last event was parsed and now
+						// Get the delta of the time when the last event was
+						// parsed and now
 						long realDelta = currentDate.getTime() - relativeDate.getTime();
 
-						// Get the delta in real realtime and compare it to the event time delta.
+						// Get the delta in real realtime and compare it to the
+						// event time delta.
 						while (realDelta < eventDelta && this._readMode != ReadMode.BURST && this._run)
 						{
 							try
 							{
-								// Wait some time and retry until the time has ellapsed.
+								// Wait some time and retry until the time has
+								// ellapsed.
 								Thread.sleep(TIME_SPAN);
 
 								currentDate = new Date();
@@ -243,7 +346,7 @@ public class FileReaderThread extends Thread
 					}
 
 				}
-
+			
 				// Store the timestamp of the current event for the next loop.
 				dateOfLastEvent = eventPacket.getTimeStamp();
 
@@ -252,18 +355,17 @@ public class FileReaderThread extends Thread
 
 				// Now pass the event to the SourceModule and into the ECG Lab.
 				this._sourceModule.append(eventPacket);
-
 			}
+				this._reader.close();
 
-			this._reader.close();
-
-			this._sourceModule.deactivate();
+				this._sourceModule.deactivate();
+			
 		}
 		catch (IOException e)
 		{
-			this._logger.log(Level.SEVERE, "Error while reading the file: " + this._inputFile.getAbsolutePath());
+			_logger.log(Level.SEVERE, "Error while reading the file: " + this._inputFile.getAbsolutePath());
 
-			this._logger.log(Level.FINEST, e.getMessage());
+			_logger.log(Level.FINEST, e.getMessage());
 		}
 		finally
 		{
@@ -275,9 +377,9 @@ public class FileReaderThread extends Thread
 				}
 				catch (IOException e)
 				{
-					this._logger.log(Level.SEVERE, "Error while closing the file: " + this._inputFile.getAbsolutePath());
+					_logger.log(Level.SEVERE, "Error while closing the file: " + this._inputFile.getAbsolutePath());
 
-					this._logger.log(Level.FINEST, e.getMessage());
+					_logger.log(Level.FINEST, e.getMessage());
 				}
 			}
 		}
@@ -285,7 +387,9 @@ public class FileReaderThread extends Thread
 
 	/**
 	 * This method sets the ReadMode for the FileReaderThread.
-	 * @param readMode Is the ReadMode. Either "BURST" or "REALTIME".
+	 * 
+	 * @param readMode
+	 *            Is the ReadMode. Either "BURST" or "REALTIME".
 	 */
 	public void setMode(ReadMode readMode)
 	{

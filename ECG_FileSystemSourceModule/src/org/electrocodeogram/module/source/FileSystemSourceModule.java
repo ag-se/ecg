@@ -2,6 +2,7 @@ package org.electrocodeogram.module.source;
 
 import java.io.File;
 
+import org.electrocodeogram.module.ModuleProperty;
 import org.electrocodeogram.module.ModulePropertyException;
 
 /**
@@ -94,6 +95,14 @@ public class FileSystemSourceModule extends SourceModule
 		{
 			throw new ModulePropertyException(
 					"The module does not support a property with the given name: " + propertyName);
+		}
+		
+		for (ModuleProperty property : this.runtimeProperties)
+		{
+			if (property.getName().equals(propertyName))
+			{
+				property.setValue(propertyValue);
+			}
 		}
 
 	}

@@ -18,6 +18,9 @@
 	<description>
 		This module is able to read a file system source for previously written events.
 	</description>
+	<type>
+		SOURCE
+	</type>
 	<properties>
 		<property>
 			<propertyName>
