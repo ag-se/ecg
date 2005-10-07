@@ -91,6 +91,17 @@
 		<ant dir="../ECG_MSDTFilterIntermediateModule" target="cleanall" />
 
 	</target>
+	
+	<!-- Calls the ant script of the ECG StatisticsTargetModule to clean it -->
+		<target name="CleanAll ECG StatisticsTargetModule">
+
+			<echo message="####################################" />
+			<echo message="CLEANING ECG STATISTICSTARGETEMODULE" />
+			<echo message="####################################" />
+
+			<ant dir="../ECG_StatisticsTargetModule" target="cleanall" />
+
+		</target>
 
 	<!-- Calls the ant script of the ECG CodechangeDifferIntermediateModule to clean it -->
 	<target name="CleanAll ECG CodechangeDifferIntermediateModule">
@@ -126,7 +137,7 @@
 			</target>
 
 	<!-- Cleans all ECG components -->
-	<target name="cleanAll" depends="CleanAll ECG SensorShell,CleanAll ECG TestHelper,CleanAll ECG ServerAndLab,CleanAll ECG SocketSourceModule, CleanAll ECG FileSystemTargetModule, CleanAll ECG FileSystemSourceModule, CleanAll ECG MSDTFilterIntermediateModule, CleanAll ECG CodechangeDifferIntermediateModule, CleanAll ECG IOSourceModule, CleanAll ECG ManualAnnotatorSourceModule, CleanAll ECG HackyStatTargetModule" />
+	<target name="cleanAll" depends="CleanAll ECG SensorShell,CleanAll ECG TestHelper,CleanAll ECG ServerAndLab,CleanAll ECG SocketSourceModule, CleanAll ECG FileSystemTargetModule, CleanAll ECG FileSystemSourceModule, CleanAll ECG MSDTFilterIntermediateModule, CleanAll ECG CodechangeDifferIntermediateModule, CleanAll ECG IOSourceModule, CleanAll ECG ManualAnnotatorSourceModule, CleanAll ECG HackyStatTargetModule, CleanAll ECG StatisticsTargetModule" />
 
 
 	<!-- Calls the ant script of the ECG SensorShell component to build it -->
@@ -233,6 +244,17 @@
 		<ant dir="../ECG_MSDTFilterIntermediateModule" target="deploy" />
 
 	</target>
+	
+	<!-- Calls the ant script of the ECG StatisticIntermediateModule to build it -->
+		<target name="Build ECG StatisticsTargetModule">
+
+			<echo message="###################################" />
+			<echo message="BUILDING ECG STATISTICSTARGETMODULE" />
+			<echo message="###################################" />
+
+			<ant dir="../ECG_StatisticsTargetModule" target="deploy" />
+
+		</target>
 
 	<!-- Calls the ant script of the ECG CodechangeDifferIntermediateModule to build it -->
 	<target name="Build ECG CodechangeDifferIntermediateModule">
@@ -292,27 +314,37 @@
 
 
 	<!-- Builds all ECG components -->
-	<target name="buildAll" depends="Build ECG SensorShell Event,Build ECG TestHelper, Build ECG SensorShell Shell,Build ECG ServerAndLab Module-API,Build ECG SocketSourceModule, Build ECG FileSystemTargetModule, Build ECG FileSystemSourceModule, Build ECG MSDTFilterIntermediateModule, Build ECG CodechangeDifferIntermediateModule, Build ECG IOSourceModule, Build ECG ManualAnnotatorSourceModule, Build ECG HackyStatTargetModule, Assemble ECG ServerAndLab" />
+	<target name="buildAll" depends="Build ECG SensorShell Event,Build ECG TestHelper, Build ECG SensorShell Shell,Build ECG ServerAndLab Module-API,Build ECG SocketSourceModule, Build ECG FileSystemTargetModule, Build ECG FileSystemSourceModule, Build ECG MSDTFilterIntermediateModule, Build ECG CodechangeDifferIntermediateModule, Build ECG IOSourceModule, Build ECG ManualAnnotatorSourceModule, Build ECG HackyStatTargetModule, Build ECG StatisticsTargetModule, Assemble ECG ServerAndLab" />
 
 	<!-- Package release -->
 	<target name="Package release" depends="cleanAll,buildAll">
 
+		<delete failonerror="no">
+				<fileset dir="dist" />
+		</delete>
+		
 		<mkdir dir="dist" />
 
 		<mkdir dir="dist/plugins" />
 
 		<mkdir dir="dist/user.home" />
 
+		<mkdir dir="dist/ecg" />
+		
 		<tstamp />
-
+		
 		<copy todir="dist/user.home">
 
 			<fileset dir="../sensor.properties/" includes="sensor.properties" />
 
 		</copy>
 
-		<zip zipfile="dist/ElectroCodeoGram${DSTAMP}${TSTAMP}.zip" basedir="../ECG_Lab/dist/application" />
+		<copy todir="dist/ecg">
 
+			<fileset dir="../ECG_Lab/dist/application" />
+
+		</copy>
+		
 		<zip zipfile="dist/plugins/org.hackystat.stdext.sensor_6.4.117.3x.zip" basedir="../HackyStat EclipseSensor/" />
 
 		<pde.exportPlugins destination="D:\UserDocuments\7oas7er\studium\Informatik\Diplomarbeit\Projektordner\ECG Build\dist" exportSource="false" exportType="directory" plugins="org.electrocodeogram.sensor.eclipse" source="1.5" target="1.5" useJARFormat="false"/>
