@@ -18,6 +18,9 @@
 	<description>
 		This module is able to sendincoming event data a HackyStat server.
 	</description>
+	<type>
+		TARGET
+	</type>
 	<properties>
 		<property>
 			<propertyName>

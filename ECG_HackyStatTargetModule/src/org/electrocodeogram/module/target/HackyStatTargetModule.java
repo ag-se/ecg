@@ -1,6 +1,6 @@
 package org.electrocodeogram.module.target;
 
-import org.electrocodeogram.event.TypedValidEventPacket;
+import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.module.ModulePropertyException;
 import org.hackystat.kernel.admin.SensorProperties;
 import org.hackystat.kernel.shell.SensorShell;
@@ -41,7 +41,7 @@ public class HackyStatTargetModule extends TargetModule
 	 * @see org.electrocodeogram.module.target.TargetModule#write(org.electrocodeogram.event.TypedValidEventPacket)
 	 */
 	@Override
-	public void write(TypedValidEventPacket arg0)
+	public void write(ValidEventPacket arg0)
 	{
 		if (this._shell == null)
 		{
