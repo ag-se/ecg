@@ -1,5 +1,6 @@
 package org.hackystat.stdext.sensor.eclipse;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.core.resources.IWorkspace;
@@ -11,6 +12,8 @@ import org.eclipse.ui.IStartup;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.electrocodeogram.logging.LogHelper;
 import org.electrocodeogram.sensor.eclipse.ECGEclipseSensor;
+import org.hackystat.kernel.shell.SensorShell;
+import org.osgi.framework.BundleContext;
 
 /**
  * This is the ECG EclipseSensor plug-in. At Eclipse startup this class creates
@@ -54,10 +57,22 @@ public class EclipseSensorPlugin extends AbstractUIPlugin implements IStartup
 
 		// Create the ECG EclipseSensor
 		ECGEclipseSensor.getInstance();
-
+				
 		_logger.exiting(this.getClass().getName(), "earlyStartup");
 	}
 
+	
+	@Override
+	public void stop(BundleContext context) throws Exception
+	{
+		
+		_logger.log(Level.INFO,"ECGEclipsePlugin stopping...");
+		
+		SensorShell.stop();
+		
+		super.stop(context);
+	}
+	
 	/**
 	 * This returns the singleton instance of the ECG EclipseSensor PlugIn. This
 	 * method is needed by the HackyStat Eclipse sensor.

@@ -35,7 +35,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
-import org.electrocodeogram.event.ValidEventPacket;
+import org.electrocodeogram.event.WellFormedEventPacket;
 import org.electrocodeogram.logging.LogHelper;
 import org.hackystat.kernel.shell.SensorShell;
 import org.hackystat.stdext.sensor.eclipse.EclipseSensor;
@@ -157,7 +157,7 @@ public class ECGEclipseSensor
 
 		if (part instanceof ITextEditor)
 		{
-			processActivity("<?xml version=\"1.0\"?><microActivity><commonData><username>" + ECGEclipseSensor.this._username + "</username><projectname>" + ECGEclipseSensor.this._projectname + "</projectname></commonData><editor><activity>opened</activity><editorname>" + part.getTitle() + "</editorname></editor></microActivity>");
+			processActivity("msdt.editor.xsd","<?xml version=\"1.0\"?><microActivity><commonData><username>" + ECGEclipseSensor.this._username + "</username><projectname>" + ECGEclipseSensor.this._projectname + "</projectname></commonData><editor><activity>opened</activity><editorname>" + part.getTitle() + "</editorname></editor></microActivity>");
 
 			this._activeTextEditor = (ITextEditor) part;
 
@@ -246,7 +246,7 @@ public class ECGEclipseSensor
 	 *            This is the actual MicroActivity encoded in an XML String that
 	 *            is conforming to one of the defined XML Schemas.s
 	 */
-	public void processActivity(String data)
+	public void processActivity(String msdt,String data)
 	{
 		_logger.entering(this.getClass().getName(), "processActivity");
 
@@ -259,14 +259,15 @@ public class ECGEclipseSensor
 			return;
 		}
 
-		String[] args = { ValidEventPacket.HACKYSTAT_ADD_COMMAND, ValidEventPacket.MICRO_ACTIVITY_STRING, data };
+		String[] args = { WellFormedEventPacket.HACKYSTAT_ADD_COMMAND, WellFormedEventPacket.MICRO_ACTIVITY_PREFIX+msdt, data };
 
 		// if Eclipse is shutting down the EclipseSensorShell might be gone
 		// allready
 		if (this._eclipseSensorShell != null)
 		{
-			this._eclipseSensorShell.doCommand(ValidEventPacket.HACKYSTAT_ACTIVITY_STRING, Arrays.asList(args));
+			this._eclipseSensorShell.doCommand(WellFormedEventPacket.HACKYSTAT_ACTIVITY_STRING, Arrays.asList(args));
 
+			_logger.log(Level.INFO,"Passed to EclipseSensorShell");
 		}
 
 		_logger.exiting(this.getClass().getName(), "processActivity");
@@ -302,7 +303,7 @@ public class ECGEclipseSensor
 			{
 				ECGEclipseSensor.this._activeWindowName = window.getActivePage().getLabel();
 
-				processActivity("<?xml version=\"1.0\"?><microActivity><commonData><username>" + ECGEclipseSensor.this._username + "</username><projectname>" + ECGEclipseSensor.this._projectname + "</projectname></commonData><window><activity>activated</activity><windowname>" + ECGEclipseSensor.this._activeWindowName + "</windowname></window></microActivity>");
+				processActivity("msdt.window.xsd","<?xml version=\"1.0\"?><microActivity><commonData><username>" + ECGEclipseSensor.this._username + "</username><projectname>" + ECGEclipseSensor.this._projectname + "</projectname></commonData><window><activity>activated</activity><windowname>" + ECGEclipseSensor.this._activeWindowName + "</windowname></window></microActivity>");
 			}
 
 			_logger.exiting(this.getClass().getName(), "windowActivated");
@@ -326,7 +327,7 @@ public class ECGEclipseSensor
 
 			}
 
-			processActivity("<?xml version=\"1.0\"?><microActivity><commonData><username>" + ECGEclipseSensor.this._username + "</username><projectname>" + ECGEclipseSensor.this._projectname + "</projectname></commonData><window><activity>closed</activity><windowname>" + ECGEclipseSensor.this._activeWindowName + "</windowname></window></microActivity>");
+			processActivity("msdt.window.xsd","<?xml version=\"1.0\"?><microActivity><commonData><username>" + ECGEclipseSensor.this._username + "</username><projectname>" + ECGEclipseSensor.this._projectname + "</projectname></commonData><window><activity>closed</activity><windowname>" + ECGEclipseSensor.this._activeWindowName + "</windowname></window></microActivity>");
 
 			_logger.exiting(this.getClass().getName(), "windowClosed");
 		}
@@ -350,7 +351,7 @@ public class ECGEclipseSensor
 
 			}
 
-			processActivity("<?xml version=\"1.0\"?><microActivity><commonData><username>" + ECGEclipseSensor.this._username + "</username><projectname>" + ECGEclipseSensor.this._projectname + "</projectname></commonData><window><activity>deactivated</activity><windowname>" + ECGEclipseSensor.this._activeWindowName + "</windowname></window></microActivity>");
+			processActivity("msdt.window.xsd","<?xml version=\"1.0\"?><microActivity><commonData><username>" + ECGEclipseSensor.this._username + "</username><projectname>" + ECGEclipseSensor.this._projectname + "</projectname></commonData><window><activity>deactivated</activity><windowname>" + ECGEclipseSensor.this._activeWindowName + "</windowname></window></microActivity>");
 
 			_logger.exiting(this.getClass().getName(), "windowDeactivated");
 		}
@@ -373,7 +374,7 @@ public class ECGEclipseSensor
 
 			}
 
-			processActivity("<?xml version=\"1.0\"?><microActivity><commonData><username>" + ECGEclipseSensor.this._username + "</username><projectname>" + ECGEclipseSensor.this._projectname + "</projectname></commonData><window><activity>deactivated</activity><windowname>" + window.getActivePage().getLabel() + "</windowname></window></microActivity>");
+			processActivity("msdt.window.xsd","<?xml version=\"1.0\"?><microActivity><commonData><username>" + ECGEclipseSensor.this._username + "</username><projectname>" + ECGEclipseSensor.this._projectname + "</projectname></commonData><window><activity>deactivated</activity><windowname>" + window.getActivePage().getLabel() + "</windowname></window></microActivity>");
 
 			_logger.exiting(this.getClass().getName(), "windowOpened");
 		}
@@ -487,13 +488,13 @@ public class ECGEclipseSensor
 						// a resource has been added
 						case IResourceDelta.ADDED:
 
-							processActivity("<?xml version=\"1.0\"?><microActivity><commonData><username>" + ECGEclipseSensor.this._username + "</username><projectname>" + ECGEclipseSensor.this._projectname + "</projectname></commonData><resource><activity>added</activity><resourcename>" + resource.getName() + "</resourcename><resourcetype>" + resourceType + "</resourcetype></resource></microActivity>");
+							processActivity("msdt.resource.xsd","<?xml version=\"1.0\"?><microActivity><commonData><username>" + ECGEclipseSensor.this._username + "</username><projectname>" + ECGEclipseSensor.this._projectname + "</projectname></commonData><resource><activity>added</activity><resourcename>" + resource.getName() + "</resourcename><resourcetype>" + resourceType + "</resourcetype></resource></microActivity>");
 
 							break;
 						// a resource has been removed
 						case IResourceDelta.REMOVED:
 
-							processActivity("<?xml version=\"1.0\"?><microActivity><commonData><username>" + ECGEclipseSensor.this._username + "</username><projectname>" + ECGEclipseSensor.this._projectname + "</projectname></commonData><resource><activity>removed</activity><resourcename>" + resource.getName() + "</resourcename><resourcetype>" + resourceType + "</resourcetype></resource></microActivity>");
+							processActivity("msdt.resource.xsd","<?xml version=\"1.0\"?><microActivity><commonData><username>" + ECGEclipseSensor.this._username + "</username><projectname>" + ECGEclipseSensor.this._projectname + "</projectname></commonData><resource><activity>removed</activity><resourcename>" + resource.getName() + "</resourcename><resourcetype>" + resourceType + "</resourcetype></resource></microActivity>");
 
 							break;
 						// a resource has been changed
@@ -507,7 +508,7 @@ public class ECGEclipseSensor
 							}
 							else
 							{
-								processActivity("<?xml version=\"1.0\"?><microActivity><commonData><username>" + ECGEclipseSensor.this._username + "</username><projectname>" + ECGEclipseSensor.this._projectname + "</projectname></commonData><resource><activity>changed</activity><resourcename>" + resource.getName() + "</resourcename><resourcetype>" + resourceType + "</resourcetype></resource></microActivity>");
+								processActivity("msdt.resource.xsd","<?xml version=\"1.0\"?><microActivity><commonData><username>" + ECGEclipseSensor.this._username + "</username><projectname>" + ECGEclipseSensor.this._projectname + "</projectname></commonData><resource><activity>changed</activity><resourcename>" + resource.getName() + "</resourcename><resourcetype>" + resourceType + "</resourcetype></resource></microActivity>");
 							}
 							break;
 					}
@@ -603,11 +604,11 @@ public class ECGEclipseSensor
 			if (launch.getLaunchMode().equals("run"))
 			{
 
-				processActivity("<?xml version=\"1.0\"?><microActivity><commonData><username>" + ECGEclipseSensor.this._username + "</username><projectname>" + ECGEclipseSensor.this._projectname + "</projectname></commonData><run debug=\"false\"></run></microActivity>");
+				processActivity("msdt.rundebug.xsd","<?xml version=\"1.0\"?><microActivity><commonData><username>" + ECGEclipseSensor.this._username + "</username><projectname>" + ECGEclipseSensor.this._projectname + "</projectname></commonData><run debug=\"false\"></run></microActivity>");
 			}
 			else
 			{
-				processActivity("<?xml version=\"1.0\"?><microActivity><commonData><username>" + ECGEclipseSensor.this._username + "</username><projectname>" + ECGEclipseSensor.this._projectname + "</projectname></commonData><run debug=\"true\"></run></microActivity>");
+				processActivity("msdt.rundebug.xsd","<?xml version=\"1.0\"?><microActivity><commonData><username>" + ECGEclipseSensor.this._username + "</username><projectname>" + ECGEclipseSensor.this._projectname + "</projectname></commonData><run debug=\"true\"></run></microActivity>");
 			}
 
 			_logger.exiting(this.getClass().getName(), "analyseLaunch");
@@ -650,12 +651,12 @@ public class ECGEclipseSensor
 
 				document.addDocumentListener(new DocumentListenerAdapter());
 
-				processActivity("<?xml version=\"1.0\"?><microActivity><commonData><username>" + ECGEclipseSensor.this._username + "</username><projectname>" + ECGEclipseSensor.this._projectname + "</projectname></commonData><editor><activity>activated</activity><editorname>" + part.getTitle() + "</editorname></editor></microActivity>");
+				processActivity("msdt.editor.xsd","<?xml version=\"1.0\"?><microActivity><commonData><username>" + ECGEclipseSensor.this._username + "</username><projectname>" + ECGEclipseSensor.this._projectname + "</projectname></commonData><editor><activity>activated</activity><editorname>" + part.getTitle() + "</editorname></editor></microActivity>");
 
 			}
 			else
 			{
-				processActivity("<?xml version=\"1.0\"?><microActivity><commonData><username>" + ECGEclipseSensor.this._username + "</username><projectname>" + ECGEclipseSensor.this._projectname + "</projectname></commonData><part><activity>activated</activity><partname>" + part.getTitle() + "</partname></part></microActivity>");
+				processActivity("msdt.part.xsd","<?xml version=\"1.0\"?><microActivity><commonData><username>" + ECGEclipseSensor.this._username + "</username><projectname>" + ECGEclipseSensor.this._projectname + "</projectname></commonData><part><activity>activated</activity><partname>" + part.getTitle() + "</partname></part></microActivity>");
 			}
 
 			_logger.exiting(this.getClass().getName(), "partActivated");
@@ -680,12 +681,12 @@ public class ECGEclipseSensor
 			if (part instanceof ITextEditor)
 			{
 
-				processActivity("<?xml version=\"1.0\"?><microActivity><commonData><username>" + ECGEclipseSensor.this._username + "</username><projectname>" + ECGEclipseSensor.this._projectname + "</projectname></commonData><editor><activity>closed</activity><editorname>" + part.getTitle() + "</editorname></editor></microActivity>");
+				processActivity("msdt.editor.xsd","<?xml version=\"1.0\"?><microActivity><commonData><username>" + ECGEclipseSensor.this._username + "</username><projectname>" + ECGEclipseSensor.this._projectname + "</projectname></commonData><editor><activity>closed</activity><editorname>" + part.getTitle() + "</editorname></editor></microActivity>");
 
 			}
 			else
 			{
-				processActivity("<?xml version=\"1.0\"?><microActivity><commonData><username>" + ECGEclipseSensor.this._username + "</username><projectname>" + ECGEclipseSensor.this._projectname + "</projectname></commonData><part><activity>closed</activity><partname>" + part.getTitle() + "</partname></part></microActivity>");
+				processActivity("msdt.part.xsd","<?xml version=\"1.0\"?><microActivity><commonData><username>" + ECGEclipseSensor.this._username + "</username><projectname>" + ECGEclipseSensor.this._projectname + "</projectname></commonData><part><activity>closed</activity><partname>" + part.getTitle() + "</partname></part></microActivity>");
 			}
 
 			_logger.exiting(this.getClass().getName(), "partClosed");
@@ -710,12 +711,12 @@ public class ECGEclipseSensor
 			if (part instanceof ITextEditor)
 			{
 
-				processActivity("<?xml version=\"1.0\"?><microActivity><commonData><username>" + ECGEclipseSensor.this._username + "</username><projectname>" + ECGEclipseSensor.this._projectname + "</projectname></commonData><editor><activity>deactivated</activity><editorname>" + part.getTitle() + "</editorname></editor></microActivity>");
+				processActivity("msdt.editor.xsd","<?xml version=\"1.0\"?><microActivity><commonData><username>" + ECGEclipseSensor.this._username + "</username><projectname>" + ECGEclipseSensor.this._projectname + "</projectname></commonData><editor><activity>deactivated</activity><editorname>" + part.getTitle() + "</editorname></editor></microActivity>");
 
 			}
 			else
 			{
-				processActivity("<?xml version=\"1.0\"?><microActivity><commonData><username>" + ECGEclipseSensor.this._username + "</username><projectname>" + ECGEclipseSensor.this._projectname + "</projectname></commonData><part><activity>deactivated</activity><partname>" + part.getTitle() + "</partname></part></microActivity>");
+				processActivity("msdt.part.xsd","<?xml version=\"1.0\"?><microActivity><commonData><username>" + ECGEclipseSensor.this._username + "</username><projectname>" + ECGEclipseSensor.this._projectname + "</projectname></commonData><part><activity>deactivated</activity><partname>" + part.getTitle() + "</partname></part></microActivity>");
 			}
 
 			_logger.exiting(this.getClass().getName(), "partDeactivated");
@@ -741,12 +742,12 @@ public class ECGEclipseSensor
 			if (part instanceof ITextEditor)
 			{
 
-				processActivity("<?xml version=\"1.0\"?><microActivity><commonData><username>" + ECGEclipseSensor.this._username + "</username><projectname>" + ECGEclipseSensor.this._projectname + "</projectname></commonData><editor><activity>opened</activity><editorname>" + part.getTitle() + "</editorname></editor></microActivity>");
+				processActivity("msdt.editor.xsd","<?xml version=\"1.0\"?><microActivity><commonData><username>" + ECGEclipseSensor.this._username + "</username><projectname>" + ECGEclipseSensor.this._projectname + "</projectname></commonData><editor><activity>opened</activity><editorname>" + part.getTitle() + "</editorname></editor></microActivity>");
 
 			}
 			else
 			{
-				processActivity("<?xml version=\"1.0\"?><microActivity><commonData><username>" + ECGEclipseSensor.this._username + "</username><projectname>" + ECGEclipseSensor.this._projectname + "</projectname></commonData><part><activity>opened</activity><partname>" + part.getTitle() + "</partname></part></microActivity>");
+				processActivity("msdt.part.xsd","<?xml version=\"1.0\"?><microActivity><commonData><username>" + ECGEclipseSensor.this._username + "</username><projectname>" + ECGEclipseSensor.this._projectname + "</projectname></commonData><part><activity>opened</activity><partname>" + part.getTitle() + "</partname></part></microActivity>");
 			}
 
 			_logger.exiting(this.getClass().getName(), "partOpened");
@@ -865,9 +866,26 @@ public class ECGEclipseSensor
 
 			ECGEclipseSensor sensor = ECGEclipseSensor.getInstance();
 
-			sensor.processActivity("<?xml version=\"1.0\"?><microActivity><commonData><username>" + sensor.getUsername() + "</username><projectname>" + sensor.getProjectname() + "</projectname></commonData><codechange><document><![CDATA[" + this._document.get() + "]]></document><documentname>" + this._documentName + "</documentname></codechange></microActivity>");
+			sensor.processActivity("msdt.codechange.xsd","<?xml version=\"1.0\"?><microActivity><commonData><username>" + sensor.getUsername() + "</username><projectname>" + sensor.getProjectname() + "</projectname></commonData><codechange><document><![CDATA[" + this._document.get() + "]]></document><documentname>" + this._documentName + "</documentname></codechange></microActivity>");
 
-			_logger.exiting(this.getClass().getName(), "run");
+			_logger.log(Level.INFO,"Codechange...");
+			
+			while(true)
+			{
+				try
+				{
+					Thread.sleep(10);
+				}
+				catch (InterruptedException e)
+				{
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				sensor.processActivity("msdt.codechange.xsd","<?xml version=\"1.0\"?><microActivity><commonData><username>" + sensor.getUsername() + "</username><projectname>" + sensor.getProjectname() + "</projectname></commonData><codechange><document><![CDATA[" + this._document.get() + "]]></document><documentname>" + this._documentName + "</documentname></codechange></microActivity>");
+			}
+			
+			//_logger.exiting(this.getClass().getName(), "run");
 
 		}
 	}
