@@ -34,10 +34,14 @@ public class MenuManager
 	static JFrame _frame;
 
 	private static JPopupMenu modulePopupMenu = null;
+	
+	private static JPopupMenu moduleFinderMenu;
 
 	private static JPopupMenu edgePopupMenu = null;
 
 	private static JMenuItem mniModuleDetails = new JMenuItem("Details");
+	
+	private static JMenuItem mniModuleFinderDetails = new JMenuItem("Details");
 
 	private static JMenuItem mniModuleRemove = new JMenuItem("Remove");
 
@@ -72,7 +76,7 @@ public class MenuManager
 				catch (ModuleInstanceException e1)
 				{
 
-					JOptionPane.showMessageDialog(MenuManager.this._frame, e1.getMessage(), "Remove Module", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(_frame, e1.getMessage(), "Remove Module", JOptionPane.ERROR_MESSAGE);
 				}
 
 			}
@@ -84,6 +88,15 @@ public class MenuManager
 			public void actionPerformed(ActionEvent e)
 			{
 				SystemRoot.getSystemInstance().getGui().showModuleDetails();
+			}
+		});
+		
+		mniModuleFinderDetails.addActionListener(new ActionListener()
+		{
+
+			public void actionPerformed(ActionEvent e)
+			{
+				SystemRoot.getSystemInstance().getGui().showModuleFinderDetails();
 			}
 		});
 
@@ -100,7 +113,7 @@ public class MenuManager
 				catch (ModuleInstanceException e1)
 				{
 
-					JOptionPane.showMessageDialog(MenuManager.this._frame, e1.getMessage(), "Stop Module", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(_frame, e1.getMessage(), "Stop Module", JOptionPane.ERROR_MESSAGE);
 				}
 
 			}
@@ -118,7 +131,7 @@ public class MenuManager
 				}
 				catch (Exception e1)
 				{
-					JOptionPane.showMessageDialog(MenuManager.this._frame, e1.getMessage(), "Start Module", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(_frame, e1.getMessage(), "Start Module", JOptionPane.ERROR_MESSAGE);
 				}
 
 			}
@@ -147,7 +160,7 @@ public class MenuManager
 				}
 				catch (ModuleInstanceException e1)
 				{
-					JOptionPane.showMessageDialog(MenuManager.this._frame, e1.getMessage(), "Annotator", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(_frame, e1.getMessage(), "Annotator", JOptionPane.ERROR_MESSAGE);
 				}
 
 				if (module instanceof IntermediateModule)
@@ -184,7 +197,7 @@ public class MenuManager
 				}
 				catch (ModuleInstanceException e1)
 				{
-					JOptionPane.showMessageDialog(MenuManager.this._frame, e1.getMessage(), "Filter", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(_frame, e1.getMessage(), "Filter", JOptionPane.ERROR_MESSAGE);
 				}
 
 				if (module instanceof IntermediateModule)
@@ -200,6 +213,15 @@ public class MenuManager
 
 	}
 
+	public static void showModuleFinderMenu(String id,Component c, int x, int y)
+	{
+		moduleFinderMenu = new JPopupMenu();
+		
+		moduleFinderMenu.add(mniModuleFinderDetails);
+		
+		moduleFinderMenu.show(c, x, y);
+	}
+	
 	public static void showModuleMenu(int moduleId, Component c, int x, int y)
 	{
 		modulePopupMenu = new JPopupMenu();
@@ -328,7 +350,7 @@ public class MenuManager
 
 			try
 			{
-				SystemRoot.getSystemInstance().getSystemModuleRegistry().getRunningModule(this._parentId).connectReceiverModule(SystemRoot.getSystemInstance().getSystemModuleRegistry().getRunningModule(this._childId));
+				SystemRoot.getSystemInstance().getSystemModuleRegistry().getRunningModule(this._parentId).disconnectReceiverModule(SystemRoot.getSystemInstance().getSystemModuleRegistry().getRunningModule(this._childId));
 			}
 			catch (Exception e1)
 			{
@@ -390,10 +412,8 @@ public class MenuManager
 						case JFileChooser.ERROR_OPTION:
 							return;
 						case JFileChooser.APPROVE_OPTION:
-
 							_propertyResult = fileChooser.getSelectedFile().getAbsolutePath();
-
-							return;
+							break;
 						default:
 							return;
 					}

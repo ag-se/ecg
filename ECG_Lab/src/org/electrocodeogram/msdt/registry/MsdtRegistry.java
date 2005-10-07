@@ -90,11 +90,16 @@ public class MsdtRegistry implements ISystemMsdtRegistry, IModuleMsdtRegistry
 
 		if (defs != null)
 		{
-			for (int i = 0; i < defs.length; i++)
+			for (String def : defs)
 			{
 				File defFile = new File(
-						msdtDir.getAbsolutePath() + File.separator + defs[i]);
+						msdtDir.getAbsolutePath() + File.separator + def);
 
+				if(defFile.getName().equals("msdt.common.xsd"))
+				{
+					continue;
+				}
+				
 				SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 
 				Schema schema = null;
@@ -105,7 +110,7 @@ public class MsdtRegistry implements ISystemMsdtRegistry, IModuleMsdtRegistry
 					schema = schemaFactory.newSchema(defFile);
 
 					MicroSensorDataType microSensorDataType = new MicroSensorDataType(
-							defFile.getName(), schema);
+							defFile.getName(), schema, defFile);
 
 					_logger.log(Level.INFO, "Loaded additional MicroSensorDatyType " + defFile.getName());
 
@@ -267,7 +272,7 @@ public class MsdtRegistry implements ISystemMsdtRegistry, IModuleMsdtRegistry
 			schema = schemaFactory.newSchema(defFile);
 
 			MicroSensorDataType microSensorDataType = new MicroSensorDataType(
-					defFile.getName(), schema);
+					defFile.getName(), schema, defFile);
 
 			_logger.log(Level.INFO, "Loaded additional MicroSensorDatyType " + defFile.getName());
 

@@ -1,7 +1,7 @@
 package org.electrocodeogram.test.server.modules;
 
-import org.electrocodeogram.event.TypedValidEventPacket;
 import org.electrocodeogram.event.ValidEventPacket;
+import org.electrocodeogram.event.WellFormedEventPacket;
 import org.electrocodeogram.module.Module;
 import org.electrocodeogram.module.ModuleActivationException;
 import org.electrocodeogram.module.ModuleConnectionException;
@@ -22,7 +22,7 @@ public class ModuleTestHelper
 
     private Module _lastModule;
 
-    private ValidEventPacket _testPacket;
+    private WellFormedEventPacket _testPacket;
 
     private boolean _result;
 
@@ -209,17 +209,17 @@ public class ModuleTestHelper
     }
 
     /**
-     * This method passes the given ValidEventPacket object to the SensorShellWrapper.sensorSource module
+     * This method passes the given WellFormedEventPacket object to the SensorShellWrapper.sensorSource module
      * that is the head of the collection of modules. After that it waits until this class' object, which is the last
      * connnected module to the collection, receives an event.
      * During event receiving the incoming event is compared to the original event. If the data is indentical
      * then this method returns "true". Otherwise it returns "false".
      * The kind of collection used during event transportation is determined by calls to the make... methods.
-     * @param packet Is the ValidEventPacket to tranport
+     * @param packet Is the WellFormedEventPacket to tranport
      * @param packetCountPar Tells how often the same packet shall be received. Used if this class is connected to multiple
      * other modules.
      */
-    public void checkModuleEventTransport(ValidEventPacket packet, int packetCountPar)
+    public void checkModuleEventTransport(WellFormedEventPacket packet, int packetCountPar)
     {
         this._testPacket = packet;
 
@@ -240,7 +240,7 @@ public class ModuleTestHelper
     }
 
   
-    public void comparePackets(TypedValidEventPacket eventPacket)
+    public void comparePackets(ValidEventPacket eventPacket)
     {
         if (this._testPacket.equals(eventPacket)) {
             this._receivedCount++;

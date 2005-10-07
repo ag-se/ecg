@@ -9,8 +9,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.electrocodeogram.event.IllegalEventParameterException;
-import org.electrocodeogram.event.TypedValidEventPacket;
-import org.electrocodeogram.event.TypedValidEventPacket.DELIVERY_STATE;
+import org.electrocodeogram.event.ValidEventPacket;
+import org.electrocodeogram.event.ValidEventPacket.DELIVERY_STATE;
 import org.electrocodeogram.logging.LogHelper;
 import org.electrocodeogram.module.intermediate.IIntermediateModule;
 import org.electrocodeogram.module.registry.ModuleClassException;
@@ -276,7 +276,7 @@ public abstract class Module
 		 * @param eventPacket
 		 *            Is the event to send
 		 */
-		public void sendEventPacket(TypedValidEventPacket eventPacket)
+		public void sendEventPacket(ValidEventPacket eventPacket)
 		{
 			_eventSenderLogger.entering(this.getClass().getName(), "sendEventPacket");
 
@@ -286,11 +286,10 @@ public abstract class Module
 
 				try
 				{
-					TypedValidEventPacket packet = new TypedValidEventPacket(
+					ValidEventPacket packet = new ValidEventPacket(
 							this._module.getId(), eventPacket.getTimeStamp(),
 							eventPacket.getSensorDataType(),
-							eventPacket.getArglist(),
-							eventPacket.getMicroSensorDataType());
+							eventPacket.getArglist());
 
 					packet.setDeliveryState(DELIVERY_STATE.SENT);
 
@@ -377,20 +376,19 @@ public abstract class Module
 				return;
 			}
 
-			if ((object instanceof EventSender) && data instanceof TypedValidEventPacket)
+			if ((object instanceof EventSender) && data instanceof ValidEventPacket)
 			{
 				try
 				{
-					TypedValidEventPacket receivedPacketForProcessing = (TypedValidEventPacket) data;
+					ValidEventPacket receivedPacketForProcessing = (ValidEventPacket) data;
 
 					receivedPacketForProcessing.setDeliveryState(DELIVERY_STATE.RECEIVED);
 
-					TypedValidEventPacket receivedPacketForSystem = new TypedValidEventPacket(
+					ValidEventPacket receivedPacketForSystem = new ValidEventPacket(
 							this._module.getId(),
 							receivedPacketForProcessing.getTimeStamp(),
 							receivedPacketForProcessing.getSensorDataType(),
-							receivedPacketForProcessing.getArglist(),
-							receivedPacketForProcessing.getMicroSensorDataType());
+							receivedPacketForProcessing.getArglist());
 
 					receivedPacketForSystem.setDeliveryState(DELIVERY_STATE.RECEIVED);
 
@@ -508,7 +506,7 @@ public abstract class Module
 		 * @param packet
 		 *            Is the last sent event packet.
 		 */
-		public void fireEventNotification(TypedValidEventPacket packet)
+		public void fireEventNotification(ValidEventPacket packet)
 		{
 			_systemNotificatorlogger.entering(this.getClass().getName(), "fireEventNotification");
 
@@ -1052,7 +1050,7 @@ public abstract class Module
 	 * @param packet
 	 *            Is the event packet that contains the analysis result
 	 */
-	protected void sendEventPacket(TypedValidEventPacket packet)
+	protected void sendEventPacket(ValidEventPacket packet)
 	{
 		_logger.entering(this.getClass().getName(), "sendEventPacket");
 
@@ -1068,7 +1066,7 @@ public abstract class Module
 	 * @param eventPacket
 	 *            Is the received event
 	 */
-	protected abstract void receiveEventPacket(TypedValidEventPacket eventPacket);
+	protected abstract void receiveEventPacket(ValidEventPacket eventPacket);
 
 	/**
 	 * This method is called whenever this module gets a notification of a
@@ -1129,6 +1127,8 @@ public abstract class Module
 
 			this._systemNotificator.fireStatechangeNotification();
 
+			_logger.log(Level.INFO,"Connetced module " + this.getName() + " to module " + module.getName());
+			
 			_logger.exiting(this.getClass().getName(), "connectReceivingModules");
 
 			return module._id;
@@ -1193,6 +1193,8 @@ public abstract class Module
 
 		this._systemNotificator.fireStatechangeNotification();
 
+		_logger.log(Level.INFO,"Disconnetced module " + this.getName() + " to module " + module.getName());
+		
 		_logger.exiting(this.getClass().getName(), "disconnectReceivingModules");
 	}
 

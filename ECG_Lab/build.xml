@@ -127,7 +127,8 @@
 							org/electrocodeogram/moduleapi/msdt/registry/*,
 							org/electrocodeogram/msdt/*,
 							org/electrocodeogram/event/*,
-							org/electrocodeogram/ui/IGui.class"
+							org/electrocodeogram/ui/IGui.class,
+							org/electrocodeogram/xml/*"
 					compress="true"
 					duplicate="fail"
 					jarfile="${build.lib}/moduleapi.jar"
@@ -241,6 +242,12 @@
 		</copy>
 
 		<copy todir="../ECG_MSDTFilterIntermediateModule/lib/ecg/">
+
+			<fileset dir="${build.lib}" includes="moduleapi.jar" />
+
+		</copy>
+		
+		<copy todir="../ECG_StatisticsTargetModule/lib/ecg/">
 
 			<fileset dir="${build.lib}" includes="moduleapi.jar" />
 

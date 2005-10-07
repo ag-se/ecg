@@ -6,6 +6,7 @@
  */
 package org.electrocodeogram.ui.modules;
 
+import org.electrocodeogram.ui.UIConstants;
 import org.jgraph.graph.DefaultEdge;
 import org.jgraph.graph.GraphConstants;
 
@@ -18,20 +19,24 @@ import org.jgraph.graph.GraphConstants;
 public class ModuleEdge extends DefaultEdge
 {
 
-    private int parentId = -1;
+    private int _parentId = -1;
     
-    private int childId = -1;
+    private int _childId = -1;
     
     public ModuleEdge(int parentId, int childId)
     {
         super();
         
-        this.parentId = parentId;
+        this._parentId = parentId;
         
-        this.childId = childId;
+        this._childId = childId;
         
-        GraphConstants.setLineEnd(this.getAttributes(),GraphConstants.ARROW_CLASSIC);
+        GraphConstants.setLineEnd(this.getAttributes(),GraphConstants.ARROW_SIMPLE);
+        
+        GraphConstants.setLineWidth(this.getAttributes(),UIConstants.MED_LINE_WIDTH);
                         
+        GraphConstants.setLineColor(this.getAttributes(),UIConstants.MED_LINE_COLOR);
+        
         GraphConstants.setDisconnectable(this.getAttributes(), false);
         
         GraphConstants.setBendable(this.getAttributes(), false);
@@ -43,10 +48,10 @@ public class ModuleEdge extends DefaultEdge
     
     public int getChildId()
     {
-        return childId;
+        return this._childId;
     }
     public int getParentId()
     {
-        return parentId;
+        return this._parentId;
     }
 }

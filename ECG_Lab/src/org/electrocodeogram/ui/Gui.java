@@ -1,6 +1,7 @@
 package org.electrocodeogram.ui;
 
 import java.awt.Color;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -8,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
 import java.util.Observable;
 import java.util.logging.Level;
@@ -17,6 +19,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -26,16 +29,18 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.border.EtchedBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
-import com.zfqjava.swing.JStatusBar;
-import org.electrocodeogram.event.TypedValidEventPacket;
+import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.logging.LogHelper;
 import org.electrocodeogram.module.Module;
-import org.electrocodeogram.module.Module.ModuleType;
 import org.electrocodeogram.module.ModuleDescriptor;
+import org.electrocodeogram.module.Module.ModuleType;
+import org.electrocodeogram.module.registry.ModuleClassException;
 import org.electrocodeogram.module.registry.ModuleInstanceException;
+import org.electrocodeogram.module.registry.ModuleInstantiationException;
 import org.electrocodeogram.module.registry.ModuleRegistry;
 import org.electrocodeogram.module.registry.ModuleSetupLoadException;
 import org.electrocodeogram.module.registry.ModuleSetupStoreException;
@@ -43,9 +48,13 @@ import org.electrocodeogram.system.SystemRoot;
 import org.electrocodeogram.ui.event.EventWindow;
 import org.electrocodeogram.ui.modules.ModuleGraph;
 
+import com.zfqjava.swing.JStatusBar;
+
 public class Gui extends JFrame implements IGui
 {
 
+	
+	
 	private static Logger _logger = LogHelper.createLogger(Gui.class.getName());
 
 	private static final long serialVersionUID = 1L;
@@ -239,6 +248,9 @@ public class Gui extends JFrame implements IGui
 		menuFile.add(mniExit);
 
 		Gui.this._menuModule = new JMenu("Module");
+		
+		Gui.this._menuModule.setEnabled(false);
+		
 		Gui.this._menuModule.addMouseListener(new MouseAdapter()
 		{
 
@@ -366,12 +378,18 @@ public class Gui extends JFrame implements IGui
 			}
 		}
 
-		else if (arg instanceof TypedValidEventPacket)
+		else if (arg instanceof ValidEventPacket)
 		{
 			if (this._frmEvents != null)
 			{
-				this._frmEvents.append((TypedValidEventPacket) arg);
+				this._frmEvents.append((ValidEventPacket) arg);
 			}
+			
+			ValidEventPacket packet = (ValidEventPacket) arg;
+			
+			int id = packet.getSourceId();
+			
+			this._pnlModules._moduleGraph.highlight(id);
 		}
 		else if (arg instanceof Module)
 		{
@@ -412,8 +430,34 @@ public class Gui extends JFrame implements IGui
 			{
 				JOptionPane.showMessageDialog(this, e.getMessage(), "Module Details", JOptionPane.ERROR_MESSAGE);
 			}
-
+			
 			JOptionPane.showMessageDialog(this, text, "Module Details", JOptionPane.INFORMATION_MESSAGE);
+		}
+
+	}
+
+	public void showModuleFinderDetails()
+	{
+
+		String id = this._pnlButtons._selectedModuleButton;
+
+		if (id.equals(""))
+		{
+			return;
+		}
+
+		ModuleDescriptor moduleDescriptor;
+
+		try
+		{
+			moduleDescriptor = SystemRoot.getSystemInstance().getSystemModuleRegistry().getModuleDescriptor(id);
+
+			JOptionPane.showMessageDialog(this, moduleDescriptor.getDescription(), "Module Description", JOptionPane.INFORMATION_MESSAGE);
+
+		}
+		catch (ModuleClassException e)
+		{
+			JOptionPane.showMessageDialog(this, e.getMessage(), "Module Description", JOptionPane.ERROR_MESSAGE);
 		}
 
 	}
@@ -475,16 +519,14 @@ public class Gui extends JFrame implements IGui
 
 			this.setLayout(new GridLayout(1, 1));
 
-			this.setBackground(Color.WHITE);
+			this.setBackground(UIConstants.PNL_MODULE_LAB_BORDER_COLOR);
 
-			this.setBorder(new TitledBorder(new LineBorder(new Color(0, 0, 0)),
-					"Module Setup"));
+			this.setBorder(new TitledBorder(null,"Module Setup"));
 
 			this._scrollPane = new JScrollPane(this._moduleGraph);
 
 			this.add(this._scrollPane);
-
-			//this.add(this._moduleGraph);
+	
 		}
 
 		/**
@@ -535,6 +577,8 @@ public class Gui extends JFrame implements IGui
 
 		private JPanel _pnlTargetModules;
 
+		static String _selectedModuleButton;
+
 		public ModuleFinderPanel(Gui gui)
 		{
 			this._pnlSourceModules = new InnerFinderPanel(
@@ -546,26 +590,23 @@ public class Gui extends JFrame implements IGui
 			this._pnlTargetModules = new InnerFinderPanel(
 					ModuleType.TARGET_MODULE);
 
-			this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+			this.setLayout(new GridLayout(3, 1));
 
-			this.setBackground(Color.WHITE);
+			this.setBackground(UIConstants.PNL_MODULE_FINDER_BORDER_COLOR);
 
-			this.setBorder(new TitledBorder(new LineBorder(new Color(0, 0, 0)),
-					"Available Modules"));
+			this.setBorder(new TitledBorder(null,"Available Modules"));
 
-			this.add(this._pnlSourceModules);
+			this.add(this._pnlSourceModules, 0);
 
-			this.add(this._pnlIntermediateModules);
+			this.add(this._pnlIntermediateModules, 1);
 
-			this.add(this._pnlTargetModules);
+			this.add(this._pnlTargetModules, 2);
 		}
 
 		public void addModule(ModuleDescriptor moduleDescriptor)
 		{
-			JButton btnModule = new JButton(moduleDescriptor.getName());
-
-			btnModule.addActionListener(new ActionAdapter(
-					moduleDescriptor.getId(), moduleDescriptor.getName()));
+			ModuleLabel btnModule = new ModuleLabel(
+					moduleDescriptor.getName(), moduleDescriptor.getId());
 
 			switch (moduleDescriptor.get_moduleType())
 			{
@@ -595,42 +636,121 @@ public class Gui extends JFrame implements IGui
 	{
 		public InnerFinderPanel(ModuleType moduleType)
 		{
-			//this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-
 			this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-
-			this.setBackground(Color.WHITE);
+			
+			this.setBackground(UIConstants.PNL_INNER_FINDER_BACKGROUND_COLOR);
 
 			switch (moduleType)
 			{
 				case SOURCE_MODULE:
 
 					this.setBorder(new TitledBorder(
-							new LineBorder(Color.GREEN), "Source Modules"));
-
-					//this.setBackground(Color.GREEN);
-
+							new LineBorder(UIConstants.PNL_INNER_FINDER_SOURCE_BORDER_COLOR,UIConstants.PNL_INNER_FINDER_SOURCE_BORDER_WIDTH,true), "Source Modules"));
 					break;
 
 				case INTERMEDIATE_MODULE:
 
 					this.setBorder(new TitledBorder(
-							new LineBorder(Color.ORANGE),
+							new LineBorder(UIConstants.PNL_INNER_FINDER_INTERMEDIATE_BORDER_COLOR,UIConstants.PNL_INNER_FINDER_INTERMEDIATE_BORDER_WIDTH,true),
 							"Intermediate Modules"));
-
-					//this.setBackground(Color.ORANGE);
 
 					break;
 
 				default:
 
-					this.setBorder(new TitledBorder(new LineBorder(Color.BLUE),
+					this.setBorder(new TitledBorder(new LineBorder(UIConstants.PNL_INNER_FINDER_TARGET_BORDER_COLOR,UIConstants.PNL_INNER_FINDER_TARGET_BORDER_WIDTH,true),
 							"Target Modules"));
-
-					//this.setBackground(Color.BLUE);
 
 					break;
 			}
+		}
+	}
+
+	private static class ModuleLabel extends JLabel
+	{
+		String _id;
+		
+		String _name;
+
+		public ModuleLabel(String name, String id)
+		{
+			super(name);
+			
+			this._name = name;
+			
+			this._id = id;
+					
+			this.setToolTipText("Click to add the " + this._name + " module. Right-Click to get Information.");
+			
+			this.setBackground(UIConstants.LBL_MODULE_BACKGROUND_COLOR);
+			
+			this.setOpaque(true);
+			
+			this.setVisible(true);
+			
+			this.addMouseListener(new MouseListener()
+			{
+
+				public void mouseClicked(MouseEvent e)
+				{
+					if (e.getButton() == MouseEvent.BUTTON3)
+					{
+						ModuleFinderPanel._selectedModuleButton = ModuleLabel.this._id;
+						
+						MenuManager.showModuleFinderMenu(ModuleFinderPanel._selectedModuleButton, ModuleLabel.this, ModuleLabel.this.getWidth() - 10, ModuleLabel.this.getHeight() - 10);
+					}
+					else if(e.getButton() == MouseEvent.BUTTON1)
+					{
+						try
+						{
+							SystemRoot.getSystemInstance().getSystemModuleRegistry().createRunningModule(ModuleLabel.this._id, ModuleLabel.this._name);
+						}
+						catch (Exception e1)
+						{
+							JOptionPane.showMessageDialog(SystemRoot.getSystemInstance().getFrame(),e1.getMessage(),"Add " + ModuleLabel.this._name + " module",JOptionPane.ERROR_MESSAGE);
+						}
+						
+					}
+
+				}
+
+				public void mousePressed(MouseEvent e)
+				{
+					ModuleLabel.this.setBackground(UIConstants.LBL_MODULE_MOUSEPRESSED_BACKGROUND_COLOR);
+					
+					ModuleLabel.this.repaint();
+					
+				}
+
+				public void mouseReleased(MouseEvent e)
+				{
+					ModuleLabel.this.setBackground(UIConstants.LBL_MODULE_MOUSERELEASED_BACKGROUND_COLOR);
+					
+					ModuleLabel.this.repaint();
+
+				}
+
+				public void mouseEntered(MouseEvent e)
+				{
+					ModuleLabel.this.setBackground(UIConstants.LBL_MODULE_MOUSEOVER_BACKGROUND_COLOR);
+					
+					ModuleLabel.this.setBorder(new LineBorder(UIConstants.LBL_MODULE_MOUSEOVER_BORDER_COLOR));
+					
+					ModuleLabel.this.repaint();
+
+				}
+
+				public void mouseExited(MouseEvent e)
+				{
+					ModuleLabel.this.setBackground(UIConstants.LBL_MODULE_MOUSEOUT_BACKGROUND_COLOR);
+					
+					ModuleLabel.this.setBorder(null);
+					
+					ModuleLabel.this.repaint();
+
+				}
+			});
+
 		}
 	}
 }

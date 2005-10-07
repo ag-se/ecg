@@ -36,6 +36,11 @@ public interface IGui extends Observer
      * @return
      */
     public abstract int getSourceModule();
+
+	/**
+	 * 
+	 */
+	public abstract void showModuleFinderDetails();
    
 
 }

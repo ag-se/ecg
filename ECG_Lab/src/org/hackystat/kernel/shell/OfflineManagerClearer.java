@@ -1,6 +1,4 @@
-/**
- * 
- */
+
 package org.hackystat.kernel.shell;
 
 import java.util.logging.Level;
@@ -19,6 +17,8 @@ public class OfflineManagerClearer
 	public static void clearOfflineManager()
 	{
 		_logger.entering(OfflineManager.class.getName(),"clearOfflineManager");
+		
+		OfflineManager.getInstance().store();
 		
 		OfflineManager.getInstance().clear();
 		

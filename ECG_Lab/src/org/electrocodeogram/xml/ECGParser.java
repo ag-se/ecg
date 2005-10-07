@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -42,9 +43,9 @@ public class ECGParser
 
 	private static final String MODULE_SETUP_XSD = "lib/ecg/module.setup.xsd";
 
-	private static Logger logger = Logger.getLogger("ECGParser");
+	static Logger logger = Logger.getLogger("ECGParser");
 
-	private static Document parseDocument(File file, String schemaLocation) throws SAXException, IOException
+	private static Document parseFile(File file, String schemaLocation) throws SAXException, IOException
 	{
 		InputSource inputSource = null;
 
@@ -129,10 +130,84 @@ public class ECGParser
 
 	}
 
+	public static Document parseAsMicroActivity(String string, String schemaLocation) throws SAXException, IOException
+	{
+		InputSource inputSource = null;
+
+		// read the property file
+		
+			inputSource = new InputSource(new StringReader(string));
+				// create the XML parser
+		DOMParser parser = new DOMParser();
+		
+		// set the parsing properties
+		try
+		{
+			parser.setFeature("http://xml.org/sax/features/validation", true);
+			parser.setFeature("http://apache.org/xml/features/validation/schema", true);
+			parser.setFeature("http://apache.org/xml/features/validation/schema-full-checking", true);
+			parser.setFeature("http://apache.org/xml/features/validation/dynamic", true);
+
+			// parse the property file against the "module.properties.xsd
+			// XML schema
+			parser.setProperty("http://apache.org/xml/properties/schema/external-noNamespaceSchemaLocation", schemaLocation);
+
+		}
+		catch (SAXNotRecognizedException e1)
+		{
+			// is checked and schould never occure
+
+			// TODO : message
+
+		}
+		catch (SAXNotSupportedException e1)
+		{
+			// is checked and schould never occure
+
+			// TODO : message
+		}
+
+		// parse
+
+		parser.setErrorHandler(new ErrorHandler()
+		{
+
+			public void warning(SAXParseException exception) throws SAXException
+			{
+
+				logger.log(Level.SEVERE, exception.getMessage());
+
+				throw new SAXException(exception.getMessage());
+			}
+
+			public void error(SAXParseException exception) throws SAXException
+			{
+				logger.log(Level.SEVERE, exception.getMessage());
+
+				throw new SAXException(exception.getMessage());
+
+			}
+
+			public void fatalError(SAXParseException exception) throws SAXException
+			{
+				logger.log(Level.SEVERE, exception.getMessage());
+
+				throw new SAXException(exception.getMessage());
+
+			}
+		});
+
+		parser.parse(inputSource);
+
+		// get the XML document
+		return parser.getDocument();
+
+	}
+	
 	public static ModuleDescriptor parseAsModuleDescriptor(File file) throws ClassLoadingException, MicroSensorDataTypeException, PropertyException, SAXException, IOException, ModuleSetupLoadException
 	{
 
-		Document document = parseDocument(file, MODULE_PROPERTIES_XSD);
+		Document document = parseFile(file, MODULE_PROPERTIES_XSD);
 
 		String id = getSingleNodeValue("id", document);
 		
@@ -154,7 +229,8 @@ public class ECGParser
 		
 		return new ModuleDescriptor(id,name,providerName,version,clazz,moduleDescription,moduleType,moduleProperties,microSensorDataTypes);
 	}
-
+	
+	
 	/**
 	 * @param document
 	 * @return
@@ -184,7 +260,7 @@ public class ECGParser
 
 	public static ModuleSetup parseAsModuleSetup(File file) throws SAXException, IOException, ModuleSetupLoadException, PropertyException, ClassNotFoundException, ClassLoadingException
 	{
-		Document document = parseDocument(file, MODULE_SETUP_XSD);
+		Document document = parseFile(file, MODULE_SETUP_XSD);
 
 		logger.log(Level.INFO, "The module setup file seems to be valid.");
 
@@ -440,7 +516,7 @@ public class ECGParser
 		return moduleClass;
 	}
 
-	private static String getSingleNodeValue(String nodeName, Document document) throws PropertyException, ModuleSetupLoadException
+	public static String getSingleNodeValue(String nodeName, Document document) throws PropertyException
 	{
 		Node node = getChildNode(document.getDocumentElement(), nodeName);
 

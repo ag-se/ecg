@@ -3,11 +3,11 @@ package org.electrocodeogram.module.source;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.electrocodeogram.event.TypedValidEventPacket;
+import org.electrocodeogram.event.IllegalEventParameterException;
 import org.electrocodeogram.event.ValidEventPacket;
+import org.electrocodeogram.event.WellFormedEventPacket;
 import org.electrocodeogram.logging.LogHelper;
 import org.electrocodeogram.module.Module;
-import org.electrocodeogram.msdt.validation.EventValidator;
 import org.electrocodeogram.system.SystemRoot;
 
 /**
@@ -23,7 +23,6 @@ public abstract class SourceModule extends Module
 
 	private static Logger _logger = LogHelper.createLogger(SourceModule.class.getName());
 
-	private EventValidator eventValidator = null;
 
 	/**
 	 * This creates the SourceModule.
@@ -35,9 +34,6 @@ public abstract class SourceModule extends Module
 		super(ModuleType.SOURCE_MODULE, moduleClassId, name);
 
 		_logger.entering(this.getClass().getName(), "SourceModule");
-
-		this.eventValidator = new EventValidator(
-				SystemRoot.getSystemInstance().getSystemMsdtRegistry());
 
 		_logger.exiting(this.getClass().getName(), "SourceModule");
 
@@ -70,7 +66,7 @@ public abstract class SourceModule extends Module
 	{
 		_logger.entering(this.getClass().getName(), "setAllowNonECGmSDTConformEvents");
 
-		this.eventValidator.setAllowNonECGmSDTConformEvents(allowNonECGmSDTConformEvents);
+		//this.eventValidator.setAllowNonECGmSDTConformEvents(allowNonECGmSDTConformEvents);
 
 		_logger.exiting(this.getClass().getName(), "setAllowNonECGmSDTConformEvents");
 	}
@@ -86,7 +82,7 @@ public abstract class SourceModule extends Module
 	{
 		_logger.entering(this.getClass().getName(), "setAllowNonHackyStatSDTConformEvents");
 
-		this.eventValidator.setAllowNonHackyStatSDTConformEvents(allowNonHackyStatSDTConformEvents);
+		//this.eventValidator.setAllowNonHackyStatSDTConformEvents(allowNonHackyStatSDTConformEvents);
 
 		_logger.exiting(this.getClass().getName(), "setAllowNonHackyStatSDTConformEvents");
 	}
@@ -102,7 +98,7 @@ public abstract class SourceModule extends Module
 	 * received ValidEventPackets to this SourceModule.
 	 * @param eventPacket Is the received or read event
 	 */
-	public void append(ValidEventPacket eventPacket)
+	public void append(WellFormedEventPacket eventPacket)
 	{
 		_logger.entering(this.getClass().getName(), "append");
 
@@ -113,11 +109,22 @@ public abstract class SourceModule extends Module
 			return;
 		}
 
-		TypedValidEventPacket typedValidEventPacket = this.eventValidator.validate(eventPacket);
-
-		if (typedValidEventPacket != null)
+		//ValidEventPacket validEventPacket = this.eventValidator.validate(eventPacket);
+		
+		ValidEventPacket validEventPacket = null;
+		
+		try
 		{
-			sendEventPacket(typedValidEventPacket);
+			validEventPacket = new ValidEventPacket(this.getId(),eventPacket.getTimeStamp(),eventPacket.getSensorDataType(),eventPacket.getArglist());
+		}
+		catch (IllegalEventParameterException e)
+		{
+			_logger.log(Level.WARNING, e.getMessage());
+		}
+
+		if (validEventPacket != null)
+		{
+			sendEventPacket(validEventPacket);
 		}
 
 		_logger.exiting(this.getClass().getName(), "append");
@@ -129,7 +136,7 @@ public abstract class SourceModule extends Module
 	 */
 	@Override
 	public final void receiveEventPacket(@SuppressWarnings("unused")
-	TypedValidEventPacket eventPacket)
+	ValidEventPacket eventPacket)
 	{
 		_logger.entering(this.getClass().getName(), "receiveEventPacket");
 

@@ -2,7 +2,7 @@ package org.electrocodeogram.module.target;
 
 import java.util.logging.Logger;
 
-import org.electrocodeogram.event.TypedValidEventPacket;
+import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.logging.LogHelper;
 import org.electrocodeogram.module.Module;
 
@@ -35,12 +35,12 @@ public abstract class TargetModule extends Module implements ITargetModule
 	}
 
 	/**
-	 * @see org.electrocodeogram.module.Module#receiveEventPacket(org.electrocodeogram.event.TypedValidEventPacket)
+	 * @see org.electrocodeogram.module.Module#receiveEventPacket(org.electrocodeogram.event.ValidEventPacket)
 	 * In addition to its superclass method this method writes out every event it
 	 * receives, by calling the module's write method.
 	 */
 	@Override
-	public void receiveEventPacket(TypedValidEventPacket eventPacket)
+	public void receiveEventPacket(ValidEventPacket eventPacket)
 	{
 		_logger.entering(this.getClass().getName(),"receiveEventPacket");
 		
@@ -56,7 +56,7 @@ public abstract class TargetModule extends Module implements ITargetModule
 	 * This method is to be implemented to do the actual writing of incoming events. 
 	 * @param eventPacket Is the incoming event that is to be written out
 	 */
-	public abstract void write(TypedValidEventPacket eventPacket);
+	public abstract void write(ValidEventPacket eventPacket);
 
 	/**
 	 * @see org.electrocodeogram.module.Module#initialize()

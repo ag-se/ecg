@@ -3,7 +3,7 @@ package org.electrocodeogram.module.intermediate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.electrocodeogram.event.TypedValidEventPacket;
+import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.logging.LogHelper;
 import org.electrocodeogram.module.Module;
 
@@ -182,12 +182,12 @@ public abstract class IntermediateModule extends Module implements IIntermediate
 	}
 
 	/**
-	 * @see org.electrocodeogram.module.Module#receiveEventPacket(org.electrocodeogram.event.TypedValidEventPacket)
+	 * @see org.electrocodeogram.module.Module#receiveEventPacket(org.electrocodeogram.event.ValidEventPacket)
 	 * In addition to its superclass method this method gets the analysis result events of the module
 	 * and sends them according to the processing mode and annotation style of the module.
 	 */
 	@Override
-	public final void receiveEventPacket(TypedValidEventPacket eventPacket)
+	public final void receiveEventPacket(ValidEventPacket eventPacket)
 	{
 
 		_logger.entering(this.getClass().getName(), "receiveEventPacket");
@@ -201,7 +201,7 @@ public abstract class IntermediateModule extends Module implements IIntermediate
 
 		if (this._processingMode == ProcessingMode.ANNOTATOR)
 		{
-			TypedValidEventPacket resultPacket = getAnalysisResult(eventPacket);
+			ValidEventPacket resultPacket = getAnalysisResult(eventPacket);
 
 			if (this._annotationStyle == AnnotationStyle.PRE_ANNOTATION)
 			{
@@ -216,7 +216,7 @@ public abstract class IntermediateModule extends Module implements IIntermediate
 		}
 		else
 		{
-			TypedValidEventPacket resultPacket = getAnalysisResult(eventPacket);
+			ValidEventPacket resultPacket = getAnalysisResult(eventPacket);
 
 			sendEventPacket(resultPacket);
 		}
@@ -224,7 +224,7 @@ public abstract class IntermediateModule extends Module implements IIntermediate
 		_logger.exiting(this.getClass().getName(), "receiveEventPacket");
 	}
 
-	private TypedValidEventPacket getAnalysisResult(TypedValidEventPacket eventPacket)
+	private ValidEventPacket getAnalysisResult(ValidEventPacket eventPacket)
 	{
 		_logger.entering(this.getClass().getName(), "getAnalysisResult");
 
@@ -240,7 +240,7 @@ public abstract class IntermediateModule extends Module implements IIntermediate
 	 * @param eventPacket Is the original incoming event data
 	 * @return The data of an event that is a result of the analysis
 	 */
-	public abstract TypedValidEventPacket analyse(TypedValidEventPacket eventPacket);
+	public abstract ValidEventPacket analyse(ValidEventPacket eventPacket);
 
 	/**
 	 * @see org.electrocodeogram.module.Module#initialize()

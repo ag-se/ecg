@@ -2,7 +2,7 @@ package org.electrocodeogram.test.server.modules;
 
 import junit.framework.TestCase;
 
-import org.electrocodeogram.event.ValidEventPacket;
+import org.electrocodeogram.event.WellFormedEventPacket;
 import org.electrocodeogram.test.EventGenerator;
 
 import utmj.threaded.RetriedAssert;
@@ -55,7 +55,7 @@ public class ModuleTests extends TestCase
     public void testEventTransportInHundredNodeModuleList() throws Exception
     {
 
-        ValidEventPacket eventPacket = this._eventGenerator.createECGEventPacket(org.electrocodeogram.test.EventGenerator.MicroSensorDataType.CODECHANGE);
+    	WellFormedEventPacket eventPacket = this._eventGenerator.createECGEventPacket(org.electrocodeogram.test.EventGenerator.MicroSensorDataType.CODECHANGE);
 
         this._moduleTestHelper.makeModuleList(100);
 
@@ -81,7 +81,7 @@ public class ModuleTests extends TestCase
     public void testEventTransportInFifteenNodeModuleTree() throws Exception
     {
 
-        ValidEventPacket eventPacket = this._eventGenerator.createECGEventPacket(org.electrocodeogram.test.EventGenerator.MicroSensorDataType.CODECHANGE);
+        WellFormedEventPacket eventPacket = this._eventGenerator.createECGEventPacket(org.electrocodeogram.test.EventGenerator.MicroSensorDataType.CODECHANGE);
 
         this._moduleTestHelper.makeModuleBinTree();
 

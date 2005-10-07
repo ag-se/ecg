@@ -3,12 +3,15 @@ package org.electrocodeogram.test.server;
 import junit.framework.TestCase;
 
 import org.electrocodeogram.event.IllegalEventParameterException;
-import org.electrocodeogram.event.TypedValidEventPacket;
 import org.electrocodeogram.event.ValidEventPacket;
-import org.electrocodeogram.msdt.validation.EventValidator;
+import org.electrocodeogram.event.WellFormedEventPacket;
+import org.electrocodeogram.event.ValidEventPacket.VALIDITY_LEVEL;
+import org.electrocodeogram.system.ISystemRoot;
+import org.electrocodeogram.system.SystemRoot;
 import org.electrocodeogram.test.EventGenerator;
 import org.electrocodeogram.test.NoTestDataException;
 import org.electrocodeogram.test.EventGenerator.SensorDataType;
+import org.electrocodeogram.test.module.TestModule;
 import org.electrocodeogram.test.server.mockClient.MockClient;
 
 /**
@@ -18,225 +21,284 @@ import org.electrocodeogram.test.server.mockClient.MockClient;
 public class ServersideTests extends TestCase
 {
 
-    private EventValidator _eventValidator = null;
+	private MockClient _mockClient = null;
 
-    private MockClient _mockClient = null;
+	private EventGenerator _eventGenerator = null;
 
-    private EventGenerator _eventGenerator = null;
+	private ISystemRoot _root;
 
-    private int _line = -1;
+	private TestModule _testModule;
 
-    /**
-     * This creates a testcase with the given name.
-     * 
-     * @param name
-     *            The name of the testcase to create
-     * @param linePar
-     *            Is the linenumber according to the file
-     *            "ECG_Test/pseudorandom.strings" that is giving the testdata
-     */
-    public ServersideTests(String name, int linePar)
-    {
-        super(name);
+	private int _line = -1;
 
-        this._line = linePar;
-    }
+	/**
+	 * This creates a testcase with the given name.
+	 * 
+	 * @param name
+	 *            The name of the testcase to create
+	 * @param linePar
+	 *            Is the linenumber according to the file
+	 *            "ECG_Test/pseudorandom.strings" that is giving the testdata
+	 */
+	public ServersideTests(String name, int linePar)
+	{
+		super(name);
 
-    @Override
-    protected void setUp() throws Exception
-    {
-        super.setUp();
+		this._line = linePar;
+	}
 
-        this._eventValidator = new EventValidator(null);
+	@Override
+	protected void setUp() throws Exception
+	{
+		super.setUp();
 
-        this._eventValidator.setAllowNonECGmSDTConformEvents(false);
+		this._mockClient = new MockClient();
+		
+		this._mockClient.setValidityLevel(VALIDITY_LEVEL.HACKYSTAT);
 
-        this._eventValidator.setAllowNonECGmSDTConformEvents(true);
+		this._eventGenerator = new EventGenerator();
 
-        this._mockClient = new MockClient();
+		if (this._root == null)
+		{
+			_root = SystemRoot.getSystemInstance();
+		}
 
-        this._eventGenerator = new EventGenerator();
-    }
+		if (this._testModule == null)
+		{
+			this._testModule = new TestModule();
 
-    @Override
-    protected void tearDown() throws Exception
-    {
-        super.tearDown();
+			this._testModule.registerMSDTs();
+		}
 
-        this._eventValidator = null;
+	}
 
-        this._mockClient = null;
+	@Override
+	protected void tearDown() throws Exception
+	{
+		super.tearDown();
 
-        this._eventGenerator = null;
-    }
+		this._mockClient = null;
 
-    /**
-     * Testcase SE6 according to the document TESTPLAN Version 1.0 or higher.
-     * This testcase passes a single syntactically valid EventPacket from a
-     * TestClient to the ECG SensorShellWrapper. But the EventPacket's
-     * commandName value is not any of the HackyStat SensorDataTypes. The test
-     * is successfull if the result from the ECG SensorShellWrapper is "false".
-     * 
-     * @throws IllegalEventParameterException
-     *             If the parameters passed to the event creating method are
-     *             illegal
-     * @throws NoTestDataException
-     *             If a pseudorandom String is requested by a line number that
-     *             is not available or if the requested String size is to higher
-     *             then available
-     * 
-     */
-    public void testUnknownCommandNameIsNotAccepted() throws IllegalEventParameterException, NoTestDataException
-    {
-        ValidEventPacket eventPacket = null;
+		this._eventGenerator = null;
+	}
 
-        eventPacket = this._eventGenerator.createValidEventPacket(true, true, this._line, true, true, 10, 10);
+	/**
+	 * Testcase SE6 according to the document TESTPLAN Version 1.0 or higher.
+	 * This testcase passes a single syntactically valid EventPacket from a
+	 * TestClient to the ECG SensorShellWrapper. But the EventPacket's
+	 * commandName value is not any of the HackyStat SensorDataTypes. The test
+	 * is successfull if the result from the ECG SensorShellWrapper is "false".
+	 * 
+	 * @throws IllegalEventParameterException
+	 *             If the parameters passed to the event creating method are
+	 *             illegal
+	 * @throws NoTestDataException
+	 *             If a pseudorandom String is requested by a line number that
+	 *             is not available or if the requested String size is to higher
+	 *             then available
+	 * 
+	 */
+	public void testUnknownCommandNameIsNotAccepted() throws NoTestDataException
+	{
+		WellFormedEventPacket eventPacket = null;
 
-        TypedValidEventPacket result = this._mockClient.passEventData(this._eventValidator, eventPacket);
+		try
+		{
+			eventPacket = this._eventGenerator.createValidEventPacket(true, true, this._line, true, true, 10, 10);
 
-        assertNull(result);
-    }
+			this._mockClient.passEventData(eventPacket);
+			
+			assertTrue(false);
 
-    /**
-     * Testcase SE7 according to the document TESTPLAN Version 1.0 or higher.
-     * This testcase passes a HackyStat "Activity" SensorDataType event to the
-     * ECG SensorShellWrapper.
-     * 
-     * The test is successfull if the result from the ECG SensorShellWrapper is
-     * "true".
-     * 
-     * @throws NoTestDataException
-     *             If a pseudorandom String is requested by a line number that
-     *             is not available or if the requested String size is to higher
-     *             then available
-     * 
-     */
-    public void testHackyStatActivityEventsAccepted() throws NoTestDataException
-    {
-        ValidEventPacket eventPacket = this._eventGenerator.createHackyStatEventPacket(SensorDataType.ACTIVITY, this._line);
+		}
+		catch (IllegalEventParameterException e)
+		{
+			assertTrue(true);
+		}
 
-        TypedValidEventPacket result = this._mockClient.passEventData(this._eventValidator, eventPacket);
+		
+	}
 
-        assertNotNull(result);
+	/**
+	 * Testcase SE7 according to the document TESTPLAN Version 1.0 or higher.
+	 * This testcase passes a HackyStat "Activity" SensorDataType event to the
+	 * ECG SensorShellWrapper.
+	 * 
+	 * The test is successfull if the result from the ECG SensorShellWrapper is
+	 * "true".
+	 * 
+	 * @throws NoTestDataException
+	 *             If a pseudorandom String is requested by a line number that
+	 *             is not available or if the requested String size is to higher
+	 *             then available
+	 * 
+	 */
+	public void testHackyStatActivityEventsAccepted() throws NoTestDataException
+	{
+		WellFormedEventPacket eventPacket = this._eventGenerator.createHackyStatEventPacket(SensorDataType.ACTIVITY, this._line);
 
-    }
+		try
+		{
+			this._mockClient.passEventData(eventPacket);
+		}
+		catch (IllegalEventParameterException e)
+		{
+			assertTrue(false);
+		}
 
-    /**
-     * Testcase SE8 according to the document TESTPLAN Version 1.0 or higher.
-     * This testcase passes a HackyStat "Build" SensorDataType event to the ECG
-     * SensorShellWrapper.
-     * 
-     * The test is successfull if the result from the ECG SensorShellWrapper is
-     * "true".
-     * 
-     * @throws NoTestDataException
-     *             If a pseudorandom String is requested by a line number that
-     *             is not available or if the requested String size is to higher
-     *             then available
-     * 
-     */
-    public void testHackyStatBuildEventsAccepted() throws NoTestDataException
-    {
-        ValidEventPacket eventPacket = this._eventGenerator.createHackyStatEventPacket(SensorDataType.BUILD, this._line);
+		assertTrue(true);
 
-        TypedValidEventPacket result = this._mockClient.passEventData(this._eventValidator, eventPacket);
+	}
 
-        assertNotNull(result);
-    }
+	/**
+	 * Testcase SE8 according to the document TESTPLAN Version 1.0 or higher.
+	 * This testcase passes a HackyStat "Build" SensorDataType event to the ECG
+	 * SensorShellWrapper.
+	 * 
+	 * The test is successfull if the result from the ECG SensorShellWrapper is
+	 * "true".
+	 * 
+	 * @throws NoTestDataException
+	 *             If a pseudorandom String is requested by a line number that
+	 *             is not available or if the requested String size is to higher
+	 *             then available
+	 * 
+	 */
+	public void testHackyStatBuildEventsAccepted() throws NoTestDataException
+	{
+		WellFormedEventPacket eventPacket = this._eventGenerator.createHackyStatEventPacket(SensorDataType.BUILD, this._line);
 
-    /**
-     * Testcase SE9 according to the document TESTPLAN Version 1.0 or higher.
-     * This testcase passes a HackyStat "BuffTrans" SensorDataType event to the
-     * ECG SensorShellWrapper.
-     * 
-     * The test is successfull if the result from the ECG SensorShellWrapper is
-     * "true".
-     * 
-     * @throws NoTestDataException
-     *             If a pseudorandom String is requested by a line number that
-     *             is not available or if the requested String size is to higher
-     *             then available
-     * 
-     */
-    public void testHackyStatBuffTransEventsAccepted() throws NoTestDataException
-    {
-        ValidEventPacket eventPacket = this._eventGenerator.createHackyStatEventPacket(SensorDataType.BUFFTRANS, this._line);
+		try
+		{
+			this._mockClient.passEventData(eventPacket);
+		}
+		catch (IllegalEventParameterException e)
+		{
+			assertTrue(false);
+		}
 
-        TypedValidEventPacket result = this._mockClient.passEventData(this._eventValidator, eventPacket);
+		assertTrue(true);
+	}
 
-        assertNotNull(result);
+	/**
+	 * Testcase SE9 according to the document TESTPLAN Version 1.0 or higher.
+	 * This testcase passes a HackyStat "BuffTrans" SensorDataType event to the
+	 * ECG SensorShellWrapper.
+	 * 
+	 * The test is successfull if the result from the ECG SensorShellWrapper is
+	 * "true".
+	 * 
+	 * @throws NoTestDataException
+	 *             If a pseudorandom String is requested by a line number that
+	 *             is not available or if the requested String size is to higher
+	 *             then available
+	 * 
+	 */
+	public void testHackyStatBuffTransEventsAccepted() throws NoTestDataException
+	{
+		WellFormedEventPacket eventPacket = this._eventGenerator.createHackyStatEventPacket(SensorDataType.BUFFTRANS, this._line);
 
-    }
+		try
+		{
+			this._mockClient.passEventData(eventPacket);
+		}
+		catch (IllegalEventParameterException e)
+		{
+			assertTrue(false);
+		}
 
-    /**
-     * Testcase SE10 according to the document TESTPLAN Version 1.0 or higher.
-     * This testcase passes a HackyStat "Commit" SensorDataType event to the ECG
-     * SensorShellWrapper.
-     * 
-     * The test is successfull if the result from the ECG SensorShellWrapper is
-     * "true".
-     * 
-     * @throws NoTestDataException
-     *             If a pseudorandom String is requested by a line number that
-     *             is not available or if the requested String size is to higher
-     *             then available
-     * 
-     */
-    public void testHackyStatCommitEventsAccepted() throws NoTestDataException
-    {
-        ValidEventPacket eventPacket = this._eventGenerator.createHackyStatEventPacket(SensorDataType.COMMIT, this._line);
+		assertTrue(true);
 
-        TypedValidEventPacket result = this._mockClient.passEventData(this._eventValidator, eventPacket);
+	}
 
-        assertNotNull(result);
+	/**
+	 * Testcase SE10 according to the document TESTPLAN Version 1.0 or higher.
+	 * This testcase passes a HackyStat "Commit" SensorDataType event to the ECG
+	 * SensorShellWrapper.
+	 * 
+	 * The test is successfull if the result from the ECG SensorShellWrapper is
+	 * "true".
+	 * 
+	 * @throws NoTestDataException
+	 *             If a pseudorandom String is requested by a line number that
+	 *             is not available or if the requested String size is to higher
+	 *             then available
+	 * 
+	 */
+	public void testHackyStatCommitEventsAccepted() throws NoTestDataException
+	{
+		WellFormedEventPacket eventPacket = this._eventGenerator.createHackyStatEventPacket(SensorDataType.COMMIT, this._line);
 
-    }
+		try
+		{
+			this._mockClient.passEventData(eventPacket);
+		}
+		catch (IllegalEventParameterException e)
+		{
+			assertTrue(false);
+		}
 
-    /**
-     * Testcase SE11 according to the document TESTPLAN Version 1.0 or higher.
-     * This testcase passes a HackyStat "Commit" SensorDataType event to the ECG
-     * SensorShellWrapper.
-     * 
-     * The test is successfull if the result from the ECG SensorShellWrapper is
-     * "true".
-     * 
-     * @throws NoTestDataException
-     *             If a pseudorandom String is requested by a line number that
-     *             is not available or if the requested String size is to higher
-     *             then available
-     * 
-     */
-    public void testHackyStatFileMetricEventsAccepted() throws NoTestDataException
-    {
-        ValidEventPacket eventPacket = this._eventGenerator.createHackyStatEventPacket(SensorDataType.FILEMETRIC, this._line);
+		assertTrue(true);
+	}
 
-        TypedValidEventPacket result = this._mockClient.passEventData(this._eventValidator, eventPacket);
+	/**
+	 * Testcase SE11 according to the document TESTPLAN Version 1.0 or higher.
+	 * This testcase passes a HackyStat "Commit" SensorDataType event to the ECG
+	 * SensorShellWrapper.
+	 * 
+	 * The test is successfull if the result from the ECG SensorShellWrapper is
+	 * "true".
+	 * 
+	 * @throws NoTestDataException
+	 *             If a pseudorandom String is requested by a line number that
+	 *             is not available or if the requested String size is to higher
+	 *             then available
+	 * 
+	 */
+	public void testHackyStatFileMetricEventsAccepted() throws NoTestDataException
+	{
+		WellFormedEventPacket eventPacket = this._eventGenerator.createHackyStatEventPacket(SensorDataType.FILEMETRIC, this._line);
 
-        assertNotNull(result);
+		try
+		{
+			this._mockClient.passEventData(eventPacket);
+		}
+		catch (IllegalEventParameterException e)
+		{
+			assertTrue(false);
+		}
 
-    }
+		assertTrue(true);
+	}
 
-    /**
-     * Testcase SE12 according to the document TESTPLAN Version 1.0 or higher.
-     * This testcase passes a HackyStat "Commit" SensorDataType event to the ECG
-     * SensorShellWrapper.
-     * 
-     * The test is successfull if the result from the ECG SensorShellWrapper is
-     * "true".
-     * 
-     * @throws NoTestDataException
-     *             If a pseudorandom String is requested by a line number that
-     *             is not available or if the requested String size is to higher
-     *             then available
-     * 
-     */
-    public void testHackyStatUnitTestEventsAccepted() throws NoTestDataException
-    {
-        ValidEventPacket eventPacket = this._eventGenerator.createHackyStatEventPacket(SensorDataType.UNITTEST, this._line);
+	/**
+	 * Testcase SE12 according to the document TESTPLAN Version 1.0 or higher.
+	 * This testcase passes a HackyStat "Commit" SensorDataType event to the ECG
+	 * SensorShellWrapper.
+	 * 
+	 * The test is successfull if the result from the ECG SensorShellWrapper is
+	 * "true".
+	 * 
+	 * @throws NoTestDataException
+	 *             If a pseudorandom String is requested by a line number that
+	 *             is not available or if the requested String size is to higher
+	 *             then available
+	 * 
+	 */
+	public void testHackyStatUnitTestEventsAccepted() throws NoTestDataException
+	{
+		WellFormedEventPacket eventPacket = this._eventGenerator.createHackyStatEventPacket(SensorDataType.UNITTEST, this._line);
 
-        TypedValidEventPacket result = this._mockClient.passEventData(this._eventValidator, eventPacket);
+		try
+		{
+			this._mockClient.passEventData(eventPacket);
+		}
+		catch (IllegalEventParameterException e)
+		{
+			assertTrue(false);
+		}
 
-        assertNotNull(result);
+		assertTrue(true);
 
-    }
+	}
 }

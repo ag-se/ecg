@@ -1,9 +1,9 @@
 package org.electrocodeogram.msdt;
 
-import java.io.Serializable;
+import java.io.File;
 import java.util.ArrayList;
-import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.validation.Schema;
 
@@ -32,6 +32,8 @@ public class MicroSensorDataType
 	private static int _count;
 
 	private int _id;
+	
+	private File _defFile;
 
 	private ArrayList<Module> _providingModules;
 
@@ -46,11 +48,13 @@ public class MicroSensorDataType
 	 * @throws MicroSensorDataTypeException
 	 *             If the given name is empty or of if the schema is null
 	 */
-	public MicroSensorDataType(String name, Schema schema) throws MicroSensorDataTypeException
+	public MicroSensorDataType(String name, Schema schema, File defFile) throws MicroSensorDataTypeException
 	{
 		this._logger = Logger.getLogger("MicroSensorDataType");
 
 		this._id = ++_count;
+		
+		this._defFile = defFile;
 
 		if (name == null || name.equals(""))
 		{
@@ -82,6 +86,11 @@ public class MicroSensorDataType
 		return this._name;
 	}
 
+	public File getDefFile()
+	{
+		return this._defFile;
+	}
+	
 	/**
 	 * This method returns the XML Schema of the MicroSensorDataType.
 	 * 

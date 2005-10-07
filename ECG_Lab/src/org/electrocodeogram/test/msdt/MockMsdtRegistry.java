@@ -78,7 +78,7 @@ public class MockMsdtRegistry extends MsdtRegistry
 
                     schema = schemaFactory.newSchema(defFile);
                     
-                    MicroSensorDataType microSensorDataType = new MicroSensorDataType(defFile.getName(),schema); 
+                    MicroSensorDataType microSensorDataType = new MicroSensorDataType(defFile.getName(),schema,defFile); 
                     
                     this.logger.log(Level.INFO,"Loaded additional MicroSensorDatyType " + defFile.getName());
                     

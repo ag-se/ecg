@@ -11,6 +11,11 @@ public class ServerTestSuite
 {
     
     /**
+	 * 
+	 */
+	private static final int TEST_COUNT = 100;
+
+	/**
      * This method returns the current testsuite.
      * @return The testsuite
      */
@@ -53,49 +58,49 @@ public class ServerTestSuite
 //            suite.addTest(new ServersideTests("testInvalidEventIsNotAcceptedArgListIsNotOfTypeString",i));
 //        }
         
-        int testHCount = 100;
+        int testHCount = TEST_COUNT;
         
         for(int i=0;i<testHCount;i++)
         {
             suite.addTest(new ServersideTests("testUnknownCommandNameIsNotAccepted",i));
         }
         
-        int testICount = 100;
+        int testICount = TEST_COUNT;
         
         for(int i=0;i<testICount;i++)
         {
             suite.addTest(new ServersideTests("testHackyStatActivityEventsAccepted",i));
         }
         
-        int testJCount = 100;
+        int testJCount = TEST_COUNT;
         
         for(int i=0;i<testJCount;i++)
         {
             suite.addTest(new ServersideTests("testHackyStatBuildEventsAccepted",i));
         }
         
-        int testKCount = 100;
+        int testKCount = TEST_COUNT;
         
         for(int i=0;i<testKCount;i++)
         {
             suite.addTest(new ServersideTests("testHackyStatBuffTransEventsAccepted",i));
         }
         
-        int testLCount = 100;
+        int testLCount = TEST_COUNT;
         
         for(int i=0;i<testLCount;i++)
         {
             suite.addTest(new ServersideTests("testHackyStatCommitEventsAccepted",i));
         }
         
-        int testMCount = 100;
+        int testMCount = TEST_COUNT;
         
         for(int i=0;i<testMCount;i++)
         {
             suite.addTest(new ServersideTests("testHackyStatFileMetricEventsAccepted",i));
         }
         
-        int testNCount = 100;
+        int testNCount = TEST_COUNT;
         
         for(int i=0;i<testNCount;i++)
         {

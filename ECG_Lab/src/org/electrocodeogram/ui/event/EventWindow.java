@@ -21,8 +21,8 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.electrocodeogram.event.TypedValidEventPacket;
-import org.electrocodeogram.event.TypedValidEventPacket.DELIVERY_STATE;
+import org.electrocodeogram.event.ValidEventPacket;
+import org.electrocodeogram.event.ValidEventPacket.DELIVERY_STATE;
 import org.electrocodeogram.module.registry.ModuleInstanceException;
 import org.electrocodeogram.system.SystemRoot;
 import org.electrocodeogram.ui.modules.ModuleGraph;
@@ -203,7 +203,7 @@ public class EventWindow extends JFrame implements IEventTarget
 			this._deliveryState = DELIVERY_STATE.SENT;
 		}
 
-		public void write(TypedValidEventPacket eventPacket)
+		public void write(ValidEventPacket eventPacket)
 		{
 			if (this._target != null)
 			{
@@ -266,7 +266,7 @@ public class EventWindow extends JFrame implements IEventTarget
 	/**
 	 * @param packet
 	 */
-	public void append(TypedValidEventPacket packet)
+	public void append(ValidEventPacket packet)
 	{
 		this._guiWriter.write(packet);
 

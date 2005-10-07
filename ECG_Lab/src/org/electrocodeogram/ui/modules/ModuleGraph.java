@@ -14,20 +14,22 @@ import javax.swing.JOptionPane;
 import javax.swing.border.LineBorder;
 
 import org.electrocodeogram.module.Module;
-import org.electrocodeogram.module.ModuleConnectionException;
 import org.electrocodeogram.module.Module.ModuleType;
-import org.electrocodeogram.module.registry.ModuleInstanceException;
 import org.electrocodeogram.system.ISystemRoot;
 import org.electrocodeogram.system.SystemRoot;
 import org.electrocodeogram.ui.Gui;
 import org.electrocodeogram.ui.IGui;
 import org.electrocodeogram.ui.MenuManager;
-import org.electrocodeogram.ui.module.ModuleCell;
+import org.electrocodeogram.ui.UIConstants;
 import org.jgraph.JGraph;
+import org.jgraph.cellview.JGraphRoundRectView;
 import org.jgraph.event.GraphSelectionEvent;
 import org.jgraph.event.GraphSelectionListener;
+import org.jgraph.graph.CellView;
+import org.jgraph.graph.DefaultCellViewFactory;
 import org.jgraph.graph.DefaultGraphModel;
 import org.jgraph.graph.GraphConstants;
+import org.jgraph.graph.GraphModel;
 
 public class ModuleGraph extends JGraph
 {
@@ -35,20 +37,16 @@ public class ModuleGraph extends JGraph
 
 	private static final int DEFAULT_MARGIN = 10;
 
-	protected static ImageIcon _icon = null;
-
 	Gui _gui;
 
-	private HashMap _cellMap;
+	private HashMap<Integer,ModuleCell> _cellMap;
 
-	static int _selected = -1;
+	private static int _selectedBefore = -1;
+	
+	private static int _selected = -1;
 
 	ModuleGraphObserverDummy _observerDummy = null;
-
-	private Icon _startIcon;
-
-	private Icon _stopIcon;
-
+	
 	private int _margin;
 
 	private int _dinstanceX;
@@ -65,26 +63,16 @@ public class ModuleGraph extends JGraph
 
 		this._observerDummy = new ModuleGraphObserverDummy(configurator, this);
 
-		this._cellMap = new HashMap();
+		this._cellMap = new HashMap<Integer,ModuleCell>();
 
 		this.setSizeable(true);
 
 		this.setAutoscrolls(true);
+		
+		this.setBackground(UIConstants.MGR_BACKGROUND_COLOR);
 
-		URL stop = ModuleCell.class.getClassLoader().getResource("org/electrocodeogram/ui/modules/Stop.GIF");
-
-		URL start = ModuleCell.class.getClassLoader().getResource("org/electrocodeogram/ui/modules/Start.GIF");
-
-		if (start != null)
-		{
-			this._startIcon = new ImageIcon(start);
-		}
-
-		if (stop != null)
-		{
-			this._stopIcon = new ImageIcon(stop);
-		}
-
+		this.setBorder(new LineBorder(UIConstants.MGR_BORDER_COLOR,UIConstants.MGR_BORDER_WIDTH,true));
+		
 		addGraphSelectionListener(new GraphSelectionListener()
 		{
 
@@ -93,12 +81,18 @@ public class ModuleGraph extends JGraph
 				if (arg0.isAddedCell() && (arg0.getCell() instanceof ModuleCell))
 				{
 
-					ModuleGraph.this._selected = ((ModuleCell) (arg0.getCell())).getId();
-
+					ModuleGraph._selected = ((ModuleCell) (arg0.getCell())).getId();
+					
+					//ModuleGraph.this._cellMap.get(new Integer(ModuleGraph.this._selected)).select();
+					
 					ModuleGraph.this._gui.enableModuleMenu(true);
 				}
 				else
 				{
+					ModuleGraph._selectedBefore = ModuleGraph.this._selected;
+					
+					//ModuleGraph.this._cellMap.get(new Integer(ModuleGraph.this._selectedBefore)).deselect();
+					
 					ModuleGraph._selected = -1;
 
 					ModuleGraph.this._gui.enableModuleMenu(false);
@@ -106,9 +100,7 @@ public class ModuleGraph extends JGraph
 
 			}
 		});
-
-		this.setBorder(new LineBorder(Color.GRAY));
-
+		
 		addMouseListener(new MouseAdapter()
 		{
 
@@ -210,22 +202,15 @@ public class ModuleGraph extends JGraph
 		if (containsModuleCell(id))
 		{
 
-			ModuleCell moduleCell = (ModuleCell) this._cellMap.get(new Integer(
-					id));
+			ModuleCell moduleCell = this._cellMap.get(new Integer(id));
 
 			if (module.isActive())
 			{
-				if (this._startIcon != null)
-				{
-					GraphConstants.setIcon(moduleCell.getAttributes(), this._startIcon);
-				}
+				moduleCell.activate();
 			}
 			else
 			{
-				if (this._stopIcon != null)
-				{
-					GraphConstants.setIcon(moduleCell.getAttributes(), this._stopIcon);
-				}
+				moduleCell.deactivate();
 			}
 
 			this.getGraphLayoutCache().insert(moduleCell);
@@ -398,4 +383,23 @@ public class ModuleGraph extends JGraph
 	{
 		return _selected;
 	}
+
+	/**
+	 * @param id
+	 */
+	public void highlight(int id)
+	{
+		ModuleCell cell = this._cellMap.get(new Integer(id));
+		
+		if(cell == null)
+		{
+			return;
+		}
+		
+		cell.eventReceived();
+		
+		this.getGraphLayoutCache().insert(cell);
+	}
+
+	
 }

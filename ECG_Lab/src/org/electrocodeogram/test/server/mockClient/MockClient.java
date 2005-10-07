@@ -1,9 +1,10 @@
 package org.electrocodeogram.test.server.mockClient;
 
 
-import org.electrocodeogram.event.TypedValidEventPacket;
+import org.electrocodeogram.event.IllegalEventParameterException;
 import org.electrocodeogram.event.ValidEventPacket;
-import org.electrocodeogram.msdt.validation.EventValidator;
+import org.electrocodeogram.event.WellFormedEventPacket;
+import org.electrocodeogram.event.ValidEventPacket.VALIDITY_LEVEL;
 
 
 /**
@@ -14,7 +15,12 @@ import org.electrocodeogram.msdt.validation.EventValidator;
 public class MockClient
 {
     
+   private VALIDITY_LEVEL _validityLevel = ValidEventPacket.DEFAULT_VALIDITY_LEVEL;
    
+   public void setValidityLevel(VALIDITY_LEVEL validityLevel)
+   {
+	   this._validityLevel = validityLevel;
+   }
 
     /**
      * Instead of sending an event from the ECG clientside to the ECG server, an event can also
@@ -23,10 +29,13 @@ public class MockClient
      * @param validator the EventValidator to test
      * @param eventPacket Is the EventPacket object carrieng the event data
      * @return "true" if the event data is valid and "false" if not.
+     * @throws IllegalEventParameterException 
      */
-    public TypedValidEventPacket passEventData(EventValidator validator, ValidEventPacket eventPacket)
+    public void passEventData(WellFormedEventPacket eventPacket) throws IllegalEventParameterException
     {
-        return validator.validate(eventPacket);
+    	ValidEventPacket.setValidityLevel(this._validityLevel);
+    	
+        new ValidEventPacket(eventPacket.getSourceId(),eventPacket.getTimeStamp(),eventPacket.getSensorDataType(),eventPacket.getArglist()); 
     }
 
 

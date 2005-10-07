@@ -1,6 +1,6 @@
 package org.electrocodeogram.test.server.modules;
 
-import org.electrocodeogram.event.TypedValidEventPacket;
+import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.module.ModulePropertyException;
 import org.electrocodeogram.module.target.TargetModule;
 import org.electrocodeogram.module.target.TargetModuleException;
@@ -24,7 +24,7 @@ public class MockTargetModule extends TargetModule
 	 * @see org.electrocodeogram.module.target.TargetModule#write(org.electrocodeogram.event.ValidEventPacket)
 	 */
 	@Override
-	public void write(TypedValidEventPacket eventPacket)
+	public void write(ValidEventPacket eventPacket)
 	{
 		this._moduleTestHelper.comparePackets(eventPacket);
 		

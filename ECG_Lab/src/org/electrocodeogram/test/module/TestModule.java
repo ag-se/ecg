@@ -1,7 +1,14 @@
 package org.electrocodeogram.test.module;
 
-import org.electrocodeogram.event.TypedValidEventPacket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.electrocodeogram.event.ValidEventPacket;
+import org.electrocodeogram.logging.LogHelper;
 import org.electrocodeogram.module.Module;
+import org.electrocodeogram.msdt.MicroSensorDataType;
+import org.electrocodeogram.msdt.registry.MicroSensorDataTypeRegistrationException;
+import org.electrocodeogram.system.SystemRoot;
 
 /**
  * This is a simple test module. every event that is received is immediatly send.
@@ -10,6 +17,8 @@ import org.electrocodeogram.module.Module;
 public class TestModule extends Module
 {
 
+	private static Logger _logger = LogHelper.createLogger(TestModule.class.getName());
+	
     /**
      * This creates the TestModule as a Module.INTERMEDIATE_MODULE
      */
@@ -20,10 +29,10 @@ public class TestModule extends Module
 
     
     /**
-     * @see org.electrocodeogram.module.Module#receiveEventPacket(org.electrocodeogram.event.TypedValidEventPacket)
+     * @see org.electrocodeogram.module.Module#receiveEventPacket(org.electrocodeogram.event.ValidEventPacket)
      */
     @Override
-    public void receiveEventPacket(TypedValidEventPacket eventPacket)
+    public void receiveEventPacket(ValidEventPacket eventPacket)
     {
         sendEventPacket(eventPacket);
         
@@ -59,5 +68,34 @@ public class TestModule extends Module
         
     }
 
+    public void registerMSDTs()
+	{
+		_logger.entering(this.getClass().getName(), "registerMSDTs");
 
+		_logger.log(Level.INFO, "Registering predefined MSDTs dor SourceModule.");
+
+			MicroSensorDataType[] msdts = SystemRoot.getModuleInstance().getModuleMsdtRegistry().getPredefinedMicroSensorDataTypes();
+
+			if (msdts == null)
+			{
+				return;
+			}
+
+			for (MicroSensorDataType msdt : msdts)
+			{
+				try
+				{
+					SystemRoot.getModuleInstance().getModuleMsdtRegistry().requestMsdtRegistration(msdt, this);
+					
+				}
+				catch (MicroSensorDataTypeRegistrationException e)
+				{
+					_logger.log(Level.SEVERE, "An Exception occured while registering predefined MSDTs for this SourceModule: " + this.getName());
+
+					return;
+				}
+			}
+		
+		this._logger.exiting(this.getClass().getName(), "registerMSDTs");
+	}
 }
