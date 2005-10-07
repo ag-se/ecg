@@ -19,6 +19,9 @@
 		This module computes the difference between two msdt.codechange.xsd events.
 		It generates msdt.diff.xsd events.
 	</description>
+	<type>
+		INTERMEDIATE
+	</type>
 	<microsensordatatypes>
 		<microsensordatatype>
 			<msdtName>

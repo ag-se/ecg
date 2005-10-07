@@ -12,7 +12,7 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 
 import org.apache.xerces.parsers.DOMParser;
-import org.electrocodeogram.event.TypedValidEventPacket;
+import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.msdt.MicroSensorDataType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -56,7 +56,7 @@ public class CodechangeDifferIntermediateModule extends IntermediateModule
      * @see org.electrocodeogram.module.intermediate.IntermediateModule#analyse(org.electrocodeogram.event.ValidEventPacket)
      */
     @Override
-    public TypedValidEventPacket analyse(TypedValidEventPacket packet)
+    public ValidEventPacket analyse(ValidEventPacket packet)
     {
         if(packet.getMicroSensorDataType().getName().equals("msdt.codechange.xsd"))
         {
@@ -127,9 +127,9 @@ public class CodechangeDifferIntermediateModule extends IntermediateModule
         
     }
 
-    private String getCode(TypedValidEventPacket packet)
+    private String getCode(ValidEventPacket packet)
     {
-        Object object = packet.getArglist().get(TypedValidEventPacket.MICROACTIVITY_INDEX);
+        Object object = packet.getArglist().get(ValidEventPacket.MICROACTIVITY_INDEX);
         
         assert(object instanceof String);
         
