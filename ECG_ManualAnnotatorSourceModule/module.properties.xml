@@ -18,6 +18,9 @@
 	<description>
 		This module enables the user to manually generate events.
 	</description>
+	<type>
+		SOURCE
+	</type>
 	<properties>
 		<property>
 			<propertyName>

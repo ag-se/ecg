@@ -11,7 +11,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 
 import org.electrocodeogram.event.IllegalEventParameterException;
-import org.electrocodeogram.event.ValidEventPacket;
+import org.electrocodeogram.event.WellFormedEventPacket;
 import org.electrocodeogram.module.ModuleActivationException;
 import org.electrocodeogram.module.ModuleProperty;
 import org.electrocodeogram.module.ModulePropertyException;
@@ -160,7 +160,7 @@ public class ManualAnnotatorSourceModule extends SourceModule
 				
 				try
 				{
-					ValidEventPacket packet = new ValidEventPacket(this._sourceModule.getId(),new Date(),"Activity",Arrays.asList(args));
+					WellFormedEventPacket packet = new WellFormedEventPacket(this._sourceModule.getId(),new Date(),"Activity",Arrays.asList(args));
 					
 					this._sourceModule.append(packet);
 				}
