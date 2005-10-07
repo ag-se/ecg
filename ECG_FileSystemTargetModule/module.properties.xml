@@ -18,6 +18,9 @@
 	<description>
 		This module is able to write incoming event data into the file system.
 	</description>
+	<type>
+		TARGET
+	</type>
 	<properties>
 		<property>
 			<propertyName>

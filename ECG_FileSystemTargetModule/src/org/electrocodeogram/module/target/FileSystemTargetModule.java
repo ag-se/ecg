@@ -8,7 +8,7 @@ import java.io.PrintWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.electrocodeogram.event.TypedValidEventPacket;
+import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.logging.LogHelper;
 import org.electrocodeogram.module.ModuleProperty;
 import org.electrocodeogram.module.ModulePropertyException;
@@ -66,7 +66,7 @@ public class FileSystemTargetModule extends TargetModule
 	 * @see org.electrocodeogram.module.target.TargetModule#write(org.electrocodeogram.event.TypedValidEventPacket)
 	 */
 	@Override
-	public void write(TypedValidEventPacket packet)
+	public void write(ValidEventPacket packet)
 	{
 
 		_logger.entering(this.getClass().getName(), "write");
