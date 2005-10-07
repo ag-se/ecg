@@ -15,7 +15,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import org.electrocodeogram.event.TypedValidEventPacket;
+import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.msdt.MicroSensorDataType;
 import org.electrocodeogram.system.SystemRoot;
 
@@ -50,7 +50,7 @@ public class MSDTFilterIntermediateModule extends IntermediateModule
      * @see org.electrocodeogram.module.intermediate.IntermediateModule#analyse(org.electrocodeogram.event.ValidEventPacket)
      */
     @Override
-    public TypedValidEventPacket analyse(TypedValidEventPacket packet)
+    public ValidEventPacket analyse(ValidEventPacket packet)
     {
         if(this.msdtFilterMap.containsKey(packet.getMicroSensorDataType()))
         {

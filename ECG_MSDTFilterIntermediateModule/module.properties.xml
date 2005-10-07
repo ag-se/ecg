@@ -18,6 +18,9 @@
 	<description>
 		This module can be used to filter out events of certain MicroSensorDataTypes.
 	</description>
+	<type>
+		INTERMEDIATE
+	</type>
 	<properties>
 		<property>
 			<propertyName>Configure Filter</propertyName>
