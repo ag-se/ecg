@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<module>
+	<id>
+		org.electrocodeogram.module.target.StatisticsTargetModule
+	</id>
+	<provider-name>
+		Frank Schlesinger (Frank@Schlesinger.com)
+	</provider-name>
+	<version>
+		0.6
+	</version>
+	<name>
+		AdHoc Statistics
+	</name>
+	<class>
+		org.electrocodeogram.module.target.StatisticsTargetModule
+	</class>
+	<description>
+		This module can be used to do statistical analysis on the event stream.
+	</description>
+	<type>
+		TARGET
+	</type>
+	<properties>
+		<property>
+			<propertyName>Show Statistics</propertyName>
+			<propertyType>java.lang.reflect.Method</propertyType>
+			<propertyValue>Show Statistics</propertyValue>
+		</property>
+	</properties>
+</module>
