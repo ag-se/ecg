@@ -1,5 +1,7 @@
 package org.hackystat.stdext.sensor.eclipse;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -7,12 +9,15 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPluginDescriptor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ui.IStartup;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.electrocodeogram.logging.LogHelper;
 import org.electrocodeogram.sensor.eclipse.ECGEclipseSensor;
 import org.hackystat.kernel.shell.SensorShell;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -26,6 +31,8 @@ public class EclipseSensorPlugin extends AbstractUIPlugin implements IStartup
 	private static EclipseSensorPlugin _plugin;
 
 	private static Logger _logger = LogHelper.createLogger(EclipseSensorPlugin.class.getName());
+	
+	public static String eclipsePluginDir;
 
 	/**
 	 * The constructor creates the PlugIn instance. It is not to be used by developers,
@@ -55,6 +62,28 @@ public class EclipseSensorPlugin extends AbstractUIPlugin implements IStartup
 
 		_logger.entering(this.getClass().getName(), "earlyStartup");
 
+		Bundle bundle = Platform.getBundle(this.getDescriptor().getUniqueIdentifier());
+		
+		Path path = new Path(".");
+		
+		URL fileURL = Platform.find(bundle, path);
+		
+		URL url = null;
+		
+		try
+		{
+			url = Platform.resolve(fileURL);
+			
+			eclipsePluginDir = url.getFile();
+		}
+		catch (IOException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+
+		
 		// Create the ECG EclipseSensor
 		ECGEclipseSensor.getInstance();
 				
