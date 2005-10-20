@@ -70,25 +70,18 @@ public class FileSystemTargetModule extends TargetModule
 	{
 
 		_logger.entering(this.getClass().getName(), "write");
-
-		if (packet == null)
-		{
-			_logger.log(Level.WARNING, "packet is null");
-
-			return;
-		}
-
+		
 		try
 		{
 			this._writer.println(packet.toString());
 
 			this._writer.flush();
 
-			_logger.log(Level.INFO, "Event packet written to " + this._outputFile.getAbsolutePath());
+			_logger.log(Level.INFO, "An event has been written to the file " + this._outputFile.getAbsolutePath() + " by the module " + this.getName());
 
 			if (this._outputFile.length() >= this._fileSize && this._splitFiles)
 			{
-				_logger.log(Level.INFO, "Logfile reached maximum file size of " + this._fileSize);
+				_logger.log(Level.INFO, "The log-file has reached the maximum file size of " + this._fileSize);
 
 				this._writer.close();
 
@@ -97,7 +90,7 @@ public class FileSystemTargetModule extends TargetModule
 
 				this._writer = new PrintWriter(new FileWriter(this._outputFile));
 
-				_logger.log(Level.INFO, "New logfile created: " + this._outputFile.getAbsolutePath());
+				_logger.log(Level.INFO, "A new log-file has been created: " + this._outputFile.getAbsolutePath());
 			}
 
 			_logger.exiting(this.getClass().getName(), "write");
@@ -108,38 +101,25 @@ public class FileSystemTargetModule extends TargetModule
 		}
 	}
 
-	/**
-	 * @see org.electrocodeogram.module.Module#setProperty(java.lang.String, java.lang.String)
-	 */
+	
 	@Override
-	public void setProperty(String propertyName, String propertyValue) throws ModulePropertyException
+	public void propertyChanged(ModuleProperty moduleProperty) throws ModulePropertyException
 	{
-		_logger.entering(this.getClass().getName(), "setProperty");
-
-		if (propertyName == null)
+	 
+		if (moduleProperty.getName().equals("Output File"))
 		{
 
-			_logger.log(Level.WARNING, "The module does not support a property with a null name.");
+			_logger.log(Level.INFO, "Request to set the property: " + moduleProperty.getName());
 
-			throw new ModulePropertyException(
-					"The module does not support a property with a null name");
-
-		}
-
-		if (propertyName.equals("Output File"))
-		{
-
-			_logger.log(Level.INFO, "Request to set the property: " + propertyName);
-
-			if (propertyValue == null)
+			if (moduleProperty.getValue() == null)
 			{
-				_logger.log(Level.WARNING, "The property value is null for: " + propertyName);
+				_logger.log(Level.WARNING, "The property value is null for: " + moduleProperty.getName());
 
 				throw new ModulePropertyException(
-						"The property value is null for: " + propertyName);
+						"The property value is null for: " + moduleProperty.getName());
 			}
 
-			File propertyValueFile = new File(propertyValue);
+			File propertyValueFile = new File(moduleProperty.getValue());
 
 			this._outputFile = propertyValueFile;
 
@@ -149,92 +129,72 @@ public class FileSystemTargetModule extends TargetModule
 			{
 				this._writer = new PrintWriter(new FileWriter(this._outputFile));
 
-				_logger.log(Level.INFO, "Set the property: " + propertyName + " to " + this._outputFile.getAbsolutePath());
+				_logger.log(Level.INFO, "Set the property: " + moduleProperty.getName() + " to " + this._outputFile.getAbsolutePath());
 			}
 			catch (IOException e)
 			{
 
-				_logger.log(Level.SEVERE, "The file could not be opened for writing: " + propertyValue);
+				_logger.log(Level.SEVERE, "The file could not be opened for writing: " + moduleProperty.getValue());
 
 				throw new ModulePropertyException(
-						"The file could not be opened for writing: " + propertyValue);
+						"The file could not be opened for writing: " + moduleProperty.getValue());
 			}
-
-			for (ModuleProperty property : this.runtimeProperties)
-			{
-				if (property.getName().equals(propertyName))
-				{
-					property.setValue(propertyValue);
-				}
-			}
+        
 
 		}
-		else if (propertyName.equals("Split Files"))
+		else if (moduleProperty.getName().equals("Split Files"))
 		{
-			_logger.log(Level.INFO, "Request to set the property: " + propertyName);
+			_logger.log(Level.INFO, "Request to set the property: " + moduleProperty.getName());
 
-			if (propertyValue.equals("true"))
+			if (moduleProperty.getValue().equals("true"))
 			{
 				this._splitFiles = true;
 
-				_logger.log(Level.INFO, "Set the property: " + propertyName + " to true");
+				_logger.log(Level.INFO, "Set the property: " + moduleProperty.getName() + " to true");
 			}
-			else if (propertyValue.equals("false"))
+			else if (moduleProperty.getValue().equals("false"))
 			{
 				this._splitFiles = false;
 
-				_logger.log(Level.INFO, "Set the property: " + propertyName + " to false");
+				_logger.log(Level.INFO, "Set the property: " + moduleProperty.getName() + " to false");
 			}
 			else
 			{
-				_logger.log(Level.WARNING, "The module does not support a property value of " + propertyValue + " with the given name: " + propertyName);
+				_logger.log(Level.WARNING, "The module does not support a property value of " + moduleProperty.getValue() + " with the given name: " + moduleProperty.getName());
 
 				throw new ModulePropertyException(
-						"The module does not support a property value of " + propertyValue + " with the given name: " + propertyName);
+						"The module does not support a property value of " + moduleProperty.getValue() + " with the given name: " + moduleProperty.getName());
 			}
 
-			for (ModuleProperty property : this.runtimeProperties)
-			{
-				if (property.getName().equals(propertyName))
-				{
-					property.setValue(propertyValue);
-				}
-			}
-
+		
 		}
-		else if (propertyName.equals("File Size"))
+		else if (moduleProperty.getName().equals("File Size"))
 		{
-			_logger.log(Level.INFO, "Request to set the property: " + propertyName);
+			_logger.log(Level.INFO, "Request to set the property: " + moduleProperty.getName());
 
 			try
 			{
-				this._fileSize = Integer.parseInt(propertyValue);
+				this._fileSize = Integer.parseInt(moduleProperty.getValue());
 
-				_logger.log(Level.INFO, "Set the property: " + propertyName + " to " + this._fileSize);
+				_logger.log(Level.INFO, "Set the property: " + moduleProperty.getName() + " to " + this._fileSize);
 
 			}
 			catch (NumberFormatException e)
 			{
-				_logger.log(Level.WARNING, "The module does not support a property value of " + propertyValue + " with the given name: " + propertyName);
+				_logger.log(Level.WARNING, "The module does not support a property value of " + moduleProperty.getValue() + " with the given name: " + moduleProperty.getName());
 
 				throw new ModulePropertyException(
-						"The module does not support a property value of " + propertyValue + " with the given name: " + propertyName);
+						"The module does not support a property value of " + moduleProperty.getValue() + " with the given name: " + moduleProperty.getName());
 			}
 
-			for (ModuleProperty property : this.runtimeProperties)
-			{
-				if (property.getName().equals(propertyName))
-				{
-					property.setValue(propertyValue);
-				}
-			}
+		
 		}
 		else
 		{
-			_logger.log(Level.WARNING, "The module does not support a property with the given name: " + propertyName);
+			_logger.log(Level.WARNING, "The module does not support a property with the given name: " + moduleProperty.getName());
 
 			throw new ModulePropertyException(
-					"The module does not support a property with the given name: " + propertyName);
+					"The module does not support a property with the given name: " + moduleProperty.getName());
 
 		}
 
