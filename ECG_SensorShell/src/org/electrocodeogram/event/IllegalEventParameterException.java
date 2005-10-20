@@ -19,7 +19,7 @@ public class IllegalEventParameterException extends Exception
     {
     	super(message);
     	
-    	_logger.log(Level.WARNING,"An IllegalEventParameterException occured");
+    	_logger.log(Level.WARNING,"An IllegalEventParameterException occured.");
     	
     	_logger.log(Level.WARNING,this.getMessage());
     }

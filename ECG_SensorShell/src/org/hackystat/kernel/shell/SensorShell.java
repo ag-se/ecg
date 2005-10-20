@@ -6,9 +6,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 import java.lang.Thread.UncaughtExceptionHandler;
+import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -17,13 +16,14 @@ import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.electrocodeogram.client.EventPacketQueueOverflowException;
 import org.electrocodeogram.client.IllegalHostOrPortException;
 import org.electrocodeogram.client.SendingThread;
-import org.electrocodeogram.client.EventPacketQueueOverflowException;
 import org.electrocodeogram.event.IllegalEventParameterException;
 import org.electrocodeogram.event.WellFormedEventPacket;
 import org.electrocodeogram.logging.LogHelper;
 import org.hackystat.kernel.admin.SensorProperties;
+
 
 /**
  * This class is the ECG SensorShell. It is named
@@ -79,7 +79,7 @@ public class SensorShell
 
 	private String _cr = System.getProperty("line.separator");
 
-	private String _prompt = ">> ";
+	private String _prompt = "SensorShell >> ";
 
 	private String _delimiter = "#";
 
@@ -120,6 +120,36 @@ public class SensorShell
 	{
 		_logger.entering(this.getClass().getName(), "SensorShell");
 
+//		String resource = "E:";
+//		
+//		URL url=null;
+//        // Try to format as a URL?
+//        ClassLoader loader=Thread.currentThread().getContextClassLoader();
+//        if (loader!=null)
+//        {
+//            url=loader.getResource(resource);
+//            if (url==null && resource.startsWith("/"))
+//                url=loader.getResource(resource.substring(1));
+//        }
+//        if (url==null)
+//        {
+//            loader=SensorShell.class.getClassLoader();
+//            if (loader!=null)
+//            {
+//                url=loader.getResource(resource);
+//                if (url==null && resource.startsWith("/"))
+//                    url=loader.getResource(resource.substring(1));
+//            }
+//        }
+//        
+//        if (url==null)
+//        {
+//            url=ClassLoader.getSystemResource(resource);
+//            if (url==null && resource.startsWith("/"))
+//                url=loader.getResource(resource.substring(1));
+//        }
+
+		
 		this._acceptEvents = true;
 		
 		this._count = 0;
@@ -203,15 +233,15 @@ public class SensorShell
 
 		if (this._properties.getECGServerType() == null)
 		{
-			_logger.log(Level.INFO, "ECG_SEVER_TYPE is null in sensor.properties.");
+			_logger.log(Level.WARNING, "ECG_SEVER_TYPE is null in sensor.properties.");
 
-			_logger.log(Level.INFO, "Going remote server...");
+			_logger.log(Level.WARNING, "Going remote server per default.");
 
 			startRemote();
 		}
 		else if (this._properties.getECGServerType().equals(INLINE_SERVER))
 		{
-			_logger.log(Level.INFO, "ECG_SEVER_TYPE is INLINE.");
+			_logger.log(Level.INFO, "The ECG_SEVER_TYPE is INLINE in sensor.properties.");
 
 			_logger.log(Level.INFO, "Going inline server...");
 
@@ -219,7 +249,7 @@ public class SensorShell
 		}
 		else if (this._properties.getECGServerType().equals(REMOTE_SERVER))
 		{
-			_logger.log(Level.INFO, "ECG_SEVER_TYPE is STANDALONE.");
+			_logger.log(Level.INFO, "ECG_SEVER_TYPE is STANDALONE in sensor.properties.");
 
 			_logger.log(Level.INFO, "Going remote server...");
 
@@ -227,9 +257,9 @@ public class SensorShell
 		}
 		else
 		{
-			_logger.log(Level.INFO, "ECG_SEVER_TYPE is something else.");
+			_logger.log(Level.INFO, "ECG_SEVER_TYPE is something else than REMOT or INLINE in sensor.properties.");
 
-			_logger.log(Level.INFO, "Going remote server...");
+			_logger.log(Level.INFO, "Going remote server per default.");
 
 			startRemote();
 		}
@@ -358,7 +388,7 @@ public class SensorShell
 		if (commandType != null && commandType.equals(ECG_LAB_PATH))
 		{
 
-			_logger.log(Level.INFO, "SensorShell is getting the path to the ECG Lab.");
+			_logger.log(Level.FINE, "SensorShell is receiving the path to the ECG Lab.");
 
 			result = analysePath(argList);
 
@@ -368,7 +398,7 @@ public class SensorShell
 
 		}
 
-		_logger.log(Level.INFO, "SensorShell is getting an event.");
+		_logger.log(Level.FINE, "SensorShell is getting an event.");
 
 		result = analyseEvent(timeStamp, commandType, argList);
 
@@ -387,22 +417,21 @@ public class SensorShell
 		try
 		{
 			packet = new WellFormedEventPacket(0, timeStamp, commandType, argList);
-
-			_logger.log(Level.INFO, "The packet is valid.");
-
-			_logger.log(Level.FINEST, packet.toString());
-
 		}
 		catch (IllegalEventParameterException e)
 		{
-			_logger.log(Level.WARNING, e.getMessage());
-
+			_logger.log(Level.FINE,"An error occured while reading an event from the sensor.");
+						
+			_logger.exiting(this.getClass().getName(), "analyseEvent");
+			
 			return false;
 		}
 
 		if (this._serverMode == ServerMode.REMOTE)
 		{
 
+			_logger.log(Level.FINE, "The SensorShell is operating in RemoteServer mode.");
+			
 			if (this._sendingThread != null)
 			{
 				// pass EventPacket to SendingThread
@@ -417,45 +446,69 @@ public class SensorShell
 					this._acceptEvents = false;
 				}
 
-				_logger.log(Level.INFO, "Event packet passed to SendingThread.");
+				_logger.log(Level.FINE, "Event packet passed to SendingThread.");
 
+			}
+			else
+			{
+				_logger.log(Level.WARNING,"The stream to the ECG Lab is not open. Maybe the SensdingThread is not started yet?");
 			}
 		}
 		else
 		{
+			_logger.log(Level.FINE, "The SensorShell is operating in InlineServer mode.");
+			
 			if (this._toInlineServer != null)
 			{
 				try
 				{
+                    _logger.log(Level.FINE, "if (this._toInlineServer != null)");
+                    
 					this._toInlineServer.flush();
-
-					// this._toInlineServer.print(ValidEventPacket.MICRO_ACTIVITY_PREFIX);
+					
+					_logger.log(Level.FINE, "this._toInlineServer.flush();");
 
 					this._toInlineServer.writeObject(packet);
-
-					// this._toInlineServer.print(ValidEventPacket.MICRO_ACTIVITY_SUFFIX);
+					
+					_logger.log(Level.FINE, "this._toInlineServer.writeObject(packet);");
 
 					this._toInlineServer.flush();
 
+					_logger.log(Level.FINE, "this._toInlineServer.flush();");
+					
 					this._count++;
+					
+					_logger.log(Level.FINE, "this._count++;");
 					
 					if(this._count == RESET_COUNT)
 					{
+						_logger.log(Level.FINE, "if(this._count == RESET_COUNT)");
+						
 						this._toInlineServer.reset();
 						
+						_logger.log(Level.FINE, "this._toInlineServer.reset();");
+						
 						this._count = 0;
+						
+						_logger.log(Level.FINE, "The stream to the ECG Lab has been reset.");
 					}
 					
-					_logger.log(Level.INFO, "Event packet passed to InlineServer.");
-
-					_logger.log(Level.INFO, packet.toString());
+					_logger.log(Level.FINE, "An event has been passed to the InlineServer.");
 
 				}
 				catch (IOException e)
 				{
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					_logger.log(Level.SEVERE, "An error occured while sending an event to the InlineServer.");
+					
+					_logger.log(Level.SEVERE, e.getMessage());
+                    
+                    _inlineServer.stopECGServer();
+					
 				}
+			}
+			else
+			{
+				_logger.log(Level.WARNING,"The stream to the ECG Lab is not open. Maybe the InlineServer is not started yet?");
 			}
 		}
 
@@ -785,15 +838,14 @@ public class SensorShell
 
 				while ((line = br.readLine()) != null)
 				{
-					// SensorShell._logger.log(Level.INFO, this._type + ">" +
-					// line);
+					 //SensorShell._logger.log(Level.INFO, this._type + ">" + line);
 				}
 			}
 			catch (IOException e)
 			{
 				SensorShell._logger.log(Level.SEVERE, "An error occured while reading from the ECG Lab process.");
 
-				SensorShell._logger.log(Level.FINEST, e.getMessage());
+				SensorShell._logger.log(Level.SEVERE, e.getMessage());
 			}
 
 			_logger.exiting(this.getClass().getName(), "run");
@@ -876,9 +928,28 @@ public class SensorShell
 			}
 			catch (IOException e)
 			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				_logger.log(Level.SEVERE,"An error occured while sending the quit command to the ECG Lab.");
 			}
+            finally
+            {
+                if(this._shell._toInlineServer != null)
+                {
+                    try
+                    {
+                        this._shell._toInlineServer.close();
+                        
+                        _logger.log(Level.SEVERE,"Stream to ECG Lab has been closed.");
+                    }
+                    catch(IOException e)
+                    {
+                        _logger.log(Level.SEVERE,"Unable to clear the stream to the ECG Lab.");
+                    }
+                }
+                
+                this._ecgLab.destroy();
+                
+                _logger.log(Level.SEVERE,"The ECG Lab process has got the kill signal.");
+            }
 		}
 
 		public void run()
@@ -911,21 +982,70 @@ public class SensorShell
 				if (this._shell.ecgEclipseSensorPath != null && !this._shell.ecgEclipseSensorPath.equals(""))
 				{
 
-					ProcessBuilder pb = new ProcessBuilder("cmd.exe", "/C",
-							"ecg.bat");
+					String osName = System.getProperty("os.name");
+					
+					if(osName == null || osName.equals(""))
+					{
+						_logger.log(Level.SEVERE,"The operating system name could not be read from the system environment. Aborting InlineServer startup...");
+						
+						_logger.exiting(this.getClass().getName(),"run");
+						
+						return;
+					}
+					
+					_logger.log(Level.FINE,"The operating system name is: " + osName);
+					
+					ProcessBuilder pb = null;
+					
+					File ecgDir = null;
+					
+					if(osName.startsWith("Windows"))
+					{
+						_logger.log(Level.INFO,"The operating system is a windows system.");
+						
+						pb = new ProcessBuilder("cmd.exe", "/C",
+						"ecg.bat");
+						
+						ecgDir = new File(this._shell.ecgEclipseSensorPath);
 
-					File ecgDir = new File(
-							"." + File.separator + this._shell.ecgEclipseSensorPath);
+						SensorShell._logger.log(Level.FINE, "ECG Lab directory is: " + ecgDir.getAbsolutePath());
+						
+					}
+					else if(osName.startsWith("Linux"))
+					{
+						_logger.log(Level.INFO,"The operating system is a linux system.");
+						
+						pb = new ProcessBuilder("sh" , "./ecg.sh");
+						
+						ecgDir = new File(this._shell.ecgEclipseSensorPath);
 
-					SensorShell._logger.log(Level.INFO, "ECG Lab directory is: " + ecgDir.getAbsolutePath());
+						SensorShell._logger.log(Level.FINE, "ECG Lab directory is: " + ecgDir.getAbsolutePath());
 
+					}
+					else
+					{
+						_logger.log(Level.SEVERE,"The operating system is an unknown system. Aborting InlineServer startup...");
+						
+						return;
+					}
+					
+					
 					pb.directory(ecgDir);
-
+					
 					this._ecgLab = pb.start();
 
 					SensorShell._logger.log(Level.INFO, "ECG Lab process started.");
 
 					this._shell._toInlineServer = new ObjectOutputStream(this._ecgLab.getOutputStream());
+					
+					if(this._shell._toInlineServer == null)
+					{
+						_logger.log(Level.INFO,"Could not create stream to InlineServer.");
+					}
+					else
+					{
+						_logger.log(Level.INFO,"Stream to InlineServer created.");
+					}
 
 					StreamGobbler errorGobbler = new StreamGobbler(
 							this._ecgLab.getErrorStream(), "ERROR");
@@ -941,14 +1061,14 @@ public class SensorShell
 				}
 				else
 				{
-					SensorShell._logger.log(Level.SEVERE, "ECG Lab path is invalid.");
+					SensorShell._logger.log(Level.SEVERE, "The ECG Lab path is null or empty.");
 				}
 			}
 			catch (IOException e)
 			{
 				SensorShell._logger.log(Level.SEVERE, "Unable to start ECG Lab.");
 
-				SensorShell._logger.log(Level.FINEST, e.getMessage());
+				SensorShell._logger.log(Level.SEVERE, e.getMessage());
 			}
 
 			_logger.exiting(this.getClass().getName(), "run");

@@ -40,11 +40,8 @@ public class EventPacket implements Serializable
 
 		this.sourceId = id;
 
-		if (timeStamp != null)
-		{
-			this._timeStamp = new Date(timeStamp.getTime());
-		}
-
+		this._timeStamp = timeStamp;
+		
 		this._sensorDataType = sensorDataType;
 
 		this._argList = argList;

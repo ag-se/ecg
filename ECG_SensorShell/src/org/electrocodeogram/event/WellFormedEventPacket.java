@@ -6,6 +6,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.electrocodeogram.logging.LogHelper;
+import org.electrocodeogram.logging.LogHelper.ECGLevel;
 
 /**
  * A ValidEventPacket is a subclass of EventPacket. The data
@@ -75,11 +76,6 @@ public class WellFormedEventPacket extends EventPacket
 
 		validate();
 
-		if (id < 0)
-		{
-			throw new IllegalEventParameterException("EventPacket is not valid");
-		}
-
 		_logger.exiting(this.getClass().getName(), "ValidEventPacket");
 
 	}
@@ -96,14 +92,12 @@ public class WellFormedEventPacket extends EventPacket
 	{
 		_logger.entering(EventPacket.class.getName(), "validate");
 
+		_logger.log(ECGLevel.PACKET,this.toString());
+		
 		if (this.getTimeStamp() == null)
 		{
-			_logger.log(Level.FINE, "Packet is not wellformed");
-
-			_logger.log(Level.FINE, "timeStamp is null");
+			_logger.log(Level.FINE, "The event is not wellformed. The timestamp is null.");
 			
-			_logger.log(Level.FINER,this.toString());
-
 			_logger.exiting(EventPacket.class.getName(), "validate");
 
 			throw new IllegalEventParameterException("The event is not wellformed");
@@ -111,46 +105,36 @@ public class WellFormedEventPacket extends EventPacket
 
 		if (this.getSensorDataType() == null)
 		{
-			_logger.log(Level.FINE, "Packet is not wellformed");
-
-			_logger.log(Level.FINE, "SensorDataType is null");
+			_logger.log(Level.FINE, "The event is not wellformed. The SensorDataType is null.");
 			
-			_logger.log(Level.FINER,this.toString());
-
+			_logger.exiting(EventPacket.class.getName(), "validate");
+			
 			throw new IllegalEventParameterException("The event is not wellformed");
 		}
 
 		if (this.getArglist() == null)
 		{
 
-			_logger.log(Level.FINE, "Packet is not wellformed");
-
-			_logger.log(Level.FINE, "argList is null");
+			_logger.log(Level.FINE, "The event is not wellformed. The argList is null.");
 			
-			_logger.log(Level.FINER,this.toString());
-
+			_logger.exiting(EventPacket.class.getName(), "validate");
+			
 			throw new IllegalEventParameterException("The event is not wellformed");
 		}
 
 		if (this.getArglist().isEmpty())
 		{
 
-			_logger.log(Level.FINE, "Packet is not wellformed");
-
-			_logger.log(Level.FINE, "argList is empty");
+			_logger.log(Level.FINE, "The event is not wellformed. The argList is empty.");
 			
-			_logger.log(Level.FINER,this.toString());
-
+			_logger.exiting(EventPacket.class.getName(), "validate");
+			
 			throw new IllegalEventParameterException("The event is not wellformed");
 		}
 
 		if (!(this.getArglist().get(0) instanceof String))
 		{
-			_logger.log(Level.FINE, "Packet is not wellformed");
-
-			_logger.log(Level.FINE, "argList is not List<String>");
-			
-			_logger.log(Level.FINER,this.toString());
+			_logger.log(Level.FINE, "The event is not wellformed. The argList is no List<String>.");
 
 			_logger.exiting(EventPacket.class.getName(), "validate");
 
@@ -158,8 +142,8 @@ public class WellFormedEventPacket extends EventPacket
 
 		}
 
-		_logger.log(Level.FINE, "Packet is wellformed");
-
+		_logger.log(Level.FINE, "The event is wellformed.");
+		
 		_logger.exiting(EventPacket.class.getName(), "validate");
 
 		

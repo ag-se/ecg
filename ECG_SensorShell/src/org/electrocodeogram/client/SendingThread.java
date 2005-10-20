@@ -185,20 +185,20 @@ public class SendingThread extends Thread
 			// open a new socket
 			this.socketToServer = new Socket(this._host, this._port);
 
-			_logger.log(Level.INFO, "Socket connection to " + this._host.toString() + ":" + this._port + " established");
+			_logger.log(Level.INFO, "A network socket connection to to the ECG Lab at " + this._host.toString() + ":" + this._port + " has been established");
 
 			// create a stream upon the socket
 			this._oos = new ObjectOutputStream(
 					this.socketToServer.getOutputStream());
 
-			_logger.log(Level.INFO, "Stream opened");
+			_logger.log(Level.FINE, "The streams to the ECG Lab are open.");
 
-			_logger.log(Level.INFO, "Connected to the ECG Server at " + this._host.toString() + ":" + this._port);
+			_logger.log(Level.INFO, "The connection is open to the ECG Lab at " + this._host.toString() + ":" + this._port + ".");
 		}
 		catch (IOException e)
 		{
 
-			_logger.log(Level.WARNING, "Unable to connect to the ECG Server at " + this._host.toString() + ":" + this._port + " \nNext attempt in " + this.connectionDelay / 1000 + " seconds.");
+			_logger.log(Level.WARNING, "Unable to connect to the ECG Lab at " + this._host.toString() + ":" + this._port + " \nNext attempt in " + this.connectionDelay / 1000 + " seconds.");
 
 			try
 			{
@@ -273,7 +273,7 @@ public class SendingThread extends Thread
 
 					this._oos.flush();
 					
-					_logger.log(Level.FINEST,"Event written to Socket.");
+					_logger.log(Level.FINE,"An event has benn written to the network socket.");
 
 					count++;
 
@@ -293,7 +293,7 @@ public class SendingThread extends Thread
 				catch (IOException e)
 				{
 
-					_logger.log(Level.WARNING, "Lost connection to the ECG Lab.");
+					_logger.log(Level.WARNING, "The connection to the ECG Lab is lost.");
 
 					this.socketToServer = null;
 				}

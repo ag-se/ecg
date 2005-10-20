@@ -3,7 +3,9 @@ package org.electrocodeogram.logging;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.logging.FileHandler;
+import java.util.logging.LogManager;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -25,6 +27,43 @@ public class LogHelper
 	
 	private static final int FILE_SIZE = 10*1024*1024;
 	
+	
+	
+	/**
+	 * 
+	 */
+	public static final String LEVEL_DEBUG = "debug";
+
+	/**
+	 * 
+	 */
+	public static final String LEVEL_PACKET = "packet";
+
+	/**
+	 * 
+	 */
+	public static final String LEVEL_VERBOSE = "verbose";
+
+	/**
+	 * 
+	 */
+	public static final String LEVEL_INFO = "info";
+
+	/**
+	 * 
+	 */
+	public static final String LEVEL_WARNING = "warning";
+
+	/**
+	 * 
+	 */
+	public static final String LEVEL_ERROR = "error";
+
+	/**
+	 * 
+	 */
+	public static final String LEVEL_OFF = "off";
+	
 	static
 	{
 		Logger rootLogger = Logger.getLogger("");
@@ -36,6 +75,8 @@ public class LogHelper
 			handler.setFormatter(new ECGFormatter());
 		}
 		
+
+			
 	}
 	
 	public static Logger createLogger(String name)
@@ -65,7 +106,9 @@ public class LogHelper
 			handler.setLevel(logLevel);
 
 		}
-
+	
+		String str;
+		
 	}
 
 	public static void setLogFile(String filename) throws SecurityException, IOException
@@ -129,6 +172,14 @@ public class LogHelper
 		{
 			return Level.FINEST;
 		}
+		else if (logLevel.equalsIgnoreCase("VERBOSE"))
+		{
+			return Level.FINE;
+		}
+		else if (logLevel.equalsIgnoreCase("PACKET"))
+		{
+			return ECGLevel.PACKET;
+		}
 		else
 		{
 			return DEFAULT_LEVEL;
@@ -145,6 +196,23 @@ public class LogHelper
 		public String format(LogRecord record)
 		{
 			return "[" + record.getLevel()  + "]  " +  new Date(record.getMillis()).toString() + " : " + record.getSourceClassName() + "#" + record.getSourceMethodName() + " : " + record.getMessage() + "\r\n";
+		}
+		
+	}
+	
+	public static class ECGLevel extends Level
+	{
+
+		public final static Level PACKET = new ECGLevel("PACKET",450);
+		
+		/**
+		 * @param name
+		 * @param value
+		 */
+		protected ECGLevel(String name, int value)
+		{
+			super(name, value);
+
 		}
 		
 	}
