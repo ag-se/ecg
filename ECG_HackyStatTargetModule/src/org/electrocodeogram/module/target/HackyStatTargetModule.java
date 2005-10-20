@@ -1,6 +1,10 @@
 package org.electrocodeogram.module.target;
 
+import java.util.logging.Logger;
+
 import org.electrocodeogram.event.ValidEventPacket;
+import org.electrocodeogram.logging.LogHelper;
+import org.electrocodeogram.module.ModuleProperty;
 import org.electrocodeogram.module.ModulePropertyException;
 import org.hackystat.kernel.admin.SensorProperties;
 import org.hackystat.kernel.shell.SensorShell;
@@ -11,6 +15,8 @@ import org.hackystat.kernel.shell.SensorShell;
 public class HackyStatTargetModule extends TargetModule
 {
 
+    private static Logger logger = LogHelper.createLogger(HackyStatTargetModule.class.getName());
+    
 	private SensorShell _shell;
 
 	private SensorProperties _properties;
@@ -33,7 +39,7 @@ public class HackyStatTargetModule extends TargetModule
 	{
 		super(id, name);
 
-		this.getLogger().exiting(this.getClass().getName(), "HackyStatTargetModule");
+		logger.exiting(this.getClass().getName(), "HackyStatTargetModule");
 
 	}
 
@@ -59,20 +65,15 @@ public class HackyStatTargetModule extends TargetModule
 	 *      java.lang.String)
 	 */
 	@Override
-	public void setProperty(String propertyName, String propertyValue) throws ModulePropertyException
+	public void propertyChanged(ModuleProperty moduleProperty) throws ModulePropertyException
 	{
-		if (propertyName.equals("HackyStat Host"))
+		if (moduleProperty.getName().equals("HackyStat Host"))
 		{
-			this._host = propertyValue;
+			this._host = moduleProperty.getValue();
 		}
-		else if (propertyName.equals("HackyStat Admin Key"))
+		else if (moduleProperty.getName().equals("HackyStat Admin Key"))
 		{
-			this._key = propertyValue;
-		}
-		else
-		{
-			throw new ModulePropertyException(
-					"The property " + propertyName + " is not supported.");
+			this._key = moduleProperty.getValue();
 		}
 	}
 
@@ -92,9 +93,9 @@ public class HackyStatTargetModule extends TargetModule
 	@Override
 	public void initialize()
 	{
-		this.getLogger().entering(this.getClass().getName(), "initialize");
+		logger.entering(this.getClass().getName(), "initialize");
 
-		this.getLogger().exiting(this.getClass().getName(), "initialize");
+		logger.exiting(this.getClass().getName(), "initialize");
 	}
 
 	/**
