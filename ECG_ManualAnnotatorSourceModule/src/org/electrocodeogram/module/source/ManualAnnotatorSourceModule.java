@@ -6,12 +6,14 @@ import java.awt.event.ActionListener;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 
 import org.electrocodeogram.event.IllegalEventParameterException;
 import org.electrocodeogram.event.WellFormedEventPacket;
+import org.electrocodeogram.logging.LogHelper;
 import org.electrocodeogram.module.ModuleActivationException;
 import org.electrocodeogram.module.ModuleProperty;
 import org.electrocodeogram.module.ModulePropertyException;
@@ -23,6 +25,8 @@ public class ManualAnnotatorSourceModule extends SourceModule
 {
 
 	private ManualAnnotatorFrame _frame;
+    
+    private Logger logger = LogHelper.createLogger(ManualAnnotatorSourceModule.class.getName());
 	
 	ManualAnnotatorEvents _events;
 	
@@ -44,23 +48,17 @@ public class ManualAnnotatorSourceModule extends SourceModule
 	 * 
 	 */
 	@Override
-	public void setProperty(String propertyName, String propertyValue) throws ModulePropertyException
+	public void propertyChanged(ModuleProperty moduleProperty) throws ModulePropertyException
 	{
-		if(propertyName.equals("Show Dialog"))
+		if(moduleProperty.getName().equals("Show Dialog"))
 		{
+            if(this._frame == null)
+            {
+                this._frame = new ManualAnnotatorFrame(this);
+            }
+            
 			this._frame.setVisible(true);
 		}
-		else if(propertyName.equals("Events"))
-		{
-			
-		}
-		else
-		{
-			throw new ModulePropertyException(
-					"The module does not support a property with the given name: " + propertyName);
-		}
-		
-		getLogger().log(Level.INFO,"The " + propertyName + " property has been set to " + propertyValue);
 	}
 
 	public void analyseCoreNotification()
@@ -74,7 +72,9 @@ public class ManualAnnotatorSourceModule extends SourceModule
 	@Override
 	public void initialize()
 	{
-		for(ModuleProperty property : this.runtimeProperties)
+        ModuleProperty[] runtimeProperties = this.getRuntimeProperties();
+        
+		for(ModuleProperty property : runtimeProperties)
 		{
 			if(property.getName().equals("Events"))
 			{
@@ -90,7 +90,7 @@ public class ManualAnnotatorSourceModule extends SourceModule
 	@Override
 	public void startReader(SourceModule sourceModule)
 	{
-		this._frame = new ManualAnnotatorFrame(this);
+		
 		
 	}
 

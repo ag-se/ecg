@@ -51,7 +51,7 @@
 				msdt.manual.xsd
 			</msdtName>
 			<msdtFile>
-				msdt\\msdt.manual.xsd
+				msdt.manual.xsd
 			</msdtFile>
 		</microsensordatatype>
 	</microsensordatatypes>
