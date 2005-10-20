@@ -16,8 +16,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import org.electrocodeogram.event.ValidEventPacket;
+import org.electrocodeogram.module.ModuleProperty;
 import org.electrocodeogram.msdt.MicroSensorDataType;
-import org.electrocodeogram.system.SystemRoot;
+import org.electrocodeogram.system.ModuleSystem;
 
 
 
@@ -69,9 +70,9 @@ public class MSDTFilterIntermediateModule extends IntermediateModule
      * @param propertyValue
      */
     @Override
-    public void setProperty(String propertyName, String propertyValue)
+    public void propertyChanged(ModuleProperty moduleProperty)
     {
-       if(propertyValue.equals("configureFilter"))
+       if(moduleProperty.getValue().equals("configureFilter"))
        {
            configureFilter();
        }
@@ -99,7 +100,7 @@ public class MSDTFilterIntermediateModule extends IntermediateModule
     {
         this.msdtFilterMap = new HashMap<MicroSensorDataType,Boolean>();
         
-        MicroSensorDataType[] msdts = SystemRoot.getModuleInstance().getModuleMsdtRegistry().getMicroSensorDataTypes();
+        MicroSensorDataType[] msdts = ModuleSystem.getInstance().getMicroSensorDataTypes();
         
         for(MicroSensorDataType msdt : msdts)
         {
@@ -130,14 +131,14 @@ public class MSDTFilterIntermediateModule extends IntermediateModule
     {
         if(this.msdtFilterMap.size() == 0)
         {
-            JOptionPane.showMessageDialog(SystemRoot.getModuleInstance().getRootFrame(),"There are no MicroSensorDataTypes loaded yet. Please add at least one SourceModule to load the core MicroSensorDataTypes.","Configure Filter Message",JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(ModuleSystem.getInstance().getRootFrame(),"There are no MicroSensorDataTypes loaded yet. Please add at least one SourceModule to load the core MicroSensorDataTypes.","Configure Filter Message",JOptionPane.INFORMATION_MESSAGE);
             
             return;
         }
         
         initializeCheckBoxes();
         
-        this.dlgFilterConfiguration = new JDialog(SystemRoot.getModuleInstance().getRootFrame(),"Configure Filter");
+        this.dlgFilterConfiguration = new JDialog(ModuleSystem.getInstance().getRootFrame(),"Configure Filter");
         
         this.pnlCheckBoxes = createMainPanel();
         
