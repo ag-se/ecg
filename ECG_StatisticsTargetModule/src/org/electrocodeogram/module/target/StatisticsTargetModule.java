@@ -21,8 +21,9 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 
 import org.electrocodeogram.event.ValidEventPacket;
+import org.electrocodeogram.module.ModuleProperty;
 import org.electrocodeogram.msdt.MicroSensorDataType;
-import org.electrocodeogram.system.SystemRoot;
+import org.electrocodeogram.system.ModuleSystem;
 import org.electrocodeogram.xml.ECGParser;
 import org.electrocodeogram.xml.PropertyException;
 import org.w3c.dom.Document;
@@ -53,9 +54,9 @@ public class StatisticsTargetModule extends TargetModule
 	 * @param propertyValue
 	 */
 	@Override
-	public void setProperty(String propertyName, String propertyValue)
+	public void propertyChanged(ModuleProperty moduleProperty)
 	{
-		if (propertyName.equals("Show Statistics"))
+		if (moduleProperty.getName().equals("Show Statistics"))
 		{
 			openDialog();
 		}
@@ -432,7 +433,7 @@ public class StatisticsTargetModule extends TargetModule
 
 		private int _rowCount;
 		
-		private int _msdtCount = SystemRoot.getModuleInstance().getModuleMsdtRegistry().getMicroSensorDataTypes().length;
+		private int _msdtCount = ModuleSystem.getInstance().getMicroSensorDataTypes().length;
 
 		private StatisticsTargetModule _statsModule;
 
@@ -519,7 +520,7 @@ public class StatisticsTargetModule extends TargetModule
 			}
 			else if(rowIndex > 2 && rowIndex < this._msdtCount + 3)
 			{
-				Integer count = day._events.get(SystemRoot.getModuleInstance().getModuleMsdtRegistry().getMicroSensorDataTypes()[rowIndex - 3]);
+				Integer count = day._events.get(ModuleSystem.getInstance().getMicroSensorDataTypes()[rowIndex - 3]);
 				
 				if(count == null)
 				{
@@ -557,7 +558,7 @@ public class StatisticsTargetModule extends TargetModule
 			}
 			else if(rowIndex > 2 && rowIndex < this._msdtCount + 3)
 			{
-				return SystemRoot.getModuleInstance().getModuleMsdtRegistry().getMicroSensorDataTypes()[rowIndex - 3].getName();
+				return ModuleSystem.getInstance().getMicroSensorDataTypes()[rowIndex - 3].getName();
 			}
 			else
 			{
