@@ -6,6 +6,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
@@ -13,12 +14,14 @@ import javax.swing.JPanel;
 
 import org.apache.xerces.parsers.DOMParser;
 import org.electrocodeogram.event.ValidEventPacket;
+import org.electrocodeogram.logging.LogHelper;
 import org.electrocodeogram.msdt.MicroSensorDataType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import org.electrocodeogram.module.ModuleProperty;
 import bmsi.util.Diff;
 
 
@@ -28,6 +31,8 @@ import bmsi.util.Diff;
 public class CodechangeDifferIntermediateModule extends IntermediateModule
 {
 
+    private static Logger logger = LogHelper.createLogger(CodechangeDifferIntermediateModule.class.getName());
+    
     private HashMap<MicroSensorDataType,Boolean> msdtFilterMap;
     
     private JDialog dlgFilterConfiguration;
@@ -87,9 +92,9 @@ public class CodechangeDifferIntermediateModule extends IntermediateModule
             
             Diff.change changes = this.diff.diff(Diff.forwardScript);
             
-            this.getLogger().log(Level.INFO,"first deleted at: " + changes.line0);
+            logger.log(Level.INFO,"first deleted at: " + changes.line0);
             
-            this.getLogger().log(Level.INFO,"first inserted at: " + changes.line1);
+            logger.log(Level.INFO,"first inserted at: " + changes.line1);
             
             this.lastCode = currentCode;
         }
@@ -166,7 +171,7 @@ public class CodechangeDifferIntermediateModule extends IntermediateModule
      * @param propertyValue
      */
     @Override
-    public void setProperty(String propertyName, String propertyValue)
+    public void propertyChanged(ModuleProperty moduleProperty)
     {
        
     }

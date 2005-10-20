@@ -28,7 +28,7 @@
 				msdt.diff.xsd
 			</msdtName>
 			<msdtFile>
-				msdt\\msdt.diff.xsd
+				msdt.diff.xsd
 			</msdtFile>
 		</microsensordatatype>
 	</microsensordatatypes>
