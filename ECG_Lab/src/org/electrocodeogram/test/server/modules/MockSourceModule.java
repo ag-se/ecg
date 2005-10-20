@@ -4,6 +4,7 @@
 package org.electrocodeogram.test.server.modules;
 
 
+import org.electrocodeogram.module.ModuleProperty;
 import org.electrocodeogram.module.source.SourceModule;
 
 /**
@@ -30,16 +31,7 @@ public class MockSourceModule extends SourceModule
         
     }
 
-    /**
-     * @see org.electrocodeogram.module.Module#setProperty(java.lang.String, java.lang.Object)
-     */
-    @Override
-    public void setProperty(String currentPropertyName, String propertyValue)
-    {
-        // Not used
-        
-    }
-
+   
     /**
      * @see org.electrocodeogram.module.Module#analyseCoreNotification()
      */
@@ -69,5 +61,14 @@ public class MockSourceModule extends SourceModule
 		// TODO Auto-generated method stub
 		
 	}
+
+        /* (non-Javadoc)
+         * @see org.electrocodeogram.module.Module#propertyChanged(org.electrocodeogram.module.ModuleProperty)
+         */
+        @Override
+        protected void propertyChanged(ModuleProperty moduleProperty) {
+            // TODO Auto-generated method stub
+            
+        }
 
 }

@@ -9,7 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.electrocodeogram.logging.LogHelper;
-import org.electrocodeogram.system.SystemRoot;
+import org.electrocodeogram.system.Core;
 
 /**
  * The ModuleClassLoader is able to load classes directly from a
@@ -77,78 +77,76 @@ public class ModuleClassLoader extends java.lang.ClassLoader
 			return null;
 		}
 
+		File classFile = null;
+
 		for (String moduleClassPath : _moduleClassPaths)
 		{
 
 			String pathToModuleClass = moduleClassPath + normalizedClassName + ".class";
 
-			File classFile = new File(pathToModuleClass);
+			classFile = new File(pathToModuleClass);
 
-			if (!classFile.exists())
+			if (classFile.exists() && classFile.isFile())
 			{
-				_logger.log(Level.WARNING, "Class is not found here: " + classFile.getAbsolutePath());
+				_logger.log(Level.FINE, "Class is found here: " + classFile.getAbsolutePath());
 
-				continue;
+				break;
 			}
+		}
 
-			if (!classFile.isFile())
-			{
-				_logger.log(Level.WARNING, "Class is not found here: " + classFile.getAbsolutePath());
+		if (classFile == null)
+		{
+			_logger.log(Level.SEVERE, "The class could not be found: " + classFile);
 
-				continue;
-			}
+			return null;
+		}
+		
+		FileInputStream fis = null;
 
-			FileInputStream fis = null;
+		try
+		{
+			fis = new FileInputStream(classFile);
 
-			_logger.log(Level.INFO, "Class is found here: " + classFile.getAbsolutePath());
+			byte[] data = new byte[(int) classFile.length()];
+
+			fis.read(data);
 
 			try
 			{
-				fis = new FileInputStream(classFile);
-
-				byte[] data = new byte[(int) classFile.length()];
-
-				fis.read(data);
-
-				try
-				{
-					toReturn = this.defineClass(null, data, 0, data.length);
-
-					break;
-
-				}
-				catch (Error e)
-				{
-					_logger.log(Level.SEVERE, "Error while loading class: " + className);
-
-					_logger.log(Level.FINEST, e.getMessage());
-
-				}
-
-				_logger.log(Level.INFO, "Successfully loaded module class: " + classFile.getName());
+				toReturn = this.defineClass(null, data, 0, data.length);
 
 			}
-			catch (IOException e)
+			catch (Error e)
 			{
+				_logger.log(Level.SEVERE, "Error while loading class: " + className);
 
-				_logger.log(Level.WARNING, "Error while loading module class: " + className);
-				
 				_logger.log(Level.FINEST, e.getMessage());
 
 			}
-			finally
+
+			_logger.log(Level.INFO, "Successfully loaded module class: " + classFile.getName());
+
+		}
+		catch (IOException e)
+		{
+
+			_logger.log(Level.WARNING, "Error while loading module class: " + className);
+
+			_logger.log(Level.FINEST, e.getMessage());
+
+		}
+		finally
+		{
+			try
 			{
-				try
+				if (fis != null)
 				{
-					if(fis != null)
-					{
-						fis.close();
-					}
+					fis.close();
 				}
-				catch (IOException e)
-				{
-					_logger.log(Level.WARNING, "Error while closing the stream.");
-				}
+			}
+			catch (IOException e)
+			{
+				_logger.log(Level.WARNING, "Error while closing the stream.");
 			}
 		}
 
@@ -221,7 +219,7 @@ public class ModuleClassLoader extends java.lang.ClassLoader
 
 		if (_theInstance == null)
 		{
-			Class clazz = SystemRoot.getSystemInstance().getClass();
+			Class clazz = org.electrocodeogram.system.System.getInstance().getClass();
 
 			ClassLoader currentClassLoader = clazz.getClassLoader();
 

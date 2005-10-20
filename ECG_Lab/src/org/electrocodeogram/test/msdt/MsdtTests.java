@@ -6,9 +6,9 @@ import junit.framework.TestCase;
 
 import org.electrocodeogram.event.IllegalEventParameterException;
 import org.electrocodeogram.event.WellFormedEventPacket;
-import org.electrocodeogram.event.ValidEventPacket.VALIDITY_LEVEL;
-import org.electrocodeogram.system.ISystemRoot;
-import org.electrocodeogram.system.SystemRoot;
+import org.electrocodeogram.event.ValidEventPacket.VALIDATION_LEVEL;
+import org.electrocodeogram.system.ISystem;
+import org.electrocodeogram.system.Core;
 import org.electrocodeogram.test.EventGenerator;
 import org.electrocodeogram.test.EventGenerator.MicroSensorDataType;
 import org.electrocodeogram.test.module.TestModule;
@@ -26,7 +26,7 @@ public class MsdtTests extends TestCase
 
 	private MockClient _mockClient = null;
 
-	private ISystemRoot _root;
+	private ISystem _root;
 
 	private TestModule _testModule;
 
@@ -40,7 +40,7 @@ public class MsdtTests extends TestCase
 
 		if (this._root == null)
 		{
-			_root = SystemRoot.getSystemInstance();
+			_root = org.electrocodeogram.system.System.getInstance();
 		}
 
 		if (this._testModule == null)
@@ -56,7 +56,7 @@ public class MsdtTests extends TestCase
 
 		this._mockClient = new MockClient();
 		
-		this._mockClient.setValidityLevel(VALIDITY_LEVEL.ECG);
+		this._mockClient.setValidityLevel(VALIDATION_LEVEL.ECG);
 
 	}
 

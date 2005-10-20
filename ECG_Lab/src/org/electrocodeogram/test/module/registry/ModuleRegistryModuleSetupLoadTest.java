@@ -6,10 +6,10 @@ package org.electrocodeogram.test.module.registry;
 import java.io.File;
 
 import org.electrocodeogram.module.classloader.ModuleClassLoaderInitializationException;
-import org.electrocodeogram.module.registry.ISystemModuleRegistry;
+import org.electrocodeogram.module.registry.IModuleRegistry;
 import org.electrocodeogram.module.registry.ModuleSetupLoadException;
-import org.electrocodeogram.system.ISystemRoot;
-import org.electrocodeogram.system.SystemRoot;
+import org.electrocodeogram.system.ISystem;
+import org.electrocodeogram.system.Core;
 
 import junit.framework.TestCase;
 
@@ -19,13 +19,13 @@ import junit.framework.TestCase;
 public class ModuleRegistryModuleSetupLoadTest extends TestCase
 {
 
-	private ISystemModuleRegistry _moduleRegistry;
+	private IModuleRegistry _moduleRegistry;
 
-	private static ISystemRoot _systemRoot = SystemRoot.getSystemInstance();
+	private static ISystem _systemRoot = org.electrocodeogram.system.System.getInstance();
 
 	protected void setUp()
 	{
-		this._moduleRegistry = _systemRoot.getSystemModuleRegistry();
+		this._moduleRegistry = _systemRoot.getModuleRegistry();
 	}
 
 	public void testIfInvalidModuleSetupCausesExceptionWithDuplicateModuleId()

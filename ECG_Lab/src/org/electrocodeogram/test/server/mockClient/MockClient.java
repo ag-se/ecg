@@ -4,7 +4,7 @@ package org.electrocodeogram.test.server.mockClient;
 import org.electrocodeogram.event.IllegalEventParameterException;
 import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.event.WellFormedEventPacket;
-import org.electrocodeogram.event.ValidEventPacket.VALIDITY_LEVEL;
+import org.electrocodeogram.event.ValidEventPacket.VALIDATION_LEVEL;
 
 
 /**
@@ -15,9 +15,9 @@ import org.electrocodeogram.event.ValidEventPacket.VALIDITY_LEVEL;
 public class MockClient
 {
     
-   private VALIDITY_LEVEL _validityLevel = ValidEventPacket.DEFAULT_VALIDITY_LEVEL;
+   private VALIDATION_LEVEL _validityLevel = ValidEventPacket.DEFAULT_VALIDITY_LEVEL;
    
-   public void setValidityLevel(VALIDITY_LEVEL validityLevel)
+   public void setValidityLevel(VALIDATION_LEVEL validityLevel)
    {
 	   this._validityLevel = validityLevel;
    }

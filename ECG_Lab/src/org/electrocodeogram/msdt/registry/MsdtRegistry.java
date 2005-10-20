@@ -15,7 +15,7 @@ import org.electrocodeogram.module.Module;
 import org.electrocodeogram.moduleapi.msdt.registry.IModuleMsdtRegistry;
 import org.electrocodeogram.msdt.MicroSensorDataType;
 import org.electrocodeogram.msdt.MicroSensorDataTypeException;
-import org.electrocodeogram.system.SystemRoot;
+import org.electrocodeogram.system.Core;
 import org.xml.sax.SAXException;
 
 /**
@@ -28,7 +28,7 @@ import org.xml.sax.SAXException;
  * deregestered. A core set of MicroSensorDataTypes are provided by the core
  * modules which are built into the ECG.
  */
-public class MsdtRegistry implements ISystemMsdtRegistry, IModuleMsdtRegistry
+public class MsdtRegistry implements IMsdtRegistry, IModuleMsdtRegistry
 {
 
 	private HashMap<String, MicroSensorDataType> registeredMsdt;
@@ -142,7 +142,7 @@ public class MsdtRegistry implements ISystemMsdtRegistry, IModuleMsdtRegistry
 	}
 
 	/**
-	 * @see org.electrocodeogram.msdt.registry.ISystemMsdtRegistry#getMicroSensorDataTypes()
+	 * @see org.electrocodeogram.msdt.registry.IMsdtRegistry#getMicroSensorDataTypes()
 	 */
 	public MicroSensorDataType[] getMicroSensorDataTypes()
 	{
@@ -183,7 +183,7 @@ public class MsdtRegistry implements ISystemMsdtRegistry, IModuleMsdtRegistry
 
 			_logger.log(Level.INFO, "Registered additonal Module with a known MicroSensorDatyType " + knownMsdt.getName());
 
-			SystemRoot.getSystemInstance().fireStateChange();
+            org.electrocodeogram.system.System.getInstance().fireStateChange();
 
 			return knownMsdt;
 
@@ -195,7 +195,7 @@ public class MsdtRegistry implements ISystemMsdtRegistry, IModuleMsdtRegistry
 
 		_logger.log(Level.INFO, "Registered a new MicroSensorDatyType " + msdt.getName());
 
-		SystemRoot.getSystemInstance().fireStateChange();
+        org.electrocodeogram.system.System.getInstance().fireStateChange();
 
 		_logger.exiting(this.getClass().getName(), "requestMsdtRegistration");
 
@@ -204,7 +204,7 @@ public class MsdtRegistry implements ISystemMsdtRegistry, IModuleMsdtRegistry
 	}
 
 	/**
-	 * @see org.electrocodeogram.msdt.registry.ISystemMsdtRegistry#deregisterMsdt(org.electrocodeogram.msdt.MicroSensorDataType)
+	 * @see org.electrocodeogram.msdt.registry.IMsdtRegistry#deregisterMsdt(org.electrocodeogram.msdt.MicroSensorDataType)
 	 */
 	public void deregisterMsdt(MicroSensorDataType msdt) throws MicroSensorDataTypeRegistrationException
 	{
@@ -226,7 +226,7 @@ public class MsdtRegistry implements ISystemMsdtRegistry, IModuleMsdtRegistry
 
 		_logger.log(Level.INFO, "Deregistered MicroSensorDatyType " + msdt.getName());
 
-		SystemRoot.getSystemInstance().fireStateChange();
+        org.electrocodeogram.system.System.getInstance().fireStateChange();
 
 		_logger.exiting(this.getClass().getName(), "deregisterMsdt");
 	}
@@ -244,7 +244,7 @@ public class MsdtRegistry implements ISystemMsdtRegistry, IModuleMsdtRegistry
 	}
 
 	/**
-	 * @see org.electrocodeogram.msdt.registry.ISystemMsdtRegistry#parseMicroSensorDataType(java.io.File)
+	 * @see org.electrocodeogram.msdt.registry.IMsdtRegistry#parseMicroSensorDataType(java.io.File)
 	 */
 	public MicroSensorDataType parseMicroSensorDataType(File defFile) throws MicroSensorDataTypeException
 	{

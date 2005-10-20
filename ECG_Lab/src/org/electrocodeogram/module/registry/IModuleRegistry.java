@@ -13,7 +13,7 @@ import org.electrocodeogram.module.classloader.ModuleClassLoaderInitializationEx
  * can be refernced by a call to
  * SystemRoot.getSystemInstance().getModuleRegistry()
  */
-public interface ISystemModuleRegistry
+public interface IModuleRegistry
 {
 
 	/**

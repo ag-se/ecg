@@ -5,9 +5,9 @@ import junit.framework.TestCase;
 import org.electrocodeogram.event.IllegalEventParameterException;
 import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.event.WellFormedEventPacket;
-import org.electrocodeogram.event.ValidEventPacket.VALIDITY_LEVEL;
-import org.electrocodeogram.system.ISystemRoot;
-import org.electrocodeogram.system.SystemRoot;
+import org.electrocodeogram.event.ValidEventPacket.VALIDATION_LEVEL;
+import org.electrocodeogram.system.ISystem;
+import org.electrocodeogram.system.Core;
 import org.electrocodeogram.test.EventGenerator;
 import org.electrocodeogram.test.NoTestDataException;
 import org.electrocodeogram.test.EventGenerator.SensorDataType;
@@ -25,7 +25,7 @@ public class ServersideTests extends TestCase
 
 	private EventGenerator _eventGenerator = null;
 
-	private ISystemRoot _root;
+	private ISystem _root;
 
 	private TestModule _testModule;
 
@@ -54,13 +54,13 @@ public class ServersideTests extends TestCase
 
 		this._mockClient = new MockClient();
 		
-		this._mockClient.setValidityLevel(VALIDITY_LEVEL.HACKYSTAT);
+		this._mockClient.setValidityLevel(VALIDATION_LEVEL.HACKYSTAT);
 
 		this._eventGenerator = new EventGenerator();
 
 		if (this._root == null)
 		{
-			_root = SystemRoot.getSystemInstance();
+			_root = org.electrocodeogram.system.System.getInstance();
 		}
 
 		if (this._testModule == null)

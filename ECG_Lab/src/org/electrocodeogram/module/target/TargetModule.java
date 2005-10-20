@@ -1,9 +1,11 @@
 package org.electrocodeogram.module.target;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.logging.LogHelper;
+import org.electrocodeogram.logging.LogHelper.ECGLevel;
 import org.electrocodeogram.module.Module;
 
 /**
@@ -46,7 +48,17 @@ public abstract class TargetModule extends Module implements ITargetModule
 		
 		if (eventPacket != null)
 		{
+			_logger.log(Level.INFO,"An event has been received by the TargetModule: " + this.getName());
+			
+			_logger.log(ECGLevel.PACKET,eventPacket.toString());
+			
 			write(eventPacket);
+			
+			_logger.log(Level.INFO,"The event has been writen by the TargetModule: " + this.getName());
+		}
+		else
+		{
+			_logger.log(Level.WARNING,"Parameter eventPacket is null.");
 		}
 		
 		_logger.exiting(this.getClass().getName(),"receiveEventPacket");

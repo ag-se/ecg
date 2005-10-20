@@ -13,8 +13,10 @@ public class PropertyException extends Exception
 	
 	public PropertyException(String string)
 	{
-		_logger.log(Level.WARNING, "An PropertyException occured");
-
-		_logger.log(Level.WARNING, this.getMessage());
+		
+//		_logger.log(Level.WARNIGN, "An PropertyException occured");
+//	
+//		_logger.log(Level.WARNING, this.getMessage());
+//		
 	}
 }

@@ -1,7 +1,5 @@
 package org.electrocodeogram.ui;
 
-import java.awt.Color;
-import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -16,7 +14,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.BoxLayout;
-import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -29,7 +26,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.border.EtchedBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
@@ -40,11 +36,10 @@ import org.electrocodeogram.module.ModuleDescriptor;
 import org.electrocodeogram.module.Module.ModuleType;
 import org.electrocodeogram.module.registry.ModuleClassException;
 import org.electrocodeogram.module.registry.ModuleInstanceException;
-import org.electrocodeogram.module.registry.ModuleInstantiationException;
 import org.electrocodeogram.module.registry.ModuleRegistry;
 import org.electrocodeogram.module.registry.ModuleSetupLoadException;
 import org.electrocodeogram.module.registry.ModuleSetupStoreException;
-import org.electrocodeogram.system.SystemRoot;
+import org.electrocodeogram.system.Core;
 import org.electrocodeogram.ui.event.EventWindow;
 import org.electrocodeogram.ui.modules.ModuleGraph;
 
@@ -53,8 +48,6 @@ import com.zfqjava.swing.JStatusBar;
 public class Gui extends JFrame implements IGui
 {
 
-	
-	
 	private static Logger _logger = LogHelper.createLogger(Gui.class.getName());
 
 	private static final long serialVersionUID = 1L;
@@ -145,7 +138,7 @@ public class Gui extends JFrame implements IGui
 
 			public void actionPerformed(ActionEvent e)
 			{
-				SystemRoot.getSystemInstance().quit();
+                org.electrocodeogram.system.System.getInstance().quit();
 
 			}
 		});
@@ -186,7 +179,7 @@ public class Gui extends JFrame implements IGui
 							return;
 					}
 
-					SystemRoot.getSystemInstance().getSystemModuleRegistry().storeModuleSetup(file);
+                    org.electrocodeogram.system.System.getInstance().getModuleRegistry().storeModuleSetup(file);
 				}
 				catch (ModuleSetupStoreException e1)
 				{
@@ -232,7 +225,7 @@ public class Gui extends JFrame implements IGui
 
 					}
 
-					SystemRoot.getSystemInstance().getSystemModuleRegistry().loadModuleSetup(file);
+                    org.electrocodeogram.system.System.getInstance().getModuleRegistry().loadModuleSetup(file);
 				}
 				catch (ModuleSetupLoadException e1)
 				{
@@ -360,7 +353,7 @@ public class Gui extends JFrame implements IGui
 				else
 				{
 
-					this._pnlModules.createModule(module.getModuleType(), module.getId(), module.getName(), module.isActive());
+					this._pnlModules.createModule(module.getModuleType(), module.getId(), module.getName(), module.getState());
 
 				}
 
@@ -385,11 +378,11 @@ public class Gui extends JFrame implements IGui
 				this._frmEvents.append((ValidEventPacket) arg);
 			}
 			
-			ValidEventPacket packet = (ValidEventPacket) arg;
-			
-			int id = packet.getSourceId();
-			
-			this._pnlModules._moduleGraph.highlight(id);
+//			ValidEventPacket packet = (ValidEventPacket) arg;
+//			
+//			int id = packet.getSourceId();
+//			
+//			this._pnlModules._moduleGraph.highlight(id);
 		}
 		else if (arg instanceof Module)
 		{
@@ -424,7 +417,7 @@ public class Gui extends JFrame implements IGui
 
 			try
 			{
-				text = SystemRoot.getSystemInstance().getSystemModuleRegistry().getRunningModule(id).getDetails();
+				text = org.electrocodeogram.system.System.getInstance().getModuleRegistry().getRunningModule(id).getDetails();
 			}
 			catch (ModuleInstanceException e)
 			{
@@ -450,7 +443,7 @@ public class Gui extends JFrame implements IGui
 
 		try
 		{
-			moduleDescriptor = SystemRoot.getSystemInstance().getSystemModuleRegistry().getModuleDescriptor(id);
+			moduleDescriptor = org.electrocodeogram.system.System.getInstance().getModuleRegistry().getModuleDescriptor(id);
 
 			JOptionPane.showMessageDialog(this, moduleDescriptor.getDescription(), "Module Description", JOptionPane.INFORMATION_MESSAGE);
 
@@ -703,11 +696,11 @@ public class Gui extends JFrame implements IGui
 					{
 						try
 						{
-							SystemRoot.getSystemInstance().getSystemModuleRegistry().createRunningModule(ModuleLabel.this._id, ModuleLabel.this._name);
+                            org.electrocodeogram.system.System.getInstance().getModuleRegistry().createRunningModule(ModuleLabel.this._id, ModuleLabel.this._name);
 						}
 						catch (Exception e1)
 						{
-							JOptionPane.showMessageDialog(SystemRoot.getSystemInstance().getFrame(),e1.getMessage(),"Add " + ModuleLabel.this._name + " module",JOptionPane.ERROR_MESSAGE);
+							JOptionPane.showMessageDialog(org.electrocodeogram.system.System.getInstance().getMainWindow(),e1.getMessage(),"Add " + ModuleLabel.this._name + " module",JOptionPane.ERROR_MESSAGE);
 						}
 						
 					}

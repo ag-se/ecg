@@ -7,8 +7,9 @@ import org.electrocodeogram.event.IllegalEventParameterException;
 import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.event.WellFormedEventPacket;
 import org.electrocodeogram.logging.LogHelper;
+import org.electrocodeogram.logging.LogHelper.ECGLevel;
 import org.electrocodeogram.module.Module;
-import org.electrocodeogram.system.SystemRoot;
+import org.electrocodeogram.system.Core;
 
 /**
  * This is the abstract class SourceModule that shall be subclassed
@@ -104,22 +105,24 @@ public abstract class SourceModule extends Module
 
 		if (eventPacket == null)
 		{
-			_logger.log(Level.WARNING, "eventPacket is null");
+			_logger.log(Level.WARNING, "Parameter eventPacket is null. Ignoring event.");
 
 			return;
 		}
 
-		//ValidEventPacket validEventPacket = this.eventValidator.validate(eventPacket);
-		
 		ValidEventPacket validEventPacket = null;
 		
 		try
 		{
 			validEventPacket = new ValidEventPacket(this.getId(),eventPacket.getTimeStamp(),eventPacket.getSensorDataType(),eventPacket.getArglist());
+			
+			_logger.log(Level.INFO,"An event has been appended to the SourceModule: " + this.getName());
+			
+			_logger.log(ECGLevel.PACKET,validEventPacket.toString());
 		}
 		catch (IllegalEventParameterException e)
 		{
-			_logger.log(Level.WARNING, e.getMessage());
+			_logger.log(Level.WARNING, "An Exception occured while appending an event to the SourceModule: " + this.getName());
 		}
 
 		if (validEventPacket != null)

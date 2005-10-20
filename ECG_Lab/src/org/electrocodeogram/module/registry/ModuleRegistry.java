@@ -23,9 +23,8 @@ import org.electrocodeogram.module.Module.ModuleType;
 import org.electrocodeogram.module.classloader.ModuleClassLoaderInitializationException;
 import org.electrocodeogram.module.setup.ModuleConfiguration;
 import org.electrocodeogram.module.setup.ModuleSetup;
-import org.electrocodeogram.moduleapi.module.registry.IModuleModuleRegistry;
 import org.electrocodeogram.msdt.MicroSensorDataTypeException;
-import org.electrocodeogram.system.SystemRoot;
+import org.electrocodeogram.system.Core;
 import org.electrocodeogram.logging.LogHelper;
 import org.electrocodeogram.xml.ClassLoadingException;
 import org.electrocodeogram.xml.ECGParser;
@@ -33,968 +32,894 @@ import org.electrocodeogram.xml.PropertyException;
 import org.xml.sax.SAXException;
 
 /**
- * This is the ModuleRegistry which maintains information about all currently
- * available in the module directory and all running modules.
- * 
- * An available module is a set of a module class that extends the class Module
- * or one of its subclasses, additonal classes and a "module.properties.xml"
- * file that is an instance of the "module.properties.xsd" XML schema and
- * provides the neccessary information about he module.
- * 
- * At runtime multiple running modules can be created from each available
- * module.
- * 
- * The ModuleRegistry is accessible through two interfaces.
- * ISystemModuleRegistry provides methods for other ECG system components and
- * IModuleModuleRegistry provides methods for ECG modules.
- * 
+ * This is the ModuleRegistry which maintains information about all
+ * currently available in the module directory and all running
+ * modules. An available module is a set of a module class that
+ * extends the class Module or one of its subclasses, additonal
+ * classes and a "module.properties.xml" file that is an instance of
+ * the "module.properties.xsd" XML schema and provides the neccessary
+ * information about he module. At runtime multiple running modules
+ * can be created from each available module. The ModuleRegistry is
+ * accessible through two interfaces. ISystemModuleRegistry provides
+ * methods for other ECG system components and IModuleModuleRegistry
+ * provides methods for ECG modules.
  */
-public class ModuleRegistry extends Observable implements ISystemModuleRegistry, IModuleModuleRegistry
-{
+public class ModuleRegistry extends Observable implements IModuleRegistry {
 
-	private static Logger _logger = LogHelper.createLogger(ModuleRegistry.class.getName());
+    private static Logger _logger = LogHelper.createLogger(ModuleRegistry.class
+        .getName());
 
-	private RunningModules _runningModules;
+    private RunningModules _runningModules;
 
-	private InstalledModules _installedModules;
+    private InstalledModules _installedModules;
 
-	/**
-	 * The constructor creates the ModuleRegistry instance.
-	 */
-	public ModuleRegistry()
-	{
+    /**
+     * The constructor creates the ModuleRegistry instance.
+     */
+    public ModuleRegistry() {
 
-		_logger.entering(this.getClass().getName(), "ModuleRegistry");
+        _logger.entering(this.getClass().getName(), "ModuleRegistry");
 
-		this._runningModules = new RunningModules();
+        this._runningModules = new RunningModules();
 
-		_logger.exiting(this.getClass().getName(), "ModuleRegistry");
+        _logger.exiting(this.getClass().getName(), "ModuleRegistry");
 
-	}
+    }
 
-	/**
-	 * The constructor creates the ModuleRegistry instance. the given path is
-	 * searched for available modules.
-	 * 
-	 * @param moduleDirectory
-	 *            This path is searched for available modules
-	 * @throws ModuleClassLoaderInitializationException
-	 */
-	public ModuleRegistry(File moduleDirectory) throws ModuleClassLoaderInitializationException
-	{
-		this();
+    /**
+     * The constructor creates the ModuleRegistry instance. the given
+     * path is searched for available modules.
+     * @param moduleDirectory
+     *            This path is searched for available modules
+     * @throws ModuleClassLoaderInitializationException
+     */
+    public ModuleRegistry(File moduleDirectory)
+        throws ModuleClassLoaderInitializationException {
+        this();
 
-		_logger.entering(this.getClass().getName(), "ModuleRegistry");
+        _logger.entering(this.getClass().getName(), "ModuleRegistry");
 
-		if (moduleDirectory == null)
-		{
-			_logger.log(Level.WARNING, "moduleDirectory is null");
+        if (moduleDirectory == null) {
+            _logger.log(Level.WARNING, "moduleDirectory is null");
 
-			return;
-		}
+            return;
+        }
 
-		this._installedModules = new InstalledModules(this, moduleDirectory);
+        this._installedModules = new InstalledModules(this, moduleDirectory);
 
-		this._installedModules.initialize();
+        this._installedModules.initialize();
 
-		setChanged();
+        setChanged();
 
-		notifyObservers();
+        notifyObservers();
 
-		clearChanged();
+        clearChanged();
 
-		_logger.exiting(this.getClass().getName(), "ModuleRegistry");
+        _logger.exiting(this.getClass().getName(), "ModuleRegistry");
 
-	}
+    }
 
-	/**
-	 * If the module directory is not known at ModuleRegistry creation this
-	 * method is used by the SystemRoot to set the module directory when known.
-	 * This method is not for use by the user.
-	 * 
-	 * @param moduleDirectory
-	 *            This path is searched for available modules
-	 * @throws ModuleClassLoaderInitializationException
-	 */
-	public void setModuleDirectory(File moduleDirectory) throws ModuleClassLoaderInitializationException
-	{
-		_logger.entering(this.getClass().getName(), "setModuleDirectory");
+    /**
+     * If the module directory is not known at ModuleRegistry creation
+     * this method is used by the SystemRoot to set the module
+     * directory when known. This method is not for use by the user.
+     * @param moduleDirectory
+     *            This path is searched for available modules
+     * @throws ModuleClassLoaderInitializationException
+     */
+    public void setModuleDirectory(File moduleDirectory)
+        throws ModuleClassLoaderInitializationException {
+        _logger.entering(this.getClass().getName(), "setModuleDirectory");
 
-		if (moduleDirectory == null)
-		{
-			_logger.log(Level.WARNING, "moduleDirectory is null");
+        if (moduleDirectory == null) {
+            _logger.log(Level.WARNING, "moduleDirectory is null");
 
-			return;
-		}
+            return;
+        }
 
-		this._installedModules = new InstalledModules(this, moduleDirectory);
+        this._installedModules = new InstalledModules(this, moduleDirectory);
 
-		this._installedModules.initialize();
+        this._installedModules.initialize();
 
-		setChanged();
+        setChanged();
 
-		notifyObservers();
+        notifyObservers();
 
-		clearChanged();
+        clearChanged();
 
-		_logger.exiting(this.getClass().getName(), "setModuleDirectory");
+        _logger.exiting(this.getClass().getName(), "setModuleDirectory");
 
-	}
+    }
 
-	/**
-	 * @see org.electrocodeogram.module.registry.ISystemModuleRegistry#getAvailableModuleIds()
-	 */
-	public String[] getAvailableModuleIds()
-	{
-		_logger.entering(this.getClass().getName(), "setModuleDirectory");
+    /**
+     * @see org.electrocodeogram.module.registry.IModuleRegistry#getAvailableModuleIds()
+     */
+    public String[] getAvailableModuleIds() {
+        _logger.entering(this.getClass().getName(), "setModuleDirectory");
 
-		if (this._installedModules.availableModuleClassesMap.size() > 0)
-		{
-			return this._installedModules.availableModuleClassesMap.keySet().toArray(new String[this._installedModules.availableModuleClassesMap.size()]);
-		}
+        if (this._installedModules.availableModuleClassesMap.size() > 0) {
+            return this._installedModules.availableModuleClassesMap.keySet()
+                .toArray(
+                    new String[this._installedModules.availableModuleClassesMap
+                        .size()]);
+        }
 
-		_logger.exiting(this.getClass().getName(), "setModuleDirectory");
+        _logger.exiting(this.getClass().getName(), "setModuleDirectory");
 
-		return null;
-	}
+        return null;
+    }
 
-	private Class getModuleClassForId(String moduleClassId) throws ModuleClassException
-	{
-		_logger.entering(this.getClass().getName(), "getModuleClassForId");
+    private Class getModuleClassForId(String moduleClassId)
+        throws ModuleClassException {
+        _logger.entering(this.getClass().getName(), "getModuleClassForId");
 
-		if (moduleClassId == null || moduleClassId.equals(""))
-		{
-			_logger.log(Level.WARNING, "The module id is null or empty.");
+        if (moduleClassId == null || moduleClassId.equals("")) {
+            _logger.log(Level.WARNING, "The module id is null or empty.");
 
-			throw new ModuleClassException("The module id is null orempty.");
-		}
+            throw new ModuleClassException("The module id is null orempty.");
+        }
 
-		if (!this._installedModules.availableModuleClassesMap.containsKey(moduleClassId))
-		{
-			throw new ModuleClassException(
-					"The module id " + moduleClassId + " is unknown.");
-		}
+        if (!this._installedModules.availableModuleClassesMap
+            .containsKey(moduleClassId)) {
+            throw new ModuleClassException("The module id " + moduleClassId
+                                           + " is unknown.");
+        }
 
-		ModuleDescriptor moduleDescriptor = this._installedModules.availableModuleClassesMap.get(moduleClassId);
+        ModuleDescriptor moduleDescriptor = this._installedModules.availableModuleClassesMap
+            .get(moduleClassId);
 
-		_logger.exiting(this.getClass().getName(), "getModuleClassForId");
+        _logger.exiting(this.getClass().getName(), "getModuleClassForId");
 
-		return moduleDescriptor.getClazz();
-	}
+        return moduleDescriptor.getClazz();
+    }
 
-	void notifyOfNewModuleDecriptor(ModuleDescriptor moduleDescriptor)
-	{
-		_logger.entering(this.getClass().getName(), "notifyOfNewModuleDecriptor");
+    void notifyOfNewModuleDecriptor(ModuleDescriptor moduleDescriptor) {
+        _logger.entering(this.getClass().getName(),
+            "notifyOfNewModuleDecriptor");
 
-		setChanged();
+        setChanged();
 
-		notifyObservers(moduleDescriptor);
+        notifyObservers(moduleDescriptor);
 
-		clearChanged();
+        clearChanged();
 
-		_logger.exiting(this.getClass().getName(), "notifyOfNewModuleDecriptor");
-	}
+        _logger
+            .exiting(this.getClass().getName(), "notifyOfNewModuleDecriptor");
+    }
 
-	private static class RunningModules
-	{
-		HashMap<Integer, Module> runningModuleMap = new HashMap<Integer, Module>();
-	}
+    private static class RunningModules {
 
-	private static class InstalledModules
-	{
-		private static Logger _installedModulesLogger = LogHelper.createLogger(InstalledModules.class.getName());
+        HashMap<Integer, Module> runningModuleMap = new HashMap<Integer, Module>();
+    }
 
-		private String _currentModuleDirectoryString;
+    private static class InstalledModules {
 
-		private static final String MODULE_PROPERTY_FILE = "module.properties.xml";
+        private static Logger _installedModulesLogger = LogHelper
+            .createLogger(InstalledModules.class.getName());
 
-		HashMap<String, ModuleDescriptor> availableModuleClassesMap = null;
+        private String _currentModuleDirectoryString;
 
-		private File _moduleDirectory;
+        private static final String MODULE_PROPERTY_FILE = "module.properties.xml";
 
-		private ModuleRegistry _moduleRegistry;
+        HashMap<String, ModuleDescriptor> availableModuleClassesMap = null;
 
-		private InstalledModules(ModuleRegistry moduleRegistry, File moduleDirectory)
-		{
-			_installedModulesLogger.entering(this.getClass().getName(), "InstalledModules");
+        private File _moduleDirectory;
 
-			this.availableModuleClassesMap = new HashMap<String, ModuleDescriptor>();
+        private ModuleRegistry _moduleRegistry;
 
-			this._moduleRegistry = moduleRegistry;
+        private InstalledModules(ModuleRegistry moduleRegistry,
+            File moduleDirectory) {
+            _installedModulesLogger.entering(this.getClass().getName(),
+                "InstalledModules");
 
-			this._moduleDirectory = moduleDirectory;
+            this.availableModuleClassesMap = new HashMap<String, ModuleDescriptor>();
 
-			_installedModulesLogger.exiting(this.getClass().getName(), "InstalledModules");
+            this._moduleRegistry = moduleRegistry;
 
-		}
+            this._moduleDirectory = moduleDirectory;
 
-		void initialize() throws ModuleClassLoaderInitializationException
-		{
-			_installedModulesLogger.entering(this.getClass().getName(), "initialize");
+            _installedModulesLogger.exiting(this.getClass().getName(),
+                "InstalledModules");
 
-			// is the parameter not null?
-			if (this._moduleDirectory == null)
-			{
-				throw new ModuleClassLoaderInitializationException(
-						"The provided module directory path is \"null\".");
-			}
+        }
 
-			// does the file exist and is it a directory?
-			if (!this._moduleDirectory.exists() || !this._moduleDirectory.isDirectory())
-			{
-				throw new ModuleClassLoaderInitializationException(
-						"The module directory does not exist or is not a directory.");
-			}
+        void initialize() throws ModuleClassLoaderInitializationException {
+            _installedModulesLogger.entering(this.getClass().getName(),
+                "initialize");
 
-			// get all filenames in it
-			String[] moduleDirectories = this._moduleDirectory.list();
+            // is the parameter not null?
+            if (this._moduleDirectory == null) {
+                throw new ModuleClassLoaderInitializationException(
+                    "The provided module directory path is \"null\".");
+            }
 
-			// assert no IO-Error has occurred
-			if (moduleDirectories == null)
-			{
-				throw new ModuleClassLoaderInitializationException(
-						"The module directory does not contain any subdirectories.");
-			}
+            // does the file exist and is it a directory?
+            if (!this._moduleDirectory.exists()
+                || !this._moduleDirectory.isDirectory()) {
+                throw new ModuleClassLoaderInitializationException(
+                    "The module directory does not exist or is not a directory.");
+            }
 
-			int length = moduleDirectories.length;
+            // get all filenames in it
+            String[] moduleDirectories = this._moduleDirectory.list();
 
-			// are there any files in it?
-			if (!(length > 0))
-			{
-				throw new ModuleClassLoaderInitializationException(
-						"The module directory does not contain any subdirectories.");
-			}
+            // assert no IO-Error has occurred
+            if (moduleDirectories == null) {
+                throw new ModuleClassLoaderInitializationException(
+                    "The module directory does not contain any subdirectories.");
+            }
 
-			for (int i = 0; i < length; i++)
-			{
+            int length = moduleDirectories.length;
 
-				this._currentModuleDirectoryString = this._moduleDirectory + File.separator + moduleDirectories[i];
+            // are there any files in it?
+            if (!(length > 0)) {
+                throw new ModuleClassLoaderInitializationException(
+                    "The module directory does not contain any subdirectories.");
+            }
 
-				File currentModuleDirectory = new File(
-						this._currentModuleDirectoryString);
+            for (int i = 0; i < length; i++) {
 
-				// skip all simple files
-				if (!currentModuleDirectory.isDirectory())
-				{
-					_installedModulesLogger.log(Level.WARNING, "Skipping simple file in module directory: " + currentModuleDirectory.getAbsolutePath());
+                this._currentModuleDirectoryString = this._moduleDirectory
+                                                     + File.separator
+                                                     + moduleDirectories[i];
 
-					continue;
-				}
+                File currentModuleDirectory = new File(
+                    this._currentModuleDirectoryString);
 
-				String modulePropertyFileString = this._currentModuleDirectoryString + File.separator + MODULE_PROPERTY_FILE;
+                // skip all simple files
+                if (!currentModuleDirectory.isDirectory()) {
+                    _installedModulesLogger.log(Level.WARNING,
+                        "Skipping simple file in module directory: "
+                                        + currentModuleDirectory
+                                            .getAbsolutePath());
 
-				File modulePropertyFile = new File(modulePropertyFileString);
+                    continue;
+                }
 
-				// inspect module.property file and skip if neccessary
-				if (!modulePropertyFile.exists() || !modulePropertyFile.isFile())
-				{
+                String modulePropertyFileString = this._currentModuleDirectoryString
+                                                  + File.separator
+                                                  + MODULE_PROPERTY_FILE;
 
-					_installedModulesLogger.log(Level.WARNING, "The module property file does not exist or is not a file: " + modulePropertyFileString);
+                File modulePropertyFile = new File(modulePropertyFileString);
 
-					continue;
+                // inspect module.property file and skip if neccessary
+                if (!modulePropertyFile.exists()
+                    || !modulePropertyFile.isFile()) {
 
-				}
+                    _installedModulesLogger.log(Level.WARNING,
+                        "The module property file does not exist or is not a file: "
+                                        + modulePropertyFileString);
 
-				ModuleDescriptor moduleDescriptor = null;
-				try
-				{
-					moduleDescriptor = ECGParser.parseAsModuleDescriptor(modulePropertyFile);
-				}
-				catch (ClassLoadingException e)
-				{
-					_installedModulesLogger.log(Level.WARNING, "Error while loading the module: " + modulePropertyFileString);
+                    continue;
 
-					continue;
-				}
-				catch (MicroSensorDataTypeException e)
-				{
-					_installedModulesLogger.log(Level.WARNING, "Error while loading the module: " + modulePropertyFileString);
-				
-					continue;
-				}
-				catch (PropertyException e)
-				{
-					_installedModulesLogger.log(Level.WARNING, "Error while loading the module: " + modulePropertyFileString);
+                }
 
-					continue;
-				}
-				catch (SAXException e)
-				{
-					_installedModulesLogger.log(Level.WARNING, "Error while loading the module: " + modulePropertyFileString);
+                ModuleDescriptor moduleDescriptor = null;
+                try {
+                    moduleDescriptor = ECGParser
+                        .parseAsModuleDescriptor(modulePropertyFile);
+                } catch (ClassLoadingException e) {
+                    _installedModulesLogger.log(Level.WARNING,
+                        "Error while loading the module: "
+                                        + modulePropertyFileString);
 
-					_installedModulesLogger.log(Level.FINEST, e.getMessage());
+                    continue;
+                } catch (MicroSensorDataTypeException e) {
+                    _installedModulesLogger.log(Level.WARNING,
+                        "Error while loading the module: "
+                                        + modulePropertyFileString);
 
-					continue;
-				}
-				catch (IOException e)
-				{
-					_installedModulesLogger.log(Level.WARNING, "Error while loading the module: " + modulePropertyFileString);
+                    continue;
+                } catch (PropertyException e) {
+                    _installedModulesLogger.log(Level.WARNING,
+                        "Error while loading the module: "
+                                        + modulePropertyFileString);
 
-					_installedModulesLogger.log(Level.FINEST, e.getMessage());
+                    continue;
+                } catch (SAXException e) {
+                    _installedModulesLogger.log(Level.WARNING,
+                        "Error while loading the module: "
+                                        + modulePropertyFileString);
 
-					continue;
-				}
-				catch (ModuleSetupLoadException e)
-				{
-					_installedModulesLogger.log(Level.WARNING, "Error while loading the module: " + modulePropertyFileString);
+                    _installedModulesLogger.log(Level.FINEST, e.getMessage());
 
-					continue;
-				}
+                    continue;
+                } catch (IOException e) {
+                    _installedModulesLogger.log(Level.WARNING,
+                        "Error while loading the module: "
+                                        + modulePropertyFileString);
 
-				if (moduleDescriptor == null)
-				{
-					_installedModulesLogger.log(Level.WARNING, "Error while loading the module: " + modulePropertyFileString);
+                    _installedModulesLogger.log(Level.FINEST, e.getMessage());
 
-					continue;
-				}
+                    continue;
+                } catch (ModuleSetupLoadException e) {
+                    _installedModulesLogger.log(Level.WARNING,
+                        "Error while loading the module: "
+                                        + modulePropertyFileString);
 
-				if (this.availableModuleClassesMap.containsKey(moduleDescriptor.getId()))
-				{
-					_installedModulesLogger.log(Level.SEVERE, "A module with the id " + moduleDescriptor.getId() + " is allready loaded.");
+                    continue;
+                }
 
-					_installedModulesLogger.log(Level.FINEST, "The ModuleDescriptor was null.");
+                if (moduleDescriptor == null) {
+                    _installedModulesLogger.log(Level.WARNING,
+                        "Error while loading the module: "
+                                        + modulePropertyFileString);
 
-					continue;
-				}
+                    continue;
+                }
 
-				// put the ModuleDescriptor into the HashMap
-				this.availableModuleClassesMap.put(moduleDescriptor.getId(), moduleDescriptor);
+                if (this.availableModuleClassesMap.containsKey(moduleDescriptor
+                    .getId())) {
+                    _installedModulesLogger.log(Level.SEVERE,
+                        "A module with the id " + moduleDescriptor.getId()
+                                        + " is allready loaded.");
 
-				_installedModulesLogger.log(Level.INFO, "Loaded additional module class with id: " + moduleDescriptor.getId() + " " + moduleDescriptor.getClazz().getName());
+                    _installedModulesLogger.log(Level.FINEST,
+                        "The ModuleDescriptor was null.");
 
-				this._moduleRegistry.notifyOfNewModuleDecriptor(moduleDescriptor);
+                    continue;
+                }
 
-			}
+                // put the ModuleDescriptor into the HashMap
+                this.availableModuleClassesMap.put(moduleDescriptor.getId(),
+                    moduleDescriptor);
 
-			_installedModulesLogger.exiting(this.getClass().getName(), "initialize");
-		}
+                _installedModulesLogger.log(Level.INFO,
+                    "A ModulePaket has been registerd with id: "
+                                    + moduleDescriptor.getId());
 
-	}
+                this._moduleRegistry
+                    .notifyOfNewModuleDecriptor(moduleDescriptor);
 
-	/**
-	 * @see org.electrocodeogram.moduleapi.module.registry.IModuleModuleRegistry#registerRunningModule(org.electrocodeogram.module.Module)
-	 */
-	public void registerRunningModule(Module module)
-	{
-		_logger.entering(this.getClass().getName(), "registerRunningModule");
+            }
 
-		// check parameter
-		if (module == null)
-		{
-			_logger.log(Level.WARNING, "module is null");
+            _installedModulesLogger.exiting(this.getClass().getName(),
+                "initialize");
+        }
 
-			return;
-		}
+    }
 
-		if (this._runningModules.runningModuleMap.containsKey(new Integer(
-				module.getId())))
-		{
-			_logger.log(Level.WARNING, "module is allready registered");
+    /**
+     * @see org.electrocodeogram.moduleapi.module.registry.IModuleModuleRegistry#registerModule(org.electrocodeogram.module.Module)
+     */
+    public void registerRunningModule(Module module) {
+        _logger.entering(this.getClass().getName(), "registerRunningModule");
 
-			return;
-		}
+        // check parameter
+        if (module == null) {
+            _logger.log(Level.WARNING, "module is null");
 
-		this._runningModules.runningModuleMap.put(new Integer(module.getId()), module);
+            return;
+        }
 
-		_logger.log(Level.INFO, "Registered new module " + module.getName());
+        if (this._runningModules.runningModuleMap.containsKey(new Integer(
+            module.getId()))) {
+            _logger.log(Level.WARNING, "module is allready registered");
 
-		SystemRoot.getSystemInstance().addSystemObserver(module.getSystemObserver());
+            return;
+        }
 
-		setChanged();
+        this._runningModules.runningModuleMap.put(new Integer(module.getId()),
+            module);
 
-		notifyObservers(module);
+        _logger.log(Level.INFO, "Registered new module " + module.getName());
 
-		clearChanged();
+        setChanged();
 
-		_logger.exiting(this.getClass().getName(), "registerRunningModule");
+        notifyObservers(module);
 
-	}
+        clearChanged();
 
-	/**
-	 * @see org.electrocodeogram.module.registry.ISystemModuleRegistry#getRunningModule(int)
-	 */
-	public Module getRunningModule(int moduleId) throws ModuleInstanceException
-	{
-		_logger.entering(this.getClass().getName(), "getRunningModule");
+        _logger.exiting(this.getClass().getName(), "registerRunningModule");
 
-		if (!(moduleId > 0))
-		{
-			throw new ModuleInstanceException("The module id is invalid.");
-		}
+    }
 
-		assert (moduleId > 0);
+    /**
+     * @see org.electrocodeogram.module.registry.IModuleRegistry#getRunningModule(int)
+     */
+    public Module getRunningModule(int moduleId) throws ModuleInstanceException {
+        _logger.entering(this.getClass().getName(), "getRunningModule");
 
-		if (!(this._runningModules.runningModuleMap.containsKey(new Integer(
-				moduleId))))
-		{
-			throw new ModuleInstanceException("The module id is unknown.");
-		}
+        if (!(moduleId > 0)) {
+            throw new ModuleInstanceException("The module id is invalid.");
+        }
 
-		_logger.exiting(this.getClass().getName(), "getRunningModule");
+        assert (moduleId > 0);
 
-		return this._runningModules.runningModuleMap.get(new Integer(moduleId));
-	}
+        if (!(this._runningModules.runningModuleMap.containsKey(new Integer(
+            moduleId)))) {
+            throw new ModuleInstanceException("The module id is unknown.");
+        }
 
-	/**
-	 * @see org.electrocodeogram.module.registry.ISystemModuleRegistry#createRunningModule(java.lang.String,
-	 *      java.lang.String)
-	 */
-	public int createRunningModule(String id, String name) throws ModuleInstantiationException, ModuleClassException
-	{
-		_logger.entering(this.getClass().getName(), "createRunningModule");
+        _logger.exiting(this.getClass().getName(), "getRunningModule");
 
-		if (id == null || id.equals(""))
-		{
-			_logger.log(Level.WARNING, "The module id is null or empty.");
+        return this._runningModules.runningModuleMap.get(new Integer(moduleId));
+    }
 
-			throw new ModuleClassException("The module id is null or empty.");
-		}
+    /**
+     * @see org.electrocodeogram.module.registry.IModuleRegistry#createRunningModule(java.lang.String,
+     *      java.lang.String)
+     */
+    public int createRunningModule(String id, String name)
+        throws ModuleInstantiationException, ModuleClassException {
+        _logger.entering(this.getClass().getName(), "createRunningModule");
 
-		if (name == null || name.equals(""))
-		{
-			_logger.log(Level.WARNING, "The module name is null or empty.");
+        if (id == null || id.equals("")) {
+            _logger.log(Level.WARNING, "The module id is null or empty.");
 
-			throw new ModuleClassException("The module name is null or empty.");
-		}
+            throw new ModuleClassException("The module id is null or empty.");
+        }
 
-		Class moduleClass = getModuleClassForId(id);
+        if (name == null || name.equals("")) {
+            _logger.log(Level.WARNING, "The module name is null or empty.");
 
-		try
-		{
+            throw new ModuleClassException("The module name is null or empty.");
+        }
 
-			Constructor[] constructors = moduleClass.getConstructors();
+        Class moduleClass = getModuleClassForId(id);
 
-			Object[] args = new Object[] { id, name };
+        try {
 
-			Object o = constructors[0].newInstance(args);
+            Constructor[] constructors = moduleClass.getConstructors();
 
-			if (!(o instanceof Module))
-			{
-				throw new ModuleInstantiationException("");
-			}
+            Object[] args = new Object[] {id, name};
 
-			Module module = (Module) o;
+            Object o = constructors[0].newInstance(args);
 
-			_logger.exiting(this.getClass().getName(), "createRunningModule");
+            if (!(o instanceof Module)) {
+                throw new ModuleInstantiationException("");
+            }
 
-			return module.getId();
+            Module module = (Module) o;
 
-		}
-		catch (InstantiationException e)
-		{
-			_logger.log(Level.SEVERE, "Error while creating a new Module.");
+            _logger.exiting(this.getClass().getName(), "createRunningModule");
 
-			throw new ModuleInstantiationException(e.getMessage());
+            return module.getId();
 
-		}
-		catch (IllegalAccessException e)
-		{
+        } catch (InstantiationException e) {
+            _logger.log(Level.SEVERE, "Error while creating a new Module.");
 
-			_logger.log(Level.SEVERE, "Error while creating a new Module.");
+            throw new ModuleInstantiationException(e.getMessage());
 
-			throw new ModuleInstantiationException(e.getMessage());
-		}
-		catch (IllegalArgumentException e)
-		{
-			_logger.log(Level.SEVERE, "Error while creating a new Module.");
+        } catch (IllegalAccessException e) {
 
-			throw new ModuleInstantiationException(e.getMessage());
-		}
-		catch (InvocationTargetException e)
-		{
-			_logger.log(Level.SEVERE, "Error while creating a new Module.");
+            _logger.log(Level.SEVERE, "Error while creating a new Module.");
 
-			throw new ModuleInstantiationException(e.getMessage());
-		}
+            throw new ModuleInstantiationException(e.getMessage());
+        } catch (IllegalArgumentException e) {
+            _logger.log(Level.SEVERE, "Error while creating a new Module.");
 
-	}
+            throw new ModuleInstantiationException(e.getMessage());
+        } catch (InvocationTargetException e) {
+            _logger.log(Level.SEVERE, "Error while creating a new Module.");
 
-	/**
-	 * @see org.electrocodeogram.moduleapi.module.registry.IModuleModuleRegistry#deregisterRunningModule(int)
-	 */
-	public void deregisterRunningModule(int id) throws ModuleInstanceException
-	{
-		_logger.entering(this.getClass().getName(), "deregisterRunningModule");
+            throw new ModuleInstantiationException(e.getMessage());
+        }
 
-		if (!(id > 0))
-		{
-			throw new ModuleInstanceException("The module id is invalid.");
-		}
+    }
 
-		assert (id > 0);
+    /**
+     * @see org.electrocodeogram.moduleapi.module.registry.IModuleModuleRegistry#deregisterModule(Module)
+     */
+    public void deregisterRunningModule(Module module) {
+        _logger.entering(this.getClass().getName(), "deregisterRunningModule");
 
-		Module module = getRunningModule(id);
+        this._runningModules.runningModuleMap
+            .remove(new Integer(module.getId()));
 
-		this._runningModules.runningModuleMap.remove(new Integer(id));
+        _logger.log(Level.INFO, "Deregestered module " + module.getName());
 
-		_logger.log(Level.INFO, "Deregestered module " + module.getName());
+        setChanged();
 
-		SystemRoot.getSystemInstance().deleteSystemObserver(module.getSystemObserver());
+        notifyObservers(module);
 
-		setChanged();
+        clearChanged();
 
-		notifyObservers(module);
+        _logger.exiting(this.getClass().getName(), "deregisterRunningModule");
 
-		clearChanged();
+    }
 
-		_logger.exiting(this.getClass().getName(), "deregisterRunningModule");
+    /**
+     * @see org.electrocodeogram.module.registry.IModuleRegistry#getModuleDescriptor(java.lang.String)
+     */
+    public ModuleDescriptor getModuleDescriptor(String moduleClassId)
+        throws ModuleClassException {
+        _logger.entering(this.getClass().getName(), "getModuleDescriptor");
 
-	}
+        if (moduleClassId == null || moduleClassId.equals("")) {
 
-	/**
-	 * @see org.electrocodeogram.module.registry.ISystemModuleRegistry#getModuleDescriptor(java.lang.String)
-	 */
-	public ModuleDescriptor getModuleDescriptor(String moduleClassId) throws ModuleClassException
-	{
-		_logger.entering(this.getClass().getName(), "getModuleDescriptor");
+            throw new ModuleClassException("The module id is null or empty.");
+        }
 
-		if (moduleClassId == null || moduleClassId.equals(""))
-		{
+        if (this._installedModules == null) {
+            throw new ModuleClassException("The module id is unknown.");
+        }
 
-			throw new ModuleClassException("The module id is null or empty.");
-		}
+        if (!this._installedModules.availableModuleClassesMap
+            .containsKey(moduleClassId)) {
+            throw new ModuleClassException("The module id is unknown.");
+        }
 
-		if (this._installedModules == null)
-		{
-			throw new ModuleClassException("The module id is unknown.");
-		}
+        _logger.exiting(this.getClass().getName(), "getModuleDescriptor");
 
-		if (!this._installedModules.availableModuleClassesMap.containsKey(moduleClassId))
-		{
-			throw new ModuleClassException("The module id is unknown.");
-		}
+        return this._installedModules.availableModuleClassesMap
+            .get(moduleClassId);
 
-		_logger.exiting(this.getClass().getName(), "getModuleDescriptor");
+    }
 
-		return this._installedModules.availableModuleClassesMap.get(moduleClassId);
+    /**
+     * @see org.electrocodeogram.module.registry.IModuleRegistry#storeModuleSetup(java.io.File)
+     */
+    public void storeModuleSetup(File file) throws ModuleSetupStoreException {
+        _logger.entering(this.getClass().getName(), "storeModuleSetup");
 
-	}
+        if (file == null) {
+            throw new ModuleSetupStoreException("The given file is null");
+        }
 
-	/**
-	 * @see org.electrocodeogram.module.registry.ISystemModuleRegistry#storeModuleSetup(java.io.File)
-	 */
-	public void storeModuleSetup(File file) throws ModuleSetupStoreException
-	{
-		_logger.entering(this.getClass().getName(), "storeModuleSetup");
+        _logger.log(Level.INFO, "Storing module setup in file "
+                                + file.getAbsolutePath());
 
-		if (file == null)
-		{
-			throw new ModuleSetupStoreException("The given file is null");
-		}
+        if (this._runningModules.runningModuleMap == null) {
+            throw new ModuleSetupStoreException(
+                "No modules are currently running.");
 
-		_logger.log(Level.INFO, "Storing module setup in file " + file.getAbsolutePath());
+        }
 
-		if (this._runningModules.runningModuleMap == null)
-		{
-			throw new ModuleSetupStoreException(
-					"No modules are currently running.");
+        PrintWriter writer = null;
 
-		}
+        try {
+            writer = new PrintWriter(new FileOutputStream(file));
+        } catch (FileNotFoundException e) {
+            throw new ModuleSetupStoreException("The given file "
+                                                + file.getAbsolutePath()
+                                                + "could not be found.");
+        }
 
-		PrintWriter writer = null;
+        writer.flush();
 
-		try
-		{
-			writer = new PrintWriter(new FileOutputStream(file));
-		}
-		catch (FileNotFoundException e)
-		{
-			throw new ModuleSetupStoreException(
-					"The given file " + file.getAbsolutePath() + "could not be found.");
-		}
+        Module[] modules = this._runningModules.runningModuleMap.values()
+            .toArray(new Module[this._runningModules.runningModuleMap.size()]);
 
-		writer.flush();
+        _logger.log(Level.INFO, "Found " + modules.length
+                                + " module(s) to store");
 
-		Module[] modules = this._runningModules.runningModuleMap.values().toArray(new Module[this._runningModules.runningModuleMap.size()]);
+        writer.println("<?xml version=\"1.0\"?>");
 
-		_logger.log(Level.INFO, "Found " + modules.length + " module(s) to store");
+        writer.println("<modulesetup>");
 
-		writer.println("<?xml version=\"1.0\"?>");
+        for (Module module : modules) {
+            _logger.log(Level.INFO, "Storing module " + module.getName());
 
-		writer.println("<modulesetup>");
+            writer.println("<module id=\"" + module.getId() + "\" active=\""
+                           + (module.getState() == true) + "\">");
 
-		for (Module module : modules)
-		{
-			_logger.log(Level.INFO, "Storing module " + module.getName());
+            writer.println("<name>");
 
-			writer.println("<module id=\"" + module.getId() + "\" active=\"" + module.isActive() + "\">");
+            writer.println(module.getName());
 
-			writer.println("<name>");
+            writer.println("</name>");
 
-			writer.println(module.getName());
+            writer.println("<fromClassId>");
 
-			writer.println("</name>");
+            writer.println(module.getClassId());
 
-			writer.println("<fromClassId>");
+            writer.println("</fromClassId>");
 
-			writer.println(module.getClassId());
+            writer.println("<connectedTo>");
 
-			writer.println("</fromClassId>");
+            if (module.getReceivingModuleCount() > 0) {
 
-			writer.println("<connectedTo>");
+                Module[] receivingModules = module.getReceivingModules();
 
-			if (module.getReceivingModuleCount() > 0)
-			{
+                _logger.log(Level.FINEST, "Module " + module.getName()
+                                          + " is connected to "
+                                          + receivingModules.length
+                                          + " other modules.");
 
-				Module[] receivingModules = module.getReceivingModules();
+                for (Module receivingModule : receivingModules) {
+                    writer.println("<id>");
 
-				_logger.log(Level.FINEST, "Module " + module.getName() + " is connected to " + receivingModules.length + " other modules.");
+                    writer.println(receivingModule.getId());
 
-				for (Module receivingModule : receivingModules)
-				{
-					writer.println("<id>");
+                    writer.println("</id>");
 
-					writer.println(receivingModule.getId());
+                    _logger.log(Level.INFO, "Connection to module "
+                                            + receivingModule.getId()
+                                            + " stored.");
+                }
 
-					writer.println("</id>");
+            } else {
+                _logger.log(Level.FINEST,
+                    "Module " + module.getName()
+                                    + " is not connected to other modules.");
 
-					_logger.log(Level.INFO, "Connection to module " + receivingModule.getId() + " stored.");
-				}
+            }
+            writer.println("</connectedTo>");
 
-			}
-			else
-			{
-				_logger.log(Level.FINEST, "Module " + module.getName() + " is not connected to other modules.");
+            writer.println("<properties>");
 
-			}
-			writer.println("</connectedTo>");
+            ModuleProperty[] moduleProperties = module.getRuntimeProperties();
 
-			writer.println("<properties>");
+            if (moduleProperties != null && moduleProperties.length > 0) {
 
-			ModuleProperty[] moduleProperties = module.getRuntimeProperties();
+                _logger.log(Level.FINEST, "Found " + moduleProperties.length
+                                          + " properties for module "
+                                          + module.getName());
 
-			if (moduleProperties != null && moduleProperties.length > 0)
-			{
+                for (ModuleProperty moduleProperty : moduleProperties) {
+                    String propertyName = moduleProperty.getName();
 
-				_logger.log(Level.FINEST, "Found " + moduleProperties.length + " properties for module " + module.getName());
+                    _logger.log(Level.FINEST, "Property name "
+                                              + moduleProperty.getName());
 
-				for (ModuleProperty moduleProperty : moduleProperties)
-				{
-					String propertyName = moduleProperty.getName();
+                    String propertyValue = moduleProperty.getValue();
 
-					_logger.log(Level.FINEST, "Property name " + moduleProperty.getName());
+                    _logger
+                        .log(Level.FINEST, "Property value " + propertyValue);
 
-					String propertyValue = moduleProperty.getValue();
+                    String propertyType = moduleProperty.getType().getName();
 
-					_logger.log(Level.FINEST, "Property value " + propertyValue);
+                    _logger.log(Level.FINEST, "Property type " + propertyType);
 
-					String propertyType = moduleProperty.getType().getName();
+                    if (propertyValue != null) {
+                        writer.println("<property>");
 
-					_logger.log(Level.FINEST, "Property type " + propertyType);
+                        writer.println("<name>");
 
-					if (propertyValue != null)
-					{
-						writer.println("<property>");
+                        writer.println(propertyName);
 
-						writer.println("<name>");
+                        writer.println("</name>");
 
-						writer.println(propertyName);
+                        writer.println("<value>");
 
-						writer.println("</name>");
+                        writer.println(propertyValue);
 
-						writer.println("<value>");
+                        writer.println("</value>");
 
-						writer.println(propertyValue);
+                        writer.println("<type>");
 
-						writer.println("</value>");
+                        writer.println(propertyType);
 
-						writer.println("<type>");
+                        writer.println("</type>");
 
-						writer.println(propertyType);
+                        writer.println("</property>");
 
-						writer.println("</type>");
+                        _logger.log(Level.FINEST, "Property value was stored");
+                    } else {
+                        _logger.log(Level.FINEST,
+                            "Property value is null and not stored");
+                    }
 
-						writer.println("</property>");
+                }
 
-						_logger.log(Level.FINEST, "Property value was stored");
-					}
-					else
-					{
-						_logger.log(Level.FINEST, "Property value is null and not stored");
-					}
+            } else {
+                _logger.log(Level.FINEST,
+                    "Did not find any properties for module "
+                                    + module.getName());
+            }
 
-				}
+            writer.println("</properties>");
 
-			}
-			else
-			{
-				_logger.log(Level.FINEST, "Did not find any properties for module " + module.getName());
-			}
+            writer.println("</module>");
 
-			writer.println("</properties>");
+            writer.flush();
 
-			writer.println("</module>");
+        }
 
-			writer.flush();
+        writer.println("</modulesetup>");
 
-		}
+        writer.flush();
 
-		writer.println("</modulesetup>");
+        writer.close();
 
-		writer.flush();
+        _logger.exiting(this.getClass().getName(), "storeModuleSetup");
 
-		writer.close();
+    }
 
-		_logger.exiting(this.getClass().getName(), "storeModuleSetup");
+    /**
+     * @see org.electrocodeogram.module.registry.IModuleRegistry#loadModuleSetup(java.io.File)
+     */
+    public void loadModuleSetup(File file) throws ModuleSetupLoadException {
+        _logger.entering(this.getClass().getName(), "loadModuleSetup");
 
-	}
+        if (file == null) {
+            throw new ModuleSetupLoadException("The given File is null");
+        }
 
-	/**
-	 * @see org.electrocodeogram.module.registry.ISystemModuleRegistry#loadModuleSetup(java.io.File)
-	 */
-	public void loadModuleSetup(File file) throws ModuleSetupLoadException
-	{
-		_logger.entering(this.getClass().getName(), "loadModuleSetup");
+        HashMap<Integer, Integer> moduleIdTransformationMap = new HashMap<Integer, Integer>();
 
-		if (file == null)
-		{
-			throw new ModuleSetupLoadException("The given File is null");
-		}
+        HashMap<Integer, Integer[]> moduleConnectionMap = new HashMap<Integer, Integer[]>();
 
-		HashMap<Integer, Integer> moduleIdTransformationMap = new HashMap<Integer, Integer>();
+        ArrayList<Integer> moduleActivationList = new ArrayList<Integer>();
 
-		HashMap<Integer, Integer[]> moduleConnectionMap = new HashMap<Integer, Integer[]>();
+        if (!file.exists()) {
+            throw new ModuleSetupLoadException("The file "
+                                               + file.getAbsolutePath()
+                                               + " does not exist.");
+        }
 
-		ArrayList<Integer> moduleActivationList = new ArrayList<Integer>();
+        if (file.isDirectory()) {
+            throw new ModuleSetupLoadException(file.getAbsolutePath()
+                                               + " is a directory, not a file.");
+        }
 
-		if (!file.exists())
-		{
-			throw new ModuleSetupLoadException(
-					"The file " + file.getAbsolutePath() + " does not exist.");
-		}
+        if (!file.canRead()) {
+            throw new ModuleSetupLoadException("The file "
+                                               + file.getAbsolutePath()
+                                               + " can not be read.");
+        }
 
-		if (file.isDirectory())
-		{
-			throw new ModuleSetupLoadException(
-					file.getAbsolutePath() + " is a directory, not a file.");
-		}
+        clearLab();
 
-		if (!file.canRead())
-		{
-			throw new ModuleSetupLoadException(
-					"The file " + file.getAbsolutePath() + " can not be read.");
-		}
+        ModuleSetup moduleSetup;
 
-		clearLab();
+        try {
+            moduleSetup = ECGParser.parseAsModuleSetup(file);
 
-		ModuleSetup moduleSetup;
+            ModuleConfiguration[] moduleConfigurations = moduleSetup
+                .getModuleConfigurations();
 
-		try
-		{
-			moduleSetup = ECGParser.parseAsModuleSetup(file);
+            for (ModuleConfiguration moduleConfiguration : moduleConfigurations) {
 
-			ModuleConfiguration[] moduleConfigurations = moduleSetup.getModuleConfigurations();
+                int assignedModuleId = createRunningModule(moduleConfiguration
+                    .getFromClassId(), moduleConfiguration.getModuleName());
 
-			for (ModuleConfiguration moduleConfiguration : moduleConfigurations)
-			{
+                ModuleProperty[] moduleProperties = moduleConfiguration
+                    .getModuleProperties();
 
-				int assignedModuleId = createRunningModule(moduleConfiguration.getFromClassId(), moduleConfiguration.getModuleName());
+                if (moduleProperties != null) {
+                    for (ModuleProperty moduleProperty : moduleProperties) {
+                        
+                        if(moduleProperty.getType().equals(Class.forName("java.lang.reflect.Method")) || moduleProperty.getValue() == null)
+                        {
+                            continue;
+                        }
+                        
+                        getRunningModule(assignedModuleId).getModuleProperty(moduleProperty.getName()).setValue(moduleProperty.getValue());
+                    }
+                }
 
-				ModuleProperty[] moduleProperties = moduleConfiguration.getModuleProperties();
+                if (moduleConfiguration.isActive()) {
+                    moduleActivationList.add(new Integer(assignedModuleId));
+                }
 
-				if (moduleProperties != null)
-				{
-					for (ModuleProperty moduleProperty : moduleProperties)
-					{
-						if (moduleProperty.getType().equals(Class.forName("java.lang.reflect.Method")))
-						{
-							continue;
-						}
+                if (moduleIdTransformationMap.containsKey(new Integer(
+                    moduleConfiguration.getModuleId()))) {
+                    throw new ModuleSetupLoadException(
+                        "Duplicate module id found "
+                                        + moduleConfiguration.getModuleId());
+                }
 
-						if(moduleProperty.getValue() == null)
-						{
-							continue;
-						}
-						
-						getRunningModule(assignedModuleId).setProperty(moduleProperty.getName(), moduleProperty.getValue());
+                moduleIdTransformationMap.put(new Integer(moduleConfiguration
+                    .getModuleId()), new Integer(assignedModuleId));
 
-					}
-				}
+                if (moduleConfiguration.getConnectedTo() != null) {
+                    moduleConnectionMap.put(new Integer(moduleConfiguration
+                        .getModuleId()), moduleConfiguration.getConnectedTo());
+                }
+            }
 
-				if (moduleConfiguration.isActive())
-				{
-					moduleActivationList.add(new Integer(assignedModuleId));
-				}
+            Integer[] storedModuleIds = moduleConnectionMap.keySet().toArray(
+                new Integer[moduleConnectionMap.size()]);
 
-				if (moduleIdTransformationMap.containsKey(new Integer(
-						moduleConfiguration.getModuleId())))
-				{
-					throw new ModuleSetupLoadException(
-							"Duplicate module id found " + moduleConfiguration.getModuleId());
-				}
+            for (Integer storedModuleId : storedModuleIds) {
+                Integer assignedModuleId = moduleIdTransformationMap
+                    .get(storedModuleId);
 
-				moduleIdTransformationMap.put(new Integer(
-						moduleConfiguration.getModuleId()), new Integer(
-						assignedModuleId));
+                Integer[] storedReceivingModuleIds = moduleConnectionMap
+                    .get(storedModuleId);
 
-				if (moduleConfiguration.getConnectedTo() != null)
-				{
-					moduleConnectionMap.put(new Integer(
-							moduleConfiguration.getModuleId()), moduleConfiguration.getConnectedTo());
-				}
-			}
+                for (Integer storedReceivingModuleId : storedReceivingModuleIds) {
+                    if (storedReceivingModuleId == null) {
+                        continue;
+                    }
 
-			Integer[] storedModuleIds = moduleConnectionMap.keySet().toArray(new Integer[moduleConnectionMap.size()]);
+                    Integer assignedReceivingModuleId = moduleIdTransformationMap
+                        .get(storedReceivingModuleId);
 
-			for (Integer storedModuleId : storedModuleIds)
-			{
-				Integer assignedModuleId = moduleIdTransformationMap.get(storedModuleId);
+                    if (assignedReceivingModuleId == null) {
+                        throw new ModuleSetupLoadException(
+                            "An unknown connected to id was found for module id: "
+                                            + storedModuleId);
+                    }
+                    Module module = getRunningModule(assignedModuleId
+                        .intValue());
 
-				Integer[] storedReceivingModuleIds = moduleConnectionMap.get(storedModuleId);
+                    Module receivingModule = getRunningModule(assignedReceivingModuleId
+                        .intValue());
 
-				for (Integer storedReceivingModuleId : storedReceivingModuleIds)
-				{
-					if (storedReceivingModuleId == null)
-					{
-						continue;
-					}
+                    module.connectReceiverModule(receivingModule);
 
-					Integer assignedReceivingModuleId = moduleIdTransformationMap.get(storedReceivingModuleId);
+                }
+            }
 
-					if (assignedReceivingModuleId == null)
-					{
-						throw new ModuleSetupLoadException(
-								"An unknown connected to id was found for module id: " + storedModuleId);
-					}
-					Module module = getRunningModule(assignedModuleId.intValue());
+            for (Integer moduleId : moduleActivationList) {
+                Module module = this.getRunningModule(moduleId.intValue());
 
-					Module receivingModule = getRunningModule(assignedReceivingModuleId.intValue());
+                if (module.isModuleType(ModuleType.TARGET_MODULE)) {
+                    try {
+                        module.activate();
+                    } catch (ModuleActivationException e) {
+                        clearLab();
 
-					module.connectReceiverModule(receivingModule);
+                        throw new ModuleSetupLoadException(e.getMessage());
+                    }
+                }
+            }
 
-				}
-			}
+            for (Integer moduleId : moduleActivationList) {
+                Module module = this.getRunningModule(moduleId.intValue());
 
-			for (Integer moduleId : moduleActivationList)
-			{
-				Module module = this.getRunningModule(moduleId.intValue());
+                if (module.isModuleType(ModuleType.INTERMEDIATE_MODULE)) {
+                    try {
+                        module.activate();
+                    } catch (ModuleActivationException e) {
+                        clearLab();
 
-				if (module.isModuleType(ModuleType.TARGET_MODULE))
-				{
-					try
-					{
-						module.activate();
-					}
-					catch (ModuleActivationException e)
-					{
-						clearLab();
+                        throw new ModuleSetupLoadException(e.getMessage());
+                    }
+                }
+            }
 
-						throw new ModuleSetupLoadException(e.getMessage());
-					}
-				}
-			}
+            for (Integer moduleId : moduleActivationList) {
+                Module module = this.getRunningModule(moduleId.intValue());
 
-			for (Integer moduleId : moduleActivationList)
-			{
-				Module module = this.getRunningModule(moduleId.intValue());
+                if (module.isModuleType(ModuleType.SOURCE_MODULE)) {
+                    try {
+                        module.activate();
+                    } catch (ModuleActivationException e) {
+                        clearLab();
 
-				if (module.isModuleType(ModuleType.INTERMEDIATE_MODULE))
-				{
-					try
-					{
-						module.activate();
-					}
-					catch (ModuleActivationException e)
-					{
-						clearLab();
+                        throw new ModuleSetupLoadException(e.getMessage());
+                    }
+                }
+            }
 
-						throw new ModuleSetupLoadException(e.getMessage());
-					}
-				}
-			}
+            _logger.exiting(this.getClass().getName(), "loadModuleSetup");
+        } catch (SAXException e) {
+            throw new ModuleSetupLoadException(e.getMessage());
+        } catch (IOException e) {
+            throw new ModuleSetupLoadException(e.getMessage());
+        } catch (ModuleSetupLoadException e) {
+            throw new ModuleSetupLoadException(e.getMessage());
+        } catch (ModuleInstanceException e) {
+            throw new ModuleSetupLoadException(e.getMessage());
+        } catch (ModuleConnectionException e) {
+            throw new ModuleSetupLoadException(e.getMessage());
+        } catch (ModuleInstantiationException e) {
+            throw new ModuleSetupLoadException(e.getMessage());
+        } catch (ModuleClassException e) {
+            throw new ModuleSetupLoadException(e.getMessage());
+       
+        } catch (PropertyException e) {
+            throw new ModuleSetupLoadException(e.getMessage());
+        } catch (ClassNotFoundException e) {
+            throw new ModuleSetupLoadException(e.getMessage());
+        } catch (ClassLoadingException e) {
+            throw new ModuleSetupLoadException(e.getMessage());
+        }
 
-			for (Integer moduleId : moduleActivationList)
-			{
-				Module module = this.getRunningModule(moduleId.intValue());
+    }
 
-				if (module.isModuleType(ModuleType.SOURCE_MODULE))
-				{
-					try
-					{
-						module.activate();
-					}
-					catch (ModuleActivationException e)
-					{
-						clearLab();
+    /**
+     * 
+     */
+    private void clearLab() {
+        _logger.entering(this.getClass().getName(), "clearLab");
 
-						throw new ModuleSetupLoadException(e.getMessage());
-					}
-				}
-			}
+        Module[] modules = this._runningModules.runningModuleMap.values()
+            .toArray(new Module[this._runningModules.runningModuleMap.size()]);
 
-			_logger.exiting(this.getClass().getName(), "loadModuleSetup");
-		}
-		catch (SAXException e)
-		{
-			throw new ModuleSetupLoadException(e.getMessage());
-		}
-		catch (IOException e)
-		{
-			throw new ModuleSetupLoadException(e.getMessage());
-		}
-		catch (ModuleSetupLoadException e)
-		{
-			throw new ModuleSetupLoadException(e.getMessage());
-		}
-		catch (ModuleInstanceException e)
-		{
-			throw new ModuleSetupLoadException(e.getMessage());
-		}
-		catch (ModuleConnectionException e)
-		{
-			throw new ModuleSetupLoadException(e.getMessage());
-		}
-		catch (ModuleInstantiationException e)
-		{
-			throw new ModuleSetupLoadException(e.getMessage());
-		}
-		catch (ModuleClassException e)
-		{
-			throw new ModuleSetupLoadException(e.getMessage());
-		}
-		catch (ModulePropertyException e)
-		{
-			throw new ModuleSetupLoadException(e.getMessage());
-		}
-		catch (PropertyException e)
-		{
-			throw new ModuleSetupLoadException(e.getMessage());
-		}
-		catch (ClassNotFoundException e)
-		{
-			throw new ModuleSetupLoadException(e.getMessage());
-		}
-		catch (ClassLoadingException e)
-		{
-			throw new ModuleSetupLoadException(e.getMessage());
-		}
+        for (Module module : modules) {
 
-	}
+            deregisterRunningModule(module);
 
-	/**
-	 * 
-	 */
-	private void clearLab()
-	{
-		_logger.entering(this.getClass().getName(), "clearLab");
+        }
 
-		Module[] modules = this._runningModules.runningModuleMap.values().toArray(new Module[this._runningModules.runningModuleMap.size()]);
+        _logger.log(Level.INFO,
+            "All running modules are deregistered. ECG Lab is cleared.");
 
-		for (Module module : modules)
-		{
-			try
-			{
-				deregisterRunningModule(module.getId());
-			}
-			catch (ModuleInstanceException e)
-			{
-				_logger.log(Level.WARNING, "An Exception occured while deregistering the module: " + module.getName());
-
-			}
-		}
-
-		_logger.log(Level.INFO, "All running modules are deregistered. ECG Lab is cleared.");
-
-		_logger.exiting(this.getClass().getName(), "clearLab");
-	}
+        _logger.exiting(this.getClass().getName(), "clearLab");
+    }
 }

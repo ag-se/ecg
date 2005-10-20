@@ -1,6 +1,7 @@
 package org.electrocodeogram.test.server.modules;
 
 import org.electrocodeogram.event.ValidEventPacket;
+import org.electrocodeogram.module.ModuleProperty;
 import org.electrocodeogram.module.ModulePropertyException;
 import org.electrocodeogram.module.target.TargetModule;
 import org.electrocodeogram.module.target.TargetModuleException;
@@ -50,15 +51,7 @@ public class MockTargetModule extends TargetModule
 		
 	}
 
-	/**
-	 * @see org.electrocodeogram.module.Module#setProperty(java.lang.String, java.lang.Object)
-	 */
-	@Override
-	public void setProperty(String currentPropertyName, String propertyValue) throws ModulePropertyException
-	{
-		// not implemented
-		
-	}
+	
 
 	
 	/**
@@ -80,5 +73,14 @@ public class MockTargetModule extends TargetModule
 		// not implemented
 		
 	}
+
+    /* (non-Javadoc)
+     * @see org.electrocodeogram.module.Module#propertyChanged(org.electrocodeogram.module.ModuleProperty)
+     */
+    @Override
+    protected void propertyChanged(ModuleProperty moduleProperty) {
+        // TODO Auto-generated method stub
+        
+    }
 
 }

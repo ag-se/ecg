@@ -9,7 +9,7 @@ import javax.xml.validation.Schema;
 
 import org.electrocodeogram.module.Module;
 import org.electrocodeogram.msdt.registry.MicroSensorDataTypeRegistrationException;
-import org.electrocodeogram.system.SystemRoot;
+import org.electrocodeogram.system.Core;
 
 /**
  * A MicroSensorDataType is a type for an actual MicroActivity event. Each
@@ -173,7 +173,7 @@ public class MicroSensorDataType
 		{
 			try
 			{
-				SystemRoot.getSystemInstance().getSystemMsdtRegistry().deregisterMsdt(this);
+                org.electrocodeogram.system.System.getInstance().getMsdtRegistry().deregisterMsdt(this);
 			}
 			catch (MicroSensorDataTypeRegistrationException e)
 			{

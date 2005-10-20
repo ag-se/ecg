@@ -19,512 +19,473 @@ import org.electrocodeogram.module.intermediate.IntermediateModule;
 import org.electrocodeogram.module.intermediate.IntermediateModule.ProcessingMode;
 import org.electrocodeogram.module.registry.ModuleClassException;
 import org.electrocodeogram.module.registry.ModuleInstanceException;
-import org.electrocodeogram.system.SystemRoot;
+import org.electrocodeogram.system.Core;
 import org.electrocodeogram.ui.modules.ModuleGraph;
 
 /**
- * @author 7oas7er
- *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
+ * @author 7oas7er TODO To change the template for this generated type
+ *         comment go to Window - Preferences - Java - Code Style -
+ *         Code Templates
  */
-public class MenuManager
-{
+public class MenuManager {
 
-	static JFrame _frame;
+    static JFrame _frame;
 
-	private static JPopupMenu modulePopupMenu = null;
-	
-	private static JPopupMenu moduleFinderMenu;
+    private static JPopupMenu modulePopupMenu = null;
 
-	private static JPopupMenu edgePopupMenu = null;
+    private static JPopupMenu moduleFinderMenu;
 
-	private static JMenuItem mniModuleDetails = new JMenuItem("Details");
-	
-	private static JMenuItem mniModuleFinderDetails = new JMenuItem("Details");
+    private static JPopupMenu edgePopupMenu = null;
 
-	private static JMenuItem mniModuleRemove = new JMenuItem("Remove");
+    private static JMenuItem mniModuleDetails = new JMenuItem("Details");
 
-	private static JMenuItem mniEdgeRemove = new JMenuItem("Remove");
+    private static JMenuItem mniModuleFinderDetails = new JMenuItem("Details");
 
-	private static JMenuItem mniModuleConnectTo = new JMenuItem("Connect to...");
+    private static JMenuItem mniModuleRemove = new JMenuItem("Remove");
 
-	private static JMenuItem mniModuleStop = new JMenuItem("Stop");
+    private static JMenuItem mniEdgeRemove = new JMenuItem("Remove");
 
-	private static JMenuItem mniModuleStart = new JMenuItem("Start");
+    private static JMenuItem mniModuleConnectTo = new JMenuItem("Connect to...");
 
-	private static JMenuItem mniMsgWindowShow = new JMenuItem("Event Window");
+    private static JMenuItem mniModuleStop = new JMenuItem("Stop");
 
-	private static JMenuItem mniMakeAnnotator = new JMenuItem("Annotator");
+    private static JMenuItem mniModuleStart = new JMenuItem("Start");
 
-	private static JMenuItem mniMakeFilter = new JMenuItem("Filter");
+    private static JMenuItem mniMsgWindowShow = new JMenuItem("Event Window");
 
-	static
-	{
-		_frame = SystemRoot.getSystemInstance().getFrame();
+    private static JMenuItem mniMakeAnnotator = new JMenuItem("Annotator");
 
-		mniModuleRemove.addActionListener(new ActionListener()
-		{
+    private static JMenuItem mniMakeFilter = new JMenuItem("Filter");
 
-			public void actionPerformed(ActionEvent e)
-			{
+    static {
+        _frame = org.electrocodeogram.system.System.getInstance()
+            .getMainWindow();
 
-				try
-				{
-					SystemRoot.getSystemInstance().getSystemModuleRegistry().getRunningModule(ModuleGraph.getSelectedModule()).remove();
-				}
-				catch (ModuleInstanceException e1)
-				{
+        mniModuleRemove.addActionListener(new ActionListener() {
 
-					JOptionPane.showMessageDialog(_frame, e1.getMessage(), "Remove Module", JOptionPane.ERROR_MESSAGE);
-				}
+            public void actionPerformed(ActionEvent e) {
 
-			}
-		});
+                try {
+                    org.electrocodeogram.system.System.getInstance()
+                        .getModuleRegistry().getRunningModule(
+                            ModuleGraph.getSelectedModule()).remove();
+                } catch (ModuleInstanceException e1) {
 
-		mniModuleDetails.addActionListener(new ActionListener()
-		{
+                    JOptionPane.showMessageDialog(_frame, e1.getMessage(),
+                        "Remove Module", JOptionPane.ERROR_MESSAGE);
+                }
 
-			public void actionPerformed(ActionEvent e)
-			{
-				SystemRoot.getSystemInstance().getGui().showModuleDetails();
-			}
-		});
-		
-		mniModuleFinderDetails.addActionListener(new ActionListener()
-		{
+            }
+        });
 
-			public void actionPerformed(ActionEvent e)
-			{
-				SystemRoot.getSystemInstance().getGui().showModuleFinderDetails();
-			}
-		});
+        mniModuleDetails.addActionListener(new ActionListener() {
 
-		mniModuleStop.addActionListener(new ActionListener()
-		{
+            public void actionPerformed(ActionEvent e) {
+                org.electrocodeogram.system.System.getInstance().getGui()
+                    .showModuleDetails();
+            }
+        });
 
-			public void actionPerformed(ActionEvent e)
-			{
+        mniModuleFinderDetails.addActionListener(new ActionListener() {
 
-				try
-				{
-					SystemRoot.getSystemInstance().getSystemModuleRegistry().getRunningModule(ModuleGraph.getSelectedModule()).deactivate();
-				}
-				catch (ModuleInstanceException e1)
-				{
+            public void actionPerformed(ActionEvent e) {
+                org.electrocodeogram.system.System.getInstance().getGui()
+                    .showModuleFinderDetails();
+            }
+        });
 
-					JOptionPane.showMessageDialog(_frame, e1.getMessage(), "Stop Module", JOptionPane.ERROR_MESSAGE);
-				}
+        mniModuleStop.addActionListener(new ActionListener() {
 
-			}
-		});
+            public void actionPerformed(ActionEvent e) {
 
-		mniModuleStart.addActionListener(new ActionListener()
-		{
+                try {
+                    org.electrocodeogram.system.System.getInstance()
+                        .getModuleRegistry().getRunningModule(
+                            ModuleGraph.getSelectedModule()).deactivate();
+                } catch (ModuleInstanceException e1) {
 
-			public void actionPerformed(ActionEvent e)
-			{
+                    JOptionPane.showMessageDialog(_frame, e1.getMessage(),
+                        "Stop Module", JOptionPane.ERROR_MESSAGE);
+                }
 
-				try
-				{
-					SystemRoot.getSystemInstance().getSystemModuleRegistry().getRunningModule(ModuleGraph.getSelectedModule()).activate();
-				}
-				catch (Exception e1)
-				{
-					JOptionPane.showMessageDialog(_frame, e1.getMessage(), "Start Module", JOptionPane.ERROR_MESSAGE);
-				}
+            }
+        });
 
-			}
-		});
+        mniModuleStart.addActionListener(new ActionListener() {
 
-		mniMsgWindowShow.addActionListener(new ActionListener()
-		{
-
-			public void actionPerformed(ActionEvent e)
-			{
-				SystemRoot.getSystemInstance().getGui().showMessagesWindow();
-
-			}
-		});
-
-		mniMakeAnnotator.addActionListener(new ActionListener()
-		{
-
-			public void actionPerformed(ActionEvent e)
-			{
-				Module module = null;
-
-				try
-				{
-					SystemRoot.getSystemInstance().getSystemModuleRegistry().getRunningModule(ModuleGraph.getSelectedModule());
-				}
-				catch (ModuleInstanceException e1)
-				{
-					JOptionPane.showMessageDialog(_frame, e1.getMessage(), "Annotator", JOptionPane.ERROR_MESSAGE);
-				}
-
-				if (module instanceof IntermediateModule)
-				{
-					IntermediateModule eventProcessor = (IntermediateModule) module;
-
-					eventProcessor.setProcessingMode(ProcessingMode.ANNOTATOR);
+            public void actionPerformed(ActionEvent e) {
 
-				}
-
-			}
-		});
-
-		mniModuleConnectTo.addActionListener(new ActionListener()
-		{
-
-			public void actionPerformed(ActionEvent e)
-			{
-				SystemRoot.getSystemInstance().getGui().enterModuleConnectionMode(ModuleGraph.getSelectedModule());
-
-			}
-		});
-
-		mniMakeFilter.addActionListener(new ActionListener()
-		{
-
-			public void actionPerformed(ActionEvent e)
-			{
-				Module module = null;
-
-				try
-				{
-					SystemRoot.getSystemInstance().getSystemModuleRegistry().getRunningModule(ModuleGraph.getSelectedModule());
-				}
-				catch (ModuleInstanceException e1)
-				{
-					JOptionPane.showMessageDialog(_frame, e1.getMessage(), "Filter", JOptionPane.ERROR_MESSAGE);
-				}
-
-				if (module instanceof IntermediateModule)
-				{
-					IntermediateModule eventProcessor = (IntermediateModule) module;
-
-					eventProcessor.setProcessingMode(IntermediateModule.ProcessingMode.FILTER);
-
-				}
-
-			}
-		});
-
-	}
+                try {
+                    org.electrocodeogram.system.System.getInstance()
+                        .getModuleRegistry().getRunningModule(
+                            ModuleGraph.getSelectedModule()).activate();
+                } catch (Exception e1) {
+                    JOptionPane.showMessageDialog(_frame, e1.getMessage(),
+                        "Start Module", JOptionPane.ERROR_MESSAGE);
+                }
 
-	public static void showModuleFinderMenu(String id,Component c, int x, int y)
-	{
-		moduleFinderMenu = new JPopupMenu();
-		
-		moduleFinderMenu.add(mniModuleFinderDetails);
-		
-		moduleFinderMenu.show(c, x, y);
-	}
-	
-	public static void showModuleMenu(int moduleId, Component c, int x, int y)
-	{
-		modulePopupMenu = new JPopupMenu();
+            }
+        });
 
-		modulePopupMenu.add(mniModuleStart);
+        mniMsgWindowShow.addActionListener(new ActionListener() {
 
-		modulePopupMenu.add(mniModuleStop);
+            public void actionPerformed(ActionEvent e) {
+                org.electrocodeogram.system.System.getInstance().getGui()
+                    .showMessagesWindow();
 
-		modulePopupMenu.addSeparator();
+            }
+        });
 
-		try
-		{
-			if (!SystemRoot.getSystemInstance().getSystemModuleRegistry().getRunningModule(moduleId).isModuleType(ModuleType.TARGET_MODULE))
-			{
-				modulePopupMenu.add(mniModuleConnectTo);
-			}
-		}
-		catch (ModuleInstanceException e2)
-		{
-			JOptionPane.showMessageDialog(_frame, e2.getMessage(), "Mneu Initialisation", JOptionPane.ERROR_MESSAGE);
-		}
+        mniMakeAnnotator.addActionListener(new ActionListener() {
 
-		modulePopupMenu.add(mniModuleRemove);
+            public void actionPerformed(ActionEvent e) {
+                Module module = null;
 
-		modulePopupMenu.addSeparator();
+                try {
+                    org.electrocodeogram.system.System.getInstance()
+                        .getModuleRegistry().getRunningModule(
+                            ModuleGraph.getSelectedModule());
+                } catch (ModuleInstanceException e1) {
+                    JOptionPane.showMessageDialog(_frame, e1.getMessage(),
+                        "Annotator", JOptionPane.ERROR_MESSAGE);
+                }
 
-		modulePopupMenu.add(mniMsgWindowShow);
+                if (module instanceof IntermediateModule) {
+                    IntermediateModule eventProcessor = (IntermediateModule) module;
 
-		try
-		{
-			if (SystemRoot.getSystemInstance().getSystemModuleRegistry().getRunningModule(moduleId).isModuleType(ModuleType.INTERMEDIATE_MODULE))
-			{
-				modulePopupMenu.addSeparator();
+                    eventProcessor.setProcessingMode(ProcessingMode.ANNOTATOR);
 
-				modulePopupMenu.add(mniMakeAnnotator);
+                }
 
-				modulePopupMenu.add(mniMakeFilter);
-			}
-		}
-		catch (ModuleInstanceException e1)
-		{
-			JOptionPane.showMessageDialog(_frame, e1.getMessage(), "Mneu Initialisation", JOptionPane.ERROR_MESSAGE);
-		}
+            }
+        });
 
-		ModuleProperty[] moduleProperties = null;
+        mniModuleConnectTo.addActionListener(new ActionListener() {
 
-		String moduleClassId = null;
-		try
-		{
-			moduleClassId = SystemRoot.getSystemInstance().getSystemModuleRegistry().getRunningModule(moduleId).getClassId();
-		}
-		catch (ModuleInstanceException e)
-		{
-			JOptionPane.showMessageDialog(_frame, e.getMessage(), "Mneu Initialisation", JOptionPane.ERROR_MESSAGE);
-		}
+            public void actionPerformed(ActionEvent e) {
+                org.electrocodeogram.system.System.getInstance().getGui()
+                    .enterModuleConnectionMode(ModuleGraph.getSelectedModule());
 
-		ModuleDescriptor moduleDescriptor = null;
-		try
-		{
-			moduleDescriptor = SystemRoot.getSystemInstance().getSystemModuleRegistry().getModuleDescriptor(moduleClassId);
-		}
-		catch (ModuleClassException e)
-		{
-			JOptionPane.showMessageDialog(_frame, e.getMessage(), "Mneu Initialisation", JOptionPane.ERROR_MESSAGE);
-		}
+            }
+        });
 
-		moduleProperties = moduleDescriptor.getProperties();
+        mniMakeFilter.addActionListener(new ActionListener() {
 
-		if (moduleProperties != null)
-		{
-			for (ModuleProperty moduleProperty : moduleProperties)
-			{
-				String propertyName = moduleProperty.getName();
+            public void actionPerformed(ActionEvent e) {
+                Module module = null;
 
-				Class propertyType = moduleProperty.getType();
+                try {
+                    org.electrocodeogram.system.System.getInstance()
+                        .getModuleRegistry().getRunningModule(
+                            ModuleGraph.getSelectedModule());
+                } catch (ModuleInstanceException e1) {
+                    JOptionPane.showMessageDialog(_frame, e1.getMessage(),
+                        "Filter", JOptionPane.ERROR_MESSAGE);
+                }
 
-				String propertyValue = moduleProperty.getValue();
+                if (module instanceof IntermediateModule) {
+                    IntermediateModule eventProcessor = (IntermediateModule) module;
 
-				JMenuItem menuItem = new JMenuItem(propertyName);
+                    eventProcessor
+                        .setProcessingMode(IntermediateModule.ProcessingMode.FILTER);
 
-				menuItem.addActionListener(new PropertyActionAdapter(moduleId,
-						propertyType, propertyName, propertyValue));
+                }
 
-				modulePopupMenu.add(menuItem);
+            }
+        });
 
-			}
+    }
 
-		}
+    public static void showModuleFinderMenu(String id, Component c, int x, int y) {
+        moduleFinderMenu = new JPopupMenu();
 
-		modulePopupMenu.addSeparator();
+        moduleFinderMenu.add(mniModuleFinderDetails);
 
-		modulePopupMenu.add(mniModuleDetails);
+        moduleFinderMenu.show(c, x, y);
+    }
 
-		modulePopupMenu.show(c, x, y);
-	}
+    public static void showModuleMenu(int moduleId, Component c, int x, int y) {
+        modulePopupMenu = new JPopupMenu();
 
-	public static void showEdgeMenu(int parentId, int childId, Component c, int x, int y)
-	{
-		edgePopupMenu = new JPopupMenu();
+        modulePopupMenu.add(mniModuleStart);
 
-		mniEdgeRemove.addActionListener(new EdgeRemoveAdapter(parentId, childId));
+        modulePopupMenu.add(mniModuleStop);
 
-		edgePopupMenu.add(mniEdgeRemove);
+        modulePopupMenu.addSeparator();
 
-		edgePopupMenu.show(c, x, y);
+        try {
+            if (!org.electrocodeogram.system.System.getInstance()
+                .getModuleRegistry().getRunningModule(moduleId).isModuleType(
+                    ModuleType.TARGET_MODULE)) {
+                modulePopupMenu.add(mniModuleConnectTo);
+            }
+        } catch (ModuleInstanceException e2) {
+            JOptionPane.showMessageDialog(_frame, e2.getMessage(),
+                "Mneu Initialisation", JOptionPane.ERROR_MESSAGE);
+        }
 
-	}
+        modulePopupMenu.add(mniModuleRemove);
 
-	private static class EdgeRemoveAdapter implements ActionListener
-	{
+        modulePopupMenu.addSeparator();
 
-		private int _parentId;
+        modulePopupMenu.add(mniMsgWindowShow);
 
-		private int _childId;
+        try {
+            if (org.electrocodeogram.system.System.getInstance()
+                .getModuleRegistry().getRunningModule(moduleId).isModuleType(
+                    ModuleType.INTERMEDIATE_MODULE)) {
+                modulePopupMenu.addSeparator();
 
-		public EdgeRemoveAdapter(int parentId, int childId)
-		{
+                modulePopupMenu.add(mniMakeAnnotator);
 
-			this._parentId = parentId;
+                modulePopupMenu.add(mniMakeFilter);
+            }
+        } catch (ModuleInstanceException e1) {
+            JOptionPane.showMessageDialog(_frame, e1.getMessage(),
+                "Mneu Initialisation", JOptionPane.ERROR_MESSAGE);
+        }
 
-			this._childId = childId;
-		}
+        ModuleProperty[] moduleProperties = null;
 
-		public void actionPerformed(ActionEvent e)
-		{
+        String moduleClassId = null;
+        try {
+            moduleClassId = org.electrocodeogram.system.System.getInstance()
+                .getModuleRegistry().getRunningModule(moduleId).getClassId();
+        } catch (ModuleInstanceException e) {
+            JOptionPane.showMessageDialog(_frame, e.getMessage(),
+                "Mneu Initialisation", JOptionPane.ERROR_MESSAGE);
+        }
 
-			try
-			{
-				SystemRoot.getSystemInstance().getSystemModuleRegistry().getRunningModule(this._parentId).disconnectReceiverModule(SystemRoot.getSystemInstance().getSystemModuleRegistry().getRunningModule(this._childId));
-			}
-			catch (Exception e1)
-			{
-				JOptionPane.showMessageDialog(MenuManager._frame, e1.getMessage(), "Remove Edge", JOptionPane.ERROR_MESSAGE);
-			}
+        ModuleDescriptor moduleDescriptor = null;
+        try {
+            moduleDescriptor = org.electrocodeogram.system.System.getInstance()
+                .getModuleRegistry().getModuleDescriptor(moduleClassId);
+        } catch (ModuleClassException e) {
+            JOptionPane.showMessageDialog(_frame, e.getMessage(),
+                "Mneu Initialisation", JOptionPane.ERROR_MESSAGE);
+        }
 
-		}
+        moduleProperties = moduleDescriptor.getProperties();
 
-	}
+        if (moduleProperties != null) {
+            for (ModuleProperty moduleProperty : moduleProperties) {
+                // String propertyName = moduleProperty.getName();
+                //
+                // Class propertyType = moduleProperty.getType();
+                //
+                // String propertyValue = moduleProperty.getValue();
 
-	private static class PropertyActionAdapter implements ActionListener
-	{
+                JMenuItem menuItem = new JMenuItem(moduleProperty.getName());
 
-		private int _moduleId;
-
-		private String _propertyName;
+                menuItem.addActionListener(new PropertyActionAdapter(
+                    moduleProperty));
 
-		private String _propertyResult;
+                modulePopupMenu.add(menuItem);
 
-		private String _propertyValue;
+            }
 
-		private Class _propertyType;
+        }
 
-		public PropertyActionAdapter(int moduleId, Class propertyType, String propertyName, String propertyValue)
-		{
-			this._moduleId = moduleId;
+        modulePopupMenu.addSeparator();
 
-			this._propertyName = propertyName;
+        modulePopupMenu.add(mniModuleDetails);
 
-			this._propertyType = propertyType;
+        modulePopupMenu.show(c, x, y);
+    }
 
-			this._propertyValue = propertyValue;
+    public static void showEdgeMenu(int parentId, int childId, Component c,
+        int x, int y) {
+        edgePopupMenu = new JPopupMenu();
 
-		}
+        mniEdgeRemove
+            .addActionListener(new EdgeRemoveAdapter(parentId, childId));
 
-		public void actionPerformed(ActionEvent e)
-		{
+        edgePopupMenu.add(mniEdgeRemove);
 
-			try
-			{
-				if (_propertyType.equals(Class.forName("java.lang.String")))
-				{
-					_propertyResult = JOptionPane.showInputDialog(MenuManager._frame, "Please enter a new value for " + this._propertyName, this._propertyName, JOptionPane.QUESTION_MESSAGE);
-				}
-				else if (_propertyType.equals(Class.forName("java.lang.Integer")))
-				{
-					_propertyResult = JOptionPane.showInputDialog(MenuManager._frame, "Please enter a new value for " + this._propertyName, this._propertyName, JOptionPane.QUESTION_MESSAGE);
-				}
-				else if (_propertyType.equals(Class.forName("java.io.File")))
-				{
-					JFileChooser fileChooser = new JFileChooser();
+        edgePopupMenu.show(c, x, y);
 
-					int result = fileChooser.showOpenDialog(MenuManager._frame);
+    }
 
-					switch (result)
-					{
-						case JFileChooser.CANCEL_OPTION:
-							return;
-						case JFileChooser.ERROR_OPTION:
-							return;
-						case JFileChooser.APPROVE_OPTION:
-							_propertyResult = fileChooser.getSelectedFile().getAbsolutePath();
-							break;
-						default:
-							return;
-					}
-				}
-				else if (this._propertyType.equals(Class.forName("java.lang.reflect.Method")))
-				{
-					this._propertyResult = this._propertyValue;
-				}
-				else if (this._propertyType.equals(Class.forName("java.lang.Boolean")))
-				{
-					int result = JOptionPane.showConfirmDialog(MenuManager._frame, "Do you want to enable the " + this._propertyName + " property?", this._propertyName, JOptionPane.YES_NO_OPTION);
+    private static class EdgeRemoveAdapter implements ActionListener {
 
-					if (result == JOptionPane.YES_OPTION)
-					{
-						this._propertyResult = "true";
-					}
-					else
-					{
-						this._propertyResult = "false";
-					}
-				}
-			}
-			catch (Exception e2)
-			{
-				JOptionPane.showMessageDialog(MenuManager._frame, e2.getMessage(), this._propertyName, JOptionPane.ERROR_MESSAGE);
-			}
+        private int _parentId;
 
-			if (this._propertyResult == null)
-			{
-				return;
-			}
+        private int _childId;
 
-			try
-			{
-				SystemRoot.getSystemInstance().getSystemModuleRegistry().getRunningModule(this._moduleId).setProperty(this._propertyName, this._propertyResult);
-			}
-			catch (Exception e1)
-			{
-				JOptionPane.showMessageDialog(MenuManager._frame, e1.getMessage(), this._propertyName, JOptionPane.ERROR_MESSAGE);
-			}
+        public EdgeRemoveAdapter(int parentId, int childId) {
 
-		}
+            this._parentId = parentId;
 
-	}
+            this._childId = childId;
+        }
 
-	public static void populateModuleMenu(JMenu menu, int id)
-	{
-		if (id == -1)
-		{
-			return;
-		}
+        public void actionPerformed(ActionEvent e) {
 
-		menu.removeAll();
+            try {
+                org.electrocodeogram.system.System.getInstance()
+                    .getModuleRegistry().getRunningModule(this._parentId)
+                    .disconnectReceiverModule(
+                        org.electrocodeogram.system.System.getInstance()
+                            .getModuleRegistry()
+                            .getRunningModule(this._childId));
+            } catch (Exception e1) {
+                JOptionPane.showMessageDialog(MenuManager._frame, e1
+                    .getMessage(), "Remove Edge", JOptionPane.ERROR_MESSAGE);
+            }
 
-		menu.add(mniModuleStart);
+        }
 
-		menu.add(mniModuleStop);
+    }
 
-		menu.addSeparator();
+    private static class PropertyActionAdapter implements ActionListener {
 
-		menu.add(mniModuleConnectTo);
+        // private int _moduleId;
+        //
+        // private String _propertyName;
+        //
+        private String propertyResult;
 
-		menu.add(mniModuleRemove);
+        //
+        // private String _propertyValue;
+        //
+        // private Class _propertyType;
 
-		ModuleProperty[] moduleProperties = null;
+        private ModuleProperty myModuleProperty;
 
-		String moduleId = null;
+        public PropertyActionAdapter(ModuleProperty moduleProperty) {
 
-		try
-		{
-			moduleId = SystemRoot.getSystemInstance().getSystemModuleRegistry().getRunningModule(id).getClassId();
-		}
-		catch (ModuleInstanceException e)
-		{
-			JOptionPane.showMessageDialog(MenuManager._frame, e.getMessage(), "Menu Initialisation", JOptionPane.ERROR_MESSAGE);
-		}
+            this.myModuleProperty = moduleProperty;
 
-		ModuleDescriptor moduleDescriptor = null;
-		try
-		{
-			moduleDescriptor = SystemRoot.getSystemInstance().getSystemModuleRegistry().getModuleDescriptor(moduleId);
-		}
-		catch (ModuleClassException e)
-		{
-			JOptionPane.showMessageDialog(MenuManager._frame, e.getMessage(), "Menu Initialisation", JOptionPane.ERROR_MESSAGE);
-		}
+        }
 
-		moduleProperties = moduleDescriptor.getProperties();
+        public void actionPerformed(ActionEvent e) {
 
-		if (moduleProperties != null)
-		{
-			for (ModuleProperty moduleProperty : moduleProperties)
-			{
-				String propertyName = moduleProperty.getName();
+            try {
+                if (this.myModuleProperty.getType().equals(
+                    Class.forName("java.lang.String"))) {
+                    this.propertyResult = JOptionPane.showInputDialog(
+                        MenuManager._frame, "Please enter a new value for "
+                                            + this.myModuleProperty.getName(),
+                        this.myModuleProperty.getName(),
+                        JOptionPane.QUESTION_MESSAGE);
+                } else if (this.myModuleProperty.getType().equals(
+                    Class.forName("java.lang.Integer"))) {
+                    this.propertyResult = JOptionPane.showInputDialog(
+                        MenuManager._frame, "Please enter a new value for "
+                                            + this.myModuleProperty.getName(),
+                        this.myModuleProperty.getName(),
+                        JOptionPane.QUESTION_MESSAGE);
+                } else if (this.myModuleProperty.getType().equals(
+                    Class.forName("java.io.File"))) {
+                    JFileChooser fileChooser = new JFileChooser();
 
-				Class propertyType = moduleProperty.getType();
+                    int result = fileChooser.showOpenDialog(MenuManager._frame);
 
-				String propertyValue = moduleProperty.getValue();
+                    switch (result) {
+                        case JFileChooser.CANCEL_OPTION:
+                            return;
+                        case JFileChooser.ERROR_OPTION:
+                            return;
+                        case JFileChooser.APPROVE_OPTION:
+                            this.propertyResult = fileChooser.getSelectedFile()
+                                .getAbsolutePath();
+                            break;
+                        default:
+                            return;
+                    }
+                } else if (this.myModuleProperty.getType().equals(
+                    Class.forName("java.lang.reflect.Method"))) {
+                    this.propertyResult = this.myModuleProperty.getValue();
+                } else if (this.myModuleProperty.getType().equals(
+                    Class.forName("java.lang.Boolean"))) {
+                    int result = JOptionPane.showConfirmDialog(
+                        MenuManager._frame, "Do you want to enable the "
+                                            + this.myModuleProperty.getName()
+                                            + " property?",
+                        this.myModuleProperty.getName(),
+                        JOptionPane.YES_NO_OPTION);
 
-				JMenuItem menuItem = new JMenuItem(propertyName);
+                    if (result == JOptionPane.YES_OPTION) {
+                        this.propertyResult = "true";
+                    } else {
+                        this.propertyResult = "false";
+                    }
+                }
+            } catch (Exception e2) {
+                JOptionPane.showMessageDialog(MenuManager._frame, e2
+                    .getMessage(), this.myModuleProperty.getName(),
+                    JOptionPane.ERROR_MESSAGE);
+            }
 
-				menuItem.addActionListener(new PropertyActionAdapter(id,
-						propertyType, propertyName, propertyValue));
+            if (this.propertyResult == null) {
+                return;
+            }
 
-				menu.add(menuItem);
+            this.myModuleProperty.setValue(this.propertyResult);
 
-			}
+        }
 
-		}
+    }
 
-		menu.add(mniModuleDetails);
+    public static void populateModuleMenu(JMenu menu, int id) {
+        if (id == -1) {
+            return;
+        }
 
-	}
+        menu.removeAll();
+
+        menu.add(mniModuleStart);
+
+        menu.add(mniModuleStop);
+
+        menu.addSeparator();
+
+        menu.add(mniModuleConnectTo);
+
+        menu.add(mniModuleRemove);
+
+        ModuleProperty[] moduleProperties = null;
+
+        String moduleId = null;
+
+        try {
+            moduleId = org.electrocodeogram.system.System.getInstance()
+                .getModuleRegistry().getRunningModule(id).getClassId();
+        } catch (ModuleInstanceException e) {
+            JOptionPane.showMessageDialog(MenuManager._frame, e.getMessage(),
+                "Menu Initialisation", JOptionPane.ERROR_MESSAGE);
+        }
+
+        ModuleDescriptor moduleDescriptor = null;
+        try {
+            moduleDescriptor = org.electrocodeogram.system.System.getInstance()
+                .getModuleRegistry().getModuleDescriptor(moduleId);
+        } catch (ModuleClassException e) {
+            JOptionPane.showMessageDialog(MenuManager._frame, e.getMessage(),
+                "Menu Initialisation", JOptionPane.ERROR_MESSAGE);
+        }
+
+        moduleProperties = moduleDescriptor.getProperties();
+
+        if (moduleProperties != null) {
+            for (ModuleProperty moduleProperty : moduleProperties) {
+//                String propertyName = moduleProperty.getName();
+//
+//                Class propertyType = moduleProperty.getType();
+//
+//                String propertyValue = moduleProperty.getValue();
+
+                JMenuItem menuItem = new JMenuItem(moduleProperty.getName());
+
+                menuItem.addActionListener(new PropertyActionAdapter(moduleProperty));
+
+                menu.add(menuItem);
+
+            }
+
+        }
+
+        menu.add(mniModuleDetails);
+
+    }
 }

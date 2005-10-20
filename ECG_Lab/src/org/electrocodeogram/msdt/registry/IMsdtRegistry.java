@@ -10,7 +10,7 @@ import org.electrocodeogram.msdt.MicroSensorDataTypeException;
  * This interface declares methods that are used by ECG system components to
  * access the MicroSensorDataType registry.
  */
-public interface ISystemMsdtRegistry
+public interface IMsdtRegistry
 {
 
 	/**

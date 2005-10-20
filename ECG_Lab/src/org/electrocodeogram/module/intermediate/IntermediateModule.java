@@ -191,14 +191,7 @@ public abstract class IntermediateModule extends Module implements IIntermediate
 	{
 
 		_logger.entering(this.getClass().getName(), "receiveEventPacket");
-
-		if (eventPacket == null)
-		{
-			_logger.log(Level.WARNING, "eventPacket is null");
-
-			return;
-		}
-
+	
 		if (this._processingMode == ProcessingMode.ANNOTATOR)
 		{
 			ValidEventPacket resultPacket = getAnalysisResult(eventPacket);

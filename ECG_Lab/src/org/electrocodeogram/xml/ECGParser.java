@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 
 import org.apache.xerces.parsers.DOMParser;
 import org.electrocodeogram.logging.LogHelper;
+import org.electrocodeogram.logging.LogHelper.ECGLevel;
 import org.electrocodeogram.module.ModuleDescriptor;
 import org.electrocodeogram.module.ModuleProperty;
 import org.electrocodeogram.module.Module.ModuleType;
@@ -20,7 +21,7 @@ import org.electrocodeogram.module.setup.ModuleConfiguration;
 import org.electrocodeogram.module.setup.ModuleSetup;
 import org.electrocodeogram.msdt.MicroSensorDataType;
 import org.electrocodeogram.msdt.MicroSensorDataTypeException;
-import org.electrocodeogram.system.SystemRoot;
+import org.electrocodeogram.system.Core;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -416,18 +417,22 @@ public class ECGParser
 	private static ModuleProperty[] getModuleProperties(Document document) throws PropertyException
 	{
 		Node properties;
+		
+		ArrayList<ModuleProperty> moduleProperties = null;
+		
+		Node[] propertyNodes;
+		
 		try
 		{
+			
 			properties = getChildNode(document.getDocumentElement(), "properties");
+			
+			propertyNodes = getChildNodes(properties, "property");
 		}
-		catch (PropertyException e1)
+		catch(PropertyException e)
 		{
 			return null;
 		}
-
-		ArrayList<ModuleProperty> moduleProperties = null;
-
-		Node[] propertyNodes = getChildNodes(properties, "property");
 
 		moduleProperties = new ArrayList<ModuleProperty>();
 
@@ -552,19 +557,19 @@ public class ECGParser
 			String msdtName = getNodeValue(msdtNameNode);
 
 			String msdtFileString = getNodeValue(msdtFileNode);
-
+			
 			File msdtFile = new File(
-					currentModuleDirectoryString + File.separator + msdtFileString);
+					currentModuleDirectoryString + File.separator + "msdt" + File.separator + msdtFileString);
 
 			
-			microSensorDataTypes.add(SystemRoot.getSystemInstance().getSystemMsdtRegistry().parseMicroSensorDataType(msdtFile));
+			microSensorDataTypes.add(org.electrocodeogram.system.System.getInstance().getMsdtRegistry().parseMicroSensorDataType(msdtFile));
 			
 		}
 
 		return microSensorDataTypes.toArray(new MicroSensorDataType[0]);
 	}
 
-	private static Node[] getChildNodes(Node parentNode, String nodeName)
+	private static Node[] getChildNodes(Node parentNode, String nodeName) throws PropertyException
 	{
 		if (parentNode == null || nodeName == null)
 		{
@@ -578,6 +583,8 @@ public class ECGParser
 		if (childNodes == null || childNodes.getLength() == 0)
 		{
 			logger.log(Level.WARNING, "Node " + parentNode.getNodeName() + " does not have any childNodes.");
+			
+			throw new PropertyException("Node " + parentNode.getNodeName() + " does not have any childNodes.");
 		}
 
 		for (int i = 0; i < childNodes.getLength(); i++)
@@ -611,7 +618,7 @@ public class ECGParser
 
 		if (node.getFirstChild() == null)
 		{
-			logger.log(Level.INFO, "Missing value for element " + node.getNodeName());
+			logger.log(ECGLevel.PACKET, "Missing value for element " + node.getNodeName());
 			
 			return null;
 			
@@ -621,13 +628,13 @@ public class ECGParser
 
 		if (value == null || value.equals(""))
 		{
-			logger.log(Level.INFO, "Missing value for element " + node.getNodeName());
+			logger.log(ECGLevel.PACKET, "Missing value for element " + node.getNodeName());
 
 			return null;
 			
 		}
 
-		logger.log(Level.INFO, "Found value " + value + " for element " + node.getNodeName());
+		logger.log(ECGLevel.PACKET, "Found value " + value + " for element " + node.getNodeName());
 
 		return value;
 	}

@@ -15,8 +15,8 @@ import javax.swing.border.LineBorder;
 
 import org.electrocodeogram.module.Module;
 import org.electrocodeogram.module.Module.ModuleType;
-import org.electrocodeogram.system.ISystemRoot;
-import org.electrocodeogram.system.SystemRoot;
+import org.electrocodeogram.system.ISystem;
+import org.electrocodeogram.system.Core;
 import org.electrocodeogram.ui.Gui;
 import org.electrocodeogram.ui.IGui;
 import org.electrocodeogram.ui.MenuManager;
@@ -106,7 +106,7 @@ public class ModuleGraph extends JGraph
 
 			public void mouseClicked(MouseEvent e)
 			{
-				ISystemRoot systemRoot = SystemRoot.getSystemInstance();
+				ISystem systemRoot = org.electrocodeogram.system.System.getInstance();
 
 				IGui gui = systemRoot.getGui();
 
@@ -125,7 +125,7 @@ public class ModuleGraph extends JGraph
 
 								_selected = mc.getId();
 
-								if (_selected == SystemRoot.getSystemInstance().getGui().getSourceModule())
+								if (_selected == org.electrocodeogram.system.System.getInstance().getGui().getSourceModule())
 								{
 									JOptionPane.showMessageDialog(getGui(), "You can not connect a module to itself.", "Connect Module", JOptionPane.ERROR_MESSAGE);
 								}
@@ -134,9 +134,9 @@ public class ModuleGraph extends JGraph
 									try
 									{
 
-										SystemRoot.getSystemInstance().getSystemModuleRegistry().getRunningModule(SystemRoot.getSystemInstance().getGui().getSourceModule()).connectReceiverModule(SystemRoot.getSystemInstance().getSystemModuleRegistry().getRunningModule(_selected));
+                                        org.electrocodeogram.system.System.getInstance().getModuleRegistry().getRunningModule(org.electrocodeogram.system.System.getInstance().getGui().getSourceModule()).connectReceiverModule(org.electrocodeogram.system.System.getInstance().getModuleRegistry().getRunningModule(_selected));
 
-										SystemRoot.getSystemInstance().getGui().exitModuleConnectionMode();
+                                        org.electrocodeogram.system.System.getInstance().getGui().exitModuleConnectionMode();
 									}
 									catch (Exception e1)
 									{
@@ -150,7 +150,7 @@ public class ModuleGraph extends JGraph
 					}
 					else if (e.getButton() == MouseEvent.BUTTON3)
 					{
-						SystemRoot.getSystemInstance().getGui().exitModuleConnectionMode();
+                        org.electrocodeogram.system.System.getInstance().getGui().exitModuleConnectionMode();
 					}
 
 				}
@@ -204,7 +204,7 @@ public class ModuleGraph extends JGraph
 
 			ModuleCell moduleCell = this._cellMap.get(new Integer(id));
 
-			if (module.isActive())
+			if (module.getState())
 			{
 				moduleCell.activate();
 			}

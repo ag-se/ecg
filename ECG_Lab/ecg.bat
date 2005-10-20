@@ -1,1 +1,1 @@
-java -jar ECGLab.jar --log-level info --log-file ECGLab.log -s module.setup
+java -jar ECGLab.jar --log-level verbose --log-file ECGLab.log -s module.setup -nogui
