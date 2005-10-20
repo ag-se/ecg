@@ -256,7 +256,7 @@ public class EventGenerator
         {
         case ACTIVITY:
 
-            args = new String[] { "add", this.randomStrings[line] };
+            args = new String[] { "add", this.randomStrings[line], this.randomStrings[line] };
 
             try {
                 eventPacket = new WellFormedEventPacket(0, createDate(true),
@@ -270,7 +270,7 @@ public class EventGenerator
 
         case BUFFTRANS:
 
-            args = new String[] { "add", this.randomStrings[line], this.randomStrings[line] };
+            args = new String[] { "add", this.randomStrings[line], this.randomStrings[line], this.randomStrings[line] };
 
             try {
                 eventPacket = new WellFormedEventPacket(0, createDate(true),
@@ -284,7 +284,7 @@ public class EventGenerator
 
         case BUILD:
 
-            args = new String[] { "add", this.randomStrings[line], this.randomStrings[line], this.randomStrings[line] };
+            args = new String[] { "add", this.randomStrings[line], this.randomStrings[line], this.randomStrings[line], this.randomStrings[line] };
 
             try {
                 eventPacket = new WellFormedEventPacket(0, createDate(true),
@@ -298,7 +298,7 @@ public class EventGenerator
 
         case CLI:
 
-            args = new String[] { "add", this.randomStrings[line], this.randomStrings[line], this.randomStrings[line], this.randomStrings[line] };
+            args = new String[] { "add", this.randomStrings[line], this.randomStrings[line], this.randomStrings[line], this.randomStrings[line], this.randomStrings[line] };
 
             try {
                 eventPacket = new WellFormedEventPacket(0, createDate(true), "CLI",
@@ -312,7 +312,7 @@ public class EventGenerator
 
         case COMMIT:
 
-            args = new String[] { "add", this.randomStrings[line], this.randomStrings[line], this.randomStrings[line], this.randomStrings[line], this.randomStrings[line], "" + line, "" + line, "" + line, this.randomStrings[line] };
+            args = new String[] { "add", this.randomStrings[line], this.randomStrings[line], this.randomStrings[line], this.randomStrings[line], this.randomStrings[line], this.randomStrings[line], "" + line, "" + line, "" + line, this.randomStrings[line] };
 
             try {
                 eventPacket = new WellFormedEventPacket(0, createDate(true),
@@ -326,7 +326,7 @@ public class EventGenerator
 
         case FILEMETRIC:
 
-            args = new String[] { "C:\\cvs\\foobarproject\\src\foo\\bar\\Bar.java", "foo.bar.Bar", "cbo=1,loc=2", "1049798488530" };
+            args = new String[] { this.randomStrings[line], "C:\\cvs\\foobarproject\\src\foo\\bar\\Bar.java", "foo.bar.Bar", "cbo=1,loc=2", "1049798488530" };
 
             try {
                 eventPacket = new WellFormedEventPacket(0, createDate(true),
@@ -340,7 +340,7 @@ public class EventGenerator
 
         case UNITTEST:
 
-            args = new String[] { this.randomStrings[line], this.randomStrings[line], "3", this.randomStrings[line], this.randomStrings[line] };
+            args = new String[] { this.randomStrings[line], this.randomStrings[line], this.randomStrings[line], "3", this.randomStrings[line], this.randomStrings[line] };
 
             try {
                 eventPacket = new WellFormedEventPacket(0, createDate(true),
