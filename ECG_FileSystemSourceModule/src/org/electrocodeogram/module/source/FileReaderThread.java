@@ -117,7 +117,7 @@ public class FileReaderThread extends Thread
 					
 					int beginOfCode = line.indexOf("![CDATA");
 					
-					_logger.log(Level.FINER, "Begin of a multiline Codechange event at index: " + beginOfCode);
+					_logger.log(Level.FINE, "Begin of a multiline Codechange event at index: " + beginOfCode);
 					
 					int endOfCode = 0;
 					
@@ -134,7 +134,7 @@ public class FileReaderThread extends Thread
 
 							endOfCode = line.lastIndexOf("</document>");
 							
-							_logger.log(Level.FINER, "Codechange event complete at index: " + endOfCode);
+							_logger.log(Level.FINE, "Codechange event complete at index: " + endOfCode);
 							
 							break;
 						}
