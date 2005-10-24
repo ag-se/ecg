@@ -34,8 +34,8 @@ import org.electrocodeogram.logging.LogHelper;
 import org.electrocodeogram.module.Module;
 import org.electrocodeogram.module.ModuleDescriptor;
 import org.electrocodeogram.module.Module.ModuleType;
-import org.electrocodeogram.module.registry.ModuleClassException;
-import org.electrocodeogram.module.registry.ModuleInstanceException;
+import org.electrocodeogram.module.registry.ModulePackageNotFoundException;
+import org.electrocodeogram.module.registry.ModuleInstanceNotFoundException;
 import org.electrocodeogram.module.registry.ModuleRegistry;
 import org.electrocodeogram.module.registry.ModuleSetupLoadException;
 import org.electrocodeogram.module.registry.ModuleSetupStoreException;
@@ -417,9 +417,9 @@ public class Gui extends JFrame implements IGui
 
 			try
 			{
-				text = org.electrocodeogram.system.System.getInstance().getModuleRegistry().getRunningModule(id).getDetails();
+				text = org.electrocodeogram.system.System.getInstance().getModuleRegistry().getModule(id).getDetails();
 			}
-			catch (ModuleInstanceException e)
+			catch (ModuleInstanceNotFoundException e)
 			{
 				JOptionPane.showMessageDialog(this, e.getMessage(), "Module Details", JOptionPane.ERROR_MESSAGE);
 			}
@@ -448,7 +448,7 @@ public class Gui extends JFrame implements IGui
 			JOptionPane.showMessageDialog(this, moduleDescriptor.getDescription(), "Module Description", JOptionPane.INFORMATION_MESSAGE);
 
 		}
-		catch (ModuleClassException e)
+		catch (ModulePackageNotFoundException e)
 		{
 			JOptionPane.showMessageDialog(this, e.getMessage(), "Module Description", JOptionPane.ERROR_MESSAGE);
 		}
@@ -601,7 +601,7 @@ public class Gui extends JFrame implements IGui
 			ModuleLabel btnModule = new ModuleLabel(
 					moduleDescriptor.getName(), moduleDescriptor.getId());
 
-			switch (moduleDescriptor.get_moduleType())
+			switch (moduleDescriptor.getModuleType())
 			{
 				case SOURCE_MODULE:
 
@@ -696,7 +696,7 @@ public class Gui extends JFrame implements IGui
 					{
 						try
 						{
-                            org.electrocodeogram.system.System.getInstance().getModuleRegistry().createRunningModule(ModuleLabel.this._id, ModuleLabel.this._name);
+                            org.electrocodeogram.system.System.getInstance().getModuleRegistry().createModule(ModuleLabel.this._id, ModuleLabel.this._name);
 						}
 						catch (Exception e1)
 						{

@@ -1,3 +1,9 @@
+/*
+ * Class: ModuleClassLoaderInitializationException
+ * Version: 1.0
+ * Date: 18.10.2005
+ * By: Frank@Schlesinger.com
+ */
 
 package org.electrocodeogram.module.classloader;
 
@@ -7,30 +13,42 @@ import java.util.logging.Logger;
 import org.electrocodeogram.logging.LogHelper;
 
 /**
- * This Exception can be thrown during the initialization of the module classes.
- * It tells that something went wrong while the ModuleRegistry tried to load
- * module classes from themodule directory. 
+ * This <code>Exception</code> is thrown during the initialization
+ * of the {@link ModuleClassLoaderInitializationException} if any
+ * error occured.
  */
-public class ModuleClassLoaderInitializationException extends Exception
-{
+public class ModuleClassLoaderInitializationException extends Exception {
 
-	private static Logger _logger = LogHelper.createLogger(ModuleClassLoaderInitializationException.class.getName());
+    /**
+     * This is the logger.
+     */
+    private static Logger logger = LogHelper
+        .createLogger(ModuleClassLoaderInitializationException.class.getName());
 
- 
+    /**
+     * This is the <em>Serialization</em> id.
+     */
     private static final long serialVersionUID = 3786132315837665255L;
 
     /**
-     * This creates the Exception with the given message.
-     * @param message Is the message for the Exception
+     * This creates the <code>Exception</code> with the given
+     * message.
+     * @param message
+     *            Is the message for the Exception
      */
-    public ModuleClassLoaderInitializationException(String message)
-    {
+    public ModuleClassLoaderInitializationException(final String message) {
         super(message);
-        
-        _logger.log(Level.WARNING, "An ModuleClassLoaderInitializationException occured");
 
-		_logger.log(Level.WARNING, this.getMessage());
+        logger.entering(this.getClass().getName(),
+            "ModuleClassLoaderInitializationException", new Object[] {message});
+
+        logger.log(Level.WARNING,
+            "A ModuleClassLoaderInitializationException has occured.");
+
+        logger.log(Level.WARNING, this.getMessage());
+
+        logger.entering(this.getClass().getName(),
+            "ModuleClassLoaderInitializationException");
     }
 
- 
 }

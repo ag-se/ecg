@@ -134,7 +134,7 @@ public class ModuleGraph extends JGraph
 									try
 									{
 
-                                        org.electrocodeogram.system.System.getInstance().getModuleRegistry().getRunningModule(org.electrocodeogram.system.System.getInstance().getGui().getSourceModule()).connectReceiverModule(org.electrocodeogram.system.System.getInstance().getModuleRegistry().getRunningModule(_selected));
+                                        org.electrocodeogram.system.System.getInstance().getModuleRegistry().getModule(org.electrocodeogram.system.System.getInstance().getGui().getSourceModule()).connectReceiverModule(org.electrocodeogram.system.System.getInstance().getModuleRegistry().getModule(_selected));
 
                                         org.electrocodeogram.system.System.getInstance().getGui().exitModuleConnectionMode();
 									}

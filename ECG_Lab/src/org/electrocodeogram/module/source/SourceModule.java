@@ -1,3 +1,10 @@
+/*
+ * Class: SourceModule
+ * Version: 1.0
+ * Date: 19.10.2005
+ * By: Frank@Schlesinger.com
+ */
+
 package org.electrocodeogram.module.source;
 
 import java.util.logging.Level;
@@ -9,148 +16,194 @@ import org.electrocodeogram.event.WellFormedEventPacket;
 import org.electrocodeogram.logging.LogHelper;
 import org.electrocodeogram.logging.LogHelper.ECGLevel;
 import org.electrocodeogram.module.Module;
-import org.electrocodeogram.system.Core;
 
 /**
- * This is the abstract class SourceModule that shall be subclassed
- * by all source modules. The abstract method startReader is to be implemented
- * in the actual source module.
- * It shall create an object that is able to receive and read ValidEventPacket
- * objects. Every read event shall then be passed back to this module's append
- * method. 
+ * This is the superclass for all
+ * {@link org.electrocodeogram.module.Module.ModuleType#SOURCE_MODULE}
+ * implementations.
  */
-public abstract class SourceModule extends Module
-{
+public abstract class SourceModule extends Module {
 
-	private static Logger _logger = LogHelper.createLogger(SourceModule.class.getName());
+    /**
+     * This is this class' logger.
+     */
+    private static Logger logger = LogHelper.createLogger(SourceModule.class
+        .getName());
 
+    /**
+     * Creates the <em>SourceModule</em>.
+     * @param id
+     *            Is the id of the <em>ModulePackage</em>
+     * @param name
+     *            Is the name to assign to this module
+     */
+    public SourceModule(final String id, final String name) {
+        super(ModuleType.SOURCE_MODULE, id, name);
 
-	/**
-	 * This creates the SourceModule.
-	 * @param moduleClassId Is the id of the module's class as defined in the ModuleRegistry
-	 * @param name Is the name given to this module instance
-	 */
-	public SourceModule(String moduleClassId, String name)
-	{
-		super(ModuleType.SOURCE_MODULE, moduleClassId, name);
+        logger.entering(this.getClass().getName(), "SourceModule",
+            new Object[] {id, name});
 
-		_logger.entering(this.getClass().getName(), "SourceModule");
+        logger.exiting(this.getClass().getName(), "SourceModule");
 
-		_logger.exiting(this.getClass().getName(), "SourceModule");
+        initialize();
+    }
 
-		initialize();
-	}
+    /**
+     * This method is called during module activation and starts the
+     * {@link EventReader} of this <em>SourceModule</em>.
+     */
+    public final void startReader() {
 
-	/**
-	 * This method shall create an object able to read in ValidEventPacket objects.
-	 * For example one could implement a reader that reads ValidEventPackets from
-	 * a text-file or one could implement a server that receives ValidEventPackets
-	 * from different client sources.
-	 * The reader must call the SourceModule's append method to pass read/received
-	 * ValidEventPackets to the module.
-	 * This method is called during SourceModule's
-	 * creation and the parameter is passed as a reference back to the SourceModule
-	 * itself.
-	 * @param sourceModule Is the backward reference to the SourceModule 
-	 */
-	public abstract void startReader(SourceModule sourceModule) throws SourceModuleException;
+        logger.entering(this.getClass().getName(), "startReader");
 
-	/**
-	 * This method is used to decalare whether event data that does not conform to
-	 * a ECG MicroSensorDataType is allowed to pass validation.
-	 * A value of "false" is ignored if the value for allowing non HackyStat conform
-	 * event data is set to "true".
-	 * @param allowNonECGmSDTConformEvents Is "true" if event data that does not conform to
-	 * a ECG MicroSensorDataType is allowed and "false" if not
-	 */
-	public void setAllowNonECGmSDTConformEvents(boolean allowNonECGmSDTConformEvents)
-	{
-		_logger.entering(this.getClass().getName(), "setAllowNonECGmSDTConformEvents");
+        preStart();
 
-		//this.eventValidator.setAllowNonECGmSDTConformEvents(allowNonECGmSDTConformEvents);
+        EventReader[] eventReader = getEventReader();
 
-		_logger.exiting(this.getClass().getName(), "setAllowNonECGmSDTConformEvents");
-	}
+        if (eventReader == null || eventReader.length == 0) {
 
-	/**
-	 * This method is used to declare whether event data that does not conform to
-	 * a HackyStat SensorDataType is allowed to pass validation.
-	 * @param allowNonHackyStatSDTConformEvents Is "true" if event data that does not conform to
-	 * a HackyStat SensorDataType is allowed and "false" if not
-	 */
+            logger.log(Level.FINE, "There are no EventReader in SourceModule "
+                                   + this.getName());
 
-	public void setAllowNonHackyStatSDTConformEvents(boolean allowNonHackyStatSDTConformEvents)
-	{
-		_logger.entering(this.getClass().getName(), "setAllowNonHackyStatSDTConformEvents");
+            logger.exiting(this.getClass().getName(), "startReader");
 
-		//this.eventValidator.setAllowNonHackyStatSDTConformEvents(allowNonHackyStatSDTConformEvents);
+            return;
+        }
 
-		_logger.exiting(this.getClass().getName(), "setAllowNonHackyStatSDTConformEvents");
-	}
+        for (EventReader reader : eventReader) {
+            reader.startReader();
+        }
 
-	/**
-	 * 
-	 *
-	 */
-	public abstract void stopReader();
+        logger.log(Level.INFO,
+            eventReader.length
+                            + "EventReader have been started for SourceModule "
+                            + this.getName());
 
-	/**
-	 * This method is called by the reader implementation to pass over read or
-	 * received ValidEventPackets to this SourceModule.
-	 * @param eventPacket Is the received or read event
-	 */
-	public void append(WellFormedEventPacket eventPacket)
-	{
-		_logger.entering(this.getClass().getName(), "append");
+        logger.exiting(this.getClass().getName(), "startReader");
+    }
 
-		if (eventPacket == null)
-		{
-			_logger.log(Level.WARNING, "Parameter eventPacket is null. Ignoring event.");
+    /**
+     * This is called when the module is deactivated. It stops all
+     * running {@link EventReader}.
+     */
+    public final void stopReader() {
 
-			return;
-		}
+        logger.entering(this.getClass().getName(), "stopReader");
 
-		ValidEventPacket validEventPacket = null;
-		
-		try
-		{
-			validEventPacket = new ValidEventPacket(this.getId(),eventPacket.getTimeStamp(),eventPacket.getSensorDataType(),eventPacket.getArglist());
-			
-			_logger.log(Level.INFO,"An event has been appended to the SourceModule: " + this.getName());
-			
-			_logger.log(ECGLevel.PACKET,validEventPacket.toString());
-		}
-		catch (IllegalEventParameterException e)
-		{
-			_logger.log(Level.WARNING, "An Exception occured while appending an event to the SourceModule: " + this.getName());
-		}
+        EventReader[] eventReader = getEventReader();
 
-		if (validEventPacket != null)
-		{
-			sendEventPacket(validEventPacket);
-		}
+        if (eventReader == null || eventReader.length == 0) {
 
-		_logger.exiting(this.getClass().getName(), "append");
-	}
+            logger.log(Level.FINE, "There are no EventReader in SourceModule "
+                                   + this.getName());
 
-	/**
-	 * This method is not implemented for a SourceModule.
-	 * @param eventPacket not used
-	 */
-	@Override
-	public final void receiveEventPacket(@SuppressWarnings("unused")
-	ValidEventPacket eventPacket)
-	{
-		_logger.entering(this.getClass().getName(), "receiveEventPacket");
+            logger.exiting(this.getClass().getName(), "stopReader");
 
-		_logger.exiting(this.getClass().getName(), "receiveEventPacket");
+            postStop();
 
-		return;
-	}
+            return;
+        }
 
-	/**
-	 * @see org.electrocodeogram.module.Module#initialize()
-	 */
-	@Override
-	public abstract void initialize();
+        for (EventReader reader : eventReader) {
+            reader.stopReader();
+        }
+
+        logger.log(Level.INFO,
+            eventReader.length
+                            + "EventReader have been stopped for SourceModule "
+                            + this.getName());
+
+        postStop();
+
+        logger.exiting(this.getClass().getName(), "stopReader");
+    }
+
+    /**
+     * This method is called by the {@link EventReader} implementation
+     * to pass read or received
+     * {@link org.electrocodeogram.event.ValidEventPacket} events to
+     * this <em>SourceModule</em>.
+     * @param eventPacket
+     *            Is the read event
+     */
+    protected final void append(final WellFormedEventPacket eventPacket) {
+        logger.entering(this.getClass().getName(), "append",
+            new Object[] {eventPacket});
+
+        if (eventPacket == null) {
+            logger.log(Level.WARNING,
+                "Parameter \"eventPacket\" is null. Ignoring event.");
+
+            logger.exiting(this.getClass().getName(), "append");
+
+            return;
+        }
+
+        ValidEventPacket validEventPacket = null;
+
+        try {
+            validEventPacket = new ValidEventPacket(this.getId(), eventPacket
+                .getTimeStamp(), eventPacket.getSensorDataType(), eventPacket
+                .getArglist());
+
+            logger.log(Level.INFO,
+                "An event has been appended to the SourceModule: "
+                                + this.getName());
+
+            logger.log(ECGLevel.PACKET, validEventPacket.toString());
+        } catch (IllegalEventParameterException e) {
+            logger.log(Level.WARNING,
+                "An Exception occured while appending an event to the SourceModule: "
+                                + this.getName());
+        }
+
+        if (validEventPacket != null) {
+            sendEventPacket(validEventPacket);
+        }
+
+        logger.exiting(this.getClass().getName(), "append");
+    }
+
+    /**
+     * This method is not implemented for a <em>SourceModule</em>.
+     * @param eventPacket
+     *            not used
+     */
+    @Override
+    public final void receiveEventPacket(@SuppressWarnings("unused")
+    final ValidEventPacket eventPacket) {
+        logger.entering(this.getClass().getName(), "receiveEventPacket",
+            new Object[] {eventPacket});
+
+        logger.exiting(this.getClass().getName(), "receiveEventPacket");
+
+        return;
+    }
+
+    /**
+     * @see org.electrocodeogram.module.Module#initialize()
+     */
+    @Override
+    public abstract void initialize();
+
+    /**
+     * This is to be implemented by all actual <em>SourceMosules</em>.
+     * It returns the module's {@link EventReader}.
+     * @return The module's {@link EventReader}
+     */
+    public abstract EventReader[] getEventReader();
+
+    /**
+     * This is to be implemented by all actual <em>SourceMosules</em>.
+     * It is called during module activation before the
+     * {@link EventReader} are started.
+     */
+    public abstract void preStart();
+
+    /**
+     * This is to be implemented by all actual <em>SourceMosules</em>.
+     * It is called during module deactivation after the
+     * {@link EventReader} are stopped.
+     */
+    public abstract void postStop();
 }

@@ -1,3 +1,10 @@
+/*
+ * Class: ModuleClassLoader
+ * Version: 1.0
+ * Date: 18.10.2005
+ * By: Frank@Schlesinger.com
+ */
+
 package org.electrocodeogram.module.classloader;
 
 import java.io.File;
@@ -9,226 +16,235 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.electrocodeogram.logging.LogHelper;
-import org.electrocodeogram.system.Core;
 
 /**
- * The ModuleClassLoader is able to load classes directly from a
- * given location in the file system, which should be the
- * module directory.
- * So the ModuleClassLoader makes it possible to have modules loaded
- * from locations that are not in the classpath.
- *
+ * The <em>ModuleClassLoader</em> is able to load <code>Class</code>
+ * files directly from a given location in the file system, which is
+ * be the module directory.
  */
-public class ModuleClassLoader extends java.lang.ClassLoader
-{
+public class ModuleClassLoader extends java.lang.ClassLoader {
 
-	private static Logger _logger = LogHelper.createLogger(ModuleClassLoader.class.getName());
+    /**
+     * Thisis the logger.
+     */
+    private static Logger logger = LogHelper
+        .createLogger(ModuleClassLoader.class.getName());
 
-	private static ArrayList<String> _moduleClassPaths;
+    /**
+     * This is a list of known <em>ModulePackage</em> pathes.
+     */
+    private static ArrayList<String> moduleClassPaths;
 
-	private static ModuleClassLoader _theInstance;
+    /**
+     * A refernce to the instance.
+     */
+    private static ModuleClassLoader theInstance;
 
-	/**
-	 * This creates the ModuleClassLoader and sets the given ClassLoader to be the parent
-	 * ClassLoader oh the ModuleClassLoader in the ClassLoader hierarchy.
-	 * @param cl Is the parent ClassLoader
-	 */
-	public ModuleClassLoader(ClassLoader cl)
-	{
-		super(cl);
+    /**
+     * This creates the <em>ModuleClassLoader</em> and sets the
+     * given <code>ClassLoader</code> to be its parent.
+     * @param loader
+     *            Is the parent <code>ClassLoader</code>
+     */
+    public ModuleClassLoader(final ClassLoader loader) {
+        super(loader);
 
-		_logger.entering(this.getClass().getName(), "ModuleClassLoader");
+        logger.entering(this.getClass().getName(), "ModuleClassLoader",
+            new Object[] {loader});
 
-		_logger.exiting(this.getClass().getName(), "ModuleClassLoader");
-	}
+        logger.exiting(this.getClass().getName(), "ModuleClassLoader");
+    }
 
-	/**
-	 * @see java.lang.ClassLoader#findClass(java.lang.String)
-	 * 
-	 * This method loads classes from the given path to the file system.
-	 */
-	@Override
-	protected Class<?> findClass(String className)
-	{
-		_logger.entering(this.getClass().getName(), "findClass");
+    /**
+     * @see java.lang.ClassLoader#findClass(java.lang.String)
+     */
+    @Override
+    protected final Class<?> findClass(final String className) {
+        logger.entering(this.getClass().getName(), "findClass",
+            new Object[] {className});
 
-		if (className == null)
-		{
-			_logger.log(Level.WARNING, "className is null");
+        if (className == null) {
+            logger.log(Level.WARNING, "The parameter \"className\" is null");
 
-			return null;
-		}
+            logger.exiting(this.getClass().getName(), "findClass", null);
 
-		Class<?> toReturn = null;
+            return null;
+        }
 
-		if (_moduleClassPaths == null)
-		{
-			_logger.log(Level.SEVERE, "No module class paths are defined.");
+        Class<?> toReturn = null;
 
-			return null;
-		}
+        if (moduleClassPaths == null) {
+            logger.log(Level.SEVERE, "No module class paths are defined.");
 
-		String normalizedClassName = getNormalizedClassName(className);
+            logger.exiting(this.getClass().getName(), "findClass", null);
 
-		if (normalizedClassName == null)
-		{
-			_logger.log(Level.SEVERE, "Class path is invalid: " + className);
+            return null;
+        }
 
-			return null;
-		}
+        String normalizedClassName = getNormalizedClassName(className);
 
-		File classFile = null;
+        if (normalizedClassName == null) {
+            logger.log(Level.SEVERE, "Class path is invalid: " + className);
+            logger.exiting(this.getClass().getName(), "findClass", null);
+            return null;
+        }
 
-		for (String moduleClassPath : _moduleClassPaths)
-		{
+        File classFile = null;
 
-			String pathToModuleClass = moduleClassPath + normalizedClassName + ".class";
+        for (String moduleClassPath : moduleClassPaths) {
 
-			classFile = new File(pathToModuleClass);
+            String pathToModuleClass = moduleClassPath + normalizedClassName
+                                       + ".class";
 
-			if (classFile.exists() && classFile.isFile())
-			{
-				_logger.log(Level.FINE, "Class is found here: " + classFile.getAbsolutePath());
+            classFile = new File(pathToModuleClass);
 
-				break;
-			}
-		}
+            if (classFile.exists() && classFile.isFile()) {
+                logger.log(Level.FINE, "Class is found here: "
+                                       + classFile.getAbsolutePath());
 
-		if (classFile == null)
-		{
-			_logger.log(Level.SEVERE, "The class could not be found: " + classFile);
+                break;
+            }
+        }
 
-			return null;
-		}
-		
-		FileInputStream fis = null;
+        if (classFile == null) {
+            logger.log(Level.SEVERE, "The class could not be found: "
+                                     + classFile);
+            logger.exiting(this.getClass().getName(), "findClass", null);
+            return null;
+        }
 
-		try
-		{
-			fis = new FileInputStream(classFile);
+        FileInputStream fis = null;
 
-			byte[] data = new byte[(int) classFile.length()];
+        try {
+            fis = new FileInputStream(classFile);
 
-			fis.read(data);
+            byte[] data = new byte[(int) classFile.length()];
 
-			try
-			{
-				toReturn = this.defineClass(null, data, 0, data.length);
+            fis.read(data);
 
-			}
-			catch (Error e)
-			{
-				_logger.log(Level.SEVERE, "Error while loading class: " + className);
+            try {
+                toReturn = this.defineClass(null, data, 0, data.length);
 
-				_logger.log(Level.FINEST, e.getMessage());
+            } catch (Error e) {
+                logger.log(Level.SEVERE, "Error while loading class: "
+                                         + className);
 
-			}
+                logger.log(Level.SEVERE, e.getMessage());
 
-			_logger.log(Level.INFO, "Successfully loaded module class: " + classFile.getName());
+            }
 
-		}
-		catch (IOException e)
-		{
+            logger.log(Level.INFO, "Successfully loaded module class: "
+                                   + classFile.getName());
 
-			_logger.log(Level.WARNING, "Error while loading module class: " + className);
+        } catch (IOException e) {
 
-			_logger.log(Level.FINEST, e.getMessage());
+            logger.log(Level.SEVERE, "Error while loading module class: "
+                                     + className);
 
-		}
-		finally
-		{
-			try
-			{
-				if (fis != null)
-				{
-					fis.close();
-				}
-			}
-			catch (IOException e)
-			{
-				_logger.log(Level.WARNING, "Error while closing the stream.");
-			}
-		}
+            logger.log(Level.SEVERE, e.getMessage());
 
-		if (toReturn == null)
-		{
-			_logger.log(Level.WARNING, "The class could not be found: " + className);
-		}
+        } finally {
+            try {
+                if (fis != null) {
+                    fis.close();
+                }
+            } catch (IOException e) {
+                logger.log(Level.SEVERE, "Error while closing the stream.");
+            }
+        }
 
-		_logger.exiting(this.getClass().getName(), "findClass");
+        if (toReturn == null) {
+            logger.log(Level.SEVERE, "The class could not be found: "
+                                     + className);
+        }
 
-		return toReturn;
-	}
+        logger.exiting(this.getClass().getName(), "findClass", toReturn);
 
-	private String getNormalizedClassName(String className)
-	{
-		_logger.entering(this.getClass().getName(), "getNormalizedClassName");
+        return toReturn;
+    }
 
-		if (className == null)
-		{
-			_logger.log(Level.WARNING, "className is null");
+    /**
+     * Converts the full qualified class name into a file system path.
+     * @param className
+     *            The full qualified class name
+     * @return A file system path
+     */
+    private String getNormalizedClassName(final String className) {
+        logger.entering(this.getClass().getName(), "getNormalizedClassName",
+            new Object[] {className});
 
-			return null;
-		}
+        if (className == null) {
+            logger.log(Level.WARNING, "The parameter \"className\" is null.");
 
-		StringTokenizer stringTokenizer = new StringTokenizer(className, ".");
+            logger.exiting(this.getClass().getName(), "getNormalizedClassName");
 
-		String normalizedClassName = "";
+            return null;
+        }
 
-		while (stringTokenizer.hasMoreTokens())
-		{
-			normalizedClassName += File.separator + stringTokenizer.nextToken();
+        StringTokenizer stringTokenizer = new StringTokenizer(className, ".");
 
-		}
+        String normalizedClassName = "";
 
-		_logger.exiting(this.getClass().getName(), "getNormalizedClassName");
+        while (stringTokenizer.hasMoreTokens()) {
+            normalizedClassName += File.separator + stringTokenizer.nextToken();
 
-		return normalizedClassName;
-	}
+        }
 
-	/**
-	 * This method is used by the ModuleRegistry to add another module path
-	 * to the list of knon module paths.
-	 * @param moduleClassPath Is the new module path
-	 */
-	public static void addModuleClassPath(String moduleClassPath)
-	{
-		_logger.entering(ModuleClassLoader.class.getName(), "addModuleClassPath");
+        logger.exiting(this.getClass().getName(), "getNormalizedClassName");
 
-		if (moduleClassPath == null)
-		{
-			_logger.log(Level.WARNING, "moduleClassPath is null");
+        return normalizedClassName;
+    }
 
-			return;
-		}
+    /**
+     * This method is used by the
+     * {@link org.electrocodeogram.module.registry.ModuleRegistry} to
+     * add another <em>ModulePackage</em> path to the list.
+     * @param moduleClassPath
+     *            Is the <em>ModulePackage</em> path to add
+     */
+    public static final void addClassPath(final String moduleClassPath) {
+        logger.entering(ModuleClassLoader.class.getName(),
+            "addModuleClassPath", new Object[] {moduleClassPath});
 
-		if (_moduleClassPaths == null)
-		{
-			_moduleClassPaths = new ArrayList<String>();
-		}
+        if (moduleClassPath == null) {
+            logger.log(Level.WARNING,
+                "The parameter \"moduleClassPath\" is null.");
+            logger.exiting(ModuleClassLoader.class.getName(),
+                "addModuleClassPath");
+            return;
+        }
 
-		_moduleClassPaths.add(moduleClassPath);
+        if (moduleClassPaths == null) {
+            moduleClassPaths = new ArrayList<String>();
+        }
 
-		_logger.exiting(ModuleClassLoader.class.getName(), "addModuleClassPath");
+        moduleClassPaths.add(moduleClassPath);
 
-	}
+        logger.exiting(ModuleClassLoader.class.getName(), "addModuleClassPath");
 
-	public static ModuleClassLoader getInstance()
-	{
-		_logger.entering(ModuleClassLoader.class.getName(), "getInstance");
+    }
 
-		if (_theInstance == null)
-		{
-			Class clazz = org.electrocodeogram.system.System.getInstance().getClass();
+    /**
+     * This method is used to get an instance of the
+     * <em>ModuleClassLoader</em>.
+     * @return An instance of this class
+     */
+    public static ModuleClassLoader getInstance() {
+        logger.entering(ModuleClassLoader.class.getName(), "getInstance");
 
-			ClassLoader currentClassLoader = clazz.getClassLoader();
+        if (theInstance == null) {
+            Class clazz = org.electrocodeogram.system.System.getInstance()
+                .getClass();
 
-			_theInstance = new ModuleClassLoader(currentClassLoader);
-		}
+            ClassLoader currentClassLoader = clazz.getClassLoader();
 
-		_logger.exiting(ModuleClassLoader.class.getName(), "getInstance");
+            theInstance = new ModuleClassLoader(currentClassLoader);
+        }
 
-		return _theInstance;
-	}
+        logger.exiting(ModuleClassLoader.class.getName(), "getInstance",
+            theInstance);
+
+        return theInstance;
+    }
 
 }

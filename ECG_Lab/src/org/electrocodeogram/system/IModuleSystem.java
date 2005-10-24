@@ -11,7 +11,7 @@ import javax.swing.JFrame;
 
 import org.electrocodeogram.module.Module;
 import org.electrocodeogram.module.ModuleDescriptor;
-import org.electrocodeogram.module.registry.ModuleClassException;
+import org.electrocodeogram.module.registry.ModulePackageNotFoundException;
 import org.electrocodeogram.msdt.MicroSensorDataType;
 import org.electrocodeogram.msdt.registry.MicroSensorDataTypeRegistrationException;
 
@@ -49,12 +49,12 @@ public interface IModuleSystem {
      * @param id
      *            Is the unique String id of the available module
      * @return The ModuleDescriptor object of an available module
-     * @throws ModuleClassException
+     * @throws ModulePackageNotFoundException
      *             If the given String id is empty or if an availabale
      *             module with the given String id can not be found
      */
 
-    ModuleDescriptor getModuleDescriptor(String id) throws ModuleClassException;
+    ModuleDescriptor getModuleDescriptor(String id) throws ModulePackageNotFoundException;
 
     /**
      * This method is used by modules that need to reference the ECG

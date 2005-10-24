@@ -23,7 +23,7 @@ import javax.swing.event.ChangeListener;
 
 import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.event.ValidEventPacket.DELIVERY_STATE;
-import org.electrocodeogram.module.registry.ModuleInstanceException;
+import org.electrocodeogram.module.registry.ModuleInstanceNotFoundException;
 import org.electrocodeogram.system.Core;
 import org.electrocodeogram.ui.modules.ModuleGraph;
 
@@ -174,18 +174,18 @@ public class EventWindow extends JFrame implements IEventTarget
 				if (this._guiWriter.get_deliveryState().equals(DELIVERY_STATE.SENT))
 				{
 
-					this._titledBorder.setTitle(MODULE_SELECTED_AND_SENT + org.electrocodeogram.system.System.getInstance().getModuleRegistry().getRunningModule(moduleId).getName());
+					this._titledBorder.setTitle(MODULE_SELECTED_AND_SENT + org.electrocodeogram.system.System.getInstance().getModuleRegistry().getModule(moduleId).getName());
 
 				}
 				else
 				{
-					this._titledBorder.setTitle(MODULE_SELECTED_AND_RECEIVED + org.electrocodeogram.system.System.getInstance().getModuleRegistry().getRunningModule(moduleId).getName());
+					this._titledBorder.setTitle(MODULE_SELECTED_AND_RECEIVED + org.electrocodeogram.system.System.getInstance().getModuleRegistry().getModule(moduleId).getName());
 				}
 
 			}
 			repaint();
 		}
-		catch (ModuleInstanceException e)
+		catch (ModuleInstanceNotFoundException e)
 		{
 			JOptionPane.showMessageDialog(org.electrocodeogram.system.System.getInstance().getMainWindow(), e.getMessage(), "Module Selection", JOptionPane.ERROR_MESSAGE);
 		}

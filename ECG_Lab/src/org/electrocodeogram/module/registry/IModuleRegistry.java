@@ -1,3 +1,10 @@
+/*
+ * Class: IModuleRegistry
+ * Version: 1.0
+ * Date: 18.10.2005
+ * By: Frank@Schlesinger.com
+ */
+
 package org.electrocodeogram.module.registry;
 
 import java.io.File;
@@ -7,78 +14,91 @@ import org.electrocodeogram.module.ModuleDescriptor;
 import org.electrocodeogram.module.classloader.ModuleClassLoaderInitializationException;
 
 /**
- * This interfce declares methods that are used to access information about
- * available modules and running modules and to create new running modules from
- * available modules. This interface is used by other ECG system components and
- * can be refernced by a call to
- * SystemRoot.getSystemInstance().getModuleRegistry()
+ * This <code>Interface</code> contains methods that are used to
+ * access information about available <em>ModulePackagaes</em> and
+ * running {@link org.electrocodeogram.module.Module} instances. It is
+ * also used to create new running module instances from
+ * <em>ModulePackages</em>.
  */
-public interface IModuleRegistry
-{
+public interface IModuleRegistry {
 
-	/**
-	 * This method returns the unique String IDs of all currently known module
-	 * class files that are available in the module directory.
-	 * 
-	 * @return The IDs of all currently known module class files
-	 */
-	public abstract String[] getAvailableModuleIds();
+    /**
+     * This method returns the unique <code>String</code> ids of all currently
+     * known <em>ModulePackages</em>.
+     * @return The ids of all <em>ModulePackages</em>
+     */
+    String[] getAvailableModuleIds();
 
-	/**
-	 * This method returns the running module with the given int id.
-	 * 
-	 * @param id
-	 *            Is the unique int id of the running module to return
-	 * @return The desired running module instance
-	 * @throws ModuleInstanceException
-	 *             If the given int id is illegal (id < 0) or if a running
-	 *             module with the given id can not be found
-	 */
-	public abstract Module getRunningModule(int id) throws ModuleInstanceException;
+    /**
+     * This method returns the module instance with the given uniique int id.
+     * @param id
+     *            Is the unique int id of the module instance to return
+     * @return The desired module instance
+     * @throws ModuleInstanceNotFoundException
+     *             If the given unique int id is illegal (id < 0) or if a
+     *             module instance with the given id can not be found
+     */
+    Module getModule(int id) throws ModuleInstanceNotFoundException;
 
-	/**
-	 * This method takes the unique String id of a available module and returns
-	 * a new running module instance of it. It also gives the running module the
-	 * provided name.
-	 * 
-	 * @param id
-	 *            Is the unique String id of the available module class to
-	 *            create the running module from
-	 * @param name
-	 *            Is the name that should be given to the new running module
-	 * @return Is hte unique int id that is assigned to the module
-	 * @throws ModuleInstantiationException
-	 *             If an Exception is thrown during the instanciation of the
-	 *             module
-	 * @throws ModuleClassException
-	 *             If the given String id is empty or if an availabale module
-	 *             with the given String id can not be found
-	 */
-	public abstract int createRunningModule(String id, String name) throws ModuleInstantiationException, ModuleClassException;
+    /**
+     * This method takes the unique <code>String</code> id of a <em>ModulePackage</em>
+     * and returns a new module instance from it. It also assignes  the given name to
+     * the module instance.
+     * @param id
+     *            Is the unique <code>String</code> id of <em>ModulePackage</em>
+     * @param name
+     *            Is the name that should be given to the new module instance
+     * @return The unique int id that is assigned to the module during creation
+     * @throws ModuleInstantiationException
+     *             If an <code>Exception</code> occures during the instanciation
+     *             of the module
+     * @throws ModulePackageNotFoundException
+     *             If the given <code>String</code> id is empty or if an <em>ModulePackage</em>
+     *             with the given id can not be found
+     */
+    int createModule(String id, String name)
+        throws ModuleInstantiationException, ModulePackageNotFoundException;
 
-	/**
-	 * The method returns the ModuleDescriptor object of an available module.
-	 * The ModuleDescriptor contains the information that was provided with the
-	 * module in its "module.properties.xml" file.
-	 * 
-	 * @param id
-	 *            Is the unique String id of the available module
-	 * @return The ModuleDescriptor object of an available module
-	 * @throws ModuleClassException
-	 *             If the given String id is empty or if an availabale module
-	 *             with the given String id can not be found
-	 */
-	public abstract ModuleDescriptor getModuleDescriptor(String id) throws ModuleClassException;
+    /**
+     * The method returns the {@link ModuleDescriptor} of a <em>ModulePackage</em>.
+     * The <em>ModuleDescriptor</em> contains the information that has been
+     * provided with the module in its <em>"module.properties.xml"</em> file.
+     * @param id
+     *            Is the unique <code>String</code> id <em>ModulePackage</em>
+     * @return The <em>ModuleDescriptor</em> of the <em>ModulePackage</em>
+     * @throws ModulePackageNotFoundException
+     *             If the given <code>String</code> id is empty or if a
+     *             <em>ModulePackage</em> with the given id can not be found
+     */
+    ModuleDescriptor getModuleDescriptor(String id)
+        throws ModulePackageNotFoundException;
 
-	/**
-	 * This method stores the current module setup as configured in the ECG's GUI
-	 * into the given File.
-	 * @param file Is the File to store the module setup in
-	 * @throws ModuleSetupStoreException If an Exception occures during the storing
-	 */
-	public abstract void storeModuleSetup(File file) throws ModuleSetupStoreException;
-	
-	public abstract void loadModuleSetup(File file) throws ModuleSetupLoadException;
-	
-	public abstract void setModuleDirectory(File moduleDirectory) throws ModuleClassLoaderInitializationException;
+    /**
+     * This method stores the current <em>ModuleSetup</em> as configured in
+     * the ECG Lab into the given <code>File</code>.
+     * @param file
+     *            Is the <code>File</code> to store the <em>ModuleSetup</em> in
+     * @throws ModuleSetupStoreException
+     *             If an <code>Exception</code> occures during the storing
+     */
+    void storeModuleSetup(File file) throws ModuleSetupStoreException;
+
+    /**
+     * This method loads at <em>ModuleSetup</em> from the given <code>File</code>
+     * into the ECG Lab.
+     * @param file
+     *            Is the <code>File</code> to load the <em>ModuleSetup</em> from
+     * @throws ModuleSetupLoadException
+     *             If an <code>Exception</code> occures during the loading
+     */
+    void loadModuleSetup(File file) throws ModuleSetupLoadException;
+
+    /**
+     * This method tells the <em>ModuleRegistry</em> where to look for
+     * <em>ModulePackages</em>.
+     * @param moduleDirectory Is the directory to look for <em>ModulePackages</em>
+     * @throws ModuleClassLoaderInitializationException If an <code>Exception</code> occures while initializing the {@link org.electrocodeogram.module.classloader.ModuleClassLoader}
+     */
+    void setModuleDirectory(File moduleDirectory)
+        throws ModuleClassLoaderInitializationException;
 }

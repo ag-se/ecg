@@ -300,6 +300,12 @@
 			<fileset dir="." includes="ecg.bat" />
 
 		</copy>
+		
+		<copy todir="${dist.dir}/application/">
+
+			<fileset dir="." includes="pipe.setup" />
+
+		</copy>
 
 		<copy todir="${dist.dir}/application/modules/">
 
@@ -307,6 +313,13 @@
 
 		</copy>
 
+		<copy todir="${dist.dir}/application/">
+
+			<fileset dir="." includes="socket.setup" />
+
+		</copy>
+
+		
 		<copy todir="${dist.dir}/application/msdt/">
 
 			<fileset dir="${msdt.dir}"/>

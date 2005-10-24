@@ -17,8 +17,7 @@ import org.electrocodeogram.test.module.TestModule;
  * connect itself to the end of each module collection and wait for incoming events
  * to proof.  
  */
-public class ModuleTestHelper
-{
+public class ModuleTestHelper {
 
     private Module _lastModule;
 
@@ -31,25 +30,23 @@ public class ModuleTestHelper
     private int _receivedCount;
 
     private MockSourceModule _rootModule;
-    
+
     private MockTargetModule _leafModule;
 
     /**
      * This creates the class as a module. 
      */
-    public ModuleTestHelper()
-    {
-     
-    	this._rootModule = new MockSourceModule();
-    	
-    	this._rootModule.setAllowNonECGmSDTConformEvents(true);
-    	
-    	this._leafModule = new MockTargetModule(this);
-    	
+    public ModuleTestHelper() {
+
+        this._rootModule = new MockSourceModule();
+
+        //this._rootModule.setAllowNonECGmSDTConformEvents(true);
+
+        this._leafModule = new MockTargetModule(this);
+
     }
 
-    private void removeConnectedModules(Module node)
-    {
+    private void removeConnectedModules(Module node) {
         Module[] connectedModules = node.getReceivingModules();
 
         for (Module module : connectedModules) {
@@ -66,31 +63,30 @@ public class ModuleTestHelper
      * @throws ModuleConnectionException If something goes wrong during conection of the modules
      * @throws ModuleActivationException 
      */
-    public void makeModuleList(int length) throws ModuleConnectionException, ModuleActivationException
-    {
+    public void makeModuleList(int length) throws ModuleConnectionException,
+        ModuleActivationException {
 
         for (int i = 0; i < length; i++) {
 
             Module next = new TestModule();
-            
+
             if (i == 0) {
 
                 this._rootModule.connectReceiverModule(next);
-            }
-            else {
+            } else {
 
                 this._lastModule.connectReceiverModule(next);
             }
 
             next.activate();
-            
+
             this._lastModule = next;
         }
 
         this._lastModule.connectReceiverModule(this._leafModule);
-        
+
         this._rootModule.activate();
-        
+
         this._leafModule.activate();
     }
 
@@ -100,17 +96,17 @@ public class ModuleTestHelper
      * @throws ModuleConnectionException If something goes wrong during conection of the modules
      * @throws ModuleActivationException 
      */
-    public void makeModuleBinTree() throws ModuleConnectionException, ModuleActivationException
-    {
+    public void makeModuleBinTree() throws ModuleConnectionException,
+        ModuleActivationException {
 
         Module leftChild = new TestModule();
-        
+
         leftChild.activate();
 
         Module rightChild = new TestModule();
 
         rightChild.activate();
-        
+
         this._rootModule.connectReceiverModule(leftChild);
 
         this._rootModule.connectReceiverModule(rightChild);
@@ -118,21 +114,21 @@ public class ModuleTestHelper
         Module leftleftChild = new TestModule();
 
         leftleftChild.activate();
-        
+
         Module leftrightChild = new TestModule();
 
         leftrightChild.activate();
-        
+
         Module rightleftChild = new TestModule();
 
         rightleftChild.activate();
-        
+
         Module rightrightChild = new TestModule();
 
         rightrightChild.activate();
-        
+
         leftChild.connectReceiverModule(leftleftChild);
-        
+
         leftChild.connectReceiverModule(leftrightChild);
 
         rightChild.connectReceiverModule(rightleftChild);
@@ -142,35 +138,35 @@ public class ModuleTestHelper
         Module leftleftleftChild = new TestModule();
 
         leftleftleftChild.activate();
-        
+
         Module leftleftrightChild = new TestModule();
 
         leftleftrightChild.activate();
-        
+
         Module leftrightleftChild = new TestModule();
 
         leftrightleftChild.activate();
-        
+
         Module leftrightrightChild = new TestModule();
 
         leftrightrightChild.activate();
-        
+
         Module rightleftleftChild = new TestModule();
 
         rightleftleftChild.activate();
-        
+
         Module rightleftrightChild = new TestModule();
 
         rightleftrightChild.activate();
-        
+
         Module rightrightleftChild = new TestModule();
 
         rightrightleftChild.activate();
-        
+
         Module rightrightrightChild = new TestModule();
 
         rightrightrightChild.activate();
-        
+
         leftleftChild.connectReceiverModule(leftleftleftChild);
 
         leftleftChild.connectReceiverModule(leftleftrightChild);
@@ -204,7 +200,7 @@ public class ModuleTestHelper
         rightrightrightChild.connectReceiverModule(this._leafModule);
 
         this._rootModule.activate();
-        
+
         this._leafModule.activate();
     }
 
@@ -219,36 +215,32 @@ public class ModuleTestHelper
      * @param packetCountPar Tells how often the same packet shall be received. Used if this class is connected to multiple
      * other modules.
      */
-    public void checkModuleEventTransport(WellFormedEventPacket packet, int packetCountPar)
-    {
+    public void checkModuleEventTransport(WellFormedEventPacket packet,
+        int packetCountPar) {
         this._testPacket = packet;
 
         this._result = false;
 
         this._packetCount = packetCountPar;
 
-        this._rootModule.append(packet);
+        this._rootModule.appendDirectly(packet);
     }
 
     /**
      * This method returns the value of the result field.
      * @return The value of the result field
      */
-    public boolean getResult()
-    {
+    public boolean getResult() {
         return this._result;
     }
 
-  
-    public void comparePackets(ValidEventPacket eventPacket)
-    {
+    public void comparePackets(ValidEventPacket eventPacket) {
         if (this._testPacket.equals(eventPacket)) {
             this._receivedCount++;
 
             if (this._receivedCount == this._packetCount) {
                 this._result = true;
-            }
-            else {
+            } else {
                 this._result = false;
             }
         }

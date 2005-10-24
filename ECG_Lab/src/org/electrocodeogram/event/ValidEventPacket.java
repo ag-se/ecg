@@ -183,6 +183,12 @@ public class ValidEventPacket extends WellFormedEventPacket {
      * @return The current <em>VALIDATION_LEVEL</em>
      */
     public static VALIDATION_LEVEL getValidationLevel() {
+
+        logger.entering(ValidEventPacket.class.getName(), "getValidationLevel");
+
+        logger.exiting(ValidEventPacket.class.getName(), "getValidationLevel",
+            validationLevel);
+
         return validationLevel;
     }
 
@@ -192,6 +198,12 @@ public class ValidEventPacket extends WellFormedEventPacket {
      * @return The event's <em>VALIDATION_LE'VEL</em>
      */
     public final VALIDATION_LEVEL getValidatedWith() {
+
+        logger.entering(this.getClass().getName(), "getValidatedWith");
+
+        logger.exiting(this.getClass().getName(), "getValidatedWith",
+            this.validatedWith);
+
         return this.validatedWith;
     }
 
@@ -202,7 +214,13 @@ public class ValidEventPacket extends WellFormedEventPacket {
      *            Is the new <em>VALIDATION_LEVEL</em>
      */
     public static void setValidityLevel(final VALIDATION_LEVEL validityLevel) {
+
+        logger.entering(ValidEventPacket.class.getName(), "setValidityLevel",
+            new Object[] {validityLevel});
+
         validationLevel = validityLevel;
+
+        logger.exiting(ValidEventPacket.class.getName(), "setValidityLevel");
 
     }
 
@@ -218,20 +236,6 @@ public class ValidEventPacket extends WellFormedEventPacket {
 
         logger.log(Level.FINE, "Going to validate the event with level: "
                                + validationLevel.toString());
-
-        // if (packet == null) {
-        // logger.log(Level.FINE,
-        // "The event is not valid in repsect to the validity level: "
-        // + validationLevel);
-        //
-        // logger.log(Level.FINE, "The event is null.");
-        //
-        // logger.exiting(this.getClass().getName(), "validate");
-        //
-        // throw new IllegalEventParameterException("The event is
-        // null.");
-        //
-        // }
 
         if (validationLevel == VALIDATION_LEVEL.INVALID) {
 
@@ -453,7 +457,7 @@ public class ValidEventPacket extends WellFormedEventPacket {
 
         } catch (SensorDataTypeException e) {
             logger.log(Level.FINE,
-                "The event is not valid in repspect to validity level: "
+                "The event is not valid in respect to validity level: "
                                 + VALIDATION_LEVEL.HACKYSTAT);
 
             logger.log(Level.FINE, e.getMessage());
@@ -473,7 +477,8 @@ public class ValidEventPacket extends WellFormedEventPacket {
     public final MicroSensorDataType getMicroSensorDataType() {
         logger.entering(this.getClass().getName(), "getMicroSensorDataType");
 
-        logger.exiting(this.getClass().getName(), "getMicroSensorDataType");
+        logger.exiting(this.getClass().getName(), "getMicroSensorDataType",
+            this.myMsdt);
 
         return this.myMsdt;
     }
@@ -485,7 +490,8 @@ public class ValidEventPacket extends WellFormedEventPacket {
     public final DELIVERY_STATE getDeliveryState() {
         logger.entering(this.getClass().getName(), "getDeliveryState");
 
-        logger.exiting(this.getClass().getName(), "getDeliveryState");
+        logger.exiting(this.getClass().getName(), "getDeliveryState",
+            this.deliveryState);
 
         return this.deliveryState;
     }
@@ -497,10 +503,13 @@ public class ValidEventPacket extends WellFormedEventPacket {
      */
 
     public final void setDeliveryState(final DELIVERY_STATE state) {
-        logger.entering(this.getClass().getName(), "setDeliveryState");
+        logger.entering(this.getClass().getName(), "setDeliveryState",
+            new Object[] {state});
 
         if (state == null) {
-            logger.log(Level.WARNING, "state is null");
+            logger.log(Level.WARNING, "The parameter \"state\" is null");
+
+            logger.exiting(this.getClass().getName(), "setDeliveryState");
 
             return;
         }
@@ -518,6 +527,11 @@ public class ValidEventPacket extends WellFormedEventPacket {
      *         if not.
      */
     public final Document getDocument() {
+
+        logger.entering(this.getClass().getName(), "getDocument");
+
+        logger.exiting(this.getClass().getName(), "getDocument", this.document);
+
         return this.document;
     }
 }

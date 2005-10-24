@@ -1,6 +1,8 @@
 /*
- * Class: Module Version: 1.0 Date: 18.10.2005 By:
- * Frank@Schlesinger.com
+ * Class: Module
+ * Version: 1.0
+ * Date: 18.10.2005
+ * By: Frank@Schlesinger.com
  */
 
 package org.electrocodeogram.module;
@@ -19,10 +21,9 @@ import org.electrocodeogram.event.ValidEventPacket.DELIVERY_STATE;
 import org.electrocodeogram.logging.LogHelper;
 import org.electrocodeogram.logging.LogHelper.ECGLevel;
 import org.electrocodeogram.module.intermediate.IIntermediateModule;
-import org.electrocodeogram.module.registry.ModuleClassException;
-import org.electrocodeogram.module.registry.ModuleInstanceException;
+import org.electrocodeogram.module.registry.ModulePackageNotFoundException;
+import org.electrocodeogram.module.registry.ModuleInstanceNotFoundException;
 import org.electrocodeogram.module.source.SourceModule;
-import org.electrocodeogram.module.source.SourceModuleException;
 import org.electrocodeogram.module.target.ITargetModule;
 import org.electrocodeogram.module.target.TargetModule;
 import org.electrocodeogram.module.target.TargetModuleException;
@@ -204,7 +205,7 @@ public abstract class Module {
 
     /**
      * This constructor is not to be used directly. Instead use
-     * {@link org.electrocodeogram.module.registry.ModuleRegistry#createRunningModule(String, String)}
+     * {@link org.electrocodeogram.module.registry.ModuleRegistry#createModule(String, String)}
      * to create a new module. This creates a new module of the given
      * type, with the given <em>ModulePacket</em> id and assigns the
      * given name to it. The module is registered with the
@@ -221,25 +222,32 @@ public abstract class Module {
      *            Is the name to be assigned to the module
      */
     public Module(final ModuleType type, final String id, final String name) {
-        logger.entering(this.getClass().getName(), "Module");
+        logger.entering(this.getClass().getName(), "Module", new Object[] {
+            type, id, name});
 
         if (type == null) {
             logger.log(Level.SEVERE,
-                "The parameter moduleType is null. Can not create Module");
+                "The parameter \"type\" is null. Can not create Module");
+
+            logger.exiting(this.getClass().getName(), "Module");
 
             return;
         }
 
         if (id == null) {
             logger.log(Level.SEVERE,
-                "The parameter moduleClassId is null. Can not create Module");
+                "The parameter \"id\" is null. Can not create Module");
+
+            logger.exiting(this.getClass().getName(), "Module");
 
             return;
         }
 
         if (name == null) {
             logger.log(Level.SEVERE,
-                "The parameter moduleName is null. Can not create Module");
+                "The parameter \"name\" is null. Can not create Module");
+
+            logger.exiting(this.getClass().getName(), "Module");
 
             return;
         }
@@ -335,7 +343,8 @@ public abstract class Module {
     public final SystemObserver getSystemObserver() {
         logger.entering(this.getClass().getName(), "getSystemObserver");
 
-        logger.exiting(this.getClass().getName(), "getSystemObserver");
+        logger.exiting(this.getClass().getName(), "getSystemObserver",
+            this.systemObserver);
 
         return this.systemObserver;
     }
@@ -347,7 +356,8 @@ public abstract class Module {
     public final int getId() {
         logger.entering(this.getClass().getName(), "getId");
 
-        logger.exiting(this.getClass().getName(), "getId");
+        logger.exiting(this.getClass().getName(), "getId", new Integer(
+            this.moduleId));
 
         return this.moduleId;
     }
@@ -359,7 +369,8 @@ public abstract class Module {
     public final ModuleType getModuleType() {
         logger.entering(this.getClass().getName(), "getModuleType");
 
-        logger.exiting(this.getClass().getName(), "getModuleType");
+        logger.exiting(this.getClass().getName(), "getModuleType",
+            this.moduleType);
 
         return this.moduleType;
     }
@@ -371,7 +382,7 @@ public abstract class Module {
     public final String getName() {
         logger.entering(this.getClass().getName(), "getName");
 
-        logger.exiting(this.getClass().getName(), "getName");
+        logger.exiting(this.getClass().getName(), "getName", this.moduleName);
 
         return this.moduleName;
     }
@@ -383,7 +394,8 @@ public abstract class Module {
     public final int getReceivingModuleCount() {
         logger.entering(this.getClass().getName(), "getReceivingModuleMap");
 
-        logger.exiting(this.getClass().getName(), "getReceivingModuleMap");
+        logger.exiting(this.getClass().getName(), "getReceivingModuleMap",
+            this.receiverModuleMap.size());
 
         return this.receiverModuleMap.size();
     }
@@ -399,7 +411,8 @@ public abstract class Module {
 
         Collection<Module> receivingModules = this.receiverModuleMap.values();
 
-        logger.exiting(this.getClass().getName(), "getReceivingModules");
+        logger.exiting(this.getClass().getName(), "getReceivingModules",
+            receivingModules.toArray(new Module[receivingModules.size()]));
 
         return receivingModules.toArray(new Module[receivingModules.size()]);
     }
@@ -465,19 +478,19 @@ public abstract class Module {
 
             text += "\nAuthor: \t";
 
-            text += moduleDescriptor.getProvider_name();
+            text += moduleDescriptor.getProviderName();
 
             text += "\nVersion: \t";
 
             text += moduleDescriptor.getVersion();
 
-        } catch (ModuleClassException e) {
+        } catch (ModulePackageNotFoundException e) {
             logger.log(Level.WARNING,
                 "An Exception has occured while reading the module description of: "
                                 + this.getName());
         }
 
-        logger.exiting(this.getClass().getName(), "getDetails");
+        logger.exiting(this.getClass().getName(), "getDetails", text);
 
         return text;
 
@@ -493,8 +506,11 @@ public abstract class Module {
         logger.entering(this.getClass().getName(),
             "getProvidedMicroSensorDataType");
 
-        logger.exiting(this.getClass().getName(),
-            "getProvidedMicroSensorDataType");
+        logger
+            .exiting(this.getClass().getName(),
+                "getProvidedMicroSensorDataType", this.providedMsdtList
+                    .toArray(new MicroSensorDataType[this.providedMsdtList
+                        .size()]));
 
         return this.providedMsdtList
             .toArray(new MicroSensorDataType[this.providedMsdtList.size()]);
@@ -506,10 +522,11 @@ public abstract class Module {
      * @return The <code>String</code> id of the
      *         <em>ModulePacket</em>
      */
-    public final String getClassId() {
+    public final String getModulePacketId() {
         logger.entering(this.getClass().getName(), "getClassId");
 
-        logger.exiting(this.getClass().getName(), "getClassId");
+        logger.exiting(this.getClass().getName(), "getClassId",
+            this.modulePacketId);
 
         return this.modulePacketId;
     }
@@ -522,16 +539,21 @@ public abstract class Module {
     public final boolean getState() {
         logger.entering(this.getClass().getName(), "getState");
 
-        logger.exiting(this.getClass().getName(), "getState", this.active);
+        logger.exiting(this.getClass().getName(), "getState", new Boolean(
+            this.active));
 
         return this.active;
     }
 
     /**
-     * This method is used to get the <em>ModuleProperty</em> with the given name.
-     * @param name Is the name of the <em>ModuleProperty</em>
+     * This method is used to get the <em>ModuleProperty</em> with
+     * the given name.
+     * @param name
+     *            Is the name of the <em>ModuleProperty</em>
      * @return The <em>ModuleProperty</em> with the given name
-     * @throws PropertyException If the a <em>ModuleProperty</em> with the given name is not declared for this module
+     * @throws PropertyException
+     *             If the a <em>ModuleProperty</em> with the given
+     *             name is not declared for this module
      */
     public final ModuleProperty getModuleProperty(final String name)
         throws PropertyException {
@@ -577,10 +599,15 @@ public abstract class Module {
         logger.entering(this.getClass().getName(), "isModuleType");
 
         if (this.moduleType == type) {
+
+            logger.exiting(this.getClass().getName(), "isModuleType",
+                new Boolean(true));
+
             return true;
         }
 
-        logger.exiting(this.getClass().getName(), "isModuleType");
+        logger.exiting(this.getClass().getName(), "isModuleType", new Boolean(
+            false));
 
         return false;
 
@@ -600,6 +627,8 @@ public abstract class Module {
 
             logger
                 .log(Level.INFO, "Module allready inactive " + this.getName());
+
+            logger.exiting(this.getClass().getName(), "deactivate");
 
             return;
 
@@ -641,24 +670,24 @@ public abstract class Module {
 
             logger.log(Level.INFO, "Module allready active " + this.getName());
 
+            logger.exiting(this.getClass().getName(), "activate");
+
             return;
         }
 
         if (this instanceof SourceModule) {
             SourceModule module = (SourceModule) this;
 
-            try {
-                module.startReader(module);
-            } catch (SourceModuleException e) {
-                throw new ModuleActivationException(e.getMessage());
-            }
+            module.startReader();
+
         } else if (this instanceof ITargetModule) {
             ITargetModule module = (ITargetModule) this;
 
             try {
                 module.startWriter();
             } catch (TargetModuleException e) {
-                throw new ModuleActivationException(e.getMessage());
+                throw new ModuleActivationException(e.getMessage(), this
+                    .getName(), this.getId());
             }
         }
 
@@ -688,7 +717,7 @@ public abstract class Module {
 
                 try {
                     module.disconnectReceiverModule(this);
-                } catch (ModuleInstanceException e) {
+                } catch (ModuleInstanceNotFoundException e) {
                     logger.log(Level.WARNING,
                         "An Exception occured while disconnecting the module: "
                                         + this.getName());
@@ -723,6 +752,7 @@ public abstract class Module {
         logger.entering(this.getClass().getName(), "getRuntimeProperties");
 
         if (this.runtimeProperties == null) {
+
             logger.exiting(this.getClass().getName(), "getRuntimeProperties");
 
             return null;
@@ -737,7 +767,8 @@ public abstract class Module {
             toReturn[i] = this.runtimeProperties[i];
         }
 
-        logger.exiting(this.getClass().getName(), "getRuntimeProperties");
+        logger.exiting(this.getClass().getName(), "getRuntimeProperties",
+            toReturn);
 
         return toReturn;
     }
@@ -757,15 +788,26 @@ public abstract class Module {
     public final int connectReceiverModule(final Module module)
         throws ModuleConnectionException {
 
-        logger.entering(this.getClass().getName(), "connectReceivingModules");
+        logger.entering(this.getClass().getName(), "connectReceivingModules",
+            new Object[] {module});
 
         if (this.moduleType == ModuleType.TARGET_MODULE) {
+
+            logger
+                .exiting(this.getClass().getName(), "connectReceivingModules");
+
             throw new ModuleConnectionException(
-                "You can not connect another module to this module.");
+                "You can not connect another module to this module.", this
+                    .getName(), this.getId(), module.getName(), module.getId());
         } else if (this.receiverModuleMap.containsKey(new Integer(module
             .getId()))) {
+
+            logger
+                .exiting(this.getClass().getName(), "connectReceivingModules");
+
             throw new ModuleConnectionException(
-                "These mdoules are connected already.");
+                "These mdoules are connected already.", this.getName(), this
+                    .getId(), module.getName(), module.getId());
         } else {
 
             this.eventSender.addObserver(module);
@@ -792,24 +834,31 @@ public abstract class Module {
      * This method disconnects a connected module.
      * @param module
      *            The module to disconnect
-     * @throws ModuleInstanceException
+     * @throws ModuleInstanceNotFoundException
      *             If the given module is not connected to this
      *             module.
      */
     public final void disconnectReceiverModule(final Module module)
-        throws ModuleInstanceException {
-        logger
-            .entering(this.getClass().getName(), "disconnectReceivingModules");
+        throws ModuleInstanceNotFoundException {
+        logger.entering(this.getClass().getName(),
+            "disconnectReceivingModules", new Object[] {module});
 
         if (module == null) {
             logger.log(Level.WARNING, "module is null");
+
+            logger.exiting(this.getClass().getName(),
+                "disconnectReceivingModules");
 
             return;
         }
 
         if (!this.receiverModuleMap.containsKey(new Integer(module.getId()))) {
-            throw new ModuleInstanceException("The given module id "
-                                              + this.moduleId + " is unknown.");
+
+            logger.exiting(this.getClass().getName(),
+                "disconnectReceivingModules");
+
+            throw new ModuleInstanceNotFoundException("The given module id "
+                                              + this.moduleId + " is unknown.",module.getId());
         }
 
         this.eventSender.deleteObserver(module);
@@ -832,9 +881,25 @@ public abstract class Module {
     final EventReceiver getEventReceiver() {
         logger.entering(this.getClass().getName(), "getEventReceiver");
 
-        logger.exiting(this.getClass().getName(), "getEventReceiver");
+        logger.exiting(this.getClass().getName(), "getEventReceiver",
+            this.eventReceiver);
 
         return this.eventReceiver;
+    }
+
+    /**
+     * This method returns a reference to the
+     * <em>SystemNotificator</em> of the module.
+     * @return The <em>SystemNotificator</em> of the module
+     */
+    final SystemNotificator getSystemNotificator() {
+
+        logger.entering(this.getClass().getName(), "getSystemNotificator");
+
+        logger.exiting(this.getClass().getName(), "getSystemNotificator",
+            this.systemNotificator);
+
+        return this.systemNotificator;
     }
 
     /**
@@ -845,7 +910,8 @@ public abstract class Module {
      *            result
      */
     protected final void sendEventPacket(final ValidEventPacket packet) {
-        logger.entering(this.getClass().getName(), "sendEventPacket");
+        logger.entering(this.getClass().getName(), "sendEventPacket",
+            new Object[] {packet});
 
         this.eventSender.sendEventPacket(packet);
 
@@ -863,7 +929,8 @@ public abstract class Module {
 
         Collection<Module> sendingModules = this.senderModuleMap.values();
 
-        logger.exiting(this.getClass().getName(), "getSendingModules");
+        logger.exiting(this.getClass().getName(), "getSendingModules",
+            sendingModules.toArray(new Module[sendingModules.size()]));
 
         return sendingModules.toArray(new Module[sendingModules.size()]);
     }
@@ -876,7 +943,8 @@ public abstract class Module {
      *            connected.
      */
     private void addParentModule(final Module module) {
-        logger.entering(this.getClass().getName(), "addParentModule");
+        logger.entering(this.getClass().getName(), "addParentModule",
+            new Object[] {module});
 
         this.senderModuleMap.put(new Integer(module.getId()), module);
 
@@ -900,6 +968,12 @@ public abstract class Module {
                 .getPredefinedMicroSensorDataTypes();
 
             if (msdts == null) {
+
+                logger.log(Level.FINE, "There are no MSDTs for module "
+                                       + this.getName() + ".");
+
+                logger.exiting(this.getClass().getName(), "registerMSDTs");
+
                 return;
             }
 
@@ -915,6 +989,8 @@ public abstract class Module {
                             Level.SEVERE,
                             "An Exception occured while registering predefined MSDTs for this SourceModule: "
                                             + this.getName());
+
+                    logger.exiting(this.getClass().getName(), "registerMSDTs");
 
                     return;
                 }
@@ -933,6 +1009,8 @@ public abstract class Module {
             if (moduleDescriptor == null) {
                 logger.log(Level.WARNING, "ModuleDescriptor was null for: "
                                           + this.getName());
+
+                logger.exiting(this.getClass().getName(), "registerMSDTs");
 
                 return;
             }
@@ -958,7 +1036,7 @@ public abstract class Module {
                                        + this.getName());
 
             }
-        } catch (ModuleClassException e) {
+        } catch (ModulePackageNotFoundException e) {
             logger.log(Level.INFO,
                 "No ModuleDescriptor was found for the module "
                                 + this.getName());
@@ -991,7 +1069,7 @@ public abstract class Module {
 
         try {
             this.runtimeProperties = ModuleSystem.getInstance()
-                .getModuleDescriptor(this.getClassId()).getProperties();
+                .getModuleDescriptor(this.getModulePacketId()).getProperties();
 
             logger
                 .log(
@@ -1000,10 +1078,13 @@ public abstract class Module {
                                     + this.getName()
                                     + " has successfully read its ModuleProperties.");
 
-        } catch (ModuleClassException e) {
+        } catch (ModulePackageNotFoundException e) {
 
             logger.log(Level.SEVERE,
                 "An error occured during ModuleProperties initialization.");
+
+            logger.exiting(this.getClass().getName(),
+                "initializeRuntimeProperties");
 
             return;
 
@@ -1011,7 +1092,11 @@ public abstract class Module {
 
         if (this.runtimeProperties == null) {
             logger.log(Level.FINE, "The module " + this.getName()
-                                   + " has no ModuleProperties.");
+
+            + " has no ModuleProperties.");
+
+            logger.exiting(this.getClass().getName(),
+                "initializeRuntimeProperties");
 
             return;
         }
@@ -1045,6 +1130,9 @@ public abstract class Module {
                 logger.log(Level.SEVERE,
                     "An error occured during ModuleProperty initilization.");
 
+                logger.exiting(this.getClass().getName(),
+                    "initializeRuntimeProperties");
+
                 return;
 
             }
@@ -1076,14 +1164,14 @@ public abstract class Module {
             .createLogger(EventSender.class.getName());
 
         /**
-         * This creates the <em>EventSender<em>.
+         * This creates the <em>EventSender</em>.
          * @param module
          *            Is the Module to which this EventSender is
          *            belonging
          */
         public EventSender(final Module module) {
-            eventSenderLogger
-                .entering(this.getClass().getName(), "eventSender");
+            eventSenderLogger.entering(this.getClass().getName(),
+                "eventSender", new Object[] {module});
 
             this.myModule = module;
 
@@ -1099,11 +1187,14 @@ public abstract class Module {
          */
         public void addObserver(final Module module) {
 
-            eventSenderLogger
-                .entering(this.getClass().getName(), "addObserver");
+            eventSenderLogger.entering(this.getClass().getName(),
+                "addObserver", new Object[] {module});
 
             if (module == null) {
                 eventSenderLogger.log(Level.WARNING, "module is null");
+
+                eventSenderLogger.exiting(this.getClass().getName(),
+                    "addObserver");
 
                 return;
             }
@@ -1121,10 +1212,13 @@ public abstract class Module {
          */
         public void deleteObserver(final Module module) {
             eventSenderLogger.entering(this.getClass().getName(),
-                "deleteObserver");
+                "deleteObserver", new Object[] {module});
 
             if (module == null) {
                 eventSenderLogger.log(Level.WARNING, "module is null");
+
+                eventSenderLogger.exiting(this.getClass().getName(),
+                    "deleteObserver");
 
                 return;
             }
@@ -1138,7 +1232,7 @@ public abstract class Module {
         /**
          * This sends the given event to all connected modules. The
          * event's
-         * {@link org.electrocodeogram.event.EventPacket#sourceId}
+         * {@link org.electrocodeogram.event.EventPacket#getSourceId()}
          * field of is set to this module's id. Before sending, the
          * given event is repackte into a new
          * {@link org.electrocodeogram.event.ValidEventPacket} and so
@@ -1148,9 +1242,9 @@ public abstract class Module {
          */
         public void sendEventPacket(final ValidEventPacket eventPacket) {
             eventSenderLogger.entering(this.getClass().getName(),
-                "sendEventPacket");
+                "sendEventPacket", new Object[] {eventPacket});
 
-            if (this.myModule.getState() == true && (eventPacket != null)) {
+            if (this.myModule.getState() && (eventPacket != null)) {
                 setChanged();
 
                 try {
@@ -1169,8 +1263,8 @@ public abstract class Module {
 
                     notifyObservers(packet);
 
-                    this.myModule.systemNotificator
-                        .fireEventNotification(packet);
+                    this.myModule.getSystemNotificator().fireEventNotification(
+                        packet);
                 } catch (IllegalEventParameterException e) {
 
                     clearChanged();
@@ -1225,7 +1319,7 @@ public abstract class Module {
             this.myModule = module;
 
             eventReceiverLogger.exiting(this.getClass().getName(),
-                "EventReceiver");
+                "EventReceiver", new Object[] {module});
         }
 
         /**
@@ -1233,11 +1327,15 @@ public abstract class Module {
          *      java.lang.Object)
          */
         public void update(final Observable object, final Object data) {
-            eventReceiverLogger.entering(this.getClass().getName(), "update");
+            eventReceiverLogger.entering(this.getClass().getName(), "update",
+                new Object[] {object, data});
 
             if (object == null) {
                 eventReceiverLogger.log(Level.WARNING,
                     "Parameter object is null. Ignoring event notification.");
+
+                eventReceiverLogger
+                    .exiting(this.getClass().getName(), "update");
 
                 return;
             }
@@ -1245,6 +1343,9 @@ public abstract class Module {
             if (data == null) {
                 eventReceiverLogger.log(Level.WARNING,
                     "Parameter data is null. Ignoring event notification.");
+
+                eventReceiverLogger
+                    .exiting(this.getClass().getName(), "update");
 
                 return;
             }
@@ -1273,8 +1374,8 @@ public abstract class Module {
                     eventReceiverLogger.log(ECGLevel.PACKET,
                         receivedPacketForProcessing.toString());
 
-                    this.myModule.systemNotificator
-                        .fireEventNotification(receivedPacketForSystem);
+                    this.myModule.getSystemNotificator().fireEventNotification(
+                        receivedPacketForSystem);
 
                     this.myModule
                         .receiveEventPacket(receivedPacketForProcessing);
@@ -1318,7 +1419,7 @@ public abstract class Module {
          */
         public SystemObserver(final Module module) {
             systemObserverLogger.entering(this.getClass().getName(),
-                "SystemObserver");
+                "SystemObserver", new Object[] {module});
 
             this.myModule = module;
 
@@ -1332,10 +1433,14 @@ public abstract class Module {
          */
         public void update(final Observable object, @SuppressWarnings("unused")
         final Object arg) {
-            systemObserverLogger.entering(this.getClass().getName(), "update");
+            systemObserverLogger.entering(this.getClass().getName(), "update",
+                new Object[] {object, arg});
 
             if (object == null) {
                 systemObserverLogger.log(Level.WARNING, "object is null");
+
+                systemObserverLogger.exiting(this.getClass().getName(),
+                    "update");
 
                 return;
             }
@@ -1375,7 +1480,7 @@ public abstract class Module {
          */
         public SystemNotificator(final Module module) {
             systemNotificatorlogger.entering(this.getClass().getName(),
-                "SystemNotificator");
+                "SystemNotificator", new Object[] {module});
 
             this.myModule = module;
 
@@ -1397,10 +1502,13 @@ public abstract class Module {
          */
         public void fireEventNotification(final ValidEventPacket packet) {
             systemNotificatorlogger.entering(this.getClass().getName(),
-                "fireEventNotification");
+                "fireEventNotification", new Object[] {packet});
 
             if (packet == null) {
                 systemNotificatorlogger.log(Level.WARNING, "packet is null");
+
+                systemNotificatorlogger.exiting(this.getClass().getName(),
+                    "fireEventNotification");
 
                 return;
             }
@@ -1463,7 +1571,7 @@ public abstract class Module {
          */
         public PropertyListener(final Module module) {
             propertyListenerLogger.entering(this.getClass().getName(),
-                "propertyListener");
+                "propertyListener", new Object[] {module});
 
             this.myModule = module;
 
@@ -1478,12 +1586,15 @@ public abstract class Module {
         public void update(final Observable o, @SuppressWarnings("unused")
         final Object arg) {
 
-            propertyListenerLogger
-                .entering(this.getClass().getName(), "update");
+            propertyListenerLogger.entering(this.getClass().getName(),
+                "update", new Object[] {o, arg});
 
             if (o == null) {
                 propertyListenerLogger.log(Level.WARNING,
                     "The parameter Observable is null.");
+
+                propertyListenerLogger.exiting(this.getClass().getName(),
+                    "update");
 
                 return;
             }
@@ -1499,6 +1610,9 @@ public abstract class Module {
             } else {
                 propertyListenerLogger.log(Level.WARNING,
                     "The parameter Observable is not a ModuleProperty.");
+
+                propertyListenerLogger.exiting(this.getClass().getName(),
+                    "update");
 
                 propertyListenerLogger.exiting(this.getClass().getName(),
                     "update");

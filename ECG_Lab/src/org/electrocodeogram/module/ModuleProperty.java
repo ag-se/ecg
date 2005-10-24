@@ -1,3 +1,10 @@
+/*
+ * Class: ModuleProperty
+ * Version: 1.0
+ * Date: 18.10.2005
+ * By: Frank@Schlesinger.com
+ */
+
 package org.electrocodeogram.module;
 
 import java.util.Observable;
@@ -7,13 +14,13 @@ import java.util.logging.Logger;
 import org.electrocodeogram.logging.LogHelper;
 
 /**
- * A ModuleProperty is a property of a module that is changeable by
- * the user during runtime. Module properties are declared in the
- * module's "module.properties.xml" file, that is provided by the
- * module's developer with each module. This file is parsed in the
- * ECG's initialization phase and each declared module property
- * becomes a ModuleProperty object registered along with the other
- * module informations in the ModuleRegistry.
+ * A <em>ModuleProperty</em> is a property of a module that is changeable by
+ * the user during runtime. <em>ModuleProperties</em> are declared in the
+ * module's <em>"module.properties.xml"</em> file, that is provided by the
+ * module's developer for each module. This file is parsed in the
+ * ECG's initialization phase and each declared <em>ModuleProperty</em>
+ * becomes a <em>ModuleProperty</em> object registered along with the rest of a
+ * module's information in the {@link org.electrocodeogram.module.registry.ModuleRegistry}.
  */
 public class ModuleProperty extends Observable {
 
@@ -57,7 +64,8 @@ public class ModuleProperty extends Observable {
     public ModuleProperty(final String name, final String value,
         final Class type) {
 
-        logger.entering(this.getClass().getName(), "ModuleProperty");
+        logger.entering(this.getClass().getName(), "ModuleProperty",
+            new Object[] {name, value, type});
 
         this.propName = name;
 
@@ -73,6 +81,11 @@ public class ModuleProperty extends Observable {
      * @return The property's name
      */
     public final String getName() {
+
+        logger.entering(this.getClass().getName(), "getName");
+
+        logger.exiting(this.getClass().getName(), "propName", this.propName);
+
         return this.propName;
     }
 
@@ -81,6 +94,11 @@ public class ModuleProperty extends Observable {
      * @return The property's default value
      */
     public final String getValue() {
+
+        logger.entering(this.getClass().getName(), "getValue");
+
+        logger.exiting(this.getClass().getName(), "getValue", this.propValue);
+
         return this.propValue;
     }
 
@@ -89,6 +107,11 @@ public class ModuleProperty extends Observable {
      * @return The property's type
      */
     public final Class getType() {
+
+        logger.entering(this.getClass().getName(), "getType");
+
+        logger.exiting(this.getClass().getName(), "getType", this.propType);
+
         return this.propType;
     }
 

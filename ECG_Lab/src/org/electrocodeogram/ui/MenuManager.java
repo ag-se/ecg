@@ -17,8 +17,8 @@ import org.electrocodeogram.module.ModuleDescriptor;
 import org.electrocodeogram.module.ModuleProperty;
 import org.electrocodeogram.module.intermediate.IntermediateModule;
 import org.electrocodeogram.module.intermediate.IntermediateModule.ProcessingMode;
-import org.electrocodeogram.module.registry.ModuleClassException;
-import org.electrocodeogram.module.registry.ModuleInstanceException;
+import org.electrocodeogram.module.registry.ModulePackageNotFoundException;
+import org.electrocodeogram.module.registry.ModuleInstanceNotFoundException;
 import org.electrocodeogram.system.Core;
 import org.electrocodeogram.ui.modules.ModuleGraph;
 
@@ -67,9 +67,9 @@ public class MenuManager {
 
                 try {
                     org.electrocodeogram.system.System.getInstance()
-                        .getModuleRegistry().getRunningModule(
+                        .getModuleRegistry().getModule(
                             ModuleGraph.getSelectedModule()).remove();
-                } catch (ModuleInstanceException e1) {
+                } catch (ModuleInstanceNotFoundException e1) {
 
                     JOptionPane.showMessageDialog(_frame, e1.getMessage(),
                         "Remove Module", JOptionPane.ERROR_MESSAGE);
@@ -100,9 +100,9 @@ public class MenuManager {
 
                 try {
                     org.electrocodeogram.system.System.getInstance()
-                        .getModuleRegistry().getRunningModule(
+                        .getModuleRegistry().getModule(
                             ModuleGraph.getSelectedModule()).deactivate();
-                } catch (ModuleInstanceException e1) {
+                } catch (ModuleInstanceNotFoundException e1) {
 
                     JOptionPane.showMessageDialog(_frame, e1.getMessage(),
                         "Stop Module", JOptionPane.ERROR_MESSAGE);
@@ -117,7 +117,7 @@ public class MenuManager {
 
                 try {
                     org.electrocodeogram.system.System.getInstance()
-                        .getModuleRegistry().getRunningModule(
+                        .getModuleRegistry().getModule(
                             ModuleGraph.getSelectedModule()).activate();
                 } catch (Exception e1) {
                     JOptionPane.showMessageDialog(_frame, e1.getMessage(),
@@ -143,9 +143,9 @@ public class MenuManager {
 
                 try {
                     org.electrocodeogram.system.System.getInstance()
-                        .getModuleRegistry().getRunningModule(
+                        .getModuleRegistry().getModule(
                             ModuleGraph.getSelectedModule());
-                } catch (ModuleInstanceException e1) {
+                } catch (ModuleInstanceNotFoundException e1) {
                     JOptionPane.showMessageDialog(_frame, e1.getMessage(),
                         "Annotator", JOptionPane.ERROR_MESSAGE);
                 }
@@ -176,9 +176,9 @@ public class MenuManager {
 
                 try {
                     org.electrocodeogram.system.System.getInstance()
-                        .getModuleRegistry().getRunningModule(
+                        .getModuleRegistry().getModule(
                             ModuleGraph.getSelectedModule());
-                } catch (ModuleInstanceException e1) {
+                } catch (ModuleInstanceNotFoundException e1) {
                     JOptionPane.showMessageDialog(_frame, e1.getMessage(),
                         "Filter", JOptionPane.ERROR_MESSAGE);
                 }
@@ -215,11 +215,11 @@ public class MenuManager {
 
         try {
             if (!org.electrocodeogram.system.System.getInstance()
-                .getModuleRegistry().getRunningModule(moduleId).isModuleType(
+                .getModuleRegistry().getModule(moduleId).isModuleType(
                     ModuleType.TARGET_MODULE)) {
                 modulePopupMenu.add(mniModuleConnectTo);
             }
-        } catch (ModuleInstanceException e2) {
+        } catch (ModuleInstanceNotFoundException e2) {
             JOptionPane.showMessageDialog(_frame, e2.getMessage(),
                 "Mneu Initialisation", JOptionPane.ERROR_MESSAGE);
         }
@@ -232,7 +232,7 @@ public class MenuManager {
 
         try {
             if (org.electrocodeogram.system.System.getInstance()
-                .getModuleRegistry().getRunningModule(moduleId).isModuleType(
+                .getModuleRegistry().getModule(moduleId).isModuleType(
                     ModuleType.INTERMEDIATE_MODULE)) {
                 modulePopupMenu.addSeparator();
 
@@ -240,7 +240,7 @@ public class MenuManager {
 
                 modulePopupMenu.add(mniMakeFilter);
             }
-        } catch (ModuleInstanceException e1) {
+        } catch (ModuleInstanceNotFoundException e1) {
             JOptionPane.showMessageDialog(_frame, e1.getMessage(),
                 "Mneu Initialisation", JOptionPane.ERROR_MESSAGE);
         }
@@ -250,8 +250,8 @@ public class MenuManager {
         String moduleClassId = null;
         try {
             moduleClassId = org.electrocodeogram.system.System.getInstance()
-                .getModuleRegistry().getRunningModule(moduleId).getClassId();
-        } catch (ModuleInstanceException e) {
+                .getModuleRegistry().getModule(moduleId).getModulePacketId();
+        } catch (ModuleInstanceNotFoundException e) {
             JOptionPane.showMessageDialog(_frame, e.getMessage(),
                 "Mneu Initialisation", JOptionPane.ERROR_MESSAGE);
         }
@@ -260,7 +260,7 @@ public class MenuManager {
         try {
             moduleDescriptor = org.electrocodeogram.system.System.getInstance()
                 .getModuleRegistry().getModuleDescriptor(moduleClassId);
-        } catch (ModuleClassException e) {
+        } catch (ModulePackageNotFoundException e) {
             JOptionPane.showMessageDialog(_frame, e.getMessage(),
                 "Mneu Initialisation", JOptionPane.ERROR_MESSAGE);
         }
@@ -323,11 +323,11 @@ public class MenuManager {
 
             try {
                 org.electrocodeogram.system.System.getInstance()
-                    .getModuleRegistry().getRunningModule(this._parentId)
+                    .getModuleRegistry().getModule(this._parentId)
                     .disconnectReceiverModule(
                         org.electrocodeogram.system.System.getInstance()
                             .getModuleRegistry()
-                            .getRunningModule(this._childId));
+                            .getModule(this._childId));
             } catch (Exception e1) {
                 JOptionPane.showMessageDialog(MenuManager._frame, e1
                     .getMessage(), "Remove Edge", JOptionPane.ERROR_MESSAGE);
@@ -450,8 +450,8 @@ public class MenuManager {
 
         try {
             moduleId = org.electrocodeogram.system.System.getInstance()
-                .getModuleRegistry().getRunningModule(id).getClassId();
-        } catch (ModuleInstanceException e) {
+                .getModuleRegistry().getModule(id).getModulePacketId();
+        } catch (ModuleInstanceNotFoundException e) {
             JOptionPane.showMessageDialog(MenuManager._frame, e.getMessage(),
                 "Menu Initialisation", JOptionPane.ERROR_MESSAGE);
         }
@@ -460,7 +460,7 @@ public class MenuManager {
         try {
             moduleDescriptor = org.electrocodeogram.system.System.getInstance()
                 .getModuleRegistry().getModuleDescriptor(moduleId);
-        } catch (ModuleClassException e) {
+        } catch (ModulePackageNotFoundException e) {
             JOptionPane.showMessageDialog(MenuManager._frame, e.getMessage(),
                 "Menu Initialisation", JOptionPane.ERROR_MESSAGE);
         }

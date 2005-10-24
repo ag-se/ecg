@@ -1,3 +1,10 @@
+/*
+ * Class: IntermediateModule
+ * Version: 1.0
+ * Date: 18.10.2005
+ * By: Frank@Schlesinger.com
+ */
+
 package org.electrocodeogram.module.intermediate;
 
 import java.util.logging.Level;
@@ -8,236 +15,276 @@ import org.electrocodeogram.logging.LogHelper;
 import org.electrocodeogram.module.Module;
 
 /**
- * This abstract class shall be subclassed for every new intermediate module.
- * The abstract method analyse is to be implemented to do the actual analysis that is
- * required by the module.
+ * This abstract class shall be subclassed for every new intermediate
+ * module. The abstract method analyse is to be implemented to do the
+ * actual analysis that is required by the module.
  */
-public abstract class IntermediateModule extends Module implements IIntermediateModule
-{
+public abstract class IntermediateModule extends Module implements
+    IIntermediateModule {
 
-	private static Logger _logger = LogHelper.createLogger(IntermediateModule.class.getName());
+    /**
+     * Thisis the default separator <code>String</code>.
+     */
+    private static final String DEFAULT_SEPARATOR = "";
 
-	/**
-	 * If an intermediate module is operating in annotation mode, the AnnotationStyle
-	 * tells when the module will send its annotation events.
-	 *
-	 */
-	public enum AnnotationStyle
-	{
-		/**
-		 * The module will first send an annotation event(s) and then send the original event(s). 
-		 */
-		PRE_ANNOTATION,
+    /**
+     * This is the logger.
+     */
+    private static Logger logger = LogHelper
+        .createLogger(IntermediateModule.class.getName());
 
-		/**
-		 * The module will first send the original event(s) and then send the an annotation event(s). 
-		 */
-		POST_ANNOTATION
-	}
+    /**
+     * If an <em>IntermediateModule</em> is operating in annotation
+     * mode, the <em>AnnotationStyle</em> tells when the module will
+     * send its annotation events.
+     */
+    public enum AnnotationStyle {
+        /**
+         * The module will first send annotation event(s) and then
+         * send the original event(s).
+         */
+        PRE_ANNOTATION,
 
-	/**
-	 * 
-	 * The ProcessingMode defines whether the module operates as an annotator or as a filter.
-	 *
-	 */
-	public enum ProcessingMode
-	{
-		/**
-		 * The module operates as an annotator.
-		 */
-		ANNOTATOR,
+        /**
+         * The module will first send the original event(s) and then
+         * send the annotation event(s).
+         */
+        POST_ANNOTATION
+    }
 
-		/**
-		 * The module operates as a filter.
-		 */
-		FILTER
-	}
+    /**
+     * The <em>ProcessingMode</em> tells whether the module operates
+     * as an annotator or as a filter.
+     */
+    public enum ProcessingMode {
+        /**
+         * The module operates as an annotator.
+         */
+        ANNOTATOR,
 
-	private String _separator = "";
+        /**
+         * The module operates as a filter.
+         */
+        FILTER
+    }
 
-	private ProcessingMode _processingMode;
+    /**
+     * This is the currently used seperator <code>String</code>.
+     */
+    private String separator = DEFAULT_SEPARATOR;
 
-	private AnnotationStyle _annotationStyle;
+    /**
+     * This is the current <em>ProcessingMode</em>.
+     */
+    private ProcessingMode processingMode;
 
-	/**
-	 * This creates a new IntermediateModule with the given processing mode.
-	 * @param moduleClassId Is the id of the module class as registered with the ModuleRegistry
-	 * @param name The name given to this moduule instance
-	 */
-	public IntermediateModule(String moduleClassId, String name)
-	{
-		super(ModuleType.INTERMEDIATE_MODULE, moduleClassId, name);
+    /**
+     * This is the current <em>AnnotationStyle</em>.
+     */
+    private AnnotationStyle annotationStyle;
 
-		_logger.entering(this.getClass().getName(), "IntermediateModule");
+    /**
+     * Creates a new <em>IntermediateModule</em> with the given
+     * <em>ProcessingMode</em>.
+     * @param id
+     *            Is the id of the <em>ModulePackage</em>.
+     * @param name
+     *            The name to assign to this module
+     */
+    public IntermediateModule(final String id, final String name) {
+        super(ModuleType.INTERMEDIATE_MODULE, id, name);
 
-		this._processingMode = ProcessingMode.ANNOTATOR;
+        logger.entering(this.getClass().getName(), "IntermediateModule",
+            new Object[] {id, name});
 
-		this._annotationStyle = AnnotationStyle.POST_ANNOTATION;
+        this.processingMode = ProcessingMode.ANNOTATOR;
 
-		initialize();
+        this.annotationStyle = AnnotationStyle.POST_ANNOTATION;
 
-		_logger.exiting(this.getClass().getName(), "IntermediateModule");
+        initialize();
 
-	}
+        logger.exiting(this.getClass().getName(), "IntermediateModule");
 
-	/**
-	 * This method returns the annotation style that is set for the module.
-	 * @return The annotation style
-	 */
-	public AnnotationStyle getAnnnotationStyle()
-	{
-		_logger.entering(this.getClass().getName(), "getAnnnotationStyle");
+    }
 
-		_logger.exiting(this.getClass().getName(), "getAnnnotationStyle");
+    /**
+     * This method returns the <em>AnnotationStyle</em> that is set
+     * for the module.
+     * @return The <em>AnnotationStyle</em> style
+     */
+    public final AnnotationStyle getAnnnotationStyle() {
+        logger.entering(this.getClass().getName(), "getAnnnotationStyle");
 
-		return this._annotationStyle;
-	}
+        logger.exiting(this.getClass().getName(), "getAnnnotationStyle",
+            this.annotationStyle);
 
-	/**
-	 * This method is used to set the annotation style of the module to the given annotation style.
-	 * @param annotationStyle Is the new annotation style of the module 
-	 */
-	public void setAnnnotationStyle(AnnotationStyle annotationStyle)
-	{
-		_logger.entering(this.getClass().getName(), "setAnnnotationStyle");
+        return this.annotationStyle;
+    }
 
-		if (annotationStyle == null)
-		{
-			_logger.log(Level.WARNING, "annotationStyle is null");
+    /**
+     * This method is used to set the <em>AnnotationStyle</em> of
+     * the module to the given <em>AnnotationStyle</em>.
+     * @param style
+     *            Is the new <em>AnnotationStyle</em> of the module
+     */
+    public final void setAnnnotationStyle(final AnnotationStyle style) {
+        logger.entering(this.getClass().getName(), "setAnnnotationStyle",
+            new Object[] {style});
 
-			return;
-		}
+        if (style == null) {
+            logger.log(Level.WARNING,
+                "The parameter \"annotationStyle\" is null");
 
-		this._annotationStyle = annotationStyle;
+            logger.exiting(this.getClass().getName(), "setAnnnotationStyle");
 
-		_logger.exiting(this.getClass().getName(), "setAnnnotationStyle");
-	}
+            return;
+        }
 
-	/**
-	 * This returns the processing mode the module is operating in.
-	 * @return The processing mode
-	 */
-	public ProcessingMode getProcessingMode()
-	{
-		_logger.entering(this.getClass().getName(), "getProcessingMode");
+        this.annotationStyle = style;
 
-		_logger.exiting(this.getClass().getName(), "getProcessingMode");
+        logger.exiting(this.getClass().getName(), "setAnnnotationStyle");
+    }
 
-		return this._processingMode;
+    /**
+     * This returns the <em>ProcessingMode</em>.
+     * @return The <em>ProcessingMode</em>
+     */
+    public final ProcessingMode getProcessingMode() {
+        logger.entering(this.getClass().getName(), "getProcessingMode");
 
-	}
+        logger.exiting(this.getClass().getName(), "getProcessingMode",
+            this.processingMode);
 
-	/**
-	 * This sets the processing mode of the module to the given mode.
-	 * @param processingMode Is the new processing mode of the module.
-	 */
-	public void setProcessingMode(ProcessingMode processingMode)
-	{
-		_logger.entering(this.getClass().getName(), "setProcessingMode");
+        return this.processingMode;
 
-		if (processingMode == null)
-		{
-			_logger.log(Level.WARNING, "processingMode is null");
+    }
 
-			return;
-		}
+    /**
+     * This sets the <em>ProcessingMode</em> of the module to the
+     * given mode.
+     * @param mode
+     *            Is the new <em>ProcessingMode</em> for the module
+     */
+    public final void setProcessingMode(final ProcessingMode mode) {
+        logger.entering(this.getClass().getName(), "setProcessingMode",
+            new Object[] {mode});
 
-		this._processingMode = processingMode;
+        if (mode == null) {
+            logger.log(Level.WARNING,
+                "The parameter \"processingMode\" is null");
 
-		_logger.exiting(this.getClass().getName(), "setProcessingMode");
+            logger.exiting(this.getClass().getName(), "setProcessingMode");
 
-	}
+            return;
+        }
 
-	/**
-	 * This method returns the separator string that this module uses.
-	 * @return The separator string
-	 */
-	public String getSeparator()
-	{
-		_logger.entering(this.getClass().getName(), "getSeparator");
+        this.processingMode = mode;
 
-		_logger.exiting(this.getClass().getName(), "getSeparator");
+        logger.exiting(this.getClass().getName(), "setProcessingMode");
 
-		return this._separator;
-	}
+    }
 
-	/**
-	 * This sets the separator string of the module to the given string value.
-	 * @param separator Is the string value to use a the new separator string
-	 */
-	public void setSeparator(String separator)
-	{
-		_logger.entering(this.getClass().getName(), "setSeparator");
+    /**
+     * This method returns the separator <code>String</code> that is
+     * used by this module.
+     * @return The separator <code>String</code>
+     */
+    public final String getSeparator() {
+        logger.entering(this.getClass().getName(), "getSeparator");
 
-		if (separator == null)
-		{
-			_logger.log(Level.WARNING, "separator is null");
+        logger.exiting(this.getClass().getName(), "getSeparator",
+            this.separator);
 
-			return;
-		}
+        return this.separator;
+    }
 
-		this._separator = separator;
+    /**
+     * This sets the separator <code>String</code> of the module to
+     * the given <code>String</code> value.
+     * @param string
+     *            Is the <code>String</code> value to use a the new
+     *            separator <code>String</code>
+     */
+    public final void setSeparator(final String string) {
+        logger.entering(this.getClass().getName(), "setSeparator",
+            new Object[] {string});
 
-		_logger.exiting(this.getClass().getName(), "setSeparator");
-	}
+        if (string == null) {
+            logger.log(Level.WARNING, "The parameter \"separator\" is null");
 
-	/**
-	 * @see org.electrocodeogram.module.Module#receiveEventPacket(org.electrocodeogram.event.ValidEventPacket)
-	 * In addition to its superclass method this method gets the analysis result events of the module
-	 * and sends them according to the processing mode and annotation style of the module.
-	 */
-	@Override
-	public final void receiveEventPacket(ValidEventPacket eventPacket)
-	{
+            logger.exiting(this.getClass().getName(), "setSeparator");
 
-		_logger.entering(this.getClass().getName(), "receiveEventPacket");
-	
-		if (this._processingMode == ProcessingMode.ANNOTATOR)
-		{
-			ValidEventPacket resultPacket = getAnalysisResult(eventPacket);
+            return;
+        }
 
-			if (this._annotationStyle == AnnotationStyle.PRE_ANNOTATION)
-			{
-				sendEventPacket(resultPacket);
-				sendEventPacket(eventPacket);
-			}
-			else
-			{
-				sendEventPacket(eventPacket);
-				sendEventPacket(resultPacket);
-			}
-		}
-		else
-		{
-			ValidEventPacket resultPacket = getAnalysisResult(eventPacket);
+        this.separator = string;
 
-			sendEventPacket(resultPacket);
-		}
+        logger.exiting(this.getClass().getName(), "setSeparator");
+    }
 
-		_logger.exiting(this.getClass().getName(), "receiveEventPacket");
-	}
+    /**
+     * @see org.electrocodeogram.module.Module#receiveEventPacket(org.electrocodeogram.event.ValidEventPacket)
+     *      In addition to its superclass method this method gets the
+     *      analysis result events of the module and sends them
+     *      according to the processing mode and annotation style of
+     *      the module.
+     */
+    @Override
+    public final void receiveEventPacket(final ValidEventPacket eventPacket) {
 
-	private ValidEventPacket getAnalysisResult(ValidEventPacket eventPacket)
-	{
-		_logger.entering(this.getClass().getName(), "getAnalysisResult");
+        logger.entering(this.getClass().getName(), "receiveEventPacket",
+            new Object[] {eventPacket});
 
-		_logger.exiting(this.getClass().getName(), "getAnalysisResult");
+        if (this.processingMode == ProcessingMode.ANNOTATOR) {
+            ValidEventPacket resultPacket = getAnalysisResult(eventPacket);
 
-		return analyse(eventPacket);
-	}
+            if (this.annotationStyle == AnnotationStyle.PRE_ANNOTATION) {
+                sendEventPacket(resultPacket);
+                sendEventPacket(eventPacket);
+            } else {
+                sendEventPacket(eventPacket);
+                sendEventPacket(resultPacket);
+            }
+        } else {
+            ValidEventPacket resultPacket = getAnalysisResult(eventPacket);
 
-	/**
-	 * This method is to be implemented by all subclassing intermediate modules.
-	 * For any given input event it shall compute and return an output event.
-	 * That is the analysis result.
-	 * @param eventPacket Is the original incoming event data
-	 * @return The data of an event that is a result of the analysis
-	 */
-	public abstract ValidEventPacket analyse(ValidEventPacket eventPacket);
+            sendEventPacket(resultPacket);
+        }
 
-	/**
-	 * @see org.electrocodeogram.module.Module#initialize()
-	 */
-	@Override
-	public abstract void initialize();
+        logger.exiting(this.getClass().getName(), "receiveEventPacket");
+    }
+
+    /**
+     * Is used to call the actual analysis implementation.
+     * @param eventPacket
+     *            Is the event to be analysed
+     * @return The event that is the result of the analysis
+     */
+    private ValidEventPacket getAnalysisResult(
+        final ValidEventPacket eventPacket) {
+        logger.entering(this.getClass().getName(), "getAnalysisResult");
+
+        ValidEventPacket packet = analyse(eventPacket);
+
+        logger.exiting(this.getClass().getName(), "getAnalysisResult", packet);
+
+        return packet;
+    }
+
+    /**
+     * This method is to be implemented by all subclassing
+     * <em>IntermediateModules</em>. For any given input event it
+     * shall compute and return an output event. That is the analysis
+     * result.
+     * @param eventPacket
+     *            Is the original incoming event
+     * @return The data of an event that is a result of the analysis
+     */
+    public abstract ValidEventPacket analyse(ValidEventPacket eventPacket);
+
+    /**
+     * @see org.electrocodeogram.module.Module#initialize()
+     */
+    @Override
+    public abstract void initialize();
 }

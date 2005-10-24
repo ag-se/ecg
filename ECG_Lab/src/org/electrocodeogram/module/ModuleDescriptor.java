@@ -1,193 +1,302 @@
+/*
+ * Class: ModuleDescriptor
+ * Version: 1.0
+ * Date: 18.10.2005
+ * By: Frank@Schlesinger.com
+ */
 package org.electrocodeogram.module;
 
+import java.util.logging.Logger;
+
+import org.electrocodeogram.logging.LogHelper;
 import org.electrocodeogram.module.Module.ModuleType;
 import org.electrocodeogram.msdt.MicroSensorDataType;
 
-
 /**
- * This class is a representation for the description of module classes.
- * The description is used by ECG components to gather information about an
- * available module class.
+ * This is representing the information from a <em>ModulePackage</em>.
  */
-public class ModuleDescriptor
-{
-
-    private String _id;
-
-    private String _name;
-
-    private String _provider_name;
-    
-    private String _version;
-    
-    private Class _clazz;
-
-    private ModuleProperty[] _moduleProperties;
-    
-    private MicroSensorDataType[] _microSensorDataTypes;
-
-    private String _description;
-    
-    private ModuleType _moduleType; 
+public class ModuleDescriptor {
 
     /**
-     * This creates a new ModuleDescriptor with the given values.
-     * @param id This is the unique id of the module class as defined in the ModuleRegistry
-     * @param name This is the name of the module
-     * @param provider_name This is the name of the module provider
-     * @param version Is the version of the module
-     * @param clazz This is the module class object
-     * @param moduleDescription Is a String describing the module 
-     * @param moduleProperties Is an Array of ModuleProperty objects, each defining a property of this module
-     * @param microSensorDataTypes 
-     
+     * This is the logger.
      */
-    public ModuleDescriptor(String id, String name, String provider_name, String version, Class clazz, String moduleDescription, ModuleType moduleType, ModuleProperty[] moduleProperties, MicroSensorDataType[] microSensorDataTypes)
-    {
-        this._id = id;
-        
-        this._name = name;
-        
-        this._provider_name = provider_name;
-        
-        this._version = version;
+    private static Logger logger = LogHelper
+        .createLogger(ModuleDescriptor.class.getName());
 
-        this._clazz = clazz;
+    /**
+     * Is the unique <code>String</code> id of a
+     * <em>ModulePackage</em>.
+     */
+    private String packageId;
 
-        this._moduleType = moduleType;
-        
-        this._description = moduleDescription;
-        
-        if(moduleProperties != null)
-        {
-        	int size = moduleProperties.length;
-        	
-        	this._moduleProperties = new ModuleProperty[size];
-        	
-        	for(int i=0;i<size;i++)
-        	{
-        		this._moduleProperties[i] = moduleProperties[i];
-        	}
+    /**
+     * Is the name of the module.
+     */
+    private String moduleName;
+
+    /**
+     * Is the name of the module provider.
+     */
+    private String moduleProviderName;
+
+    /**
+     * Is the version information.
+     */
+    private String moduleVersion;
+
+    /**
+     * Is the module's <code>Class</code>, from eich it will be
+     * created.
+     */
+    private Class moduleClazz;
+
+    /**
+     * Is containing the <em>ModuleProperties</em>.
+     */
+    private ModuleProperty[] moduleProperties;
+
+    /**
+     * Is containing the module's <em>MicroSensorDataTypes</em>.
+     */
+    private MicroSensorDataType[] microSensorDataTypes;
+
+    /**
+     * Is a description for the module.
+     */
+    private String moduleDescription;
+
+    /**
+     * Is the <em>MODULE_TYPE</em> of the module.
+     */
+    private ModuleType moduleType;
+
+    /**
+     * This creates a new <em>ModuleDescriptor</em> with the given
+     * values.
+     * @param id
+     *            Is the unique <code>String</code> id of the
+     *            <em>ModulePackage</em>
+     * @param name
+     *            Is the name of the module
+     * @param providerName
+     *            Is the name of the module provider
+     * @param version
+     *            Is the version of the module
+     * @param clazz
+     *            This is the module's <code>Class</code>
+     * @param description
+     *            Is the module description.
+     * @param type
+     *            Is the <em>MODULE_TYPE</em> of the module
+     * @param properties
+     *            Is an Array of <em>ModuleProperties</em> for the
+     *            module
+     * @param msdts
+     *            Is an Array of <em>MicroSensorDataType</em> for
+     *            the module
+     */
+    public ModuleDescriptor(final String id, final String name,
+        final String providerName, final String version, final Class clazz,
+        final String description, final ModuleType type,
+        final ModuleProperty[] properties, final MicroSensorDataType[] msdts) {
+
+        logger.entering(this.getClass().getName(), "ModuleDescriptor",
+            new Object[] {id, name, providerName, version, clazz, description,
+                type, properties, msdts});
+
+        this.packageId = id;
+
+        this.moduleName = name;
+
+        this.moduleProviderName = providerName;
+
+        this.moduleVersion = version;
+
+        this.moduleClazz = clazz;
+
+        this.moduleType = type;
+
+        this.moduleDescription = description;
+
+        if (properties != null) {
+            int size = properties.length;
+
+            this.moduleProperties = new ModuleProperty[size];
+
+            for (int i = 0; i < size; i++) {
+                this.moduleProperties[i] = properties[i];
+            }
         }
-                
-        if(microSensorDataTypes != null)
-        {
-        	int size = microSensorDataTypes.length;
-        	
-        	this._microSensorDataTypes = new MicroSensorDataType[size];
-        	
-        	for(int i=0;i<size;i++)
-        	{
-        		this._microSensorDataTypes[i] = microSensorDataTypes[i];
-        	}
+
+        if (msdts != null) {
+            int size = msdts.length;
+
+            this.microSensorDataTypes = new MicroSensorDataType[size];
+
+            for (int i = 0; i < size; i++) {
+                this.microSensorDataTypes[i] = msdts[i];
+            }
         }
+
+        logger.exiting(this.getClass().getName(), "ModuleDescriptor");
 
     }
 
     /**
      * This returns the module's description.
-     * @return the module's description
+     * @return The module's description
      */
-    public String getDescription()
-    {
-        return this._description;
+    public final String getDescription() {
+
+        logger.entering(this.getClass().getName(), "getDescription");
+
+        logger.exiting(this.getClass().getName(), "getDescription",
+            this.moduleDescription);
+
+        return this.moduleDescription;
     }
 
     /**
-     * This method returns the module class object.
-     * @return The module class object
+     * This method returns the module's class.
+     * @return The module's class
      */
-    public Class getClazz()
-    {
-        return this._clazz;
+    public final Class getClazz() {
+
+        logger.entering(this.getClass().getName(), "getClazz");
+
+        logger.exiting(this.getClass().getName(), "getClazz", this.moduleClazz);
+
+        return this.moduleClazz;
     }
 
     /**
-     * This method returns the module name.
-     * @return The module name
+     * This method returns the module's name.
+     * @return The module's name
      */
-    public String getName()
-    {
-        return this._name;
+    public final String getName() {
+
+        logger.entering(this.getClass().getName(), "getName");
+
+        logger.exiting(this.getClass().getName(), "getName", this.moduleName);
+
+        return this.moduleName;
     }
 
     /**
-     * This method returns module properties as an Array of ModuleProperty objects.
-     * @return The module properties as an Array of ModuleProperty objects
+     * This method returns an <code>Array</code> of
+     * <em>ModuleProperties</em>.
+     * @return An <code>Array</code> of <em>ModuleProperties</em>
      */
-    public ModuleProperty[] getProperties()
-    {
-    	if(this._moduleProperties == null)
-    	{
-    		return null;
-    	}
-    	
-    	int size = this._moduleProperties.length;
-    	
-    	ModuleProperty[] toReturn = new ModuleProperty[size];
-    	
-    	for(int i=0;i<size;i++)
-    	{
-    		toReturn[i] = this._moduleProperties[i];
-    	}
-    	
+    public final ModuleProperty[] getProperties() {
+
+        logger.entering(this.getClass().getName(), "getProperties");
+
+        if (this.moduleProperties == null) {
+
+            logger.exiting(this.getClass().getName(), "getProperties", null);
+
+            return null;
+        }
+
+        int size = this.moduleProperties.length;
+
+        ModuleProperty[] toReturn = new ModuleProperty[size];
+
+        for (int i = 0; i < size; i++) {
+            toReturn[i] = this.moduleProperties[i];
+        }
+
+        logger.exiting(this.getClass().getName(), "getProperties", toReturn);
+
         return toReturn;
     }
 
     /**
-     * This method returns the unique String id of this module
-     * @return The unique String id of this module
+     * This method returns the unique <code>String</code> id of this
+     * module.
+     * @return The unique <code>String</code> id of this module
      */
-    public String getId()
-    {
-        return this._id;
+    public final String getId() {
+
+        logger.entering(this.getClass().getName(), "getId");
+
+        logger.exiting(this.getClass().getName(), "getId", this.packageId);
+
+        return this.packageId;
     }
-    
+
     /**
-     * This method returns the MicroSensorDataTypes that are provided by this module as an Array
-     * @return The MicroSensorDataTypes that are provided by this module
+     * This method returns the <em>MicroSensorDataTypes</em> that
+     * are provided by this module.
+     * @return The <em>MicroSensorDataTypes</em> that are provided
+     *         by this module
      */
-    public MicroSensorDataType[] getMicroSensorDataTypes()
-    {
-    	if(this._microSensorDataTypes == null)
-    	{
-    		return null;
-    	}
-    	
-    	int size = this._microSensorDataTypes.length;
-    	
-    	MicroSensorDataType[] toReturn = new MicroSensorDataType[size];
-    	
-    	for(int i=0;i<size;i++)
-    	{
-    		toReturn[i] = this._microSensorDataTypes[i];
-    	}
-    	
+    public final MicroSensorDataType[] getMicroSensorDataTypes() {
+
+        logger.entering(this.getClass().getName(), "getMicroSensorDataTypes");
+
+        if (this.microSensorDataTypes == null) {
+
+            logger.exiting(this.getClass().getName(),
+                "getMicroSensorDataTypes", null);
+
+            return null;
+        }
+
+        int size = this.microSensorDataTypes.length;
+
+        MicroSensorDataType[] toReturn = new MicroSensorDataType[size];
+
+        for (int i = 0; i < size; i++) {
+            toReturn[i] = this.microSensorDataTypes[i];
+        }
+
+        logger.exiting(this.getClass().getName(), "getMicroSensorDataTypes",
+            toReturn);
+
         return toReturn;
     }
 
-	
     /**
-     * This method returns the module provider name.
-     * @return The module provider name
+     * This method returns the module's provider name.
+     * @return The module's provider name
      */
-    public String getProvider_name()
-	{
-		return this._provider_name;
-	}
-    
+    public final String getProviderName() {
+
+        logger.entering(this.getClass().getName(), "getProviderName");
+
+        logger.exiting(this.getClass().getName(), "getProviderName",
+            this.moduleProviderName);
+
+        return this.moduleProviderName;
+    }
+
     /**
-     * This method returns the module version.
+     * This method returns the module's version.
      * @return The module version
      */
 
-	public String getVersion()
-	{
-		return this._version;
-	}
+    public final String getVersion() {
 
-	public ModuleType get_moduleType()
-	{
-		return this._moduleType;
-	}
+        logger.entering(this.getClass().getName(), "getVersion");
+
+        logger.exiting(this.getClass().getName(), "getVersion",
+            this.moduleVersion);
+
+        return this.moduleVersion;
+    }
+
+    /**
+     * This returns the module's <em>MODULE_TYYPE</em>.
+     * @return The module's <em>MODULE_TYYPE</em>
+     */
+    public final ModuleType getModuleType() {
+
+        logger.entering(this.getClass().getName(), "getModuleType");
+
+        logger.exiting(this.getClass().getName(), "getModuleType",
+            this.moduleType);
+
+        return this.moduleType;
+    }
 }

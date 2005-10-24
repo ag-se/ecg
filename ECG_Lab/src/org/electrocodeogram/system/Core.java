@@ -11,8 +11,10 @@
  */
 package org.electrocodeogram.system;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.Observable;
 import java.util.logging.Level;
@@ -26,7 +28,7 @@ import org.electrocodeogram.module.Module;
 import org.electrocodeogram.module.ModuleDescriptor;
 import org.electrocodeogram.module.classloader.ModuleClassLoaderInitializationException;
 import org.electrocodeogram.module.registry.IModuleRegistry;
-import org.electrocodeogram.module.registry.ModuleClassException;
+import org.electrocodeogram.module.registry.ModulePackageNotFoundException;
 import org.electrocodeogram.module.registry.ModuleRegistry;
 import org.electrocodeogram.module.registry.ModuleSetupLoadException;
 import org.electrocodeogram.msdt.MicroSensorDataType;
@@ -159,6 +161,8 @@ public final class Core extends Observable implements ISystem, IModuleSystem {
         logger.entering(this.getClass().getName(), "SystemRoot", new Object[] {
             moduleDir, moduleSetup, nogui});
 
+        Thread console = new Console();
+
         if (!nogui) {
             logger.log(Level.INFO,
                 "Going to start ECG Lab with user interface.");
@@ -167,10 +171,6 @@ public final class Core extends Observable implements ISystem, IModuleSystem {
         } else {
             logger.log(Level.INFO,
                 "Going to start ECG Lab without user interface.");
-
-            Thread workerThread = new WorkerThread();
-
-            workerThread.start();
         }
 
         if (moduleDir == null) {
@@ -199,6 +199,8 @@ public final class Core extends Observable implements ISystem, IModuleSystem {
 
             this.moduleRegistry.loadModuleSetup(new File(moduleSetup));
         }
+
+        console.start();
 
         logger.exiting(this.getClass().getName(), "SystemRoot");
 
@@ -313,7 +315,7 @@ public final class Core extends Observable implements ISystem, IModuleSystem {
 
         this.addObserver(module.getSystemObserver());
 
-        this.moduleRegistry.registerRunningModule(module);
+        this.moduleRegistry.registerModule(module);
 
     }
 
@@ -331,7 +333,7 @@ public final class Core extends Observable implements ISystem, IModuleSystem {
 
         this.deleteObserver(module.getSystemObserver());
 
-        this.moduleRegistry.deregisterRunningModule(module);
+        this.moduleRegistry.deregisterModule(module);
 
     }
 
@@ -339,7 +341,7 @@ public final class Core extends Observable implements ISystem, IModuleSystem {
      * @see org.electrocodeogram.system.IModuleSystem#getModuleDescriptor(java.lang.String)
      */
     public ModuleDescriptor getModuleDescriptor(final String id)
-        throws ModuleClassException {
+        throws ModulePackageNotFoundException {
         return this.moduleRegistry.getModuleDescriptor(id);
     }
 
@@ -796,31 +798,83 @@ public final class Core extends Observable implements ISystem, IModuleSystem {
     }
 
     /**
-     * If the ECG Lab is started without a graphical user interface,
-     * this Thread is used to prevent it from simply exiting after
-     * leaving the
-     * {@link org.electrocodeogram.system.Core#main(String[])} method.
+     * The <em>Console</em> is reading commands from <em>SDTIN</em>.
+     * It is currently only used to quit the ECG Lab, but could
+     * easily be extended to be an alternative to the GUI.
      */
-    private static class WorkerThread extends Thread {
+    private static class Console extends Thread {
+
+        /**
+         * This is the logger.
+         */
+        private Logger consoleLogger = LogHelper.createLogger(Console.class
+            .getName());
+
+        /**
+         * To read from <em>SDTIN</em>.
+         */
+        private BufferedReader reader;
+
+        /**
+         * The <code>Thread</code> is running untl this is <code>false</code>.
+         */
+        private boolean run;
+
+        /**
+         * Creates the <em>Console</em>.
+         *
+         */
+        public Console() {
+
+            this.consoleLogger.entering(this.getClass().getName(), "Console");
+
+            this.reader = new BufferedReader(new InputStreamReader(
+                java.lang.System.in));
+
+            this.run = true;
+
+            this.consoleLogger.exiting(this.getClass().getName(), "Console");
+        }
 
         /**
          * @see java.lang.Thread#run()
          */
-        @SuppressWarnings("synthetic-access")
         @Override
         public void run() {
-            while (true) {
+
+            this.consoleLogger.entering(this.getClass().getName(), "run");
+
+            String line;
+
+            while (this.run) {
+
                 try {
-                    synchronized (this) {
-                        wait();
+                    line = this.reader.readLine();
+
+                    java.lang.System.out.println("Echo: " + line);
+
+                    if (line.equals("quit")) {
+                        Core.getInstance().quit();
+                    } else {
+                        java.lang.System.out.println("Unknown Commmand: "
+                                                     + line);
                     }
 
-                } catch (InterruptedException e) {
-                    logger.log(Level.WARNING,
-                        "The SystemRoot's WorkerThread has been interrupted.");
+                } catch (IOException e) {
+
+                    this.consoleLogger.log(Level.SEVERE,
+                        "An error occured while reading from SDTIN.");
+
+                    this.consoleLogger.log(Level.SEVERE, e.getMessage());
+
+                    this.run = false;
                 }
+
             }
+
+            this.consoleLogger.exiting(this.getClass().getName(), "run");
 
         }
     }
+
 }
