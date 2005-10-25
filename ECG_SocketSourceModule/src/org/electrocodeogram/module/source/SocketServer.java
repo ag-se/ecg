@@ -22,7 +22,7 @@ import org.electrocodeogram.logging.LogHelper;
 public class SocketServer extends Thread implements ISocketServer
 {
     
-	private static Logger _logger = LogHelper.createLogger(SocketServer.class.getName());
+	private static Logger logger = LogHelper.createLogger(SocketServer.class.getName());
     
     private int _port = -1;
     
@@ -41,11 +41,11 @@ public class SocketServer extends Thread implements ISocketServer
      */
     public SocketServer(SourceModule module, int port)
     {
-    	_logger.entering(this.getClass().getName(),"SocketServer");
+    	logger.entering(this.getClass().getName(),"SocketServer");
     	
     	if(module == null)
     	{
-    		_logger.log(Level.SEVERE,"The parameter module is null. Can not create the SocketServer");
+    		logger.log(Level.SEVERE,"The parameter module is null. Can not create the SocketServer");
     		
     		return;
     	}
@@ -56,9 +56,9 @@ public class SocketServer extends Thread implements ISocketServer
 		}
     	else
     	{
-    		_logger.log(Level.WARNING, "The value for the port property must be a number greater than " + SocketSourceModule.MIN_PORT + " and less then " + SocketSourceModule.MAX_PORT + ".");
+    		logger.log(Level.WARNING, "The value for the port property must be a number greater than " + SocketSourceModule.MIN_PORT + " and less then " + SocketSourceModule.MAX_PORT + ".");
     		
-    		_logger.log(Level.SEVERE,"Can not create the SocketServer");
+    		logger.log(Level.SEVERE,"Can not create the SocketServer");
     		
     		return;
     	}
@@ -68,7 +68,7 @@ public class SocketServer extends Thread implements ISocketServer
         
         this._serverThreadPool = new HashMap<Integer,SocketServerThread>();
      
-        _logger.exiting(this.getClass().getName(),"SocketServer");
+        logger.exiting(this.getClass().getName(),"SocketServer");
 
     }
     
@@ -78,7 +78,7 @@ public class SocketServer extends Thread implements ISocketServer
      */
     public InetAddress[] getSensorAddresses()
     {
-    	_logger.entering(this.getClass().getName(),"getSensorAddress");
+    	logger.entering(this.getClass().getName(),"getSensorAddress");
     	
         int count = this.getSensorCount();
         
@@ -96,7 +96,7 @@ public class SocketServer extends Thread implements ISocketServer
             addresses[i] = ((SocketServerThread)sensorThreads[i]).getSensorAddress();
         }
         
-        _logger.exiting(this.getClass().getName(),"getSensorAddress");
+        logger.exiting(this.getClass().getName(),"getSensorAddress");
         
         return addresses;
     }
@@ -107,9 +107,9 @@ public class SocketServer extends Thread implements ISocketServer
      */
     public int getSensorCount()
     {
-    	_logger.entering(this.getClass().getName(),"getSensorCount");
+    	logger.entering(this.getClass().getName(),"getSensorCount");
     	
-    	_logger.exiting(this.getClass().getName(),"getSensorCount");
+    	logger.exiting(this.getClass().getName(),"getSensorCount");
     	
         return this._serverThreadPool.size();
 
@@ -122,11 +122,11 @@ public class SocketServer extends Thread implements ISocketServer
      */
     public void removeSensorThread(int id)
     {
-    	_logger.entering(this.getClass().getName(),"removeSensorThread");
+    	logger.entering(this.getClass().getName(),"removeSensorThread");
     	
         this._serverThreadPool.remove(new Integer(id));
         
-        _logger.exiting(this.getClass().getName(),"removeSensorThread");
+        logger.exiting(this.getClass().getName(),"removeSensorThread");
     }
 
     /**
@@ -137,7 +137,7 @@ public class SocketServer extends Thread implements ISocketServer
      */
     public String[] getAddress()
     {
-    	 _logger.entering(this.getClass().getName(),"getAddress");
+    	 logger.entering(this.getClass().getName(),"getAddress");
     	
         String[] toReturn = null;
         
@@ -148,10 +148,10 @@ public class SocketServer extends Thread implements ISocketServer
             
             // As the localhost should not be unknown, this should never happen. 
             
-            _logger.log(Level.SEVERE,"An unexpected exception has occurred. Please report this at www.electrocodeogram.org");
+            logger.log(Level.SEVERE,"An unexpected exception has occurred. Please report this at www.electrocodeogram.org");
         }
         
-        _logger.exiting(this.getClass().getName(),"getAddress");
+        logger.exiting(this.getClass().getName(),"getAddress");
         
         return toReturn;
     }
@@ -166,18 +166,18 @@ public class SocketServer extends Thread implements ISocketServer
     @Override
     public void run()
     {
-    	 _logger.entering(this.getClass().getName(),"run");
+    	 logger.entering(this.getClass().getName(),"run");
     	
         try {
 
             this._serverSocket = new ServerSocket(this._port);
 
-            _logger.log(Level.INFO,"ECG Server is up and listening on port: " + this._port);
+            logger.log(Level.INFO,"ECG Server is up and listening on port: " + this._port);
             
         }
         catch (IOException e) {
             
-            _logger.log(Level.SEVERE,"The ECG Server could not be started. (Maybe port " + this._port + " is in use?");
+            logger.log(Level.SEVERE,"The ECG Server could not be started. (Maybe port " + this._port + " is in use?");
             
             this.shutDown();
             
@@ -189,12 +189,12 @@ public class SocketServer extends Thread implements ISocketServer
                 // this method call blocks until a new incoming connection request
                 Socket socketToSensor = this._serverSocket.accept();
                 
-                _logger.log(Level.INFO,"New connection request from: " + socketToSensor.getInetAddress().toString());
+                logger.log(Level.INFO,"New connection request from: " + socketToSensor.getInetAddress().toString());
                 
                 // create a new ServerThread to communicate on the given Socket
                 SocketServerThread serverThread = new SocketServerThread(this,this._sourceModule,socketToSensor);
                 
-                _logger.log(Level.INFO,"A new ServerThread has been created.");
+                logger.log(Level.INFO,"A new ServerThread has been created.");
                 
                 // put the ServerThread in the threadpool
                 this._serverThreadPool.put(new Integer(serverThread.getServerThreadId()),serverThread);
@@ -202,17 +202,17 @@ public class SocketServer extends Thread implements ISocketServer
                 // start the ServerThread
                 serverThread.start();
                 
-                _logger.log(Level.INFO,"The new ServerThread has been started.");
+                logger.log(Level.INFO,"The new ServerThread has been started.");
                 
             }
             catch (IOException e) {
                 
-                _logger.log(Level.WARNING,"New connection request failed.");
+                logger.log(Level.WARNING,"New connection request failed.");
                 
             }
         }
         
-        _logger.exiting(this.getClass().getName(),"run");
+        logger.exiting(this.getClass().getName(),"run");
     }
 
     /**
@@ -221,7 +221,7 @@ public class SocketServer extends Thread implements ISocketServer
      */
     public String[] getSensorNames()
     {
-    	 _logger.entering(this.getClass().getName(),"getSensorName");
+    	 logger.entering(this.getClass().getName(),"getSensorName");
     	
         int count = this.getSensorCount();
         
@@ -234,7 +234,7 @@ public class SocketServer extends Thread implements ISocketServer
             names[i] = ((SocketServerThread)sensorThreads[i]).getSensorName();
         }
         
-        _logger.exiting(this.getClass().getName(),"getSensorName");
+        logger.exiting(this.getClass().getName(),"getSensorName");
         
         return names;
     }
@@ -247,13 +247,13 @@ public class SocketServer extends Thread implements ISocketServer
     public void shutDown()
     {
     	
-    	_logger.entering(this.getClass().getName(),"shutDown");
+    	logger.entering(this.getClass().getName(),"shutDown");
     	
-        _logger.log(Level.INFO,"Shutting down SocketServer at port: " + this._port);
+        logger.log(Level.INFO,"Shutting down SocketServer at port: " + this._port);
         
         Object[] threadArray = this._serverThreadPool.values().toArray();
         
-        _logger.log(Level.INFO,"Going to stop " + threadArray.length + " running ServerThreads.");
+        logger.log(Level.INFO,"Going to stop " + threadArray.length + " running ServerThreads.");
         
         for(Object threadObject : threadArray)
         {
@@ -263,7 +263,7 @@ public class SocketServer extends Thread implements ISocketServer
             
         }
 
-        _logger.log(Level.INFO,"All ServerThreads have been stopped.");
+        logger.log(Level.INFO,"All ServerThreads have been stopped.");
         
         this._run = false;
         
@@ -272,16 +272,30 @@ public class SocketServer extends Thread implements ISocketServer
             try {
                 this._serverSocket.close();
                 
-                _logger.log(Level.INFO,"The Socket has been closed.");
+                logger.log(Level.INFO,"The Socket has been closed.");
             }
             catch (IOException e) {
                 
-                _logger.log(Level.WARNING,"The socket could not be closed. Shutdown was not clean.");
+                logger.log(Level.WARNING,"The socket could not be closed. Shutdown was not clean.");
             }
         }
         
-        _logger.log(Level.INFO,"Shutdown complete");
+        logger.log(Level.INFO,"Shutdown complete");
         
-        _logger.exiting(this.getClass().getName(),"shutDown");
+        logger.exiting(this.getClass().getName(),"shutDown");
+    }
+
+    /**
+     * @return
+     */
+    public EventReader[] getEventReader() {
+        
+        logger.entering(this.getClass().getName(),"getEventReader");
+        
+        SocketServerThread[] threads = this._serverThreadPool.values().toArray(new SocketServerThread[this._serverThreadPool.size()]);
+        
+        logger.entering(this.getClass().getName(),"getEventReader",threads);
+        
+        return threads;
     }
 }

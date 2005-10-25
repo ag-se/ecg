@@ -4,11 +4,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.net.SocketException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.electrocodeogram.event.IllegalEventParameterException;
 import org.electrocodeogram.event.WellFormedEventPacket;
 import org.electrocodeogram.logging.LogHelper;
 
@@ -16,230 +14,277 @@ import org.electrocodeogram.logging.LogHelper;
  * A ServerThread maintains communication with a single ECG sensor.
  * Communication is done by (de)serialization over sockets.
  */
-public class SocketServerThread extends Thread
-{
-	private static Logger _logger = LogHelper.createLogger(SocketServerThread.class.getName());
+public class SocketServerThread extends EventReader {
 
-	private static int _count = 0;
+    private static Logger logger = LogHelper
+        .createLogger(SocketServerThread.class.getName());
 
-	private int _id = -1;
+    private static int _count = 0;
 
-	private Socket _socketToSensor = null;
+    private int _id = -1;
 
-	private boolean _run = true;
+    private Socket _socketToSensor = null;
 
-	private ObjectInputStream _ois = null;
+    private ObjectInputStream _ois = null;
 
-	private ISocketServer _sensorServer = null;
+    private ISocketServer _sensorServer = null;
 
-	private String _sensorName = null;
+    private String _sensorName = null;
 
-	private SourceModule _sourceModule;
+    private Object _object;
 
-	private Object _object;
+    private WellFormedEventPacket _packet;
 
-	private WellFormedEventPacket _packet;
+    /**
+     * This method returns the name of the currently connected ECG
+     * sensor.
+     * @return The name of the currently connected ECG sensor
+     */
+    public String getSensorName() {
+        logger.entering(this.getClass().getName(), "getSensorName");
 
-	/**
-	 * This method returns the name of the currently connected ECG sensor.
-	 * @return The name of the currently connected ECG sensor
-	 */
-	public String getSensorName()
-	{
-		_logger.entering(this.getClass().getName(), "getSensorName");
+        logger.exiting(this.getClass().getName(), "getSensorName");
 
-		_logger.exiting(this.getClass().getName(), "getSensorName");
+        return this._sensorName;
+    }
 
-		return this._sensorName;
-	}
+    /**
+     * This method returns the IP address of the currently connected
+     * ECG sensor.
+     * @return The IP address of the currently connected ECG sensor
+     */
+    public InetAddress getSensorAddress() {
+        logger.entering(this.getClass().getName(), "getSensorAddress");
 
-	/**
-	 * This method returns the IP address of the currently connected ECG sensor.
-	 * @return The IP address of the currently connected ECG sensor
-	 */
-	public InetAddress getSensorAddress()
-	{
-		_logger.entering(this.getClass().getName(), "getSensorAddress");
+        if (this._socketToSensor != null) {
+            return this._socketToSensor.getInetAddress();
+        }
 
-		if (this._socketToSensor != null)
-		{
-			return this._socketToSensor.getInetAddress();
-		}
+        logger.exiting(this.getClass().getName(), "getSensorAddress");
 
-		_logger.exiting(this.getClass().getName(), "getSensorAddress");
+        return null;
 
-		return null;
+    }
 
-	}
+    /**
+     * This creates a new ServerThread.
+     * @param sensorServer
+     *            A reference to the SensorServer that is managing
+     *            this ServerThread
+     * @param module
+     *            Is the source module to which the received event
+     *            data is passed
+     * @param socketToSensor
+     *            The socket to the ECG sensor
+     * @throws IOException
+     *             If the creation of the ObjectInputStream fails
+     */
+    public SocketServerThread(ISocketServer sensorServer, SourceModule module,
+        Socket socketToSensor) throws IOException {
+        super(module);
 
-	/**
-	 * This creates a new ServerThread.
-	 * @param sensorServer A reference to the SensorServer that is managing this ServerThread
-	 * @param module Is the source module to which the received event data is passed
-	 * @param socketToSensor The socket to the ECG sensor
-	 * @throws IOException If the creation of the ObjectInputStream fails
-	 */
-	public SocketServerThread(ISocketServer sensorServer, SourceModule module, Socket socketToSensor) throws IOException
-	{
-		super();
+        logger.entering(this.getClass().getName(), "SocketServerThread");
 
-		_logger.entering(this.getClass().getName(), "SocketServerThread");
+        if (module == null) {
+            logger
+                .log(Level.SEVERE,
+                    "The parameter module is null. Can not create the SocketServerThread");
 
-		this._sourceModule = module;
+            return;
+        }
 
-		if (module == null)
-		{
-			_logger.log(Level.SEVERE, "The parameter module is null. Can not create the SocketServerThread");
+        if (sensorServer == null) {
+            logger
+                .log(Level.SEVERE,
+                    "The parameter sensorServer is null. Can not create the SocketServerThread");
 
-			return;
-		}
+            return;
+        }
 
-		if (sensorServer == null)
-		{
-			_logger.log(Level.SEVERE, "The parameter sensorServer is null. Can not create the SocketServerThread");
+        if (socketToSensor == null) {
+            logger
+                .log(Level.SEVERE,
+                    "The parameter socketToSensor is null. Can not create the SocketServerThread");
 
-			return;
-		}
+            return;
+        }
 
-		if (socketToSensor == null)
-		{
-			_logger.log(Level.SEVERE, "The parameter socketToSensor is null. Can not create the SocketServerThread");
+        // Assign the ServerThread a unique ID
+        this._id = ++_count;
 
-			return;
-		}
+        this._sensorServer = sensorServer;
 
-		// Assign the ServerThread a unique ID
-		this._id = ++_count;
+        this._socketToSensor = socketToSensor;
 
-		this._sensorServer = sensorServer;
+        this._ois = new ObjectInputStream(socketToSensor.getInputStream());
 
-		this._socketToSensor = socketToSensor;
+        this.startReader();
 
-		this._ois = new ObjectInputStream(socketToSensor.getInputStream());
+        logger.exiting(this.getClass().getName(), "SocketServerThread");
+    }
 
-		_logger.exiting(this.getClass().getName(), "SocketServerThread");
-	}
+    /**
+     * This method returns the unique ID of the ServerThread.
+     * @return The unique ID of the ServerThread
+     */
+    public int getServerThreadId() {
+        logger.entering(this.getClass().getName(), "getSensorThreadId");
 
-	/**
-	 * This method returns the unique ID of the ServerThread.
-	 * @return The unique ID of the ServerThread
-	 */
-	public int getServerThreadId()
-	{
-		_logger.entering(this.getClass().getName(), "getSensorThreadId");
+        logger.exiting(this.getClass().getName(), "getSensorThreadId");
 
-		_logger.exiting(this.getClass().getName(), "getSensorThreadId");
+        return this._id;
+    }
 
-		return this._id;
-	}
+    /**
+     * This method stops the the Thread.
+     */
+    public void stopSensorThread() {
+        logger.entering(this.getClass().getName(), "stopSensorThread");
 
-	/**
-	 * This method stops the the Thread.
-	 */
-	public void stopSensorThread()
-	{
-		_logger.entering(this.getClass().getName(), "stopSensorThread");
+        this._sensorServer.removeSensorThread(this._id);
 
-		this._run = false;
+        try {
+            if (this._ois != null) {
+                this._ois.close();
+            }
+            if (this._socketToSensor != null) {
+                this._socketToSensor.close();
+            }
+        } catch (IOException e) {
 
-		this._sensorServer.removeSensorThread(this._id);
+            logger.log(Level.WARNING,
+                "The ServerThread could not be stopped cleanly.");
+        }
 
-		try
-		{
-			if (this._ois != null)
-			{
-				this._ois.close();
-			}
-			if (this._socketToSensor != null)
-			{
-				this._socketToSensor.close();
-			}
-		}
-		catch (IOException e)
-		{
+        logger.exiting(this.getClass().getName(), "stopSensorThread");
+    }
 
-			_logger.log(Level.WARNING, "The ServerThread could not be stopped cleanly.");
-		}
+  
+    /**
+     * @see org.electrocodeogram.module.source.EventReader#read()
+     */
+    @Override
+    public WellFormedEventPacket read() throws EventReaderException {
 
-		_logger.exiting(this.getClass().getName(), "stopSensorThread");
-	}
+        logger.entering(this.getClass().getName(), "read");
 
-	/**
-	 * @see java.lang.Thread#run()
-	 * The receiving of event data is implemented here.
-	 */
-	@Override
-	public void run()
-	{
-		_logger.entering(this.getClass().getName(), "run");
+        try {
+            this._object = this._ois.readObject();
 
-		while (this._run)
-		{
-			try
-			{
+            logger
+                .log(Level.FINE,
+                    "An object has been received over the socket and deserialized.");
 
-				this._object = this._ois.readObject();
+            this._packet = (WellFormedEventPacket) this._object;
 
-				this._packet = (WellFormedEventPacket) this._object;
+            logger.log(Level.FINE, "The object is a WellFormedeventPacket.");
 
-				WellFormedEventPacket packet = new WellFormedEventPacket(0,
-						this._packet.getTimeStamp(),
-						this._packet.getSensorDataType(),
-						this._packet.getArglist());
+            WellFormedEventPacket packet = new WellFormedEventPacket(0,
+                this._packet.getTimeStamp(), this._packet.getSensorDataType(),
+                this._packet.getArgList());
 
-				if (this._packet != null)
-				{
-					this._sourceModule.append(packet);
+            logger.log(Level.FINE,
+                "A new WellFormedEventPacket has been created to be returned.");
 
-				}
+            logger.exiting(this.getClass().getName(), "read", packet);
 
-				/* If the event data contains the "setTool" String, which is giving the name of the application
-				 * the sensor runs in, this String is used as the sensor name.
-				 */
-				if (this._packet.getSensorDataType().equals("Activity") && this._packet.getArglist().get(0).equals("setTool"))
-				{
-					String tmpSensorName;
+            return packet;
+        } catch (Exception e) {
 
-					if ((tmpSensorName = (String) this._packet.getArglist().get(1)) != null)
-					{
-						this._sensorName = tmpSensorName;
+            logger
+                .log(Level.WARNING,
+                    "An Exception occured while reading and deserializing an object.");
 
-					}
-				}
+            logger.log(Level.WARNING, e.getMessage());
 
-			}
-			catch (SocketException e)
-			{
+            logger.exiting(this.getClass().getName(), "read");
 
-				this._run = false;
+            throw new EventReaderException("");
+        }
 
-				_logger.log(Level.WARNING, "The socket connection to the ECG Sensor is lost.");
-			}
-			catch (IOException e)
-			{
+    }
 
-				_logger.log(Level.WARNING, "Error while reading from the ECG sensor.");
-			}
-			catch (ClassNotFoundException e)
-			{
-
-				_logger.log(Level.WARNING, "Error while reading from the ECG sensor.");
-
-			}
-			catch (ClassCastException e)
-			{
-				_logger.log(Level.ALL, "catch(ClassCastException e)");
-
-				// If something else then a ValidEventPacket is received, we don't care!
-			}
-			catch (IllegalEventParameterException e)
-			{
-				_logger.log(Level.WARNING, "Error while reading from the ECG sensor.");
-
-			}
-		}
-
-		_logger.exiting(this.getClass().getName(), "run");
-
-	}
+    // /**
+    // * @see java.lang.Thread#run()
+    // * The receiving of event data is implemented here.
+    // */
+    // @Override
+    // public void run()
+    // {
+    // _logger.entering(this.getClass().getName(), "run");
+    //
+    // while (this._run)
+    // {
+    // try
+    // {
+    //
+    // this._object = this._ois.readObject();
+    //
+    // this._packet = (WellFormedEventPacket) this._object;
+    //
+    // WellFormedEventPacket packet = new WellFormedEventPacket(0,
+    // this._packet.getTimeStamp(),
+    // this._packet.getSensorDataType(),
+    // this._packet.getArglist());
+    //
+    // if (this._packet != null)
+    // {
+    // this._sourceModule.append(packet);
+    //
+    // }
+    //
+    // /* If the event data contains the "setTool" String, which is
+    // giving the name of the application
+    // * the sensor runs in, this String is used as the sensor name.
+    // */
+    // if (this._packet.getSensorDataType().equals("Activity") &&
+    // this._packet.getArglist().get(0).equals("setTool"))
+    // {
+    // String tmpSensorName;
+    //
+    // if ((tmpSensorName = (String) this._packet.getArglist().get(1))
+    // != null)
+    // {
+    // this._sensorName = tmpSensorName;
+    //
+    // }
+    // }
+    //
+    // }
+    // catch (SocketException e)
+    // {
+    //
+    // this._run = false;
+    //
+    // _logger.log(Level.WARNING, "The socket connection to the sensor
+    // is lost.");
+    // }
+    // catch (IOException e)
+    // {
+    //
+    // this._run = false;
+    //				
+    // _logger.log(Level.WARNING, "The socket connection to the sensor
+    // is lost.");
+    //			}
+    //			catch (ClassNotFoundException e)
+    //			{
+    //
+    //				_logger.log(Level.WARNING, "The " + this._sourceModule.getName() + " received an object of an unknown class and ignores it.");
+    //
+    //			}
+    //			catch (ClassCastException e)
+    //			{
+    //				_logger.log(Level.WARNING, "The " + this._sourceModule.getName() + " received an object class that is not WellformedEventPacket and ignores it.");
+    //			}
+    //			catch (IllegalEventParameterException e)
+    //			{
+    //				_logger.log(Level.WARNING, "An error occured while reading an event from the sensor.");
+    //
+    //			}
+    //		}
+    //
+    //		_logger.exiting(this.getClass().getName(), "run");
+    //
+    //	}
 }
