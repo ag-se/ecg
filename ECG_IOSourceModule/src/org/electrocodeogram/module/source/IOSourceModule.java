@@ -12,215 +12,297 @@ import org.electrocodeogram.module.ModulePropertyException;
 import org.electrocodeogram.system.ModuleSystem;
 
 /**
- * This class is an ECG nodule that reads in ECG events form standard input.
- * It is primarilly used by the ECG EclipseSenor if it runs in InlineServer mode.
- * In that case the ECG Lab is started with this module and
- * the ECG EclipseSensor writes recorded events to the standard input of this module.
+ * This class is an ECG nodule that reads in ECG events form standard
+ * input. It is primarilly used by the ECG EclipseSenor if it runs in
+ * InlineServer mode. In that case the ECG Lab is started with this
+ * module and the ECG EclipseSensor writes recorded events to the
+ * standard input of this module.
  */
-public class IOSourceModule extends SourceModule
-{
+public class IOSourceModule extends SourceModule {
 
-	static Logger _logger = LogHelper.createLogger(IOSourceModule.class.getName());
+    static Logger _logger = LogHelper.createLogger(IOSourceModule.class
+        .getName());
 
-	private Console _console;
+    private Console _console;
 
-	/**
-	 * The constructor creates the module instance. It is not to be called by
-	 * developers, instead it is called from the ECG ModuleRegistry when the
-	 * user requested a new instance of this module.
-	 * 
-	 * @param id
-	 *            This is the unique String id of the module
-	 * @param name
-	 *            This is the name which is given to the module instance
-	 */
-	public IOSourceModule(String id, String name)
-	{
-		super(id, name);
+    /**
+     * The constructor creates the module instance. It is not to be
+     * called by developers, instead it is called from the ECG
+     * ModuleRegistry when the user requested a new instance of this
+     * module.
+     * @param id
+     *            This is the unique String id of the module
+     * @param name
+     *            This is the name which is given to the module
+     *            instance
+     */
+    public IOSourceModule(String id, String name) {
+        super(id, name);
 
-		_logger.entering(this.getClass().getName(), "IOSOurceModule");
+        _logger.entering(this.getClass().getName(), "IOSOurceModule");
 
-		_logger.exiting(this.getClass().getName(), "IOSOurceModule");
-	}
+        _logger.exiting(this.getClass().getName(), "IOSOurceModule");
+    }
 
-	
-	
-	/**
-	 * @see org.electrocodeogram.module.Module#propertyChanged(org.electrocodeogram.module.ModuleProperty)
-	 */
-	@SuppressWarnings("unused")
+    /**
+     * @see org.electrocodeogram.module.Module#propertyChanged(org.electrocodeogram.module.ModuleProperty)
+     */
+    @SuppressWarnings("unused")
     @Override
-	public void propertyChanged(@SuppressWarnings("unused") ModuleProperty moduleProperty) throws ModulePropertyException
-	{
-		// not implemented
-	}
+    public void propertyChanged(@SuppressWarnings("unused")
+    ModuleProperty moduleProperty) throws ModulePropertyException {
+    // not implemented
+    }
 
-	/**
-	 * @see org.electrocodeogram.module.Module#analyseCoreNotification() This
-	 * The method is not implemented in this module.
-	 */
-	@Override
-	public void analyseCoreNotification()
-	{
-		// not implemented
-	}
+    /**
+     * @see org.electrocodeogram.module.Module#analyseCoreNotification()
+     *      This The method is not implemented in this module.
+     */
+    @Override
+    public void analyseCoreNotification() {
+    // not implemented
+    }
 
-	/**
-	 * @see org.electrocodeogram.module.Module#initialize()
-	 * The method is not implemented in this module. 
-	 */
-	@Override
-	public void initialize()
-	{
-		// not implemented
-	}
+    /**
+     * @see org.electrocodeogram.module.Module#initialize() The method
+     *      is not implemented in this module.
+     */
+    @Override
+    public void initialize() {
+    // not implemented
+    }
 
-	/**
-	 * @see org.electrocodeogram.module.source.SourceModule#startReader(org.electrocodeogram.module.source.SourceModule)
-	 */
-	@Override
-	public void startReader(SourceModule sourceModule) throws SourceModuleException
-	{
-		_logger.entering(this.getClass().getName(), "startReader");
+    // /**
+    // * @see
+    // org.electrocodeogram.module.source.SourceModule#startReader(org.electrocodeogram.module.source.SourceModule)
+    // */
+    // @Override
+    // public void startReader(SourceModule sourceModule) throws
+    // SourceModuleException
+    // {
+    // _logger.entering(this.getClass().getName(), "startReader");
+    //
+    // this._console = new Console(sourceModule);
+    //		
+    // System.out.println("console created");
+    //
+    // this._console.start();
+    //		
+    // System.out.println("console started");
+    //
+    // _logger.exiting(this.getClass().getName(), "startReader");
+    // }
 
-		this._console = new Console(sourceModule);
-		
-		System.out.println("console created");
+    // /**
+    // * @see
+    // org.electrocodeogram.module.source.SourceModule#stopReader()
+    // */
+    // @Override
+    // public void stopReader()
+    // {
+    // this._console.shutDown();
+    //
+    // this._console = null;
+    // }
 
-		this._console.start();
-		
-		System.out.println("console started");
+    private class Console extends EventReader {
 
-		_logger.exiting(this.getClass().getName(), "startReader");
-	}
+        private ObjectInputStream _ois = null;
 
-	/**
-	 * @see org.electrocodeogram.module.source.SourceModule#stopReader()
-	 */
-	@Override
-	public void stopReader()
-	{
-		this._console.shutDown();
+        private SourceModule _sourceModule;
 
-		this._console = null;
-	}
+        private boolean _run = true;
 
-	private class Console extends Thread
-	{
+        /**
+         * This creates the Console Thread to continously read in
+         * events from standard input.
+         * @param sourceModule
+         *            Is the SourceModule to which events are beeing
+         *            passed
+         * @throws IOException
+         */
+        public Console(SourceModule sourceModule) {
 
-		private ObjectInputStream _ois = null;
+            super(sourceModule);
 
-		private SourceModule _sourceModule;
+            _logger.entering(this.getClass().getName(), "Console");
 
-		private boolean _run = true;
+            this._sourceModule = sourceModule;
 
-		/**
-		 * This creates the Console Thread to
-		 * continously read in events from standard input.
-		 * @param sourceModule Is the SourceModule to which events are beeing passed
-		 * @throws IOException 
-		 */
-		public Console(SourceModule sourceModule)
-		{
+            try {
+                this._ois = new ObjectInputStream(System.in);
+            } catch (IOException e1) {
+                _logger.log(Level.SEVERE,
+                    "An error occured while starting the SourceModule: "
+                                    + this.getName());
 
-			_logger.entering(this.getClass().getName(), "Console");
+                _logger.exiting(this.getClass().getName(), "startReader");
 
-			this._sourceModule = sourceModule;
+                this._sourceModule.deactivate();
 
-			_logger.exiting(this.getClass().getName(), "Console");
-		}
+                return;
+            }
+            
+            _logger.exiting(this.getClass().getName(), "Console");
+        }
 
-		/**
-		 * This stops the Console Thread.
-		 *
-		 */
-		public void shutDown()
-		{
-			this._run = false;
-		}
+        /**
+         * This stops the Console Thread.
+         */
+        public void shutDown() {
+            this._run = false;
+        }
 
-		/**
-		 * @see java.lang.Thread#run()
-		 */
-		@Override
-		public void run()
-		{
-			_logger.entering(this.getClass().getName(), "run");
+//        /**
+//         * @see java.lang.Thread#run()
+//         */
+//        @Override
+//        public void run() {
+//            _logger.entering(this.getClass().getName(), "run");
+//
+//            try {
+//                this._ois = new ObjectInputStream(System.in);
+//            } catch (IOException e1) {
+//                _logger.log(Level.SEVERE,
+//                    "An error occured while starting the SourceModule: "
+//                                    + this.getName());
+//
+//                _logger.exiting(this.getClass().getName(), "startReader");
+//
+//                this._sourceModule.deactivate();
+//
+//                return;
+//            }
+//
+//            while (this._run) {
+//
+//                System.out.println("run");
+//
+//                System.out.println(this._sourceModule.getName() + " >>");
+//
+//                Object inputObject = null;
+//
+//                try {
+//                    System.out.println("before read");
+//
+//                    inputObject = this._ois.readObject();
+//
+//                    System.out.println("after read");
+//
+//                    _logger.log(Level.INFO, "Read a line...");
+//                } catch (Exception e) {
+//
+//                    _logger.log(Level.SEVERE,
+//                        "An error occurred while receiving data.");
+//
+//                    _logger.log(Level.SEVERE, e.getMessage());
+//
+//                    this._sourceModule.deactivate();
+//
+//                    return;
+//                }
+//
+//                if (inputObject instanceof WellFormedEventPacket) {
+//
+//                    _logger.log(Level.INFO, "Event received");
+//
+//                    WellFormedEventPacket packet = (WellFormedEventPacket) inputObject;
+//
+//                    this._sourceModule.append(packet);
+//
+//                } else if (inputObject instanceof String) {
+//
+//                    _logger.log(Level.INFO, "String received");
+//
+//                    String string = (String) inputObject;
+//
+//                    _logger.log(Level.INFO, string);
+//
+//                    if (string.equals("quit")) {
+//                        ModuleSystem.getInstance().quit();
+//                    }
+//                }
+//
+//            }
+//
+//            _logger.exiting(this.getClass().getName(), "run");
+//        }
 
-			try
-			{
-				this._ois = new ObjectInputStream(System.in);
-			}
-			catch (IOException e1)
-			{
-				_logger.log(Level.SEVERE, "An error occured while starting the SourceModule: " + this.getName());
+        /*
+         * (non-Javadoc)
+         * @see org.electrocodeogram.module.source.EventReader#read()
+         */
+        @Override
+        public WellFormedEventPacket read() throws EventReaderException {
 
-				_logger.exiting(this.getClass().getName(), "startReader");
-				
-				this._sourceModule.deactivate();
-				
-				return;
-			}
+            Object inputObject = null;
+            
+            try {
+                inputObject = this._ois.readObject();
+                
+                if (inputObject instanceof WellFormedEventPacket) {
 
-			while (this._run)
-			{
+                    _logger.log(Level.INFO, "Event received");
 
-				System.out.println("run");
-				
-				System.out.println(this._sourceModule.getName() + " >>");
+                    WellFormedEventPacket packet = (WellFormedEventPacket) inputObject;
 
-				Object inputObject = null;
+                    return packet;
 
-				try
-				{
-					System.out.println("before read");
-					
-					inputObject = this._ois.readObject();
-					
-					System.out.println("after read");
-					
-					_logger.log(Level.INFO,"Read a line...");
-				}
-                catch (Exception e) {
+                } else if (inputObject instanceof String) {
+
+                    _logger.log(Level.INFO, "String received");
+
+                    String string = (String) inputObject;
+
+                    _logger.log(Level.INFO, string);
+
+                    if (string.equals("quit")) {
+                        ModuleSystem.getInstance().quit();
+                    }
                     
-                    _logger.log(Level.SEVERE, "An error occurred while receiving data.");
-
-                    _logger.log(Level.SEVERE, e.getMessage());
-                    
-                    this._sourceModule.deactivate();
-                    
-                    return;
+                    return null;
                 }
+                
+                
+            } catch (Exception e) {
+             throw new EventReaderException("");
+            }
+            
+            return null;
+        }
 
-				if (inputObject instanceof WellFormedEventPacket)
-				{
+    }
 
-					_logger.log(Level.INFO, "Event received");
+    /*
+     * (non-Javadoc)
+     * @see org.electrocodeogram.module.source.SourceModule#getEventReader()
+     */
+    @Override
+    public EventReader[] getEventReader() {
 
-					WellFormedEventPacket packet = (WellFormedEventPacket) inputObject;
+        return new EventReader[] {this._console};
+    }
 
-					this._sourceModule.append(packet);
+    /* (non-Javadoc)
+     * @see org.electrocodeogram.module.source.SourceModule#preStart()
+     */
+    @Override
+    public void preStart() {
+        _logger.entering(this.getClass().getName(), "preStart");
 
-				}
-				else if (inputObject instanceof String)
-				{
+        this._console = new Console(this);
 
-					_logger.log(Level.INFO, "String received");
-					
-					String string = (String) inputObject;
+        this._console.start();
 
-					_logger.log(Level.INFO, string);
-					
-					if (string.equals("quit"))
-					{
-						ModuleSystem.getInstance().quit();
-					}
-				}
-				
-			}
+        _logger.exiting(this.getClass().getName(), "preStart");
 
-			_logger.exiting(this.getClass().getName(), "run");
-		}
-		
-	}
+    }
+
+    /* (non-Javadoc)
+     * @see org.electrocodeogram.module.source.SourceModule#postStop()
+     */
+    @Override
+    public void postStop() {
+
+    }
 }
