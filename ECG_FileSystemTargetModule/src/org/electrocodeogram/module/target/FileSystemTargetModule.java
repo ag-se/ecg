@@ -116,7 +116,7 @@ public class FileSystemTargetModule extends TargetModule
 				_logger.log(Level.WARNING, "The property value is null for: " + moduleProperty.getName());
 
 				throw new ModulePropertyException(
-						"The property value is null for: " + moduleProperty.getName());
+						"The property value is null.", this.getName(), this.getId(), moduleProperty.getName(), moduleProperty.getValue());
 			}
 
 			File propertyValueFile = new File(moduleProperty.getValue());
@@ -137,7 +137,7 @@ public class FileSystemTargetModule extends TargetModule
 				_logger.log(Level.SEVERE, "The file could not be opened for writing: " + moduleProperty.getValue());
 
 				throw new ModulePropertyException(
-						"The file could not be opened for writing: " + moduleProperty.getValue());
+						"The file could not be opened for writing.", this.getName(), this.getId(), moduleProperty.getName(), moduleProperty.getValue());
 			}
         
 
@@ -163,7 +163,7 @@ public class FileSystemTargetModule extends TargetModule
 				_logger.log(Level.WARNING, "The module does not support a property value of " + moduleProperty.getValue() + " with the given name: " + moduleProperty.getName());
 
 				throw new ModulePropertyException(
-						"The module does not support a property value of " + moduleProperty.getValue() + " with the given name: " + moduleProperty.getName());
+						"The module does not support this property.", this.getName(), this.getId(), moduleProperty.getName(), moduleProperty.getValue());
 			}
 
 		
@@ -184,7 +184,7 @@ public class FileSystemTargetModule extends TargetModule
 				_logger.log(Level.WARNING, "The module does not support a property value of " + moduleProperty.getValue() + " with the given name: " + moduleProperty.getName());
 
 				throw new ModulePropertyException(
-						"The module does not support a property value of " + moduleProperty.getValue() + " with the given name: " + moduleProperty.getName());
+                    "The module does not support this property.", this.getName(), this.getId(), moduleProperty.getName(), moduleProperty.getValue());
 			}
 
 		
@@ -194,7 +194,7 @@ public class FileSystemTargetModule extends TargetModule
 			_logger.log(Level.WARNING, "The module does not support a property with the given name: " + moduleProperty.getName());
 
 			throw new ModulePropertyException(
-					"The module does not support a property with the given name: " + moduleProperty.getName());
+                "The module does not support this property.", this.getName(), this.getId(), moduleProperty.getName(), moduleProperty.getValue());
 
 		}
 
