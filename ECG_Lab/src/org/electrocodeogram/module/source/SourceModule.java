@@ -144,7 +144,7 @@ public abstract class SourceModule extends Module {
         try {
             validEventPacket = new ValidEventPacket(this.getId(), eventPacket
                 .getTimeStamp(), eventPacket.getSensorDataType(), eventPacket
-                .getArglist());
+                .getArgList());
 
             logger.log(Level.INFO,
                 "An event has been appended to the SourceModule: "

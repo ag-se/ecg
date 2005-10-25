@@ -1251,7 +1251,7 @@ public abstract class Module {
                     ValidEventPacket packet = new ValidEventPacket(
                         this.myModule.getId(), eventPacket.getTimeStamp(),
                         eventPacket.getSensorDataType(), eventPacket
-                            .getArglist());
+                            .getArgList());
 
                     packet.setDeliveryState(DELIVERY_STATE.SENT);
 
@@ -1362,7 +1362,7 @@ public abstract class Module {
                         this.myModule.getId(), receivedPacketForProcessing
                             .getTimeStamp(), receivedPacketForProcessing
                             .getSensorDataType(), receivedPacketForProcessing
-                            .getArglist());
+                            .getArgList());
 
                     receivedPacketForSystem
                         .setDeliveryState(DELIVERY_STATE.RECEIVED);

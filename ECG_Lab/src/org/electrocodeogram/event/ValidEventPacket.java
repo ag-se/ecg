@@ -245,7 +245,7 @@ public class ValidEventPacket extends WellFormedEventPacket {
 
         if (validationLevel == VALIDATION_LEVEL.HACKYSTAT) {
             new WellFormedEventPacket(this.getSourceId(), this.getTimeStamp(),
-                this.getSensorDataType(), this.getArglist());
+                this.getSensorDataType(), this.getArgList());
 
             hackyStatValidate();
         }
@@ -253,7 +253,7 @@ public class ValidEventPacket extends WellFormedEventPacket {
         else if (validationLevel == VALIDATION_LEVEL.ECG) {
 
             new WellFormedEventPacket(this.getSourceId(), this.getTimeStamp(),
-                this.getSensorDataType(), this.getArglist());
+                this.getSensorDataType(), this.getArgList());
 
             hackyStatValidate();
 
@@ -302,7 +302,7 @@ public class ValidEventPacket extends WellFormedEventPacket {
             "The event is not valid in repspect to validity level: "
                             + VALIDATION_LEVEL.ECG);
 
-        List argList = this.getArglist();
+        List argList = this.getArgList();
 
         String microActivityType = (String) argList.get(1);
 
@@ -426,7 +426,7 @@ public class ValidEventPacket extends WellFormedEventPacket {
 
         List<String> entryList = new ArrayList<String>();
 
-        List argList = this.getArglist();
+        List argList = this.getArgList();
 
         entryList.add(new Long(this.getTimeStamp().getTime()).toString());
 
