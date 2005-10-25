@@ -54,7 +54,7 @@ public class HackyStatTargetModule extends TargetModule
 			return;
 		}
 
-		this._shell.doCommand(arg0.getTimeStamp(), arg0.getSensorDataType(), arg0.getArglist());
+		this._shell.doCommand(arg0.getTimeStamp(), arg0.getSensorDataType(), arg0.getArgList());
 
 		this._shell.send();
 
@@ -108,13 +108,13 @@ public class HackyStatTargetModule extends TargetModule
 		if (this._host == null)
 		{
 			throw new TargetModuleException(
-					"The HackyStat host property is not set yet.");
+					"The HackyStat host property is not set yet.", this.getName());
 		}
 
 		if (this._key == null)
 		{
 			throw new TargetModuleException(
-					"The HackyStat admin key property is not set yet.");
+					"The HackyStat admin key property is not set yet.", this.getName());
 		}
 
 		this._properties = new SensorProperties(this._host, this._key);
