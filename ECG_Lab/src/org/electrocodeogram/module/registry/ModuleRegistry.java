@@ -26,6 +26,7 @@ import org.electrocodeogram.module.ModuleActivationException;
 import org.electrocodeogram.module.ModuleConnectionException;
 import org.electrocodeogram.module.ModuleDescriptor;
 import org.electrocodeogram.module.ModuleProperty;
+import org.electrocodeogram.module.ModulePropertyException;
 import org.electrocodeogram.module.Module.ModuleType;
 import org.electrocodeogram.module.classloader.ModuleClassLoaderInitializationException;
 import org.electrocodeogram.module.setup.ModuleConfiguration;
@@ -33,7 +34,7 @@ import org.electrocodeogram.module.setup.ModuleSetup;
 import org.electrocodeogram.msdt.MicroSensorDataTypeException;
 import org.electrocodeogram.xml.ClassLoadingException;
 import org.electrocodeogram.xml.ECGParser;
-import org.electrocodeogram.xml.PropertyException;
+import org.electrocodeogram.xml.NodeException;
 import org.xml.sax.SAXException;
 
 /**
@@ -394,12 +395,6 @@ public class ModuleRegistry extends Observable implements IModuleRegistry {
                                         + modulePropertyFileString);
 
                     continue;
-                } catch (PropertyException e) {
-                    modulePackagesMapLogger.log(Level.WARNING,
-                        "Error while loading the module: "
-                                        + modulePropertyFileString);
-
-                    continue;
                 } catch (SAXException e) {
                     modulePackagesMapLogger.log(Level.WARNING,
                         "Error while loading the module: "
@@ -416,14 +411,24 @@ public class ModuleRegistry extends Observable implements IModuleRegistry {
                     modulePackagesMapLogger.log(Level.FINEST, e.getMessage());
 
                     continue;
-                } catch (ModuleSetupLoadException e) {
+                } catch (NodeException e) {
                     modulePackagesMapLogger.log(Level.WARNING,
                         "Error while loading the module: "
                                         + modulePropertyFileString);
 
+                    modulePackagesMapLogger.log(Level.FINEST, e.getMessage());
+
+                    continue;
+
+                } catch (ModulePropertyException e) {
+                    modulePackagesMapLogger.log(Level.WARNING,
+                        "Error while loading the module: "
+                                        + modulePropertyFileString);
+
+                    modulePackagesMapLogger.log(Level.FINEST, e.getMessage());
+
                     continue;
                 }
-
                 if (moduleDescriptor == null) {
                     modulePackagesMapLogger.log(Level.WARNING,
                         "Error while loading the module: "
@@ -766,7 +771,8 @@ public class ModuleRegistry extends Observable implements IModuleRegistry {
             logger.exiting(this.getClass().getName(), "storeModuleSetup");
             throw new ModuleSetupStoreException("The given file "
                                                 + file.getAbsolutePath()
-                                                + "could not be found.", file.getAbsolutePath());
+                                                + "could not be found.", file
+                .getAbsolutePath());
         }
 
         writer.flush();
@@ -1116,7 +1122,7 @@ public class ModuleRegistry extends Observable implements IModuleRegistry {
             logger.exiting(this.getClass().getName(), "loadModuleSetup");
             throw new ModuleSetupLoadException(e.getMessage(), file
                 .getAbsolutePath());
-        } catch (PropertyException e) {
+        } catch (ModulePropertyException e) {
             logger.exiting(this.getClass().getName(), "loadModuleSetup");
             throw new ModuleSetupLoadException(e.getMessage(), file
                 .getAbsolutePath());
@@ -1125,6 +1131,10 @@ public class ModuleRegistry extends Observable implements IModuleRegistry {
             throw new ModuleSetupLoadException(e.getMessage(), file
                 .getAbsolutePath());
         } catch (ClassLoadingException e) {
+            logger.exiting(this.getClass().getName(), "loadModuleSetup");
+            throw new ModuleSetupLoadException(e.getMessage(), file
+                .getAbsolutePath());
+        } catch (NodeException e) {
             logger.exiting(this.getClass().getName(), "loadModuleSetup");
             throw new ModuleSetupLoadException(e.getMessage(), file
                 .getAbsolutePath());

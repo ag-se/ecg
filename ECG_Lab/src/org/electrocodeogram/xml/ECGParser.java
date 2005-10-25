@@ -21,9 +21,9 @@ import org.electrocodeogram.logging.LogHelper;
 import org.electrocodeogram.logging.LogHelper.ECGLevel;
 import org.electrocodeogram.module.ModuleDescriptor;
 import org.electrocodeogram.module.ModuleProperty;
+import org.electrocodeogram.module.ModulePropertyException;
 import org.electrocodeogram.module.Module.ModuleType;
 import org.electrocodeogram.module.classloader.ModuleClassLoader;
-import org.electrocodeogram.module.registry.ModuleSetupLoadException;
 import org.electrocodeogram.module.setup.ModuleConfiguration;
 import org.electrocodeogram.module.setup.ModuleSetup;
 import org.electrocodeogram.msdt.MicroSensorDataType;
@@ -333,20 +333,22 @@ public final class ECGParser {
      *             If an error occurs while loading the
      *             <em>MicroSensorDataTypes</em>, which are defined
      *             in the properties file
-     * @throws PropertyException
-     *             If an error occurs while loading the
-     *             <em>ModuleProperties</em>, which are defined in
-     *             the properties file
+     * @throws NodeException
+     *             If a expected XML <code>Node</code> or its value
+     *             can not be found
      * @throws SAXException
      *             If the file does not contain a wellformed and valid
      *             XML document
      * @throws IOException
      *             If an error occurs while reading from the file
-     * @throws ModuleSetupLoadException
+     * @throws ModulePropertyException
+     *             If an error occurs while loading the
+     *             <em>ModuleProperties</em>, which are defined in
+     *             the properties file
      */
     public static ModuleDescriptor parseAsModuleDescriptor(final File file)
         throws ClassLoadingException, MicroSensorDataTypeException,
-        PropertyException, SAXException, IOException, ModuleSetupLoadException {
+        NodeException, SAXException, IOException, ModulePropertyException {
 
         logger.entering(ECGParser.class.getName(), "parseAsModuleDescriptor",
             new Object[] {file});
@@ -390,12 +392,12 @@ public final class ECGParser {
      * @param document
      *            Is the XML <code>Document</code>
      * @return The <em>MODULE_TYPE</em>
-     * @throws PropertyException
+     * @throws NodeException
      *             If the given XML <code>Document</code> is not
      *             containing a module description
      */
     private static ModuleType getModuleType(final Document document)
-        throws PropertyException {
+        throws NodeException {
 
         logger.entering(ECGParser.class.getName(), "getModuleType",
             new Object[] {document});
@@ -430,18 +432,17 @@ public final class ECGParser {
      *             <em>ModuleSetup</em>
      * @throws IOException
      *             If an error occurs while reading from the file
-     * @throws ModuleSetupLoadException
-     * @throws PropertyException
-     *             If an error occurs while loading the
-     *             <em>ModuleProperties</em> from the
+     * @throws NodeException
+     *             If a expected XML <code>Node</code> or its value
+     *             can not be found If an error occurs while loading
+     *             the <em>ModuleProperties</em> from the
      *             <em>ModuleSetup</em>
      * @throws ClassLoadingException
      *             If an error occurs while loading the module class
      *             from the <em>ModuleSetup</em>
      */
     public static ModuleSetup parseAsModuleSetup(final File file)
-        throws SAXException, IOException, ModuleSetupLoadException,
-        PropertyException, ClassLoadingException {
+        throws SAXException, IOException, NodeException, ClassLoadingException {
 
         logger.entering(ECGParser.class.getName(), "parseAsModuleSetup",
             new Object[] {file});
@@ -459,9 +460,9 @@ public final class ECGParser {
                                + " stored modules in module setup file.");
 
         if (moduleNodes.length == 0) {
-            throw new ModuleSetupLoadException(
-                "The module setup is empty in file " + file.getAbsolutePath(),
-                file.getAbsolutePath());
+            throw new NodeException(
+                "The ModuleSetup is empty. No node was found.", "module", file
+                    .getAbsolutePath());
         }
 
         for (Node moduleNode : moduleNodes) {
@@ -493,9 +494,9 @@ public final class ECGParser {
 
                 logger.exiting(ECGParser.class.getName(), "parseAsModuleSetup");
 
-                throw new ModuleSetupLoadException(
-                    "Illegal value for attribute \"id\" for element \"module\".",
-                    file.getAbsolutePath());
+                throw new NodeException(
+                    "The value is not a positive integer number", moduleNode
+                        .getNodeName(), file.getAbsolutePath());
             }
 
             boolean active = false;
@@ -549,9 +550,9 @@ public final class ECGParser {
                         logger.exiting(ECGParser.class.getName(),
                             "parseAsModuleSetup");
 
-                        throw new ModuleSetupLoadException(
-                            "Illegal value for element \"id\" for element \"connectedTo\" for module number "
-                                            + storedModuleId, file
+                        throw new NodeException(
+                            "The value is not a positive integer number",
+                            connectedToNode.getNodeName(), file
                                 .getAbsolutePath());
                     }
 
@@ -617,12 +618,12 @@ public final class ECGParser {
      * @param document
      *            The XML <code>Document</code>
      * @return The <em>ModuleProperties</em>
-     * @throws PropertyException
+     * @throws NodeException
      *             If an error occurs while accessing the document's
      *             nodes.
      */
     private static ModuleProperty[] getModuleProperties(final Document document)
-        throws PropertyException {
+        throws NodeException {
 
         logger.entering(ECGParser.class.getName(), "getModuleProperties",
             new Object[] {document});
@@ -639,7 +640,7 @@ public final class ECGParser {
                 "properties");
 
             propertyNodes = getChildNodes(properties, "property");
-        } catch (PropertyException e) {
+        } catch (NodeException e) {
 
             logger.exiting(ECGParser.class.getName(), "getModuleProperties",
                 null);
@@ -684,7 +685,10 @@ public final class ECGParser {
                     logger.exiting(ECGParser.class.getName(),
                         "getModuleProperties");
 
-                    throw new PropertyException(e1.getMessage());
+                    throw new NodeException(
+                        "The property type is not a Java class.",
+                        modulePropertyTypeNode.getNodeName(),
+                        modulePropertyValueNode.getNodeName());
                 }
             }
 
@@ -696,9 +700,10 @@ public final class ECGParser {
                 logger
                     .exiting(ECGParser.class.getName(), "getModuleProperties");
 
-                throw new PropertyException(
-                    "The property type is not a known Class: "
-                                    + modulePropertyType);
+                throw new NodeException(
+                    "The property type is not a Java class.",
+                    modulePropertyTypeNode.getNodeName(),
+                    modulePropertyValueNode.getNodeName());
             }
 
             String modulePropertyValue = null;
@@ -767,12 +772,12 @@ public final class ECGParser {
      * @param document
      *            Is the value from the given XML <code>Node</code>
      * @return The value of the <code>Node</code>
-     * @throws PropertyException
+     * @throws NodeException
      *             If an error occurs while accessing the
      *             <code>Node</code>
      */
     private static String getSingleNodeValue(final String nodeName,
-        final Document document) throws PropertyException {
+        final Document document) throws NodeException {
 
         logger.entering(ECGParser.class.getName(), "getSingleNodeValue",
             new Object[] {nodeName, document});
@@ -788,17 +793,27 @@ public final class ECGParser {
     /**
      * Returns the <em>MicroSensorDataTypes</em> form the given XML
      * <code>Document</code>, wich is expected to be a parsed
-     * "module.properties.xml" file.
+     * "module.properties.xml" file. This method uses
+     * {@link org.electrocodeogram.msdt.registry.MsdtRegistry#parseMicroSensorDataType(File)}
+     * to actually parse the XML schemata into
+     * {@link javax.xml.validation.Schema} objects.
      * @param document
      *            The XML <code>Document</code>
+     * @param modulePath
+     *            Is the path to the module wich
+     *            <em>ModuleDescription</em> is currently parsed.
      * @return The <em>MicroSensorDataTypes</em>
-     * @throws PropertyException
+     * @throws NodeException
      *             If an error occurs while accessing the document's
      *             nodes.
+     * @throws MicroSensorDataTypeException
+     *             If an error occured while a
+     *             <em>MicroSensorDataType</em> is created from the
+     *             <em>ModuleDescription's</em> definiton
      */
     private static MicroSensorDataType[] getMicroSensorDataTypes(
-        Document document, String currentModuleDirectoryString)
-        throws MicroSensorDataTypeException, PropertyException {
+        final Document document, final String modulePath)
+        throws MicroSensorDataTypeException, NodeException {
 
         logger.entering(ECGParser.class.getName(), "getMicroSensorDataTypes");
 
@@ -807,7 +822,7 @@ public final class ECGParser {
         try {
             microSensorDataTypesNode = getChildNode(document
                 .getDocumentElement(), "microsensordatatypes");
-        } catch (PropertyException e1) {
+        } catch (NodeException e1) {
 
             logger.exiting(ECGParser.class.getName(),
                 "getMicroSensorDataTypes", null);
@@ -828,9 +843,8 @@ public final class ECGParser {
 
             String msdtFileString = getNodeValue(msdtFileNode);
 
-            File msdtFile = new File(currentModuleDirectoryString
-                                     + File.separator + "msdt" + File.separator
-                                     + msdtFileString);
+            File msdtFile = new File(modulePath + File.separator + "msdt"
+                                     + File.separator + msdtFileString);
 
             microSensorDataTypes.add(org.electrocodeogram.system.System
                 .getInstance().getMsdtRegistry().parseMicroSensorDataType(
@@ -855,10 +869,12 @@ public final class ECGParser {
      *            return
      * @return An <code>Array</code> of child <code>Nodes</code>
      *         with the given name
-     * @throws PropertyException
+     * @throws NodeException
+     *             If an error occurs while accessing the document's
+     *             nodes.
      */
     private static Node[] getChildNodes(final Node parentNode,
-        final String nodeName) throws PropertyException {
+        final String nodeName) throws NodeException {
 
         logger.entering(ECGParser.class.getName(), "getChildNodes",
             new Object[] {parentNode, nodeName});
@@ -880,8 +896,9 @@ public final class ECGParser {
 
             logger.exiting(ECGParser.class.getName(), "getChildNodes");
 
-            throw new PropertyException("Node " + parentNode.getNodeName()
-                                        + " does not have any childNodes.");
+            throw new NodeException("The requested child node " + nodeName
+                                    + " is not found.", parentNode
+                .getNodeName(), parentNode.getOwnerDocument().getNodeName());
         }
 
         for (int i = 0; i < childNodes.getLength(); i++) {
@@ -907,10 +924,12 @@ public final class ECGParser {
      *            Is the name of the child <code>Node</code> to
      *            return
      * @return The first child <code>Node</code> with the given name
-     * @throws PropertyException
+     * @throws NodeException
+     *             If an error occurs while accessing the document's
+     *             nodes.
      */
     private static Node getChildNode(final Node parentNode,
-        final String nodeName) throws PropertyException {
+        final String nodeName) throws NodeException {
 
         logger.entering(ECGParser.class.getName(), "getChildNode",
             new Object[] {parentNode, nodeName});
@@ -921,9 +940,9 @@ public final class ECGParser {
 
             logger.exiting(ECGParser.class.getName(), "getChildNodes");
 
-            throw new PropertyException("The node " + parentNode.getNodeName()
-                                        + " does not have a child with name: "
-                                        + nodeName);
+            throw new NodeException("The requested child node " + nodeName
+                                    + " is not found.", parentNode
+                .getNodeName(), parentNode.getOwnerDocument().getNodeName());
         }
 
         logger.exiting(ECGParser.class.getName(), "getChildNodes",
@@ -1026,10 +1045,12 @@ public final class ECGParser {
      *            Is the name of the attribute from which the value is
      *            returned
      * @return Is the value of the attribute
-     * @throws ModuleSetupLoadException
+     * @throws NodeException
+     *             If an error occurs while accessing the document's
+     *             nodes.
      */
     private static String getAttributeValue(final Node node,
-        final String attributeName) throws ModuleSetupLoadException {
+        final String attributeName) throws NodeException {
 
         logger.entering(ECGParser.class.getName(), "getAttributeValue",
             new Object[] {node, attributeName});
@@ -1049,8 +1070,10 @@ public final class ECGParser {
 
             logger.exiting(ECGParser.class.getName(), "getAttributeValue");
 
-            throw new ModuleSetupLoadException("Attribute missing for element "
-                                               + node.getNodeName(), "");
+            throw new NodeException(
+                "The node does not provide the requested attribute "
+                                + attributeName, node.getNodeName(), node
+                    .getOwnerDocument().getNodeName());
         }
 
         Node attributeNode = node.getAttributes().getNamedItem(attributeName);
@@ -1061,8 +1084,10 @@ public final class ECGParser {
 
             logger.exiting(ECGParser.class.getName(), "getAttributeValue");
 
-            throw new ModuleSetupLoadException(
-                "Attribute value missing for element " + node.getNodeName(), "");
+            throw new NodeException(
+                "The node does not provide the requested attribute "
+                                + attributeName, node.getNodeName(), node
+                    .getOwnerDocument().getNodeName());
         }
 
         logger.exiting(ECGParser.class.getName(), "getAttributeValue",

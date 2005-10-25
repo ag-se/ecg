@@ -31,7 +31,8 @@ import org.electrocodeogram.msdt.MicroSensorDataType;
 import org.electrocodeogram.msdt.registry.MicroSensorDataTypeRegistrationException;
 import org.electrocodeogram.system.ISystem;
 import org.electrocodeogram.system.ModuleSystem;
-import org.electrocodeogram.xml.PropertyException;
+
+// import org.electrocodeogram.xml.ModulePropertyException;
 
 /**
  * This abstract class represents an <em> ElectroCodeoGram Module</em>.
@@ -551,12 +552,12 @@ public abstract class Module {
      * @param name
      *            Is the name of the <em>ModuleProperty</em>
      * @return The <em>ModuleProperty</em> with the given name
-     * @throws PropertyException
+     * @throws ModulePropertyException
      *             If the a <em>ModuleProperty</em> with the given
      *             name is not declared for this module
      */
     public final ModuleProperty getModuleProperty(final String name)
-        throws PropertyException {
+        throws ModulePropertyException {
         logger.entering(this.getClass().getName(), "getModuleProperty",
             new Object[] {name});
 
@@ -565,8 +566,9 @@ public abstract class Module {
         if (this.runtimeProperties == null) {
             logger.exiting(this.getClass().getName(), "getModuleProperty");
 
-            throw new PropertyException("The module " + this.getName()
-                                        + " has no ModuleProperties.");
+            throw new ModulePropertyException(
+                "The module has no ModuleProperties.", this.getName(), this
+                    .getId(), "", "");
         }
 
         for (ModuleProperty moduleProperty : this.runtimeProperties) {
@@ -583,9 +585,9 @@ public abstract class Module {
         logger
             .exiting(this.getClass().getName(), "getModuleProperty", toReturn);
 
-        throw new PropertyException("The module " + this.getName()
-                                    + " has no ModuleProperty with name "
-                                    + name + ".");
+        throw new ModulePropertyException(
+            "The module has no ModuleProperty with name " + name + ".", this
+                .getName(), this.getId(), "", "");
     }
 
     /**
@@ -858,7 +860,9 @@ public abstract class Module {
                 "disconnectReceivingModules");
 
             throw new ModuleInstanceNotFoundException("The given module id "
-                                              + this.moduleId + " is unknown.",module.getId());
+                                                      + this.moduleId
+                                                      + " is unknown.", module
+                .getId());
         }
 
         this.eventSender.deleteObserver(module);
