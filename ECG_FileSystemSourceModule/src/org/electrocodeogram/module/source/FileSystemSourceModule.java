@@ -62,7 +62,7 @@ public class FileSystemSourceModule extends SourceModule {
     @Override
     public void propertyChanged(ModuleProperty moduleProperty)
         throws ModulePropertyException {
-        
+
         if (moduleProperty.getName().equals("Input File")) {
 
             File propertyValueFile = new File(moduleProperty.getValue());
@@ -83,8 +83,7 @@ public class FileSystemSourceModule extends SourceModule {
             }
         } else {
             throw new ModulePropertyException(
-                "The module does not support a property with the given name: "
-                                + moduleProperty.getName());
+                "The module does not support this property.", this.getName(), this.getId(), moduleProperty.getName(), moduleProperty.getValue());
         }
     }
 
@@ -113,28 +112,65 @@ public class FileSystemSourceModule extends SourceModule {
     // not implemented
     }
 
-    /**
-     * @see org.electrocodeogram.module.source.SourceModule#startReader(org.electrocodeogram.module.source.SourceModule)
+    /*
+     * (non-Javadoc)
+     * @see org.electrocodeogram.module.source.SourceModule#getEventReader()
      */
     @Override
-    public void startReader(SourceModule sourceModule)
-        throws SourceModuleException {
+    public EventReader[] getEventReader() {
+       
+        return new EventReader[] {this._readerThread};
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.electrocodeogram.module.source.SourceModule#preStart()
+     */
+    @Override
+    public void preStart() {
         if (this._inputFile == null) {
-            throw new SourceModuleException("No input file selected");
+            return;
         }
 
-        this._readerThread = new FileReaderThread(sourceModule,
+        this._readerThread = new FileReaderThread(this,
             this._inputFile, this._readMode);
 
-        this._readerThread.start();
     }
 
-    /**
-     * @see org.electrocodeogram.module.source.SourceModule#stopReader()
+    /*
+     * (non-Javadoc)
+     * @see org.electrocodeogram.module.source.SourceModule#postStop()
      */
     @Override
-    public void stopReader() {
-        this._readerThread.stopReader();
+    public void postStop() {
+    
 
     }
+
+    // /**
+    // * @see
+    // org.electrocodeogram.module.source.SourceModule#startReader(org.electrocodeogram.module.source.SourceModule)
+    // */
+    // @Override
+    // public void startReader(SourceModule sourceModule)
+    // throws SourceModuleException {
+    // if (this._inputFile == null) {
+    // throw new SourceModuleException("No input file selected");
+    // }
+    //
+    // this._readerThread = new FileReaderThread(sourceModule,
+    // this._inputFile, this._readMode);
+    //
+    // this._readerThread.start();
+    // }
+    //
+    // /**
+    // * @see
+    // org.electrocodeogram.module.source.SourceModule#stopReader()
+    // */
+    // @Override
+    // public void stopReader() {
+    //        this._readerThread.stopReader();
+    //
+    //    }
 }
