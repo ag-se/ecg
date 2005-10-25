@@ -116,6 +116,8 @@ public class ECGEclipseSensor
 		 * to the SensorShell itself.
 		 */
 		this._eclipseSensorShell.doCommand(SensorShell.ECG_LAB_PATH, list);
+        
+        _logger.log(Level.FINE,"The Sensorpath has been sent to the SensorShell.");
 
 		// Try to get the username from the operating system environment
 		this._username = System.getenv("username");
@@ -906,24 +908,24 @@ public class ECGEclipseSensor
 
 			_logger.log(Level.INFO,"Codechange...");
 			
-//			while(true)
-//			{
-//				try
-//				{
-//					Thread.sleep(1000);
-//				}
-//				catch (InterruptedException e)
-//				{
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-//				
-//				_logger.log(ECGLevel.PACKET,"A codechange event has been recorded.");
-//				
-//				sensor.processActivity("msdt.codechange.xsd","<?xml version=\"1.0\"?><microActivity><commonData><username>" + sensor.getUsername() + "</username><projectname>" + sensor.getProjectname() + "</projectname></commonData><codechange><document><![CDATA[" + this._document.get() + "]]></document><documentname>" + this._documentName + "</documentname></codechange></microActivity>");
-//			}
+			while(true)
+			{
+				try
+				{
+					Thread.sleep(1000);
+				}
+				catch (InterruptedException e)
+				{
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				_logger.log(ECGLevel.PACKET,"A codechange event has been recorded.");
+				
+				sensor.processActivity("msdt.codechange.xsd","<?xml version=\"1.0\"?><microActivity><commonData><username>" + sensor.getUsername() + "</username><projectname>" + sensor.getProjectname() + "</projectname></commonData><codechange><document><![CDATA[" + this._document.get() + "]]></document><documentname>" + this._documentName + "</documentname></codechange></microActivity>");
+			}
 			
-			_logger.exiting(this.getClass().getName(), "run");
+//			_logger.exiting(this.getClass().getName(), "run");
 
 		}
 	}
