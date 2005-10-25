@@ -134,7 +134,7 @@ public class CodechangeDifferIntermediateModule extends IntermediateModule
 
     private String getCode(ValidEventPacket packet)
     {
-        Object object = packet.getArglist().get(ValidEventPacket.MICROACTIVITY_INDEX);
+        Object object = packet.getArgList().get(ValidEventPacket.MICROACTIVITY_INDEX);
         
         assert(object instanceof String);
         
