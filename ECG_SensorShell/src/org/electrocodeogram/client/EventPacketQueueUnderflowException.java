@@ -1,5 +1,5 @@
 /*
- * Class: EventPacketQueueOverflowException
+ * Class: EventPacketQueueUnderflowException
  * Version: 1.0
  * Date: 16.10.2005
  * By: Frank@Schlesinger.com
@@ -12,11 +12,10 @@ import java.util.logging.Logger;
 import org.electrocodeogram.logging.LogHelper;
 
 /**
- * When more events are added to the buffer as allowed by
- * {@link EventSender#MAX_QUEUE_SIZE}, this <em>Exceptiony</em> is
- * thrown.
+ * when the event buffer contains no events but an event shall be
+ * removed, this <em>Exception</em> is thrown.
  */
-public class EventPacketQueueOverflowException extends Exception {
+public class EventPacketQueueUnderflowException extends Exception {
 
     /**
      * This is the logger.
@@ -32,15 +31,15 @@ public class EventPacketQueueOverflowException extends Exception {
     /**
      * Creates the <em>Exception</em>.
      */
-    public EventPacketQueueOverflowException() {
+    public EventPacketQueueUnderflowException() {
         logger.entering(this.getClass().getName(),
-            "EventPacketQueueOverflowException");
+            "EventPacketQueueUnderflowException");
 
         logger.log(Level.SEVERE,
-            "An EventPacketQueueOverflowException has occured.");
+            "An EventPacketQueueUnderflowException has occured.");
 
         logger.exiting(this.getClass().getName(),
-            "EventPacketQueueOverflowException");
+            "EventPacketQueueUnderflowException");
     }
 
 }

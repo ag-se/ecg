@@ -65,7 +65,7 @@ public class MockSensor
 
 		this.sendingTime = new Date();
 
-		boolean result = this._shell.doCommand(eventPacket.getTimeStamp(), eventPacket.getSensorDataType(), eventPacket.getArglist());
+		boolean result = this._shell.doCommand(eventPacket.getTimeStamp(), eventPacket.getSensorDataType(), eventPacket.getArgList());
 
 		_logger.exiting(this.getClass().getName(), "sendEvent");
 

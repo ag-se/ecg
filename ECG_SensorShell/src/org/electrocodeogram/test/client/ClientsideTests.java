@@ -2,7 +2,7 @@ package org.electrocodeogram.test.client;
 
 import junit.framework.TestCase;
 
-import org.electrocodeogram.client.SendingThreadTest;
+
 import org.electrocodeogram.event.EventPacket;
 import org.electrocodeogram.event.IllegalEventParameterException;
 import org.electrocodeogram.event.WellFormedEventPacket;
@@ -27,7 +27,7 @@ public class ClientsideTests extends TestCase
     
     int _line = -1;
     
-    SendingThreadTest _threadTest;
+
     
     int _bufferSizeBefore;
     
@@ -87,52 +87,7 @@ public class ClientsideTests extends TestCase
         assertTrue("" + this._line,result);
        
     }
-
     
-    
-    /**
-     * Testcase CL2 according to the document TESTPLAN Version 1.0 or higher.
-     * This testcase passes a single syntactically valid EventPacket from a TestSensor
-     * to the ECG SensorShell. The test is successful if the SendingThreatTest tells
-     * that the size of the SendingThread EventPacketBuffer is increased by one element
-     * and that this element is the sent EventPacket. 
-     * @throws IllegalEventParameterException If the parameters passed to the event creating method are not legal
-     * @throws NoTestDataException If a pseudo-random String is requested by a line number that is not available or if the requested String size is to higher then available
-     *
-     */
-    public void testValidEventIsQueued() throws IllegalEventParameterException, NoTestDataException
-    {
-        ClientsideTests.this._eventPacket = this._eventGenerator.createValidEventPacket(true, true, this._line,  true, true, 10, 10);
-
-        this._testSensor.sendEvent(ClientsideTests.this._eventPacket);
-
-        ClientsideTests.this._threadTest = new SendingThreadTest();
-
-        ClientsideTests.this._bufferSizeBefore = ClientsideTests.this._threadTest.getBufferSize();
-
-        this._testSensor.sendEvent(ClientsideTests.this._eventPacket);
-        
-        try
-		{
-			new RetriedAssert(2000, 100) {
-			    @Override
-			    public void run() throws Exception
-			    {
-			    	 assertTrue("" + ClientsideTests.this._line,ClientsideTests.this._threadTest.testBufferSize(ClientsideTests.this._bufferSizeBefore + 1));
-			    	 
-			    	 assertTrue("" + ClientsideTests.this._line,ClientsideTests.this._threadTest.testLastElement(ClientsideTests.this._eventPacket));
-			    }
-			}.start();
-		}
-		catch (Exception e)
-		{
-			assertTrue(e.getMessage(),false);
-		}
-
-       
-
-        
-    }
 
     /**
      * Testcase CL3 according to the document TESTPLAN Version 1.0 or higher.

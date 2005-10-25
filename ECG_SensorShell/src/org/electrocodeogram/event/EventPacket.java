@@ -1,3 +1,10 @@
+/*
+ * Class: EventPacket
+ * Version: 1.0
+ * Date: 16.10.2005
+ * By: Frank@Schlesinger.com
+ */
+
 package org.electrocodeogram.event;
 
 import java.io.Serializable;
@@ -10,203 +17,232 @@ import java.util.logging.Logger;
 import org.electrocodeogram.logging.LogHelper;
 
 /**
- * An EventPacket is a for a recorded event.
+ * This is the most fundamental representation for an recordable
+ * events in the <em>ElectroCodeoGram</em>. In case of an
+ * <em>eventPacket</em> no assertions are made depending the syntax
+ * or the content of the event.<br>
+ * Instead events with a legal syntax are stored in
+ * {@link org.electrocodeogram.event.WellFormedEventPacket} objetcs
+ * and events with validated content are stored in
+ * {@link org.electrocodeogram.event.ValidEventPackets}.
  */
-public class EventPacket implements Serializable
-{
-	private static final long serialVersionUID = 2353171166739768704L;
+public class EventPacket implements Serializable {
 
-	private static Logger _logger = LogHelper.createLogger(EventPacket.class.getName());
+    /**
+     * This is the <em>Serialization</em> id.
+     */
+    private static final long serialVersionUID = 2353171166739768704L;
 
-	private int sourceId = -1;
+    /**
+     * This is the logger.
+     */
+    private static Logger logger = LogHelper.createLogger(EventPacket.class
+        .getName());
 
-	private Date _timeStamp = null;
+    /**
+     * The unique int id of the module that processed this event at
+     * last.
+     */
+    private int sourceId = -1;
 
-	private String _sensorDataType = null;
+    /**
+     * The timestamp telling when thew event was recorded.
+     */
+    private Date myTimeStamp;
 
-	private List _argList = null;
+    /**
+     * The <em>HackyStat SensorDataType</em> of the event.
+     */
+    private String mySensorDataType;
 
-	/**
-	 * This creates a new EventPacket object
-	 * @param id The module source ID identifies where the EventPacket comes from
-	 * @param timeStamp The timeStamp tells when the event was recorded
-	 * @param sensorDataType The HackyStat SensorDataType of the event
-	 * @param argList The argList of parameters containing all the relevant event data
-	 */
-	public EventPacket(int id, Date timeStamp, String sensorDataType, List argList)
-	{
+    /**
+     * The stringlist containing the evtn's data.
+     */
+    private List myArgList;
 
-		_logger.entering(this.getClass().getName(), "EventPacket");
+    /**
+     * This creates a new <em>EventPacket</em>.
+     * @param id
+     *            The unique int id of the module that processed this
+     *            event at last
+     * @param timeStamp
+     *            The timestamp telling when thew event was recorded
+     * @param sensorDataType
+     *            The <em>HackyStat SensorDataType</em> of the event
+     * @param argList
+     *            The stringlist containing the evtn's data
+     */
+    public EventPacket(final int id, final Date timeStamp,
+        final String sensorDataType, final List argList) {
 
-		this.sourceId = id;
+        logger.entering(this.getClass().getName(), "EventPacket", new Object[] {
+            new Integer(id), timeStamp, sensorDataType, argList});
 
-		this._timeStamp = timeStamp;
-		
-		this._sensorDataType = sensorDataType;
+        this.sourceId = id;
 
-		this._argList = argList;
+        this.myTimeStamp = timeStamp;
 
-		_logger.exiting(this.getClass().getName(), "EventPacket");
+        this.mySensorDataType = sensorDataType;
 
-	}
+        this.myArgList = argList;
 
-	/**
-	 * This method returns the ID that identifies the source module of this EventPacket object.
-	 * @return The ID of the source module
-	 */
-	public int getSourceId()
-	{
-		_logger.entering(this.getClass().getName(), "getSourceId");
+        logger.exiting(this.getClass().getName(), "EventPacket");
 
-		_logger.exiting(this.getClass().getName(), "getSourceId");
+    }
 
-		return this.sourceId;
-	}
+    /**
+     * This method returns the id that identifies module, which was
+     * processing this event at last.
+     * @return The id of the last processing module
+     */
+    public int getSourceId() {
+        logger.entering(this.getClass().getName(), "getSourceId");
 
-	/**
-	 * This method returns the timestamp of the EventPacket.
-	 * @return The timestamp as a Date object
-	 */
-	public Date getTimeStamp()
-	{
-		_logger.entering(this.getClass().getName(), "getTimeStamp");
+        logger.exiting(this.getClass().getName(), "getSourceId", this.sourceId);
 
-		if (this._timeStamp != null)
-		{
-			_logger.exiting(this.getClass().getName(), "getTimeStamp");
+        return this.sourceId;
+    }
 
-			return new Date(this._timeStamp.getTime());
-		}
+    /**
+     * This method returns the timestamp of the event.
+     * @return The timestamp
+     */
+    public Date getTimeStamp() {
+        logger.entering(this.getClass().getName(), "getTimeStamp");
 
-		_logger.exiting(this.getClass().getName(), "getTimeStamp");
+        if (this.myTimeStamp != null) {
 
-		return null;
-	}
+            logger.exiting(this.getClass().getName(), "getTimeStamp", new Date(
+                this.myTimeStamp.getTime()));
 
-	/**
-	 * This method returns the HackyStat SensorDataType of the event.
-	 * @return The HackyStat SensorDataType
-	 */
-	public String getSensorDataType()
-	{
-		_logger.entering(this.getClass().getName(), "getSensorDataType");
+            return new Date(this.myTimeStamp.getTime());
+        }
 
-		_logger.exiting(this.getClass().getName(), "getSensorDataType");
+        logger.exiting(this.getClass().getName(), "getTimeStamp", null);
 
-		return this._sensorDataType;
-	}
+        return null;
+    }
 
-	/**
-	 * This method returns the argList of the EventPacket
-	 * @return The argList as a List
-	 */
-	public List getArglist()
-	{
-		_logger.entering(this.getClass().getName(), "getArglist");
+    /**
+     * This method returns the <em>HackyStat SensorDataType</em> of
+     * the event.
+     * @return The <em>HackyStat SensorDataType</em>
+     */
+    public String getSensorDataType() {
+        logger.entering(this.getClass().getName(), "getSensorDataType");
 
-		_logger.exiting(this.getClass().getName(), "getArglist");
+        logger.exiting(this.getClass().getName(), "getSensorDataType",
+            this.mySensorDataType);
 
-		return this._argList;
-	}
+        return this.mySensorDataType;
+    }
 
-	
+    /**
+     * This method returns the stringlist of the event
+     * @return The stringlist
+     */
+    public List getArgList() {
+        logger.entering(this.getClass().getName(), "getArglist");
 
-	/**
-	 * This method returns a String representation of the EventPacket.
-	 * @return A String representation of the EventPacket
-	 * 
-	 */
-	@Override
-	public String toString()
-	{
-		_logger.entering(this.getClass().getName(), "isValid");
+        logger.exiting(this.getClass().getName(), "getArglist", this.myArgList);
 
-		String string = "";
-		
-		String dateString = "";
+        return this.myArgList;
+    }
 
-		if(this.getTimeStamp() != null)
-		{
-		
-			SimpleDateFormat dateFormat = new SimpleDateFormat(
-					WellFormedEventPacket.DATE_FORMAT_PATTERN);
-	
-			dateString = dateFormat.format(this.getTimeStamp());
+    /**
+     * This method returns a <code>String</code> representation of
+     * the event.
+     * @return A <code>String</code> representation of the event
+     */
+    @Override
+    public String toString() {
+        logger.entering(this.getClass().getName(), "toString");
 
-		}
-		
-		string += dateString + "#";
+        String string = "";
 
-		
-		
-		string += this.getSensorDataType() + "#";
+        String dateString = "";
 
-		StringBuffer stringBuffer = new StringBuffer();
+        if (this.getTimeStamp() != null) {
 
-		if(this.getArglist() != null)
-		{
-			for (int i = 0; i < this.getArglist().size(); i++)
-			{
-				stringBuffer.append(";");
-	
-				stringBuffer.append((String) this.getArglist().get(i));
-			}
-		}
-		_logger.exiting(this.getClass().getName(), "isValid");
+            SimpleDateFormat dateFormat = new SimpleDateFormat(
+                WellFormedEventPacket.DATE_FORMAT_PATTERN);
 
-		return string + stringBuffer.toString();
-	}
+            dateString = dateFormat.format(this.getTimeStamp());
 
-	/**
-	 * This method compares a given EventPacket with this EventPacket.
-	 * @param packet Is the EventPacket to compare
-	 * @return "true" if the two EventPackets have identical timeStamps, SensorDataTypes and argLists; "false" otherwise
-	 */
-	public boolean isEqual(Object packet)
-	{
-		_logger.entering(this.getClass().getName(), "equals");
+        }
 
-		boolean equals = false;
+        string += dateString + "#";
 
-		if (!(packet instanceof EventPacket))
-		{
-			_logger.log(Level.FINEST, "Object is not an EventPacket");
+        string += this.getSensorDataType() + "#";
 
-			_logger.exiting(this.getClass().getName(), "equals");
+        StringBuffer stringBuffer = new StringBuffer();
 
-			return false;
-		}
+        if (this.getArgList() != null) {
+            for (int i = 0; i < this.getArgList().size(); i++) {
+                stringBuffer.append(";");
 
-		EventPacket eventPacket = (EventPacket) packet;
+                stringBuffer.append((String) this.getArgList().get(i));
+            }
+        }
 
-		if (this.getTimeStamp().equals(eventPacket.getTimeStamp()) && this.getSensorDataType().equals(eventPacket.getSensorDataType()))
-		{
-			if (this.getArglist().size() == eventPacket.getArglist().size())
-			{
-				int size = eventPacket.getArglist().size();
+        logger.exiting(this.getClass().getName(), "toString", string
+                                                              + stringBuffer
+                                                                  .toString());
 
-				for (int i = 0; i < size; i++)
-				{
-					String testString = (String) this.getArglist().get(i);
+        return string + stringBuffer.toString();
+    }
 
-					String receivedString = (String) eventPacket.getArglist().get(i);
+    /**
+     * This method compares a given event with this event.
+     * @param packet
+     *            Is the event to compare this to
+     * @return <code>true</code> if the two events have identical
+     *         timestamps, SensorDataTypes and stringlists and
+     *         <code>false</code> otherwise
+     */
+    public boolean isEqual(Object packet) {
+        logger.entering(this.getClass().getName(), "isEqual",
+            new Object[] {packet});
 
-					if (testString.equals(receivedString))
-					{
-						equals = true;
-					}
-					else
-					{
-						equals = false;
-					}
-				}
-			}
+        boolean equals = false;
 
-		}
+        if (!(packet instanceof EventPacket)) {
+            logger.log(Level.WARNING,
+                "The parameter \"packet\" is not an EventPacket");
 
-		_logger.exiting(this.getClass().getName(), "equals");
+            logger.exiting(this.getClass().getName(), "isEqual", new Boolean(
+                false));
 
-		return equals;
+            return false;
+        }
 
-	}
+        EventPacket eventPacket = (EventPacket) packet;
+
+        if (this.getTimeStamp().equals(eventPacket.getTimeStamp())
+            && this.getSensorDataType().equals(eventPacket.getSensorDataType())) {
+            if (this.getArgList().size() == eventPacket.getArgList().size()) {
+                int size = eventPacket.getArgList().size();
+
+                for (int i = 0; i < size; i++) {
+                    String testString = (String) this.getArgList().get(i);
+
+                    String receivedString = (String) eventPacket.getArgList()
+                        .get(i);
+
+                    if (testString.equals(receivedString)) {
+                        equals = true;
+                    } else {
+                        equals = false;
+                    }
+                }
+            }
+
+        }
+
+        logger.exiting(this.getClass().getName(), "isEqual",
+            new Boolean(equals));
+
+        return equals;
+
+    }
 }
