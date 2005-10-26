@@ -45,705 +45,668 @@ import org.electrocodeogram.ui.modules.ModuleGraph;
 
 import com.zfqjava.swing.JStatusBar;
 
-public class Gui extends JFrame implements IGui
-{
+public class Gui extends JFrame implements IGui {
 
-	private static Logger _logger = LogHelper.createLogger(Gui.class.getName());
+    private static Logger _logger = LogHelper.createLogger(Gui.class.getName());
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private EventWindow _frmEvents = null;
+    private EventWindow _frmEvents = null;
 
-	private ModuleLabPanel _pnlModules;
+    private ModuleLabPanel _pnlModules;
 
-	private JStatusBar _statusBar;
+    private JStatusBar _statusBar;
 
-	private ModuleFinderPanel _pnlButtons;
+    private ModuleFinderPanel _pnlButtons;
 
-	private JSplitPane _splitPane;
+    private JSplitPane _splitPane;
 
-	private JMenu _menuModule;
+    private JMenu _menuModule;
 
-	private boolean _moduleConnectionMode;
+    private boolean _moduleConnectionMode;
 
-	private int _sourceModuleId;
+    private int _sourceModuleId;
 
-	public Gui(Observable observable)
-	{
-		super();
+    public Gui(Observable observable) {
+        super();
 
-		observable.addObserver(this);
+        //observable.addObserver(this);
 
-		initializeLookAndFeel();
+        initializeLookAndFeel();
 
-		initializeFrame();
+        initializeFrame();
 
-		initializeMenu();
+        initializeMenu();
 
-		this._pnlModules = new ModuleLabPanel(this);
+        this._pnlModules = new ModuleLabPanel(this);
 
-		this._pnlButtons = new ModuleFinderPanel(this);
+        this._pnlButtons = new ModuleFinderPanel(this);
 
-		initializeSplitPane();
+        initializeSplitPane();
 
-		initializeStatusBar();
+        initializeStatusBar();
 
-		setVisible(true);
-	}
+        setVisible(true);
+    }
 
-	private void initializeSplitPane()
-	{
-		this._splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+    private void initializeSplitPane() {
+        this._splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 
-		this._splitPane.add(this._pnlButtons, 0);
+        this._splitPane.add(this._pnlButtons, 0);
 
-		this._splitPane.add(this._pnlModules, 1);
+        this._splitPane.add(this._pnlModules, 1);
 
-		GridBagConstraints c = new GridBagConstraints();
-		c.anchor = GridBagConstraints.NORTHWEST;
-		c.fill = GridBagConstraints.BOTH;
-		c.gridx = 0;
-		c.gridy = 0;
-		c.weighty = 2;
-		c.weightx = 2;
+        GridBagConstraints c = new GridBagConstraints();
+        c.anchor = GridBagConstraints.NORTHWEST;
+        c.fill = GridBagConstraints.BOTH;
+        c.gridx = 0;
+        c.gridy = 0;
+        c.weighty = 2;
+        c.weightx = 2;
 
-		getContentPane().add(this._splitPane, c);
-	}
+        getContentPane().add(this._splitPane, c);
+    }
 
-	private void initializeStatusBar()
-	{
-		this._statusBar = new JStatusBar(JStatusBar.EXPLORER);
+    private void initializeStatusBar() {
+        this._statusBar = new JStatusBar(JStatusBar.EXPLORER);
 
-		GridBagConstraints c2 = new GridBagConstraints();
-		c2.anchor = GridBagConstraints.SOUTHWEST;
-		c2.fill = GridBagConstraints.HORIZONTAL;
-		c2.gridx = 0;
-		c2.gridy = 2;
-		c2.weighty = 0;
-		c2.weightx = 2;
+        GridBagConstraints c2 = new GridBagConstraints();
+        c2.anchor = GridBagConstraints.SOUTHWEST;
+        c2.fill = GridBagConstraints.HORIZONTAL;
+        c2.gridx = 0;
+        c2.gridy = 2;
+        c2.weighty = 0;
+        c2.weightx = 2;
 
-		getContentPane().add(_statusBar, c2);
-	}
+        getContentPane().add(_statusBar, c2);
+    }
 
-	private void initializeMenu()
-	{
-		JMenuBar menuBar = new JMenuBar();
+    private void initializeMenu() {
+        JMenuBar menuBar = new JMenuBar();
 
-		JMenu menuFile = new JMenu("File");
+        JMenu menuFile = new JMenu("File");
 
-		JMenuItem mniExit = new JMenuItem("Exit");
+        JMenuItem mniExit = new JMenuItem("Exit");
 
-		mniExit.addActionListener(new ActionListener()
-		{
+        mniExit.addActionListener(new ActionListener() {
 
-			public void actionPerformed(ActionEvent e)
-			{
+            public void actionPerformed(ActionEvent e) {
                 org.electrocodeogram.system.System.getInstance().quit();
 
-			}
-		});
+            }
+        });
 
-		JMenuItem mniSave = new JMenuItem("Save module setup");
+        JMenuItem mniSave = new JMenuItem("Save module setup");
 
-		mniSave.addActionListener(new ActionListener()
-		{
+        mniSave.addActionListener(new ActionListener() {
 
-			public void actionPerformed(ActionEvent e)
-			{
-				try
-				{
-					JFileChooser fileChooser = new JFileChooser();
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    JFileChooser fileChooser = new JFileChooser();
 
-					fileChooser.setDialogTitle("Select the file to store the module setup in");
+                    fileChooser
+                        .setDialogTitle("Select the file to store the module setup in");
 
-					fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
+                    fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
 
-					File file = null;
+                    File file = null;
 
-					int result = fileChooser.showOpenDialog(Gui.this);
+                    int result = fileChooser.showOpenDialog(Gui.this);
 
-					switch (result)
-					{
-						case JFileChooser.CANCEL_OPTION:
-							return;
-						case JFileChooser.ERROR_OPTION:
-							return;
-						case JFileChooser.APPROVE_OPTION:
+                    switch (result) {
+                        case JFileChooser.CANCEL_OPTION:
+                            return;
+                        case JFileChooser.ERROR_OPTION:
+                            return;
+                        case JFileChooser.APPROVE_OPTION:
 
-							file = new File(
-									fileChooser.getSelectedFile().getAbsolutePath());
+                            file = new File(fileChooser.getSelectedFile()
+                                .getAbsolutePath());
 
-							break;
-						default:
+                            break;
+                        default:
 
-							return;
-					}
+                            return;
+                    }
 
-                    org.electrocodeogram.system.System.getInstance().getModuleRegistry().storeModuleSetup(file);
-				}
-				catch (ModuleSetupStoreException e1)
-				{
-					JOptionPane.showMessageDialog(Gui.this, e1.getMessage(), "Module setup storage error", JOptionPane.ERROR_MESSAGE);
-				}
+                    org.electrocodeogram.system.System.getInstance()
+                        .getModuleRegistry().storeModuleSetup(file);
+                } catch (ModuleSetupStoreException e1) {
+                    JOptionPane
+                        .showMessageDialog(Gui.this, e1.getMessage(),
+                            "Module setup storage error",
+                            JOptionPane.ERROR_MESSAGE);
+                }
 
-			}
-		});
+            }
+        });
 
-		JMenuItem mniLoad = new JMenuItem("Load module setup");
-		mniLoad.addActionListener(new ActionListener()
-		{
+        JMenuItem mniLoad = new JMenuItem("Load module setup");
+        mniLoad.addActionListener(new ActionListener() {
 
-			public void actionPerformed(ActionEvent e)
-			{
-				try
-				{
-					JFileChooser fileChooser = new JFileChooser();
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    JFileChooser fileChooser = new JFileChooser();
 
-					fileChooser.setDialogTitle("Select the file to load the module setup from");
+                    fileChooser
+                        .setDialogTitle("Select the file to load the module setup from");
 
-					fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
+                    fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
 
-					File file = null;
+                    File file = null;
 
-					int result = fileChooser.showOpenDialog(Gui.this);
+                    int result = fileChooser.showOpenDialog(Gui.this);
 
-					switch (result)
-					{
-						case JFileChooser.CANCEL_OPTION:
-							return;
-						case JFileChooser.ERROR_OPTION:
-							return;
-						case JFileChooser.APPROVE_OPTION:
+                    switch (result) {
+                        case JFileChooser.CANCEL_OPTION:
+                            return;
+                        case JFileChooser.ERROR_OPTION:
+                            return;
+                        case JFileChooser.APPROVE_OPTION:
 
-							file = new File(
-									fileChooser.getSelectedFile().getAbsolutePath());
+                            file = new File(fileChooser.getSelectedFile()
+                                .getAbsolutePath());
 
-							break;
+                            break;
 
-						default:
-							return;
+                        default:
+                            return;
 
-					}
+                    }
 
-                    org.electrocodeogram.system.System.getInstance().getModuleRegistry().loadModuleSetup(file);
-				}
-				catch (ModuleSetupLoadException e1)
-				{
-					JOptionPane.showMessageDialog(Gui.this, e1.getMessage(), "Module setup loading error", JOptionPane.ERROR_MESSAGE);
-				}
+                    org.electrocodeogram.system.System.getInstance()
+                        .getModuleRegistry().loadModuleSetup(file);
+                } catch (ModuleSetupLoadException e1) {
+                    JOptionPane
+                        .showMessageDialog(Gui.this, e1.getMessage(),
+                            "Module setup loading error",
+                            JOptionPane.ERROR_MESSAGE);
+                }
 
-			}
-		});
+            }
+        });
 
-		menuFile.add(mniSave);
-		menuFile.add(mniLoad);
-		menuFile.addSeparator();
-		menuFile.add(mniExit);
+        menuFile.add(mniSave);
+        menuFile.add(mniLoad);
+        menuFile.addSeparator();
+        menuFile.add(mniExit);
 
-		Gui.this._menuModule = new JMenu("Module");
-		
-		Gui.this._menuModule.setEnabled(false);
-		
-		Gui.this._menuModule.addMouseListener(new MouseAdapter()
-		{
-
-			@Override
-			public void mouseEntered(MouseEvent e)
-			{
-				MenuManager.populateModuleMenu(Gui.this._menuModule, Gui.this._pnlModules.getSelectedModule());
-			}
-		});
-
-		JMenu menuWindow = new JMenu("Window");
-		JMenuItem mniShow = new JMenuItem("Event Window");
-
-		mniShow.addActionListener(new ActionListener()
-		{
-
-			public void actionPerformed(ActionEvent e)
-			{
-
-				showMessagesWindow();
+        Gui.this._menuModule = new JMenu("Module");
 
-			}
-		});
-		menuWindow.add(mniShow);
+        Gui.this._menuModule.setEnabled(false);
 
-		menuBar.add(menuFile);
-		menuBar.add(Gui.this._menuModule);
-		menuBar.add(menuWindow);
+        Gui.this._menuModule.addMouseListener(new MouseAdapter() {
 
-		this.setJMenuBar(menuBar);
-	}
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                MenuManager.populateModuleMenu(Gui.this._menuModule,
+                    Gui.this._pnlModules.getSelectedModule());
+            }
+        });
 
-	private void initializeFrame()
-	{
-		setTitle("ElectroCodeoGram - ECG Lab");
-
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-		setExtendedState(JFrame.MAXIMIZED_BOTH);
-
-		setBounds(0, 0, 800, 600);
-
-		getContentPane().setLayout(new GridBagLayout());
-	}
-
-	private void initializeLookAndFeel()
-	{
-		try
-		{
-
-			UIManager.setLookAndFeel("org.fife.plaf.Office2003.Office2003LookAndFeel");
-		}
-		catch (UnsupportedLookAndFeelException e)
-		{
-			try
-			{
-				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-			}
-			catch (Exception e1)
-			{
-				_logger.log(Level.WARNING, "Can not set the LookAndFeel");
-
-				_logger.log(Level.FINEST, e.getMessage());
-			}
-
-		}
-		catch (Exception e)
-		{
-			_logger.log(Level.WARNING, "Can not set the LookAndFeel");
-
-			_logger.log(Level.FINEST, e.getMessage());
-		}
-	}
-
-	public void showMessagesWindow()
-	{
-		if (this._frmEvents == null)
-		{
-			this._frmEvents = new EventWindow();
-
-			this._frmEvents.setSelectedModul(Gui.this._pnlModules.getSelectedModule());
-		}
-
-		this._frmEvents.setVisible(true);
-	}
-
-	public void update(Observable o, Object arg)
-	{
-
-		/*
-		 * if the ModuleRegistry is sending the event, a module-instance has
-		 * been added or removed or a module class has been installed
-		 */
-		if (o instanceof ModuleRegistry)
-		{
-
-			// a module has been added or removed
-			if (arg instanceof Module)
-			{
-
-				Module module = (Module) arg;
-
-				if (this._pnlModules.containsModule(module.getId()))
-				{
-					this._pnlModules.removeModule(module.getId());
-				}
-				else
-				{
-
-					this._pnlModules.createModule(module.getModuleType(), module.getId(), module.getName(), module.getState());
-
-				}
-
-			}
-			// a module class has been intalled
-			else if (arg instanceof ModuleDescriptor)
-			{
-
-				ModuleDescriptor moduleDescriptor = (ModuleDescriptor) arg;
-
-				this._pnlButtons.addModule(moduleDescriptor);
-
-				this._splitPane.resetToPreferredSizes();
-
-			}
-		}
-
-		else if (arg instanceof ValidEventPacket)
-		{
-			if (this._frmEvents != null)
-			{
-				this._frmEvents.append((ValidEventPacket) arg);
-			}
-			
-//			ValidEventPacket packet = (ValidEventPacket) arg;
-//			
-//			int id = packet.getSourceId();
-//			
-//			this._pnlModules._moduleGraph.highlight(id);
-		}
-		else if (arg instanceof Module)
-		{
-			Module module = (Module) arg;
-
-			int id = module.getId();
-
-			if (this._pnlModules.containsModule(id))
-			{
-				this._pnlModules.updateModule(id, module);
-			}
-		}
-	}
-
-	public void enableModuleMenu(boolean enable)
-	{
-		this._menuModule.setEnabled(enable);
-	}
-
-	/**
-	 * 
-	 */
-	public void showModuleDetails()
-	{
-
-		int id = this._pnlModules.getSelectedModule();
-
-		if (id != -1)
-		{
+        JMenu menuWindow = new JMenu("Window");
+        JMenuItem mniShow = new JMenuItem("Event Window");
 
-			String text = "";
+        mniShow.addActionListener(new ActionListener() {
 
-			try
-			{
-				text = org.electrocodeogram.system.System.getInstance().getModuleRegistry().getModule(id).getDetails();
-			}
-			catch (ModuleInstanceNotFoundException e)
-			{
-				JOptionPane.showMessageDialog(this, e.getMessage(), "Module Details", JOptionPane.ERROR_MESSAGE);
-			}
-			
-			JOptionPane.showMessageDialog(this, text, "Module Details", JOptionPane.INFORMATION_MESSAGE);
-		}
+            public void actionPerformed(ActionEvent e) {
 
-	}
+                showMessagesWindow();
 
-	public void showModuleFinderDetails()
-	{
+            }
+        });
+        menuWindow.add(mniShow);
 
-		String id = this._pnlButtons._selectedModuleButton;
+        menuBar.add(menuFile);
+        menuBar.add(Gui.this._menuModule);
+        menuBar.add(menuWindow);
 
-		if (id.equals(""))
-		{
-			return;
-		}
-
-		ModuleDescriptor moduleDescriptor;
+        this.setJMenuBar(menuBar);
+    }
 
-		try
-		{
-			moduleDescriptor = org.electrocodeogram.system.System.getInstance().getModuleRegistry().getModuleDescriptor(id);
+    private void initializeFrame() {
+        setTitle("ElectroCodeoGram - ECG Lab");
 
-			JOptionPane.showMessageDialog(this, moduleDescriptor.getDescription(), "Module Description", JOptionPane.INFORMATION_MESSAGE);
-
-		}
-		catch (ModulePackageNotFoundException e)
-		{
-			JOptionPane.showMessageDialog(this, e.getMessage(), "Module Description", JOptionPane.ERROR_MESSAGE);
-		}
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-	}
-
-	/**
-	 * @param selectedModuleCellId2
-	 */
-	public void enterModuleConnectionMode(int selectedModuleCellId)
-	{
-
-		this._moduleConnectionMode = true;
-
-		this._sourceModuleId = selectedModuleCellId;
-
-	}
-
-	/**
-	 * @return
-	 */
-	public boolean getModuleConnectionMode()
-	{
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
 
-		return this._moduleConnectionMode;
-	}
+        setBounds(0, 0, 800, 600);
 
-	/**
-	 * @return
-	 */
-	public int getSourceModule()
-	{
+        getContentPane().setLayout(new GridBagLayout());
+    }
 
-		return this._sourceModuleId;
-	}
+    private void initializeLookAndFeel() {
+        try {
 
-	/**
-	 * 
-	 */
-	public void exitModuleConnectionMode()
-	{
-		this._moduleConnectionMode = false;
+            UIManager
+                .setLookAndFeel("org.fife.plaf.Office2003.Office2003LookAndFeel");
+        } catch (UnsupportedLookAndFeelException e) {
+            try {
+                UIManager.setLookAndFeel(UIManager
+                    .getSystemLookAndFeelClassName());
+            } catch (Exception e1) {
+                _logger.log(Level.WARNING, "Can not set the LookAndFeel");
 
-		this._sourceModuleId = -1;
+                _logger.log(Level.FINEST, e.getMessage());
+            }
 
-	}
+        } catch (Exception e) {
+            _logger.log(Level.WARNING, "Can not set the LookAndFeel");
 
-	private static class ModuleLabPanel extends JPanel
-	{
-		private Gui _gui;
+            _logger.log(Level.FINEST, e.getMessage());
+        }
+    }
 
-		private ModuleGraph _moduleGraph;
+    public void showMessagesWindow() {
+        if (this._frmEvents == null) {
+            this._frmEvents = new EventWindow();
 
-		private JScrollPane _scrollPane;
+            this._frmEvents.setSelectedModul(Gui.this._pnlModules
+                .getSelectedModule());
+        }
 
-		public ModuleLabPanel(Gui gui)
-		{
-			this._gui = gui;
+        this._frmEvents.setVisible(true);
+    }
 
-			this._moduleGraph = new ModuleGraph(this._gui);
+    public void update(Observable o, Object arg) {
 
-			this.setLayout(new GridLayout(1, 1));
+        /*
+         * if the ModuleRegistry is sending the event, a
+         * module-instance has been added or removed or a module class
+         * has been installed
+         */
+        if (o instanceof ModuleRegistry) {
 
-			this.setBackground(UIConstants.PNL_MODULE_LAB_BORDER_COLOR);
+            // a module has been added or removed
+            if (arg instanceof Module) {
 
-			this.setBorder(new TitledBorder(null,"Module Setup"));
+                Module module = (Module) arg;
 
-			this._scrollPane = new JScrollPane(this._moduleGraph);
+                if (this._pnlModules.containsModule(module.getId())) {
+                    this._pnlModules.removeModule(module.getId());
+                } else {
 
-			this.add(this._scrollPane);
-	
-		}
+                    this._pnlModules.createModule(module.getModuleType(),
+                        module.getId(), module.getName(), module.getState());
 
-		/**
-		 * @return
-		 */
-		public int getSelectedModule()
-		{
-			return ModuleGraph.getSelectedModule();
-		}
+                }
 
-		/**
-		 * @param moduleType
-		 * @param id
-		 * @param name
-		 * @param b
-		 */
-		public void createModule(ModuleType moduleType, int id, String name, boolean b)
-		{
-			this._moduleGraph.createModuleCell(moduleType, id, name, b);
+            }
+            // a module class has been intalled
+            else if (arg instanceof ModuleDescriptor) {
 
-		}
+                ModuleDescriptor moduleDescriptor = (ModuleDescriptor) arg;
 
-		/**
-		 * @param id
-		 */
-		public void removeModule(int id)
-		{
-			this._moduleGraph.removeModuleCell(id);
+                this._pnlButtons.addModule(moduleDescriptor);
 
-		}
+                this._splitPane.resetToPreferredSizes();
 
-		public boolean containsModule(int id)
-		{
-			return this._moduleGraph.containsModuleCell(id);
-		}
+            }
+        }
 
-		public void updateModule(int id, Module module)
-		{
-			this._moduleGraph.updateModuleCell(id, module);
-		}
-	}
+        else if (arg instanceof ValidEventPacket) {
+            if (this._frmEvents != null) {
+                this._frmEvents.append((ValidEventPacket) arg);
+            }
 
-	private static class ModuleFinderPanel extends JPanel
-	{
-		private JPanel _pnlSourceModules;
+            // ValidEventPacket packet = (ValidEventPacket) arg;
+            //			
+            // int id = packet.getSourceId();
+            //			
+            // this._pnlModules._moduleGraph.highlight(id);
+        } else if (arg instanceof Module) {
+            Module module = (Module) arg;
 
-		private JPanel _pnlIntermediateModules;
+            int id = module.getId();
 
-		private JPanel _pnlTargetModules;
+            if (this._pnlModules.containsModule(id)) {
+                this._pnlModules.updateModule(id, module);
+            }
+        }
+    }
 
-		static String _selectedModuleButton;
+    public void enableModuleMenu(boolean enable) {
+        this._menuModule.setEnabled(enable);
+    }
 
-		public ModuleFinderPanel(Gui gui)
-		{
-			this._pnlSourceModules = new InnerFinderPanel(
-					ModuleType.SOURCE_MODULE);
+    /**
+     * 
+     */
+    public void showModuleDetails() {
 
-			this._pnlIntermediateModules = new InnerFinderPanel(
-					ModuleType.INTERMEDIATE_MODULE);
+        int id = this._pnlModules.getSelectedModule();
 
-			this._pnlTargetModules = new InnerFinderPanel(
-					ModuleType.TARGET_MODULE);
+        if (id != -1) {
 
-			this.setLayout(new GridLayout(3, 1));
+            String text = "";
 
-			this.setBackground(UIConstants.PNL_MODULE_FINDER_BORDER_COLOR);
+            try {
+                text = org.electrocodeogram.system.System.getInstance()
+                    .getModuleRegistry().getModule(id).getDetails();
+            } catch (ModuleInstanceNotFoundException e) {
+                JOptionPane.showMessageDialog(this, e.getMessage(),
+                    "Module Details", JOptionPane.ERROR_MESSAGE);
+            }
 
-			this.setBorder(new TitledBorder(null,"Available Modules"));
+            JOptionPane.showMessageDialog(this, text, "Module Details",
+                JOptionPane.INFORMATION_MESSAGE);
+        }
 
-			this.add(this._pnlSourceModules, 0);
+    }
 
-			this.add(this._pnlIntermediateModules, 1);
+    public void showModuleFinderDetails() {
 
-			this.add(this._pnlTargetModules, 2);
-		}
+        String id = this._pnlButtons._selectedModuleButton;
 
-		public void addModule(ModuleDescriptor moduleDescriptor)
-		{
-			ModuleLabel btnModule = new ModuleLabel(
-					moduleDescriptor.getName(), moduleDescriptor.getId());
+        if (id.equals("")) {
+            return;
+        }
 
-			switch (moduleDescriptor.getModuleType())
-			{
-				case SOURCE_MODULE:
-
-					this._pnlSourceModules.add(btnModule);
-
-					break;
+        ModuleDescriptor moduleDescriptor;
 
-				case INTERMEDIATE_MODULE:
-
-					this._pnlIntermediateModules.add(btnModule);
-
-					break;
-
-				default:
-
-					this._pnlTargetModules.add(btnModule);
-
-					break;
-
-			}
-		}
-	}
-
-	private static class InnerFinderPanel extends JPanel
-	{
-		public InnerFinderPanel(ModuleType moduleType)
-		{
-			this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-			
-			this.setBackground(UIConstants.PNL_INNER_FINDER_BACKGROUND_COLOR);
-
-			switch (moduleType)
-			{
-				case SOURCE_MODULE:
-
-					this.setBorder(new TitledBorder(
-							new LineBorder(UIConstants.PNL_INNER_FINDER_SOURCE_BORDER_COLOR,UIConstants.PNL_INNER_FINDER_SOURCE_BORDER_WIDTH,true), "Source Modules"));
-					break;
-
-				case INTERMEDIATE_MODULE:
-
-					this.setBorder(new TitledBorder(
-							new LineBorder(UIConstants.PNL_INNER_FINDER_INTERMEDIATE_BORDER_COLOR,UIConstants.PNL_INNER_FINDER_INTERMEDIATE_BORDER_WIDTH,true),
-							"Intermediate Modules"));
-
-					break;
-
-				default:
-
-					this.setBorder(new TitledBorder(new LineBorder(UIConstants.PNL_INNER_FINDER_TARGET_BORDER_COLOR,UIConstants.PNL_INNER_FINDER_TARGET_BORDER_WIDTH,true),
-							"Target Modules"));
-
-					break;
-			}
-		}
-	}
-
-	private static class ModuleLabel extends JLabel
-	{
-		String _id;
-		
-		String _name;
-
-		public ModuleLabel(String name, String id)
-		{
-			super(name);
-			
-			this._name = name;
-			
-			this._id = id;
-					
-			this.setToolTipText("Click to add the " + this._name + " module. Right-Click to get Information.");
-			
-			this.setBackground(UIConstants.LBL_MODULE_BACKGROUND_COLOR);
-			
-			this.setOpaque(true);
-			
-			this.setVisible(true);
-			
-			this.addMouseListener(new MouseListener()
-			{
-
-				public void mouseClicked(MouseEvent e)
-				{
-					if (e.getButton() == MouseEvent.BUTTON3)
-					{
-						ModuleFinderPanel._selectedModuleButton = ModuleLabel.this._id;
-						
-						MenuManager.showModuleFinderMenu(ModuleFinderPanel._selectedModuleButton, ModuleLabel.this, ModuleLabel.this.getWidth() - 10, ModuleLabel.this.getHeight() - 10);
-					}
-					else if(e.getButton() == MouseEvent.BUTTON1)
-					{
-						try
-						{
-                            org.electrocodeogram.system.System.getInstance().getModuleRegistry().createModule(ModuleLabel.this._id, ModuleLabel.this._name);
-						}
-						catch (Exception e1)
-						{
-							JOptionPane.showMessageDialog(org.electrocodeogram.system.System.getInstance().getMainWindow(),e1.getMessage(),"Add " + ModuleLabel.this._name + " module",JOptionPane.ERROR_MESSAGE);
-						}
-						
-					}
-
-				}
-
-				public void mousePressed(MouseEvent e)
-				{
-					ModuleLabel.this.setBackground(UIConstants.LBL_MODULE_MOUSEPRESSED_BACKGROUND_COLOR);
-					
-					ModuleLabel.this.repaint();
-					
-				}
-
-				public void mouseReleased(MouseEvent e)
-				{
-					ModuleLabel.this.setBackground(UIConstants.LBL_MODULE_MOUSERELEASED_BACKGROUND_COLOR);
-					
-					ModuleLabel.this.repaint();
-
-				}
-
-				public void mouseEntered(MouseEvent e)
-				{
-					ModuleLabel.this.setBackground(UIConstants.LBL_MODULE_MOUSEOVER_BACKGROUND_COLOR);
-					
-					ModuleLabel.this.setBorder(new LineBorder(UIConstants.LBL_MODULE_MOUSEOVER_BORDER_COLOR));
-					
-					ModuleLabel.this.repaint();
-
-				}
-
-				public void mouseExited(MouseEvent e)
-				{
-					ModuleLabel.this.setBackground(UIConstants.LBL_MODULE_MOUSEOUT_BACKGROUND_COLOR);
-					
-					ModuleLabel.this.setBorder(null);
-					
-					ModuleLabel.this.repaint();
-
-				}
-			});
-
-		}
-	}
+        try {
+            moduleDescriptor = org.electrocodeogram.system.System.getInstance()
+                .getModuleRegistry().getModuleDescriptor(id);
+
+            JOptionPane.showMessageDialog(this, moduleDescriptor
+                .getDescription(), "Module Description",
+                JOptionPane.INFORMATION_MESSAGE);
+
+        } catch (ModulePackageNotFoundException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(),
+                "Module Description", JOptionPane.ERROR_MESSAGE);
+        }
+
+    }
+
+    /**
+     * @param selectedModuleCellId2
+     */
+    public void enterModuleConnectionMode(int selectedModuleCellId) {
+
+        this._moduleConnectionMode = true;
+
+        this._sourceModuleId = selectedModuleCellId;
+
+    }
+
+    /**
+     * @return
+     */
+    public boolean getModuleConnectionMode() {
+
+        return this._moduleConnectionMode;
+    }
+
+    /**
+     * @return
+     */
+    public int getSourceModule() {
+
+        return this._sourceModuleId;
+    }
+
+    /**
+     * 
+     */
+    public void exitModuleConnectionMode() {
+        this._moduleConnectionMode = false;
+
+        this._sourceModuleId = -1;
+
+    }
+
+    private static class ModuleLabPanel extends JPanel {
+
+        private Gui _gui;
+
+        private ModuleGraph _moduleGraph;
+
+        private JScrollPane _scrollPane;
+
+        public ModuleLabPanel(Gui gui) {
+            this._gui = gui;
+
+            this._moduleGraph = new ModuleGraph(this._gui);
+
+            this.setLayout(new GridLayout(1, 1));
+
+            this.setBackground(UIConstants.PNL_MODULE_LAB_BORDER_COLOR);
+
+            this.setBorder(new TitledBorder(null, "Module Setup"));
+
+            this._scrollPane = new JScrollPane(this._moduleGraph);
+
+            this.add(this._scrollPane);
+
+        }
+
+        /**
+         * @return
+         */
+        public int getSelectedModule() {
+            return ModuleGraph.getSelectedModule();
+        }
+
+        /**
+         * @param moduleType
+         * @param id
+         * @param name
+         * @param b
+         */
+        public void createModule(ModuleType moduleType, int id, String name,
+            boolean b) {
+            this._moduleGraph.createModuleCell(moduleType, id, name, b);
+
+        }
+
+        /**
+         * @param id
+         */
+        public void removeModule(int id) {
+            this._moduleGraph.removeModuleCell(id);
+
+        }
+
+        public boolean containsModule(int id) {
+            return this._moduleGraph.containsModuleCell(id);
+        }
+
+        public void updateModule(int id, Module module) {
+            this._moduleGraph.updateModuleCell(id, module);
+        }
+    }
+
+    private static class ModuleFinderPanel extends JPanel {
+
+        private JPanel _pnlSourceModules;
+
+        private JPanel _pnlIntermediateModules;
+
+        private JPanel _pnlTargetModules;
+
+        static String _selectedModuleButton;
+
+        public ModuleFinderPanel(Gui gui) {
+            this._pnlSourceModules = new InnerFinderPanel(
+                ModuleType.SOURCE_MODULE);
+
+            this._pnlIntermediateModules = new InnerFinderPanel(
+                ModuleType.INTERMEDIATE_MODULE);
+
+            this._pnlTargetModules = new InnerFinderPanel(
+                ModuleType.TARGET_MODULE);
+
+            this.setLayout(new GridLayout(3, 1));
+
+            this.setBackground(UIConstants.PNL_MODULE_FINDER_BORDER_COLOR);
+
+            this.setBorder(new TitledBorder(null, "Available Modules"));
+
+            this.add(this._pnlSourceModules, 0);
+
+            this.add(this._pnlIntermediateModules, 1);
+
+            this.add(this._pnlTargetModules, 2);
+        }
+
+        public void addModule(ModuleDescriptor moduleDescriptor) {
+            ModuleLabel btnModule = new ModuleLabel(moduleDescriptor.getName(),
+                moduleDescriptor.getId());
+
+            switch (moduleDescriptor.getModuleType()) {
+                case SOURCE_MODULE:
+
+                    this._pnlSourceModules.add(btnModule);
+
+                    break;
+
+                case INTERMEDIATE_MODULE:
+
+                    this._pnlIntermediateModules.add(btnModule);
+
+                    break;
+
+                default:
+
+                    this._pnlTargetModules.add(btnModule);
+
+                    break;
+
+            }
+        }
+    }
+
+    private static class InnerFinderPanel extends JPanel {
+
+        public InnerFinderPanel(ModuleType moduleType) {
+            this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+
+            this.setBackground(UIConstants.PNL_INNER_FINDER_BACKGROUND_COLOR);
+
+            switch (moduleType) {
+                case SOURCE_MODULE:
+
+                    this.setBorder(new TitledBorder(
+                        new LineBorder(
+                            UIConstants.PNL_INNER_FINDER_SOURCE_BORDER_COLOR,
+                            UIConstants.PNL_INNER_FINDER_SOURCE_BORDER_WIDTH,
+                            true), "Source Modules"));
+                    break;
+
+                case INTERMEDIATE_MODULE:
+
+                    this.setBorder(new TitledBorder(new LineBorder(
+                        UIConstants.PNL_INNER_FINDER_INTERMEDIATE_BORDER_COLOR,
+                        UIConstants.PNL_INNER_FINDER_INTERMEDIATE_BORDER_WIDTH,
+                        true), "Intermediate Modules"));
+
+                    break;
+
+                default:
+
+                    this.setBorder(new TitledBorder(
+                        new LineBorder(
+                            UIConstants.PNL_INNER_FINDER_TARGET_BORDER_COLOR,
+                            UIConstants.PNL_INNER_FINDER_TARGET_BORDER_WIDTH,
+                            true), "Target Modules"));
+
+                    break;
+            }
+        }
+    }
+
+    private static class ModuleLabel extends JLabel {
+
+        String _id;
+
+        String _name;
+
+        public ModuleLabel(String name, String id) {
+            super(name);
+
+            this._name = name;
+
+            this._id = id;
+
+            this.setToolTipText("Click to add the " + this._name
+                                + " module. Right-Click to get Information.");
+
+            this.setBackground(UIConstants.LBL_MODULE_BACKGROUND_COLOR);
+
+            this.setOpaque(true);
+
+            this.setVisible(true);
+
+            this.addMouseListener(new MouseListener() {
+
+                public void mouseClicked(MouseEvent e) {
+                    if (e.getButton() == MouseEvent.BUTTON3) {
+                        ModuleFinderPanel._selectedModuleButton = ModuleLabel.this._id;
+
+                        MenuManager.showModuleFinderMenu(
+                            ModuleFinderPanel._selectedModuleButton,
+                            ModuleLabel.this, ModuleLabel.this.getWidth() - 10,
+                            ModuleLabel.this.getHeight() - 10);
+                    } else if (e.getButton() == MouseEvent.BUTTON1) {
+                        try {
+                            org.electrocodeogram.system.System.getInstance()
+                                .getModuleRegistry().createModule(
+                                    ModuleLabel.this._id,
+                                    ModuleLabel.this._name);
+                        } catch (Exception e1) {
+                            JOptionPane.showMessageDialog(
+                                org.electrocodeogram.system.System
+                                    .getInstance().getMainWindow(), e1
+                                    .getMessage(), "Add "
+                                                   + ModuleLabel.this._name
+                                                   + " module",
+                                JOptionPane.ERROR_MESSAGE);
+                        }
+
+                    }
+
+                }
+
+                public void mousePressed(MouseEvent e) {
+                    ModuleLabel.this
+                        .setBackground(UIConstants.LBL_MODULE_MOUSEPRESSED_BACKGROUND_COLOR);
+
+                    ModuleLabel.this.repaint();
+
+                }
+
+                public void mouseReleased(MouseEvent e) {
+                    ModuleLabel.this
+                        .setBackground(UIConstants.LBL_MODULE_MOUSERELEASED_BACKGROUND_COLOR);
+
+                    ModuleLabel.this.repaint();
+
+                }
+
+                public void mouseEntered(MouseEvent e) {
+                    ModuleLabel.this
+                        .setBackground(UIConstants.LBL_MODULE_MOUSEOVER_BACKGROUND_COLOR);
+
+                    ModuleLabel.this.setBorder(new LineBorder(
+                        UIConstants.LBL_MODULE_MOUSEOVER_BORDER_COLOR));
+
+                    ModuleLabel.this.repaint();
+
+                }
+
+                public void mouseExited(MouseEvent e) {
+                    ModuleLabel.this
+                        .setBackground(UIConstants.LBL_MODULE_MOUSEOUT_BACKGROUND_COLOR);
+
+                    ModuleLabel.this.setBorder(null);
+
+                    ModuleLabel.this.repaint();
+
+                }
+            });
+
+        }
+    }
 }

@@ -39,10 +39,10 @@ public class TestModule extends Module {
     }
 
     /**
-     * @see org.electrocodeogram.module.Module#analyseCoreNotification()
+     * @see org.electrocodeogram.module.Module#update()
      */
     @Override
-    public void analyseCoreNotification() {
+    public void update() {
     // not needed
 
     }

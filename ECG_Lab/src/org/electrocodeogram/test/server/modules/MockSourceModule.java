@@ -20,10 +20,10 @@ public class MockSourceModule extends SourceModule {
     }
 
     /**
-     * @see org.electrocodeogram.module.Module#analyseCoreNotification()
+     * @see org.electrocodeogram.module.Module#update()
      */
     @Override
-    public void analyseCoreNotification() {
+    public void update() {
     //      Not used
 
     }

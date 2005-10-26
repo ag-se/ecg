@@ -32,8 +32,6 @@ import org.electrocodeogram.msdt.registry.MicroSensorDataTypeRegistrationExcepti
 import org.electrocodeogram.system.ISystem;
 import org.electrocodeogram.system.ModuleSystem;
 
-// import org.electrocodeogram.xml.ModulePropertyException;
-
 /**
  * This abstract class represents an <em> ElectroCodeoGram Module</em>.
  * A module is an object able to receive events from other modules and
@@ -144,20 +142,20 @@ public abstract class Module {
      * This <code>Map</code> contains the modules, which are
      * connected to this module as a receiver of events.
      */
-    private HashMap<Integer, Module> receiverModuleMap;
+    private HashMap < Integer, Module > receiverModuleMap;
 
     /**
      * This <code>Map</code> contains the modules, which this module
      * is connected to and that are sending events to this module.
      */
-    private HashMap<Integer, Module> senderModuleMap;
+    private HashMap < Integer, Module > senderModuleMap;
 
     /**
      * This <code>List</code> contains the
      * <em>MicroSensorDataTypes</em> that are provided by this
      * module.
      */
-    private ArrayList<MicroSensorDataType> providedMsdtList;
+    private ArrayList < MicroSensorDataType > providedMsdtList;
 
     /**
      * Is the state of the module.
@@ -222,6 +220,7 @@ public abstract class Module {
      * @param name
      *            Is the name to be assigned to the module
      */
+    @SuppressWarnings("synthetic-access")
     public Module(final ModuleType type, final String id, final String name) {
         logger.entering(this.getClass().getName(), "Module", new Object[] {
             type, id, name});
@@ -261,11 +260,11 @@ public abstract class Module {
 
         this.moduleType = type;
 
-        this.receiverModuleMap = new HashMap<Integer, Module>();
+        this.receiverModuleMap = new HashMap < Integer, Module > ();
 
-        this.senderModuleMap = new HashMap<Integer, Module>();
+        this.senderModuleMap = new HashMap < Integer, Module > ();
 
-        this.providedMsdtList = new ArrayList<MicroSensorDataType>();
+        this.providedMsdtList = new ArrayList < MicroSensorDataType > ();
 
         this.systemObserver = new SystemObserver(this);
 
@@ -304,10 +303,10 @@ public abstract class Module {
 
     /**
      * This method is called whenever this module gets a notification
-     * of a state change form the sytem. It is left to the actual
+     * of a state change form the system. It is left to the actual
      * module implementation to react on such an event.
      */
-    public abstract void analyseCoreNotification();
+    public abstract void update();
 
     /**
      * The nested {@link Module.PropertyListener} calls this, whenever
@@ -396,7 +395,7 @@ public abstract class Module {
         logger.entering(this.getClass().getName(), "getReceivingModuleMap");
 
         logger.exiting(this.getClass().getName(), "getReceivingModuleMap",
-            this.receiverModuleMap.size());
+            new Integer(this.receiverModuleMap.size()));
 
         return this.receiverModuleMap.size();
     }
@@ -410,7 +409,8 @@ public abstract class Module {
     public final Module[] getReceivingModules() {
         logger.entering(this.getClass().getName(), "getReceivingModules");
 
-        Collection<Module> receivingModules = this.receiverModuleMap.values();
+        Collection < Module > receivingModules = this.receiverModuleMap
+            .values();
 
         logger.exiting(this.getClass().getName(), "getReceivingModules",
             receivingModules.toArray(new Module[receivingModules.size()]));
@@ -931,7 +931,7 @@ public abstract class Module {
     private Module[] getSendingModules() {
         logger.entering(this.getClass().getName(), "getSendingModules");
 
-        Collection<Module> sendingModules = this.senderModuleMap.values();
+        Collection < Module > sendingModules = this.senderModuleMap.values();
 
         logger.exiting(this.getClass().getName(), "getSendingModules",
             sendingModules.toArray(new Module[sendingModules.size()]));
@@ -1450,7 +1450,7 @@ public abstract class Module {
             }
 
             if (object instanceof ISystem) {
-                this.myModule.analyseCoreNotification();
+                this.myModule.update();
             }
 
             systemObserverLogger.exiting(this.getClass().getName(), "update");
@@ -1463,7 +1463,7 @@ public abstract class Module {
      * The <em>SystemNotificator</em> is used by the module to
      * notify the system about state changes in the module.
      */
-    private static class SystemNotificator extends Observable {
+    public static final class SystemNotificator extends Observable {
 
         /**
          * A reference to the sorrounding module.
@@ -1482,16 +1482,18 @@ public abstract class Module {
          * @param module
          *            Is the surrounding module
          */
-        public SystemNotificator(final Module module) {
+        private SystemNotificator(final Module module) {
             systemNotificatorlogger.entering(this.getClass().getName(),
                 "SystemNotificator", new Object[] {module});
 
             this.myModule = module;
 
-            if (org.electrocodeogram.system.System.getInstance().getGui() != null) {
-                this.addObserver(org.electrocodeogram.system.System
-                    .getInstance().getGui());
-            }
+             if
+             (org.electrocodeogram.system.System.getInstance().getGui()
+             != null) {
+             this.addObserver(org.electrocodeogram.system.System
+             .getInstance().getGui());
+             }
 
             systemNotificatorlogger.exiting(this.getClass().getName(),
                 "SystemNotificator");
@@ -1546,6 +1548,19 @@ public abstract class Module {
                 "fireStatechangeNotification");
         }
 
+        /**
+         * This returns the module of this <em>SystemNotificator</em>.
+         * @return The module of this <em>SystemNotificator</em>
+         */
+        public Module getModule() {
+            systemNotificatorlogger.entering(this.getClass().getName(),
+                "getModule");
+
+            systemNotificatorlogger.exiting(this.getClass().getName(),
+                "getModule", this.myModule);
+
+            return this.myModule;
+        }
     }
 
     /**

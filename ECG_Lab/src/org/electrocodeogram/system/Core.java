@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.Observable;
+import java.util.Observer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -75,7 +76,8 @@ import org.electrocodeogram.ui.IGui;
  * @see org.electrocodeogram.system.ISystem
  * @see org.electrocodeogram.system.IModuleSystem
  */
-public final class Core extends Observable implements ISystem, IModuleSystem {
+public final class Core extends Observable implements ISystem, IModuleSystem,
+    Observer {
 
     /**
      * This is the default <em>ModuleDirectoryPath</em>.
@@ -125,6 +127,10 @@ public final class Core extends Observable implements ISystem, IModuleSystem {
 
         theInstance = this;
 
+        this.mstdRegistry.addObserver(this);
+
+        this.moduleRegistry.addObserver(this);
+
         logger.exiting(this.getClass().getName(), "SystemRoot");
 
     }
@@ -168,6 +174,11 @@ public final class Core extends Observable implements ISystem, IModuleSystem {
                 "Going to start ECG Lab with user interface.");
 
             this.gui = new Gui(this.moduleRegistry);
+
+            this.moduleRegistry.addObserver(this.gui);
+            
+            this.mstdRegistry.addObserver(this.gui);
+
         } else {
             logger.log(Level.INFO,
                 "Going to start ECG Lab without user interface.");
@@ -279,25 +290,6 @@ public final class Core extends Observable implements ISystem, IModuleSystem {
         logger.exiting(this.getClass().getName(), "getFrames", this.gui);
 
         return this.gui;
-
-    }
-
-    /**
-     * @see org.electrocodeogram.system.ISystem#fireStateChange()
-     */
-    public void fireStateChange() {
-        logger.entering(this.getClass().getName(), "fireStateChange");
-
-        this.setChanged();
-
-        this.notifyObservers();
-
-        this.clearChanged();
-
-        logger.log(Level.FINE,
-            "A statechange has occured. Notification has been done.");
-
-        logger.exiting(this.getClass().getName(), "fireStateChange");
 
     }
 
@@ -877,4 +869,44 @@ public final class Core extends Observable implements ISystem, IModuleSystem {
         }
     }
 
+    /**
+     * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
+     */
+    public void update(final Observable o, final Object arg) {
+
+        logger.entering(this.getClass().getName(), "update", new Object[] {o,
+            arg});
+
+        if (o instanceof Module.SystemNotificator) {
+
+            Module.SystemNotificator sn = (Module.SystemNotificator) o;
+
+            fireStateChange(sn.getModule());
+        } else if (o instanceof ModuleRegistry) {
+            fireStateChange(arg);
+        }
+
+        logger.exiting(this.getClass().getName(), "update");
+
+    }
+
+    /**
+     * @see org.electrocodeogram.system.ISystem#fireStateChange(Object)
+     */
+    public void fireStateChange(final Object object) {
+        logger.entering(this.getClass().getName(), "fireStateChange",
+            new Object[] {object});
+
+        this.setChanged();
+
+        this.notifyObservers(object);
+
+        this.clearChanged();
+
+        logger.log(Level.FINE,
+            "A statechange has occured. Notification has been done.");
+
+        logger.exiting(this.getClass().getName(), "fireStateChange");
+
+    }
 }

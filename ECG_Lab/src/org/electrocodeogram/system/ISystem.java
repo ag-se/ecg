@@ -7,6 +7,8 @@
 
 package org.electrocodeogram.system;
 
+import java.util.Observer;
+
 import javax.swing.JFrame;
 import org.electrocodeogram.module.registry.IModuleRegistry;
 import org.electrocodeogram.msdt.registry.IMsdtRegistry;
@@ -18,7 +20,7 @@ import org.electrocodeogram.ui.IGui;
  * always accesible by a call to the static method
  * {@link org.electrocodeogram.system.System#getInstance()}.
  */
-public interface ISystem {
+public interface ISystem extends Observer {
 
     /**
      * This method returns a reference to the implementation of an
@@ -64,6 +66,7 @@ public interface ISystem {
      * When an ECG Lab subsystem has changed its state in a way that
      * is interesting to modules, it calls this method. It will lead
      * to a notification to all modules about the statechange.
+     * @param object Is the object that has changed its state
      */
-    void fireStateChange();
+    void fireStateChange(Object object);
 }

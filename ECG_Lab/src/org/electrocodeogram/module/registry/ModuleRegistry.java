@@ -235,9 +235,14 @@ public class ModuleRegistry extends Observable implements IModuleRegistry {
         return moduleDescriptor.getClazz();
     }
 
-    void notifyOfNewModuleDecriptor(ModuleDescriptor moduleDescriptor) {
+    /**
+     * Fires a notification that a new <em>ModuleDescriptor</em> has been registered.
+     * The event handling is done in {@link Core#update(Observable, Object)}.
+     * @param moduleDescriptor Is the newly registered <em>ModuleDescriptor</em>
+     */
+    void fireNewModulePackage(ModuleDescriptor moduleDescriptor) {
         logger
-            .entering(this.getClass().getName(), "notifyOfNewModuleDecriptor");
+            .entering(this.getClass().getName(), "fireNewModulePackage");
 
         setChanged();
 
@@ -245,7 +250,7 @@ public class ModuleRegistry extends Observable implements IModuleRegistry {
 
         clearChanged();
 
-        logger.exiting(this.getClass().getName(), "notifyOfNewModuleDecriptor");
+        logger.exiting(this.getClass().getName(), "fireNewModulePackage");
     }
 
     /**
@@ -458,7 +463,7 @@ public class ModuleRegistry extends Observable implements IModuleRegistry {
                                     + moduleDescriptor.getId());
 
                 this.moduleRegistry
-                    .notifyOfNewModuleDecriptor(moduleDescriptor);
+                    .fireNewModulePackage(moduleDescriptor);
 
             }
 
@@ -569,14 +574,22 @@ public class ModuleRegistry extends Observable implements IModuleRegistry {
         logger.log(Level.INFO, "A new module instance with name "
                                + module.getName() + " has been registered.");
 
+        fireModuleInstance(module);
+
+        logger.exiting(this.getClass().getName(), "registerRunningModule");
+
+    }
+
+    /**
+     * Fires a notification about a module instance that has either been registered or deregistered with the <em>ModuleRegistry</em>.
+     * @param module Is the module instance
+     */
+    private void fireModuleInstance(final Module module) {
         setChanged();
 
         notifyObservers(module);
 
         clearChanged();
-
-        logger.exiting(this.getClass().getName(), "registerRunningModule");
-
     }
 
     /**
@@ -689,11 +702,7 @@ public class ModuleRegistry extends Observable implements IModuleRegistry {
         logger.log(Level.INFO, "The module " + module.getName()
                                + " has been deregistered.");
 
-        setChanged();
-
-        notifyObservers(module);
-
-        clearChanged();
+        fireModuleInstance(module);
 
         logger.exiting(this.getClass().getName(), "deregisterModule");
 

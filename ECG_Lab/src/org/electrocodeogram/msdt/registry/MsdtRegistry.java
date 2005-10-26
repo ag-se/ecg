@@ -10,6 +10,7 @@ package org.electrocodeogram.msdt.registry;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
+import java.util.Observable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -35,7 +36,7 @@ import org.xml.sax.SAXException;
  * deregistered. A core set of <em>MicroSensorDataTypes</em> is
  * provided by the ECG.
  */
-public class MsdtRegistry implements IMsdtRegistry {
+public class MsdtRegistry extends Observable implements IMsdtRegistry {
 
     /**
      * This is a map of all currently registered
@@ -226,7 +227,7 @@ public class MsdtRegistry implements IMsdtRegistry {
                 "Registered additonal Module with a known MicroSensorDatyType "
                                 + knownMsdt.getName());
 
-            org.electrocodeogram.system.System.getInstance().fireStateChange();
+            fireStatechangeNotification();
 
             return knownMsdt;
 
@@ -239,7 +240,7 @@ public class MsdtRegistry implements IMsdtRegistry {
         logger.log(Level.INFO, "Registered a new MicroSensorDatyType "
                                + msdt.getName());
 
-        org.electrocodeogram.system.System.getInstance().fireStateChange();
+        fireStatechangeNotification();
 
         logger.exiting(this.getClass().getName(), "requestMsdtRegistration",
             msdt);
@@ -278,7 +279,7 @@ public class MsdtRegistry implements IMsdtRegistry {
         logger.log(Level.INFO, "Deregistered MicroSensorDatyType "
                                + msdt.getName());
 
-        org.electrocodeogram.system.System.getInstance().fireStateChange();
+        fireStatechangeNotification();
 
         logger.exiting(this.getClass().getName(), "deregisterMsdt");
     }
@@ -360,5 +361,23 @@ public class MsdtRegistry implements IMsdtRegistry {
                                 + "\n" + e.getMessage());
         }
 
+    }
+
+    /**
+     * The method is called to notify the ECG system of state
+     * changes in the module.
+     */
+    private void fireStatechangeNotification() {
+        logger.entering(this.getClass().getName(),
+            "fireStatechangeNotification");
+
+        setChanged();
+
+        notifyObservers(this);
+
+        clearChanged();
+
+        logger.exiting(this.getClass().getName(),
+            "fireStatechangeNotification");
     }
 }

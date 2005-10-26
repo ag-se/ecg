@@ -139,4 +139,18 @@ public abstract class EventReader extends Thread {
 
         logger.exiting(this.getClass().getName(), "stopReader");
     }
+
+    /**
+     * This method returns the <em>SourceModule</em> to which this <em>EventReader</em>
+     * is appending read events.
+     * @return The <em>SourceModule</em> of this <em>EventReader</em>
+     */
+    public SourceModule getSourceModule() {
+        logger.entering(this.getClass().getName(), "getSourceModule");
+
+        logger.exiting(this.getClass().getName(), "getSourceModule",
+            this.mySourceModule);
+
+        return this.mySourceModule;
+    }
 }
