@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<BugCollection version="0.8.8" timestamp="1122455070093">
+  <Project filename="&lt;&lt;unnamed project&gt;&gt;">
+    <Jar>D:\UserDocuments\7oas7er\studium\Informatik\Diplomarbeit\Projektordner\ECG_EclipseSensor\build\classes\org\electrocodeogram\sensor\eclipse\ECGEclipseSensor$1.class</Jar>
+    <Jar>D:\UserDocuments\7oas7er\studium\Informatik\Diplomarbeit\Projektordner\ECG_EclipseSensor\build\classes\org\electrocodeogram\sensor\eclipse\ECGEclipseSensor$ResourceChangeAdapter.class</Jar>
+    <Jar>D:\UserDocuments\7oas7er\studium\Informatik\Diplomarbeit\Projektordner\ECG_EclipseSensor\build\classes\org\electrocodeogram\sensor\eclipse\ECGEclipseSensor.class</Jar>
+    <Jar>D:\UserDocuments\7oas7er\studium\Informatik\Diplomarbeit\Projektordner\ECG_EclipseSensor\build\classes\org\hackystat\stdext\sensor\eclipse\EclipseSensorPlugin.class</Jar>
+    <AuxClasspathEntry>D:\UserDocuments\7oas7er\studium\Informatik\Diplomarbeit\Projektordner\ECG_EclipseSensor\build\classes</AuxClasspathEntry>
+    <AuxClasspathEntry>D:\UserDocuments\7oas7er\studium\Informatik\Diplomarbeit\Projektordner\ECG_EclipseSensor\lib\jar\2x\org.eclipse.cdt.core_2.0.0\cdtcore.jar</AuxClasspathEntry>
+    <AuxClasspathEntry>D:\UserDocuments\7oas7er\studium\Informatik\Diplomarbeit\Projektordner\ECG_EclipseSensor\lib\jar\2x\org.eclipse.cdt.core_2.0.0\cdtparser.jar</AuxClasspathEntry>
+    <AuxClasspathEntry>D:\UserDocuments\7oas7er\studium\Informatik\Diplomarbeit\Projektordner\ECG_EclipseSensor\sensorshell.jar</AuxClasspathEntry>
+    <AuxClasspathEntry>E:\Programme\eclipse 3.1\plugins\org.eclipse.ui.ide_3.1.0.jar</AuxClasspathEntry>
+    <AuxClasspathEntry>E:\Programme\eclipse 3.1\plugins\org.eclipse.ui.views_3.1.0.jar</AuxClasspathEntry>
+    <AuxClasspathEntry>E:\Programme\eclipse 3.1\plugins\org.eclipse.jface.text_3.1.0.jar</AuxClasspathEntry>
+    <AuxClasspathEntry>E:\Programme\eclipse 3.1\plugins\org.eclipse.text_3.1.0.jar</AuxClasspathEntry>
+    <AuxClasspathEntry>E:\Programme\eclipse 3.1\plugins\org.eclipse.ui.workbench.texteditor_3.1.0.jar</AuxClasspathEntry>
+    <AuxClasspathEntry>E:\Programme\eclipse 3.1\plugins\org.eclipse.ui.editors_3.1.0.jar</AuxClasspathEntry>
+    <AuxClasspathEntry>E:\Programme\eclipse 3.1\plugins\org.eclipse.core.filebuffers_3.1.0.jar</AuxClasspathEntry>
+    <AuxClasspathEntry>E:\Programme\eclipse 3.1\plugins\org.eclipse.ui_3.1.0.jar</AuxClasspathEntry>
+    <AuxClasspathEntry>E:\Programme\eclipse 3.1\plugins\org.eclipse.swt_3.1.0.jar</AuxClasspathEntry>
+    <AuxClasspathEntry>E:\Programme\eclipse 3.1\plugins\org.eclipse.swt.win32.win32.x86_3.1.0.jar</AuxClasspathEntry>
+    <AuxClasspathEntry>E:\Programme\eclipse 3.1\plugins\org.eclipse.jface_3.1.0.jar</AuxClasspathEntry>
+    <AuxClasspathEntry>E:\Programme\eclipse 3.1\plugins\org.eclipse.core.commands_3.1.0.jar</AuxClasspathEntry>
+    <AuxClasspathEntry>E:\Programme\eclipse 3.1\plugins\org.eclipse.ui.workbench_3.1.0.jar</AuxClasspathEntry>
+    <AuxClasspathEntry>E:\Programme\eclipse 3.1\plugins\org.eclipse.core.resources_3.1.0.jar</AuxClasspathEntry>
+    <AuxClasspathEntry>E:\Programme\eclipse 3.1\plugins\org.eclipse.core.runtime_3.1.0.jar</AuxClasspathEntry>
+    <AuxClasspathEntry>E:\Programme\eclipse 3.1\plugins\org.eclipse.osgi_3.1.0.jar</AuxClasspathEntry>
+    <AuxClasspathEntry>E:\Programme\eclipse 3.1\plugins\org.eclipse.core.runtime.compatibility_3.1.0.jar</AuxClasspathEntry>
+    <AuxClasspathEntry>E:\Programme\eclipse 3.1\plugins\org.eclipse.update.configurator_3.1.0.jar</AuxClasspathEntry>
+    <AuxClasspathEntry>E:\Programme\eclipse 3.1\plugins\org.eclipse.jdt.core_3.1.0.jar</AuxClasspathEntry>
+    <AuxClasspathEntry>E:\Programme\eclipse 3.1\plugins\org.eclipse.jdt.junit_3.1.0\junitsupport.jar</AuxClasspathEntry>
+    <AuxClasspathEntry>E:\Programme\eclipse 3.1\plugins\org.eclipse.jdt.ui_3.1.0.jar</AuxClasspathEntry>
+    <AuxClasspathEntry>E:\Programme\eclipse 3.1\plugins\org.eclipse.debug.core_3.1.0.jar</AuxClasspathEntry>
+    <AuxClasspathEntry>E:\Programme\eclipse 3.1\plugins\org.eclipse.update.ui_3.1.0.jar</AuxClasspathEntry>
+    <AuxClasspathEntry>D:\UserDocuments\7oas7er\studium\Informatik\Diplomarbeit\Projektordner\ECG_EclipseSensor\lib\hackystat\sensor.eclipse.3x.jar</AuxClasspathEntry>
+  </Project>
+  <BugInstance type="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD" priority="1" abbrev="ST" category="STYLE" uid="12" active="1122455070093-1122455070093,1122455724750-1122455724750">
+    <Class classname="org.hackystat.stdext.sensor.eclipse.EclipseSensorPlugin"/>
+    <Method classname="org.hackystat.stdext.sensor.eclipse.EclipseSensorPlugin" name="&lt;init&gt;" signature="(Lorg/eclipse/core/runtime/IPluginDescriptor;)V">
+      <SourceLine classname="org.hackystat.stdext.sensor.eclipse.EclipseSensorPlugin" start="25" end="27" startBytecode="0" endBytecode="9" sourcefile="EclipseSensorPlugin.java"/>
+    </Method>
+    <Field classname="org.hackystat.stdext.sensor.eclipse.EclipseSensorPlugin" name="plugin" signature="Lorg/hackystat/stdext/sensor/eclipse/EclipseSensorPlugin;" isStatic="true"/>
+    <SourceLine classname="org.hackystat.stdext.sensor.eclipse.EclipseSensorPlugin" start="26" end="26" startBytecode="6" endBytecode="6" sourcefile="EclipseSensorPlugin.java"/>
+  </BugInstance>
+  <Errors></Errors>
+  <FindBugsSummary timestamp="Wed, 27 Jul 2005 11:04:30 +0200" total_classes="0" total_bugs="0" total_size="0" num_packages="0"></FindBugsSummary>
+</BugCollection>
