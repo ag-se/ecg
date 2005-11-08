@@ -10,10 +10,12 @@ package org.electrocodeogram.logging;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.Level;
+import java.util.logging.LogManager;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
@@ -101,8 +103,11 @@ public final class LogHelper {
     }
 
     /**
-     * This creates a new <em>Logger</em> instance with the given name.
-     * @param name Is the name for the <em>logger</em>, usually the name of the class in ECG
+     * This creates a new <em>Logger</em> instance with the given
+     * name.
+     * @param name
+     *            Is the name for the <em>logger</em>, usually the
+     *            name of the class in ECG
      * @return A new <em>Logger</em> instance
      */
     public static Logger createLogger(final String name) {
@@ -115,7 +120,8 @@ public final class LogHelper {
 
     /**
      * This sets the loglevel for all <em>Logger</em>.
-     * @param logLevel Is the new Loglevel
+     * @param logLevel
+     *            Is the new Loglevel
      */
     public static void setLogLevel(Level logLevel) {
         if (logLevel == null) {
@@ -132,12 +138,38 @@ public final class LogHelper {
             handler.setLevel(logLevel);
 
         }
+
+    }
+
+    /**
+     * This method is called to disable all logger that are not
+     * from the ElectroCodeoGram itself, but from the Java API and
+     * other components.
+     *
+     */
+    public static void disableForeignLogger() {
+        Enumeration < String > loggerNames = LogManager.getLogManager()
+            .getLoggerNames();
+
+        while (loggerNames.hasMoreElements()) {
+            String loggerName = loggerNames.nextElement();
+
+            if ((!loggerName.startsWith("org.electrocodeogram"))
+                && (!loggerName.equals(""))) {
+                Logger alienLogger = Logger.getLogger(loggerName);
+
+                alienLogger.setLevel(Level.OFF);
+            }
+        }
     }
 
     /**
      * This sets the logfile to use.
-     * @param filename Is the name of the logfile
-     * @throws IOException If such an <em>Exception</em> occurs while creating the logfile
+     * @param filename
+     *            Is the name of the logfile
+     * @throws IOException
+     *             If such an <em>Exception</em> occurs while
+     *             creating the logfile
      */
     public static void setLogFile(String filename) throws IOException {
         if (filename == null) {
@@ -177,7 +209,8 @@ public final class LogHelper {
 
     /**
      * This returns the Loglevel object to a given Loglevel string.
-     * @param logLevel Is the Loglevel string, i.e. "verbose"
+     * @param logLevel
+     *            Is the Loglevel string, i.e. "verbose"
      * @return A Loglevel object, i.e. <em>Level.FINE</em>
      */
     public static Level getLogLevel(final String logLevel) {
@@ -202,8 +235,8 @@ public final class LogHelper {
     }
 
     /**
-     * This class is used to formatt the log entries for all <em>Logger</em>.
-     *
+     * This class is used to formatt the log entries for all
+     * <em>Logger</em>.
      */
     private static class ECGFormatter extends Formatter {
 
@@ -212,18 +245,47 @@ public final class LogHelper {
          */
         @Override
         public String format(final LogRecord record) {
-            return "[" + record.getLevel() + "]  "
-                   + new Date(record.getMillis()).toString() + " : "
-                   + record.getSourceClassName() + "#"
-                   + record.getSourceMethodName() + " : " + record.getMessage()
-                   + "\r\n";
+
+            Object[] parameters = record.getParameters();
+
+            String logEntry = "[" + record.getLevel() + "]  "
+                              + new Date(record.getMillis()).toString() + " : "
+                              + record.getSourceClassName() + "#"
+                              + record.getSourceMethodName();
+
+            if (parameters == null) {
+                logEntry += " : " + record.getMessage() + "\r\n";
+            } else {
+                logEntry += "(";
+
+                for (int i = 0; i < parameters.length; i++) {
+                    if (parameters[i] == null) {
+                        logEntry += "null";
+                    } else {
+                        Class clazz = parameters[i].getClass();
+
+                        Object o = clazz.cast(parameters[i]);
+
+                        logEntry += clazz.getSimpleName() + " " + o.toString();
+                    }
+
+                    if (i < parameters.length - 1) {
+                        logEntry += ", ";
+                    }
+                }
+
+                logEntry += ")";
+
+                logEntry += " : " + record.getMessage() + "\r\n";
+            }
+
+            return logEntry;
         }
 
     }
 
     /**
      * This class defines an additional Loglevel for the ECG.
-     *
      */
     public static class ECGLevel extends Level {
 
@@ -233,15 +295,17 @@ public final class LogHelper {
         private static final long serialVersionUID = 8792104761302051549L;
 
         /**
-         * This additional Loglevel is used in the ECG to log event contents
-         * in addition to the <em>VERBOSE</em> Loglevel.
+         * This additional Loglevel is used in the ECG to log event
+         * contents in addition to the <em>VERBOSE</em> Loglevel.
          */
         public static final Level PACKET = new ECGLevel("PACKET", 450);
 
         /**
          * Creates an additional Loglevel.
-         * @param name IS the name of the Loglevel
-         * @param value Is the value for the Loglevel
+         * @param name
+         *            IS the name of the Loglevel
+         * @param value
+         *            Is the value for the Loglevel
          */
         protected ECGLevel(final String name, final int value) {
             super(name, value);

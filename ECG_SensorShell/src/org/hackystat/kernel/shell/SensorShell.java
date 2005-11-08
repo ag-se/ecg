@@ -125,10 +125,6 @@ public class SensorShell {
      */
     private ServerMode serverMode;
 
-    // private static int RESET_COUNT = 100;
-
-    // private int _count;
-
     /**
      * This is the logger.
      */

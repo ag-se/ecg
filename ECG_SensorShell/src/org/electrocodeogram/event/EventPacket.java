@@ -181,7 +181,11 @@ public class EventPacket implements Serializable {
             for (int i = 0; i < this.getArgList().size(); i++) {
                 stringBuffer.append(";");
 
-                stringBuffer.append((String) this.getArgList().get(i));
+                Object entry = this.getArgList().get(i);
+
+                if (entry instanceof String) {
+                    stringBuffer.append((String) entry);
+                }
             }
         }
 
