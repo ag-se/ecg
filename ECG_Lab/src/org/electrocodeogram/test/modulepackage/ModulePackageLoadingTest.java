@@ -56,7 +56,7 @@ public class ModulePackageLoadingTest extends TestCase implements Observer {
      * higher. This testcase is trying to load the
      * <em>ModulePackage</em> from
      * "testmodules/notExistingDirectory". This <em>ModulePackage</em>
-     * is not existing. The expected result is that the test is not
+     * is not existing. The expected result is that the test is 
      * throwing a {@link ModuleClassLoaderInitializationException}.
      */
     public final void testIfNotExistingModuleDirectoryCausesException() {
@@ -137,7 +137,7 @@ public class ModulePackageLoadingTest extends TestCase implements Observer {
      * <em>ModulePackage</em> from
      * "testmodules/noModulePropertyFile". This <em>ModulePackage</em>
      * is missing a "module.properties.xml" file. The expected result
-     * is that the test is not throwing a
+     * is that the test is throwing a
      * {@link ModuleClassLoaderInitializationException}.
      */
     public final void testIfNoModulePropertyFileCausesException() {
