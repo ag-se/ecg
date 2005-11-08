@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<modulesetup>
+<module id="2" active="true">
+<name>
+File Writer
+</name>
+<fromClassId>
+org.electrocodeogram.module.target.FileSystemTargetModule
+</fromClassId>
+<connectedTo>
+</connectedTo>
+<properties>
+</properties>
+</module>
+<module id="1" active="true">
+<name>
+Socket Server And Reader
+</name>
+<fromClassId>
+org.electrocodeogram.module.intermediate.SocketSourceModule
+</fromClassId>
+<connectedTo>
+<id>
+2
+</id>
+</connectedTo>
+<properties>
+<property>
+<name>
+port
+</name>
+<value>
+22222
+</value>
+<type>
+java.lang.Integer
+</type>
+</property>
+<property>
+<name>
+Show Clients
+</name>
+<value>
+Show Clients
+</value>
+<type>
+java.lang.reflect.Method
+</type>
+</property>
+</properties>
+</module>
+</modulesetup>

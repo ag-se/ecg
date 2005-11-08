@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Buildfile for the Module-API and ECG ServerAndLab application -->
+
+<project name="ECG ServerAndLab" default="help" basedir=".">
+
+	<!-- Project-wide settings. All directories are relative to the -->
+	<!-- project root directory -->
+
+	<!-- Project directories -->
+	<property name="src.dir" value="src"/>
+
+	<property name="dist.dir" value="dist"/>
+
+	<property name="doc.dir" value="doc"/>
+
+	<property name="lib.dir" value="lib"/>
+
+	<property name="module.dir" value="modules"/>
+
+	<property name="msdt.dir" value="msdt"/>
+
+	<property name="bin.dir" value="bin"/>
+
+
+	<!-- Temporary build directory names -->
+	<property name="build.dir" value="build"/>
+
+	<property name="build.classes" value="${build.dir}/classes"/>
+
+	<property name="build.doc" value="${build.dir}/doc"/>
+
+	<property name="build.lib" value="${build.dir}/lib"/>
+
+	<!-- Classpath setting -->
+	<path id="classpath">
+		<fileset dir="${lib.dir}">
+			<include name="**/*.jar/"/>
+		</fileset>
+
+		<fileset dir="e:/programme/eclipse 3.1/plugins/org.junit_3.8.1/">
+			<include name="junit.jar"/>
+		</fileset>
+
+
+
+	</path>
+
+
+	<target name="help">
+		<echo message="Build the ServerAndLab component"/>
+		<echo message="Usage: ant [ant options] target1 [ target2 | target3 | ... ]"/>
+		<echo message=""/>
+		<echo message="build - Build the Module-APE and ServerAndLab application."/>
+		<echo message="jarEcgLab - build + Package the ServerAndLab application into ECGLab.jar"/>
+		<echo message="jarModuleApi - build + Package the Module-API into moduleapi.jar"/>
+		<echo message="javadoc - Generate the API documentation."/>
+		<echo message="clean - Delete class files built during previous builds. Leave directories."/>
+		<echo message="cleanall - clean + Delete any created directories and their contents."/>
+		<echo message="deployEcgLab - jarEcgLab + Deploy the ECGLab.jar into ./dist/lib/."/>
+		<echo message="deployModuleApi - jarEcgLab + Deploy the moduleapi.jar into ./dist/lib/."/>
+		<echo message="Assemble application - Assemble the ECG ServerAndLab application with modules into ./application/"/>
+	</target>
+
+	<!-- Target to create the build directories prior to a compile target -->
+	<!-- The start time of the build is marked as well for the log -->
+	<target name="prepare">
+
+		<mkdir dir="${build.dir}"/>
+		<mkdir dir="${build.classes}"/>
+		<mkdir dir="${build.lib}"/>
+		<mkdir dir="${doc.dir}"/>
+
+		<tstamp />
+		<echo message="${TSTAMP}"/>
+
+	</target>
+
+	<!-- Build the Module-API and ECG ServerAndLab application. -->
+	<target name="build" depends="prepare">
+
+		<echo message="Building the Module-API and ServerAndLab application..."/>
+
+		<javac
+			destdir="${build.classes}"
+			srcdir="${src.dir}"
+			source="1.5"
+			debug="on"
+			deprecation="on">
+
+			<classpath refid="classpath" />
+
+		</javac>
+
+	</target>
+
+
+	<!-- Package the ServerAndLab application into ECGLab.jar. -->
+	<target name="jarEcgLab" depends="build">
+
+		<echo message="Packaging the ECG ServerAndLab application into ECGLab.jar..."/>
+
+		<jar
+				compress="true"
+				duplicate="fail"
+				jarfile="${build.lib}/ECGLab.jar"
+				basedir="${build.classes}"
+				manifest="manifest.txt"/>
+	</target>
+
+	<!-- Package the Module-API into moduleapi.jar -->
+	<target name="jarModuleApi" depends="build">
+
+		<echo message="Packaging the Module-API into moduleapi.jar..."/>
+
+		<jar
+					includes="org/electrocodeogram/module/*,
+							org/electrocodeogram/module/intermediate/*,
+							org/electrocodeogram/module/source/*,
+							org/electrocodeogram/module/target/*,
+							org/electrocodeogram/modulepackage/*,
+							org/electrocodeogram/system/IModuleSystem.class*,
+							org/electrocodeogram/system/ModuleSystem.class*,
+							org/electrocodeogram/system/logging/*,
+							org/electrocodeogram/moduleapi/*,
+							org/electrocodeogram/moduleapi/module/*,
+							org/electrocodeogram/module/event/*,
+							org/electrocodeogram/moduleapi/module/registry/*,
+							org/electrocodeogram/moduleapi/msdt/registry/*,
+							org/electrocodeogram/msdt/*,
+							org/electrocodeogram/event/*,
+							org/electrocodeogram/ui/IGui.class,
+							org/electrocodeogram/xml/*"
+					compress="true"
+					duplicate="fail"
+					jarfile="${build.lib}/moduleapi.jar"
+					basedir="${build.classes}" />
+	</target>
+
+	<!-- Generate the API documentation. -->
+	<target name="javadoc">
+
+		<javadoc
+			packagenames="org.*"
+			sourcepath="${src.dir}"
+			destdir="${doc.dir}">
+
+			<classpath refid="classpath"/>
+
+		</javadoc>
+
+	</target>
+
+	<!-- Delete class files built during previous builds. Leave directories. -->
+	<target name="clean">
+
+		<delete failonerror="no">
+			<fileset dir="${build.classes}" includes="**/*.class"/>
+		</delete>
+
+	</target>
+
+	<!-- Delete any created directories and their contents. -->
+	<target name="cleanall" depends="clean">
+
+		<delete dir="${build.dir}"/>
+		<delete dir="${dist.dir}"/>
+		<delete dir="${doc.dir}"/>
+		<delete dir="${module.dir}"/>
+		
+		<delete failonerror="no">
+			<fileset dir="${lib.dir}/ecg" includes="**/*.jar"/>
+		</delete>
+
+	</target>
+
+	<!-- Deploy the ECGLab.jar into ./dist/lib/. -->
+	<target name="deployEcgLab" depends="jarEcgLab">
+
+		<echo message="Deploying ECGLab.jar..."/>
+
+		<!-- Create the distribution directories -->
+		<mkdir dir="${dist.dir}"/>
+		<mkdir dir="${dist.dir}/lib"/>
+		<mkdir dir="${dist.dir}/doc"/>
+
+		<!-- Copy the libraries -->
+		<copy todir="${dist.dir}/lib">
+
+			<fileset dir="${build.lib}" includes="ECGLab.jar" />
+
+		</copy>
+
+		<!-- Copy the documentation -->
+		<copy todir="${dist.dir}/doc">
+
+			<fileset dir="${doc.dir}"/>
+
+		</copy>
+
+	</target>
+
+	<!-- Deploy the Module-API into ./dist/lib/. -->
+	<target name="deployModuleApi" depends="jarModuleApi">
+
+		<echo message="Deploying moduleapi.jar ..."/>
+
+		<!-- Create the distribuition directories -->
+		<mkdir dir="${dist.dir}"/>
+		<mkdir dir="${dist.dir}/lib"/>
+		<mkdir dir="${dist.dir}/doc"/>
+
+		<!-- Copy the libraries -->
+		<copy todir="${dist.dir}/lib">
+
+			<fileset dir="${build.lib}" includes="moduleapi.jar" />
+
+		</copy>
+
+		<!-- Copy the documentation -->
+		<copy todir="${dist.dir}/doc">
+
+			<fileset dir="${doc.dir}"/>
+
+		</copy>
+
+		<!-- Copy the moduleapi.jar to the module projects -->
+		<copy todir="../ECG_SocketSourceModule/lib/ecg/">
+
+			<fileset dir="${build.lib}" includes="moduleapi.jar" />
+
+		</copy>
+		
+		<copy todir="../ECG_FileSystemTargetModule/lib/ecg/">
+
+			<fileset dir="${build.lib}" includes="moduleapi.jar" />
+
+		</copy>
+		
+		<copy todir="../ECG_FileSystemSourceModule/lib/ecg/">
+
+			<fileset dir="${build.lib}" includes="moduleapi.jar" />
+
+		</copy>
+
+		<copy todir="../ECG_MSDTFilterIntermediateModule/lib/ecg/">
+
+			<fileset dir="${build.lib}" includes="moduleapi.jar" />
+
+		</copy>
+		
+		<copy todir="../ECG_StatisticsTargetModule/lib/ecg/">
+
+			<fileset dir="${build.lib}" includes="moduleapi.jar" />
+
+		</copy>
+		
+		<copy todir="../ECG_CodechangeDifferIntermediateModule/lib/ecg/">
+
+			<fileset dir="${build.lib}" includes="moduleapi.jar" />
+
+		</copy>
+
+		<copy todir="../ECG_IOSourceModule/lib/ecg/">
+
+			<fileset dir="${build.lib}" includes="moduleapi.jar" />
+
+		</copy>
+		
+		<copy todir="../ECG_ManualAnnotatorSourceModule/lib/ecg/">
+
+			<fileset dir="${build.lib}" includes="moduleapi.jar" />
+
+		</copy>
+		
+		<copy todir="../ECG_HackyStatTargetModule/lib/ecg/">
+
+			<fileset dir="${build.lib}" includes="moduleapi.jar" />
+
+		</copy>
+		
+	</target>
+
+	<!-- Assemble application -->
+	<target name="Assemble ECGLab" depends="deployEcgLab">
+
+		<echo message="Assembling ECG ServerAndLab application"/>
+
+		<mkdir dir="${dist.dir}/application/"/>
+		<mkdir dir="${dist.dir}/application/modules/"/>
+		<mkdir dir="${dist.dir}/application/msdt/"/>
+		<mkdir dir="${dist.dir}/application/lib/"/>
+
+		<copy todir="${dist.dir}/application/">
+
+			<fileset dir="${dist.dir}/lib/" includes="ECGLab.jar" />
+
+		</copy>
+		
+		<copy todir="${dist.dir}/application/">
+
+			<fileset dir="." includes="ecg.bat" />
+
+		</copy>
+		
+		<copy todir="${dist.dir}/application/">
+
+			<fileset dir="." includes="pipe.setup" />
+
+		</copy>
+
+		<copy todir="${dist.dir}/application/modules/">
+
+			<fileset dir="${module.dir}"/>
+
+		</copy>
+
+		<copy todir="${dist.dir}/application/">
+
+			<fileset dir="." includes="socket.setup" />
+
+		</copy>
+
+		
+		<copy todir="${dist.dir}/application/msdt/">
+
+			<fileset dir="${msdt.dir}"/>
+
+		</copy>
+		
+		<copy todir="${dist.dir}/application/lib/">
+
+			<fileset dir="${lib.dir}"/>
+
+		</copy>
+
+
+	</target>
+</project>
+
