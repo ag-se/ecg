@@ -29,6 +29,8 @@ import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.IDebugEventSetListener;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.RuntimeProcess;
+import org.eclipse.jdt.internal.junit.ui.JUnitPlugin;
+import org.eclipse.jdt.junit.ITestRunListener;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentListener;
@@ -40,6 +42,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.texteditor.DocumentProviderRegistry;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.electrocodeogram.event.WellFormedEventPacket;
@@ -149,8 +152,8 @@ public final class ECGEclipseSensor {
         // String version =
         // EclipseSensorPlugin.getInstance().getDescriptor()
         // .getVersionIdentifier().toString();
-        String[] path = {EclipseSensorPlugin.getInstance().getSensorPath() + File.separator
-                         + "ecg"};
+        String[] path = {EclipseSensorPlugin.getInstance().getSensorPath()
+                         + File.separator + "ecg"};
 
         List list = Arrays.asList(path);
 
@@ -238,6 +241,8 @@ public final class ECGEclipseSensor {
         dp.addDebugEventListener(new DebugEventSetAdapter());
 
         logger.log(Level.FINE, "Added DebugEventSetListener.");
+
+        JUnitPlugin.getDefault().addTestRunListener(new TestRunAdapter());
 
         logger.exiting(this.getClass().getName(), "ECGEclipseSensor");
     }
@@ -731,8 +736,10 @@ public final class ECGEclipseSensor {
         }
 
         /**
-         * This method is analysing the current program lauch and determines if it is a run or a debug launch.
-         * @param launch Is the launch to analyse
+         * This method is analysing the current program lauch and
+         * determines if it is a run or a debug launch.
+         * @param launch
+         *            Is the launch to analyse
          */
         @SuppressWarnings("synthetic-access")
         private void analyseLaunch(final ILaunch launch) {
@@ -775,7 +782,8 @@ public final class ECGEclipseSensor {
     }
 
     /**
-     * This is listening for events that are affected to GUI parts and editors of <em>Eclipse</em>.
+     * This is listening for events that are affected to GUI parts and
+     * editors of <em>Eclipse</em>.
      */
     private class PartAndEditorListenerAdapter implements IPartListener {
 
@@ -785,7 +793,8 @@ public final class ECGEclipseSensor {
         @SuppressWarnings("synthetic-access")
         public void partActivated(final IWorkbenchPart part) {
 
-            logger.entering(this.getClass().getName(), "partActivated", new Object[] {part});
+            logger.entering(this.getClass().getName(), "partActivated",
+                new Object[] {part});
 
             if (part == null) {
                 logger.log(Level.FINE,
@@ -845,7 +854,8 @@ public final class ECGEclipseSensor {
          */
         @SuppressWarnings("synthetic-access")
         public void partClosed(final IWorkbenchPart part) {
-            logger.entering(this.getClass().getName(), "partClosed", new Object[] {part});
+            logger.entering(this.getClass().getName(), "partClosed",
+                new Object[] {part});
 
             if (part == null) {
                 logger.log(Level.FINE,
@@ -894,7 +904,8 @@ public final class ECGEclipseSensor {
          */
         @SuppressWarnings("synthetic-access")
         public void partDeactivated(final IWorkbenchPart part) {
-            logger.entering(this.getClass().getName(), "partDeactivated", new Object[] {part});
+            logger.entering(this.getClass().getName(), "partDeactivated",
+                new Object[] {part});
 
             if (part == null) {
                 logger.log(Level.FINE,
@@ -944,7 +955,8 @@ public final class ECGEclipseSensor {
          */
         @SuppressWarnings("synthetic-access")
         public void partOpened(final IWorkbenchPart part) {
-            logger.entering(this.getClass().getName(), "partOpened", new Object[] {part});
+            logger.entering(this.getClass().getName(), "partOpened",
+                new Object[] {part});
 
             if (part == null) {
                 logger.log(Level.FINE,
@@ -970,6 +982,24 @@ public final class ECGEclipseSensor {
                                     + part.getTitle()
                                     + "</editorname></editor></microActivity>");
 
+                ITextEditor editor = (ITextEditor) part;
+
+                IDocumentProvider provider = editor.getDocumentProvider();
+
+                IDocument doc = provider.getDocument(editor.getEditorInput());
+
+                processActivity(
+                    "msdt.codechange.xsd",
+                    "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+                                    + getUsername()
+                                    + "</username><projectname>"
+                                    + getProjectname()
+                                    + "</projectname></commonData><codechange><document><![CDATA["
+                                    + doc.get()
+                                    + "]]></document><documentname>"
+                                    + part.getTitle()
+                                    + "</documentname></codechange></microActivity>");
+
             } else {
                 logger.log(ECGLevel.PACKET,
                     "A partOpened event has been recorded.");
@@ -983,6 +1013,7 @@ public final class ECGEclipseSensor {
                                     + "</projectname></commonData><part><activity>opened</activity><partname>"
                                     + part.getTitle()
                                     + "</partname></part></microActivity>");
+
             }
 
             logger.exiting(this.getClass().getName(), "partOpened");
@@ -994,7 +1025,8 @@ public final class ECGEclipseSensor {
         @SuppressWarnings("synthetic-access")
         public void partBroughtToTop(@SuppressWarnings("unused")
         final IWorkbenchPart part) {
-            logger.entering(this.getClass().getName(), "partBroughtToTop", new Object[] {part});
+            logger.entering(this.getClass().getName(), "partBroughtToTop",
+                new Object[] {part});
 
             // not implemented
 
@@ -1003,20 +1035,23 @@ public final class ECGEclipseSensor {
     }
 
     /**
-     This is listening for events about changes in the text of open documents.
+     * This is listening for events about changes in the text of open
+     * documents.
      */
     private class DocumentListenerAdapter implements IDocumentListener {
 
         /**
-         * This is used to wait a moment after a <em>DocumentChanged</em>
-         * event has been recorded. Only when the user has not changed the
-         * document for {@link ECGEclipseSensor#CODECHANGE_INTERVALL} amount of time,
-         * a <em>Codechange</em> event is sent.
+         * This is used to wait a moment after a
+         * <em>DocumentChanged</em> event has been recorded. Only
+         * when the user has not changed the document for
+         * {@link ECGEclipseSensor#CODECHANGE_INTERVALL} amount of
+         * time, a <em>Codechange</em> event is sent.
          */
         private Timer timer = null;
 
         /**
-         * Creates the <em>DocumentListenerAdapter</em> and the <code>Timer</code>.
+         * Creates the <em>DocumentListenerAdapter</em> and the
+         * <code>Timer</code>.
          */
         @SuppressWarnings("synthetic-access")
         public DocumentListenerAdapter() {
@@ -1049,7 +1084,8 @@ public final class ECGEclipseSensor {
          */
         @SuppressWarnings("synthetic-access")
         public void documentChanged(final DocumentEvent event) {
-            logger.entering(this.getClass().getName(), "documentChanged", new Object[] {event});
+            logger.entering(this.getClass().getName(), "documentChanged",
+                new Object[] {event});
 
             if (event == null) {
                 logger.log(Level.FINE,
@@ -1073,14 +1109,302 @@ public final class ECGEclipseSensor {
     }
 
     /**
-     * This <em>TimerTask</em> is used in creating <em>Codechange</em> events.
-     * In <em>Eclipse</em> every time the user changes a single character in the
-     * active document an <em>DocumentChanged</em> event is fired. To avoid
-     * sending <em>Codechange</em> this often, the sensor shall wait for an amount
-     * of time after before sending a <em>Codechange</em>.
-     * Only when the user does not change the document's text for {@link ECGEclipseSensor#CODECHANGE_INTERVALL}
-     * time, a <em>Codechange</em> is sent to the ECG Lab.
-     *
+     * This is listening for events about tests and testruns.
+     */
+    private class TestRunAdapter implements ITestRunListener {
+
+        /**
+         * Stores the number of individual tests in the current
+         * testrun.
+         */
+        private int currentTestCount;
+
+        /**
+         * @see org.eclipse.jdt.junit.ITestRunListener#testRunStarted(int)
+         */
+        @SuppressWarnings("synthetic-access")
+        public void testRunStarted(final int testCount) {
+
+            logger.entering(this.getClass().getName(), "testRunStarted",
+                new Object[] {new Integer(testCount)});
+
+            this.currentTestCount = testCount;
+
+            logger.log(ECGLevel.PACKET,
+                "An testRunStarted event has been recorded.");
+
+            processActivity(
+                "msdt.testrun.xsd",
+                "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+                                + ECGEclipseSensor.this.username
+                                + "</username><projectname>"
+                                + ECGEclipseSensor.this.projectname
+                                + "</projectname></commonData><testrun><activity>started</activity><elapsedtime>0</elapsedtime><testcount>"
+                                + testCount
+                                + "</testcount></testrun></microActivity>");
+
+            logger.exiting(this.getClass().getName(), "testRunStarted");
+
+        }
+
+        /**
+         * @see org.eclipse.jdt.junit.ITestRunListener#testRunEnded(long)
+         */
+        @SuppressWarnings("synthetic-access")
+        public void testRunEnded(final long elapsedTime) {
+            logger.entering(this.getClass().getName(), "testRunEnded",
+                new Object[] {new Long(elapsedTime)});
+
+            logger.log(ECGLevel.PACKET,
+                "An testRunEnded event has been recorded.");
+
+            processActivity(
+                "msdt.testrun.xsd",
+                "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+                                + ECGEclipseSensor.this.username
+                                + "</username><projectname>"
+                                + ECGEclipseSensor.this.projectname
+                                + "</projectname></commonData><testrun><activity>ended</activity><elapsedtime>"
+                                + elapsedTime + "</elapsedtime><testcount>"
+                                + this.currentTestCount
+                                + "</testcount></testrun></microActivity>");
+
+            logger.exiting(this.getClass().getName(), "testRunEnded");
+
+        }
+
+        /**
+         * @see org.eclipse.jdt.junit.ITestRunListener#testRunStopped(long)
+         */
+        @SuppressWarnings("synthetic-access")
+        public void testRunStopped(final long elapsedTime) {
+            logger.entering(this.getClass().getName(), "testRunStopped",
+                new Object[] {new Long(elapsedTime)});
+
+            logger.log(ECGLevel.PACKET,
+                "An testRunStopped event has been recorded.");
+
+            processActivity(
+                "msdt.testrun.xsd",
+                "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+                                + ECGEclipseSensor.this.username
+                                + "</username><projectname>"
+                                + ECGEclipseSensor.this.projectname
+                                + "</projectname></commonData><testrun><activity>stopped</activity><elapsedtime>"
+                                + elapsedTime + "</elapsedtime><testcount>"
+                                + this.currentTestCount
+                                + "</testcount></testrun></microActivity>");
+
+            logger.exiting(this.getClass().getName(), "testRunStopped");
+
+        }
+
+        /**
+         * @see org.eclipse.jdt.junit.ITestRunListener#testStarted(java.lang.String,
+         *      java.lang.String)
+         */
+        @SuppressWarnings("synthetic-access")
+        public void testStarted(final String testId, final String testName) {
+            logger.entering(this.getClass().getName(), "testStarted",
+                new Object[] {testId, testName});
+
+            logger.log(ECGLevel.PACKET,
+                "An testStarted event has been recorded.");
+
+            processActivity(
+                "msdt.test.xsd",
+                "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+                                + ECGEclipseSensor.this.username
+                                + "</username><projectname>"
+                                + ECGEclipseSensor.this.projectname
+                                + "</projectname></commonData><test><activity>started</activity><name>"
+                                + testName
+                                + "</name><id>"
+                                + testId
+                                + "</id><status>OK</status></test></microActivity>");
+
+            logger.exiting(this.getClass().getName(), "testStarted");
+
+        }
+
+        /**
+         * @see org.eclipse.jdt.junit.ITestRunListener#testEnded(java.lang.String,
+         *      java.lang.String)
+         */
+        @SuppressWarnings("synthetic-access")
+        public void testEnded(final String testId, final String testName) {
+            logger.entering(this.getClass().getName(), "testEnded",
+                new Object[] {testId, testName});
+
+            logger
+                .log(ECGLevel.PACKET, "An testEnded event has been recorded.");
+
+            processActivity(
+                "msdt.test.xsd",
+                "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+                                + ECGEclipseSensor.this.username
+                                + "</username><projectname>"
+                                + ECGEclipseSensor.this.projectname
+                                + "</projectname></commonData><test><activity>ended</activity><name>"
+                                + testName
+                                + "</name><id>"
+                                + testId
+                                + "</id><status>OK</status></test></microActivity>");
+
+            logger.exiting(this.getClass().getName(), "testEnded");
+
+        }
+
+        /**
+         * @see org.eclipse.jdt.junit.ITestRunListener#testFailed(int,
+         *      java.lang.String, java.lang.String, java.lang.String)
+         */
+        @SuppressWarnings("synthetic-access")
+        public void testFailed(final int status, final String testId,
+            final String testName, final String trace) {
+            logger.entering(this.getClass().getName(), "testFailed",
+                new Object[] {testId, testName, new Integer(status), trace});
+
+            String statusString;
+
+            switch (status) {
+                case ITestRunListener.STATUS_OK:
+
+                    statusString = "OK";
+
+                    break;
+
+                case ITestRunListener.STATUS_ERROR:
+
+                    statusString = "ERROR";
+
+                    break;
+
+                case ITestRunListener.STATUS_FAILURE:
+
+                    statusString = "FAILURE";
+
+                    break;
+
+                default:
+
+                    statusString = "";
+
+                    break;
+            }
+
+            logger.log(ECGLevel.PACKET,
+                "An testFailed event has been recorded.");
+
+            processActivity(
+                "msdt.test.xsd",
+                "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+                                + ECGEclipseSensor.this.username
+                                + "</username><projectname>"
+                                + ECGEclipseSensor.this.projectname
+                                + "</projectname></commonData><test><activity>failed</activity><name>"
+                                + testName + "</name><id>" + testId
+                                + "</id><status>" + statusString
+                                + "</status></test></microActivity>");
+
+            logger.exiting(this.getClass().getName(), "testFailed");
+
+        }
+
+        /**
+         * @see org.eclipse.jdt.junit.ITestRunListener#testRunTerminated()
+         */
+        @SuppressWarnings("synthetic-access")
+        public void testRunTerminated() {
+            logger.entering(this.getClass().getName(), "testRunTerminated");
+
+            logger.log(ECGLevel.PACKET,
+                "An testRunTerminated event has been recorded.");
+
+            processActivity(
+                "msdt.testrun.xsd",
+                "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+                                + ECGEclipseSensor.this.username
+                                + "</username><projectname>"
+                                + ECGEclipseSensor.this.projectname
+                                + "</projectname></commonData><testrun><activity>terminated</activity><elapsedtime>0</elapsedtime><testcount>"
+                                + this.currentTestCount
+                                + "</testcount></testrun></microActivity>");
+
+            logger.exiting(this.getClass().getName(), "testRunTerminated");
+
+        }
+
+        /**
+         * @see org.eclipse.jdt.junit.ITestRunListener#testReran(java.lang.String,
+         *      java.lang.String, java.lang.String, int,
+         *      java.lang.String)
+         */
+        @SuppressWarnings("synthetic-access")
+        public void testReran(final String testId, @SuppressWarnings("unused")
+        final String testClass, final String testName, final int status,
+            final String trace) {
+            logger.entering(this.getClass().getName(), "testReran",
+                new Object[] {testId, testName, new Integer(status), trace});
+
+            String statusString;
+
+            switch (status) {
+                case ITestRunListener.STATUS_OK:
+
+                    statusString = "OK";
+
+                    break;
+
+                case ITestRunListener.STATUS_ERROR:
+
+                    statusString = "ERROR";
+
+                    break;
+
+                case ITestRunListener.STATUS_FAILURE:
+
+                    statusString = "FAILURE";
+
+                    break;
+
+                default:
+
+                    statusString = "";
+
+                    break;
+            }
+
+            logger
+                .log(ECGLevel.PACKET, "An testReran event has been recorded.");
+
+            processActivity(
+                "msdt.test.xsd",
+                "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+                                + ECGEclipseSensor.this.username
+                                + "</username><projectname>"
+                                + ECGEclipseSensor.this.projectname
+                                + "</projectname></commonData><test><activity>reran</activity><name>"
+                                + testName + "</name><id>" + testId
+                                + "</id><status>" + statusString
+                                + "</status></test></microActivity>");
+
+            logger.exiting(this.getClass().getName(), "testReran");
+
+        }
+
+    }
+
+    /**
+     * This <em>TimerTask</em> is used in creating
+     * <em>Codechange</em> events. In <em>Eclipse</em> every time
+     * the user changes a single character in the active document an
+     * <em>DocumentChanged</em> event is fired. To avoid sending
+     * <em>Codechange</em> this often, the sensor shall wait for an
+     * amount of time after before sending a <em>Codechange</em>.
+     * Only when the user does not change the document's text for
+     * {@link ECGEclipseSensor#CODECHANGE_INTERVALL} time, a
+     * <em>Codechange</em> is sent to the ECG Lab.
      */
     private static class CodeChangeTimerTask extends TimerTask {
 
@@ -1102,8 +1426,10 @@ public final class ECGEclipseSensor {
          *            Is the name of the document
          */
         @SuppressWarnings("synthetic-access")
-        public CodeChangeTimerTask(final IDocument document, final String documentName) {
-            logger.entering(this.getClass().getName(), "CodeChangeTimerTask", new Object[] {document, documentName});
+        public CodeChangeTimerTask(final IDocument document,
+            final String documentName) {
+            logger.entering(this.getClass().getName(), "CodeChangeTimerTask",
+                new Object[] {document, documentName});
 
             this.doc = document;
 

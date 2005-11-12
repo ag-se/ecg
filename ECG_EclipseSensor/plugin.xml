@@ -42,6 +42,7 @@
       <import plugin="org.eclipse.osgi"/>
       <import plugin="org.eclipse.debug.core"/>
       <import plugin="org.eclipse.update.ui"/>
+      <import plugin="org.eclipse.update.core"/>
       <!--
         <import plugin="org.eclipse.cdt"/>
         <import plugin="org.eclipse.cdt.core"/> 
@@ -51,5 +52,14 @@
 <!-- Instantiates EclipseSensorPlugin when workbench starts up -->
    <extension
          point="org.eclipse.ui.startup">
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+         	
+         	<page id="org.electrocodeogram.sensor.eclipse.Page"
+				class="org.electrocodeogram.sensor.eclipse.Page"
+				name="ElectroCodeoGram - Sensor">
+			</page>
+         
    </extension>
 </plugin>

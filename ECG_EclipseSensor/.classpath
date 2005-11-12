@@ -7,5 +7,6 @@
 	<classpathentry sourcepath="/ECG_SensorShell" kind="lib" path="sensorshell.jar"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry sourcepath="/hackyEclipse" kind="lib" path="lib/hackystat/sensor.eclipse.3x.jar"/>
+	<classpathentry kind="lib" path="E:/Programme/eclipse 3.1/plugins/org.eclipse.jdt.junit.runtime_3.1.0/junitruntime.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
