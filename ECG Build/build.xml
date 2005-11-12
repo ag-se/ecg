@@ -4,6 +4,25 @@
 
 <project name="ElectroCodeoGram" default="all" basedir=".">
 
+	<property name="doc.dir" value="../ECG_DeveloperDocumentation" />
+
+	<!-- Sourcepath setting -->
+	<path id="sourcepath">
+		<dirset dir="../ECG_Lab/src" />
+		<dirset dir="../ECG_SensorShell/src" />
+		<dirset dir="../ECG_TestHelper/src" />
+		<dirset dir="../ECG_EclipseSensor/src" />
+		<dirset dir="../ECG_FileSystemSourceModule/src" />
+		<dirset dir="../ECG_FileSystemTargetModule/src" />
+		<dirset dir="../ECG_HackyStatTargetModule/src" />
+		<dirset dir="../ECG_Installer/src" />
+		<dirset dir="../ECG_ManualAnnotatorSourceModule/src" />
+		<dirset dir="../ECG_MSDTFilterIntermediateModule/src" />
+		<dirset dir="../ECG_SocketSourceModule/src" />
+		<dirset dir="../ECG_StatisticsTargetModule/src" />
+	</path>
+
+
 	<!-- Calls the ant script of the ECG SensorShell component to clean it -->
 	<target name="CleanAll ECG SensorShell">
 
@@ -58,15 +77,26 @@
 		<ant dir="../ECG_FileSystemTargetModule" target="cleanall" />
 
 	</target>
-	
+
 	<!-- Calls the ant script of the ECG HackyStatTargetModule to clean it -->
-		<target name="CleanAll ECG HackyStatTargetModule">
+	<target name="CleanAll ECG HackyStatTargetModule">
+
+		<echo message="##################################" />
+		<echo message="CLEANING ECG HACKYSTATTARGETMODULE" />
+		<echo message="##################################" />
+
+		<ant dir="../ECG_HackyStatTargetModule" target="cleanall" />
+
+	</target>
+	
+	<!-- Calls the ant script of the ECG HackyStatSoureModule to clean it -->
+		<target name="CleanAll ECG HackyStatSourceModule">
 
 			<echo message="##################################" />
-			<echo message="CLEANING ECG HACKYSTATTARGETMODULE" />
+			<echo message="CLEANING ECG HACKYSTATSOURCEMODULE" />
 			<echo message="##################################" />
 
-			<ant dir="../ECG_HackyStatTargetModule" target="cleanall" />
+			<ant dir="../ECG_HackyStatSourceModule" target="cleanall" />
 
 		</target>
 
@@ -91,17 +121,17 @@
 		<ant dir="../ECG_MSDTFilterIntermediateModule" target="cleanall" />
 
 	</target>
-	
+
 	<!-- Calls the ant script of the ECG StatisticsTargetModule to clean it -->
-		<target name="CleanAll ECG StatisticsTargetModule">
+	<target name="CleanAll ECG StatisticsTargetModule">
 
-			<echo message="####################################" />
-			<echo message="CLEANING ECG STATISTICSTARGETEMODULE" />
-			<echo message="####################################" />
+		<echo message="####################################" />
+		<echo message="CLEANING ECG STATISTICSTARGETEMODULE" />
+		<echo message="####################################" />
 
-			<ant dir="../ECG_StatisticsTargetModule" target="cleanall" />
+		<ant dir="../ECG_StatisticsTargetModule" target="cleanall" />
 
-		</target>
+	</target>
 
 	<!-- Calls the ant script of the ECG CodechangeDifferIntermediateModule to clean it -->
 	<target name="CleanAll ECG CodechangeDifferIntermediateModule">
@@ -113,31 +143,53 @@
 		<ant dir="../ECG_CodechangeDifferIntermediateModule" target="cleanall" />
 
 	</target>
-	
+
 	<!-- Calls the ant script of the ECG IOSourceModule to clean it -->
-		<target name="CleanAll ECG IOSourceModule">
+	<target name="CleanAll ECG IOSourceModule">
 
-			<echo message="###################################" />
-			<echo message="CLEANING ECG IOSOURCEMODULE" />
-			<echo message="###################################" />
+		<echo message="###################################" />
+		<echo message="CLEANING ECG IOSOURCEMODULE" />
+		<echo message="###################################" />
 
-			<ant dir="../ECG_IOSourceModule" target="cleanall" />
+		<ant dir="../ECG_IOSourceModule" target="cleanall" />
+
+	</target>
+
+	<!-- Calls the ant script of the ECG ManualAnnotatorSourceModule to clean it -->
+	<target name="CleanAll ECG ManualAnnotatorSourceModule">
+
+		<echo message="########################################" />
+		<echo message="CLEANING ECG MANUALANNOTATORSOURCEMODULE" />
+		<echo message="########################################" />
+
+		<ant dir="../ECG_IOSourceModule" target="cleanall" />
+
+	</target>
+	
+	<!-- Calls the ant script of the ECG TestFirstEpisodeRecognizerModule to clean it -->
+		<target name="CleanAll ECG TestFirstEpisodeRecognizerModule">
+
+			<echo message="#############################################" />
+			<echo message="CLEANING ECG TestFirstEpisodeRecognizerModule" />
+			<echo message="#############################################" />
+
+			<ant dir="../ECG_TestFirstEpisodeRecognizerModule" target="cleanall" />
 
 		</target>
-	
-	<!-- Calls the ant script of the ECG ManualAnnotatorSourceModule to clean it -->
-			<target name="CleanAll ECG ManualAnnotatorSourceModule">
 
-				<echo message="########################################" />
-				<echo message="CLEANING ECG MANUALANNOTATORSOURCEMODULE" />
-				<echo message="########################################" />
+	<!-- Calls the ant script of the ECG Installer to clean it -->
+	<target name="CleanAll ECG Installer">
 
-				<ant dir="../ECG_IOSourceModule" target="cleanall" />
+		<echo message="######################" />
+		<echo message="CLEANING ECG INSTALLER" />
+		<echo message="######################" />
 
-			</target>
+		<ant dir="../ECG_Installer" target="cleanall" />
+
+	</target>
 
 	<!-- Cleans all ECG components -->
-	<target name="cleanAll" depends="CleanAll ECG SensorShell,CleanAll ECG TestHelper,CleanAll ECG ServerAndLab,CleanAll ECG SocketSourceModule, CleanAll ECG FileSystemTargetModule, CleanAll ECG FileSystemSourceModule, CleanAll ECG MSDTFilterIntermediateModule, CleanAll ECG CodechangeDifferIntermediateModule, CleanAll ECG IOSourceModule, CleanAll ECG ManualAnnotatorSourceModule, CleanAll ECG HackyStatTargetModule, CleanAll ECG StatisticsTargetModule" />
+	<target name="cleanAll" depends="CleanAll ECG SensorShell,CleanAll ECG TestHelper,CleanAll ECG ServerAndLab,CleanAll ECG SocketSourceModule, CleanAll ECG FileSystemTargetModule, CleanAll ECG FileSystemSourceModule, CleanAll ECG MSDTFilterIntermediateModule, CleanAll ECG CodechangeDifferIntermediateModule, CleanAll ECG ManualAnnotatorSourceModule, CleanAll ECG HackyStatTargetModule, CleanAll ECG HackyStatSourceModule, CleanAll ECG StatisticsTargetModule, CleanAll ECG TestFirstEpisodeRecognizerModule, CleanAll ECG Installer" />
 
 
 	<!-- Calls the ant script of the ECG SensorShell component to build it -->
@@ -211,15 +263,26 @@
 		<ant dir="../ECG_FileSystemTargetModule" target="deploy" />
 
 	</target>
+
+	<!-- Calls the ant script of the ECG HackyStatTargetModule to build it -->
+	<target name="Build ECG HackyStatTargetModule">
+
+		<echo message="###################################" />
+		<echo message="BUILDING ECG HACKYSTATTARGETMODULE" />
+		<echo message="###################################" />
+
+		<ant dir="../ECG_HackyStatTargetModule" target="deploy" />
+
+	</target>
 	
-	<!-- Calls the ant script of the ECG FileSystemTargetModule to build it -->
-		<target name="Build ECG HackyStatTargetModule">
+	<!-- Calls the ant script of the ECG HackyStatSourceModule to build it -->
+		<target name="Build ECG HackyStatSourceModule">
 
 			<echo message="###################################" />
-			<echo message="BUILDING ECG HACKYSTATTARGETMODULE" />
+			<echo message="BUILDING ECG HACKYSTATSOURCEMODULE" />
 			<echo message="###################################" />
 
-			<ant dir="../ECG_HackyStatTargetModule" target="deploy" />
+			<ant dir="../ECG_HackyStatSourceModule" target="deploy" />
 
 		</target>
 
@@ -244,17 +307,17 @@
 		<ant dir="../ECG_MSDTFilterIntermediateModule" target="deploy" />
 
 	</target>
-	
+
 	<!-- Calls the ant script of the ECG StatisticIntermediateModule to build it -->
-		<target name="Build ECG StatisticsTargetModule">
+	<target name="Build ECG StatisticsTargetModule">
 
-			<echo message="###################################" />
-			<echo message="BUILDING ECG STATISTICSTARGETMODULE" />
-			<echo message="###################################" />
+		<echo message="###################################" />
+		<echo message="BUILDING ECG STATISTICSTARGETMODULE" />
+		<echo message="###################################" />
 
-			<ant dir="../ECG_StatisticsTargetModule" target="deploy" />
+		<ant dir="../ECG_StatisticsTargetModule" target="deploy" />
 
-		</target>
+	</target>
 
 	<!-- Calls the ant script of the ECG CodechangeDifferIntermediateModule to build it -->
 	<target name="Build ECG CodechangeDifferIntermediateModule">
@@ -277,28 +340,50 @@
 		<ant dir="../ECG_SocketEchoSourceModule" target="deploy" />
 
 	</target>
-	
+
 	<!-- Calls the ant script of the ECG IOSourceModule to build it -->
-		<target name="Build ECG IOSourceModule">
+	<target name="Build ECG IOSourceModule">
 
-			<echo message="###################################" />
-			<echo message="BUILDING ECG IOSOURCEMODULE" />
-			<echo message="###################################" />
+		<echo message="###################################" />
+		<echo message="BUILDING ECG IOSOURCEMODULE" />
+		<echo message="###################################" />
 
-			<ant dir="../ECG_IOSourceModule" target="deploy" />
+		<ant dir="../ECG_IOSourceModule" target="deploy" />
+
+	</target>
+
+	<!-- Calls the ant script of the ECG ManualAnnotatorSourceModule to build it -->
+	<target name="Build ECG ManualAnnotatorSourceModule">
+
+		<echo message="########################################" />
+		<echo message="BUILDING ECG MANUALANNOTATORSOURCEMODULE" />
+		<echo message="########################################" />
+
+		<ant dir="../ECG_ManualAnnotatorSourceModule" target="deploy" />
+
+	</target>
+	
+	<!-- Calls the ant script of the ECG TestFirstEpisodeRecognizerModule to build it -->
+		<target name="Build ECG TestFirstEpisodeRecognizerModule">
+
+			<echo message="#############################################" />
+			<echo message="BUILDING ECG TestFirstEpisodeRecognizerModule" />
+			<echo message="#############################################" />
+
+			<ant dir="../ECG_TestFirstEpisodeRecognizerModule" target="deploy" />
 
 		</target>
-	
-	<!-- Calls the ant script of the ECG ManualAnnotatorSourceModule to build it -->
-			<target name="Build ECG ManualAnnotatorSourceModule">
 
-				<echo message="########################################" />
-				<echo message="BUILDING ECG MANUALANNOTATORSOURCEMODULE" />
-				<echo message="########################################" />
+	<!-- Calls the ant script of the ECG Installer to build it -->
+	<target name="Build ECG Installer">
 
-				<ant dir="../ECG_ManualAnnotatorSourceModule" target="deploy" />
+		<echo message="######################" />
+		<echo message="BUILDING ECG INSTALLER" />
+		<echo message="######################" />
 
-			</target>
+		<ant dir="../ECG_Installer" target="deploy" />
+
+	</target>
 
 	<!-- Calls the ant script of the ECG ServerAndLab to assemble the application -->
 	<target name="Assemble ECG ServerAndLab">
@@ -314,15 +399,15 @@
 
 
 	<!-- Builds all ECG components -->
-	<target name="buildAll" depends="Build ECG SensorShell Event,Build ECG TestHelper, Build ECG SensorShell Shell,Build ECG ServerAndLab Module-API,Build ECG SocketSourceModule, Build ECG FileSystemTargetModule, Build ECG FileSystemSourceModule, Build ECG MSDTFilterIntermediateModule, Build ECG CodechangeDifferIntermediateModule, Build ECG IOSourceModule, Build ECG ManualAnnotatorSourceModule, Build ECG HackyStatTargetModule, Build ECG StatisticsTargetModule, Assemble ECG ServerAndLab" />
+	<target name="buildAll" depends="Build ECG SensorShell Event,Build ECG TestHelper, Build ECG SensorShell Shell,Build ECG ServerAndLab Module-API, Build ECG FileSystemTargetModule, Build ECG FileSystemSourceModule, Build ECG MSDTFilterIntermediateModule, Build ECG CodechangeDifferIntermediateModule,Build ECG SocketSourceModule, Build ECG ManualAnnotatorSourceModule, Build ECG HackyStatTargetModule, Build ECG HackyStatSourceModule, Build ECG StatisticsTargetModule, Build ECG TestFirstEpisodeRecognizerModule, Build ECG Installer, Assemble ECG ServerAndLab" />
 
 	<!-- Package release -->
 	<target name="Package release" depends="cleanAll,buildAll">
 
 		<delete failonerror="no">
-				<fileset dir="dist" />
+			<fileset dir="dist" />
 		</delete>
-		
+
 		<mkdir dir="dist" />
 
 		<mkdir dir="dist/plugins" />
@@ -330,9 +415,9 @@
 		<mkdir dir="dist/user.home" />
 
 		<mkdir dir="dist/ecg" />
-		
+
 		<tstamp />
-		
+
 		<copy todir="dist/user.home">
 
 			<fileset dir="../sensor.properties/" includes="sensor.properties" />
@@ -344,13 +429,17 @@
 			<fileset dir="../ECG_Lab/dist/application" />
 
 		</copy>
-		
-		<zip zipfile="dist/plugins/org.hackystat.stdext.sensor_6.4.117.3x.zip" basedir="../HackyStat EclipseSensor/" />
 
-		<pde.exportPlugins destination="D:\UserDocuments\7oas7er\studium\Informatik\Diplomarbeit\Projektordner\ECG Build\dist" exportSource="false" exportType="directory" plugins="org.electrocodeogram.sensor.eclipse" source="1.5" target="1.5" useJARFormat="false"/>
-		
-		
-		
+		<mkdir dir="../ECG_EclipseSensor/ecg" />
+
+
+		<copy todir="../ECG_EclipseSensor/ecg">
+
+			<fileset dir="../ECG_Lab/dist/application" />
+
+		</copy>
+
+
 	</target>
 
 	<!-- Invokes all ECG ant scripts -->
@@ -358,6 +447,69 @@
 
 	</target>
 
+	<target name="clean javadoc">
+
+		<delete failonerror="no" includeemptydirs="true">
+			<fileset dir="${doc.dir}" includes="**/*" />
+		</delete>
+
+	</target>
+
+
+	<!-- Generate the API documentation -->
+	<target name="javadoc" depends="clean javadoc">
+
+		<mkdir dir="${doc.dir}/images" />
+			
+		<copy todir="${doc.dir}/images">
+		
+			<fileset dir="images" />			
+		</copy>
+		
+		<javadoc packagenames="org.*" destdir="${doc.dir}" access="private" use="true" windowtitle="ElectroCodeoGram API and Developer Documentation">
+
+			<sourcepath refid="sourcepath" />
+
+			<header>
+				<![CDATA[ElectroCodeoGram<br><a target="_new" href="http://www.electrocodeogram.org">www.electrocodeogram.org</a>]]></header>
+
+		<doctitle>
+			<![CDATA[<img src='images/ECG.jpg'><br><br><br>ElectroCodeoGram API and Developer Documentation<br><br><span style='font-size:70%'>Frank Schlesinger<br>Software Engineering Workgroup<br>Institut für Informatik</span><br><br><span style='font-size:80%'>Freie Universität Berlin</span>]]></doctitle>
+
+	<group title="ECG Eclipse Sensor" packages="org.electrocodeogram.sensor.eclipse:org.hackystat.stdext.sensor.eclipse" />
+	<group title="ECG SensorShell" packages="org.electrocodeogram.client:org.hackystat.kernel.shell:org.hackystat.kernel.admin" />
+	<group title="ECG Module API" packages="org.electrocodeogram.module:org.electrocodeogram.module.source:org.electrocodeogram.module.intermediate:org.electrocodeogram.module.target:org.electrocodeogram.module.event" />			
+	<group title="ECG Event API" packages="org.electrocodeogram.event" />
+	<group title="ECG Lab" packages="org.electrocodeogram.module.classloader:org.electrocodeogram.module.registry:org.electrocodeogram.module.setup:org.electrocodeogram.msdt:org.electrocodeogram.msdt.registry:org.electrocodeogram.system:org.electrocodeogram.ui:org.electrocodeogram.ui.*" />						
+	<group title="ECG SourceModules" packages="org.electrocodeogram.module.source.implementation" />						
+	<group title="ECG IntermediateModules" packages="org.electrocodeogram.module.intermediate.implementation" />						
+	<group title="ECG TargetModules" packages="org.electrocodeogram.module.target.implementation" />						
+	<group title="ECG Helper Packages" packages="org.electrocodeogram.logging:org.electrocodeogram.xml:org.electrocodeogram.installer:org.electrocodeogram.constants" />
+	<group title="ECG Test Packages" packages="org.electrocodeogram.test:org.electrocodeogram.test.*" />
+			
+			
+	
+			
+
+			
+</javadoc>
+
+</target>
+
 
 </project>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
