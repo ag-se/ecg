@@ -1,5 +1,5 @@
 
-package org.electrocodeogram.module.source;
+package org.electrocodeogram.module.source.implementation;
 
 /**
  * This Interface is provided to avoid circular dependencies

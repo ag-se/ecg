@@ -5,7 +5,7 @@
  * By: Frank@Schlesinger.com
  */
 
-package org.electrocodeogram.module.source;
+package org.electrocodeogram.module.source.implementation;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -16,6 +16,9 @@ import java.util.logging.Logger;
 
 import org.electrocodeogram.event.WellFormedEventPacket;
 import org.electrocodeogram.logging.LogHelper;
+import org.electrocodeogram.module.source.EventReader;
+import org.electrocodeogram.module.source.EventReaderException;
+import org.electrocodeogram.module.source.SourceModule;
 
 /**
  * Each sensor has one own <em>SocketServerThread</em> as his communication partner.

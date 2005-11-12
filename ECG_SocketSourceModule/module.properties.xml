@@ -1,22 +1,22 @@
 <?xml version="1.0"?>
 <module>
 	<id>
-		org.electrocodeogram.module.intermediate.SocketSourceModule
+		org.electrocodeogram.module.source.implementation.SocketSourceModule
 	</id>
 	<provider-name>
 		Frank Schlesinger (Frank@Schlesinger.com)
 	</provider-name>
 	<version>
-		0.6
+		1.0
 	</version>
 	<name>
 		Socket Server And Reader
 	</name>
 	<class>
-		org.electrocodeogram.module.source.SocketSourceModule
+		org.electrocodeogram.module.source.implementation.SocketSourceModule
 	</class>
 	<description>
-		This module is listening on TCP port 22222 for incoming ECG Sensor events.
+		This module is listening on the given TCP port for incoming events from ECG sensors.
 	</description>
 	<type>
 		SOURCE
@@ -31,17 +31,6 @@
 			</propertyType>
 			<propertyValue>
 				22222
-			</propertyValue>
-		</property>
-		<property>
-			<propertyName>
-				Show Clients
-			</propertyName>
-			<propertyType>
-				java.lang.reflect.Method
-			</propertyType>
-			<propertyValue>
-				Show Clients
 			</propertyValue>
 		</property>
 	</properties>

@@ -5,18 +5,25 @@
  * By: Frank@Schlesinger.com
  */
 
-package org.electrocodeogram.module.source;
+package org.electrocodeogram.module.source.implementation;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 
 import org.electrocodeogram.logging.LogHelper;
 import org.electrocodeogram.module.ModuleActivationException;
-import org.electrocodeogram.module.ModuleProperty;
-import org.electrocodeogram.module.ModulePropertyException;
+import org.electrocodeogram.modulepackage.ModuleProperty;
+import org.electrocodeogram.modulepackage.ModulePropertyException;
+import org.electrocodeogram.module.UIModule;
+import org.electrocodeogram.module.event.MessageEvent;
+import org.electrocodeogram.module.source.EventReader;
+import org.electrocodeogram.module.source.ServerModule;
+import org.electrocodeogram.module.source.SourceModule;
 import org.electrocodeogram.system.ModuleSystem;
 
 /**
@@ -26,7 +33,7 @@ import org.electrocodeogram.system.ModuleSystem;
  * {@link SocketServerThread}, which than receives the events as
  * serialized objects from the the client sensor.
  */
-public class SocketSourceModule extends SourceModule {
+public class SocketSourceModule extends SourceModule implements UIModule, ServerModule{
 
     /**
      * This is the default TCP-Port to listen on.
@@ -73,13 +80,16 @@ public class SocketSourceModule extends SourceModule {
     public SocketSourceModule(final String packageId, final String name) {
         super(packageId, name);
 
-        logger.entering(this.getClass().getName(), "SocketSourceModule", new Object[] {packageId, name});
+        logger.entering(this.getClass().getName(), "SocketSourceModule",
+            new Object[] {packageId, name});
 
         logger.exiting(this.getClass().getName(), "SocketSourceModule");
 
     }
 
-   
+    /**
+     * 
+     */
     @Override
     public final void update() {
         logger.entering(this.getClass().getName(), "analyseCoreNotification");
@@ -105,37 +115,9 @@ public class SocketSourceModule extends SourceModule {
      * @see org.electrocodeogram.module.Module#propertyChanged(org.electrocodeogram.module.ModuleProperty)
      */
     @Override
-    public final void propertyChanged(final ModuleProperty moduleProperty) throws ModulePropertyException
-        {
-        if (moduleProperty.getName().equals("Show Clients")) {
-            JFrame frame = ModuleSystem.getInstance().getRootFrame();
-
-            if (this.socketServer == null) {
-                JOptionPane.showMessageDialog(frame,
-                    "The module has not been started yet.", "Show Clients",
-                    JOptionPane.ERROR_MESSAGE);
-            } else {
-                String message = "";
-
-                int count = this.socketServer.getSensorCount();
-
-                message += "Connected to " + count + " ECG clients.\n";
-
-                for (int i = 0; i < count; i++) {
-                    message += "Client "
-                               + i
-                               + ": "
-                               + this.socketServer.getSensorNames()[i]
-                               + " at "
-                               + this.socketServer.getSensorAddresses()[i]
-                                   .toString() + "\n";
-                }
-
-                JOptionPane.showMessageDialog(frame, message, "ECG Clients",
-                    JOptionPane.INFORMATION_MESSAGE);
-            }
-        }
-
+    public final void propertyChanged(final ModuleProperty moduleProperty)
+        throws ModulePropertyException {
+        
         if (moduleProperty.getName().equals("port")) {
             logger.log(Level.INFO, "Request to set the property: "
                                    + moduleProperty.getName());
@@ -250,5 +232,53 @@ public class SocketSourceModule extends SourceModule {
         }
 
         logger.exiting(this.getClass().getName(), "postStop");
+    }
+
+    /* (non-Javadoc)
+     * @see org.electrocodeogram.module.UIModule#getPanelName()
+     */
+    public String getPanelName() {
+        
+        return "Connected Sensors";
+    }
+
+    /**
+     * @see org.electrocodeogram.module.UIModule#getPanel()
+     */
+    public JPanel getPanel() {
+        
+        
+        
+        JPanel panel = new JPanel();
+        
+        String message = "";
+
+        if (this.socketServer == null) {
+
+            MessageEvent event = new MessageEvent("The module has not been started yet.",MessageEvent.MessageType.ERROR, getName(), getId());
+            
+            getGuiNotifiator().fireMessageNotification(event);
+            
+            return null;
+
+        }
+
+        int count = this.socketServer.getSensorCount();
+
+        message += "Connected to " + count + " ECG clients.\n";
+
+        for (int i = 0; i < count; i++) {
+            message += "Client "
+                       + i
+                       + ": "
+                       + this.socketServer.getSensorNames()[i]
+                       + " at "
+                       + this.socketServer.getSensorAddresses()[i]
+                           .toString() + "\n";
+        }
+        
+        panel.add(new JLabel(message));
+        
+        return panel;
     }
 }

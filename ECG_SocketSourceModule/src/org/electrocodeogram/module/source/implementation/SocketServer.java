@@ -5,7 +5,7 @@
  * By: Frank@Schlesinger.com
  */
 
-package org.electrocodeogram.module.source;
+package org.electrocodeogram.module.source.implementation;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -17,6 +17,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.electrocodeogram.logging.LogHelper;
+import org.electrocodeogram.module.source.EventReader;
+import org.electrocodeogram.module.source.SourceModule;
 
 /**
  * This <code>Thread</code> is continuously listening for connection
@@ -249,7 +251,7 @@ public class SocketServer extends Thread implements ISocketServer {
                     .getServerThreadId()), serverThread);
 
                 // start the ServerThread
-                serverThread.start();
+                //serverThread.start();
 
                 logger
                     .log(Level.INFO, "The new ServerThread has been started.");
@@ -341,6 +343,10 @@ public class SocketServer extends Thread implements ISocketServer {
     public final EventReader[] getEventReader() {
 
         logger.entering(this.getClass().getName(), "getEventReader");
+
+        if (this.threadPool.size() == 0) {
+            return new EventReader[0];
+        }
 
         SocketServerThread[] threads = this.threadPool.values().toArray(
             new SocketServerThread[this.threadPool.size()]);
