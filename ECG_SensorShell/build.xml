@@ -282,6 +282,18 @@
 				<fileset dir="${build.lib}" includes="event.jar" />
 
 		</copy>
+		
+		<copy todir="../ECG_TestFirstEpisodeRecognizerModule/lib/ecg">
+
+				<fileset dir="${build.lib}" includes="event.jar" />
+
+		</copy>
+		
+		<copy todir="../ECG_HackyStatSourceModule/lib/ecg">
+
+				<fileset dir="${build.lib}" includes="event.jar" />
+
+		</copy>
 
 	</target>
 
