@@ -5,7 +5,7 @@
  * By: Frank@Schlesinger.com
  */
 
-package org.electrocodeogram.module.target;
+package org.electrocodeogram.module.target.implementation;
 
 import java.awt.GridLayout;
 import java.text.SimpleDateFormat;
@@ -15,14 +15,16 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
-import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 
 import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.logging.LogHelper;
-import org.electrocodeogram.module.ModuleProperty;
+import org.electrocodeogram.modulepackage.ModuleProperty;
+import org.electrocodeogram.module.UIModule;
+import org.electrocodeogram.module.target.TargetModule;
 import org.electrocodeogram.msdt.MicroSensorDataType;
 import org.electrocodeogram.system.ModuleSystem;
 
@@ -31,7 +33,7 @@ import org.electrocodeogram.system.ModuleSystem;
  * count of events per day. The statistics are displayed in a GUI
  * window.
  */
-public class StatisticsTargetModule extends TargetModule {
+public class StatisticsTargetModule extends TargetModule implements UIModule {
 
     /**
      * This is the logger.
@@ -48,7 +50,7 @@ public class StatisticsTargetModule extends TargetModule {
     /**
      * A reference to the statistics window.
      */
-    private StatsFrame frmStats;
+    private StatsFrame pnlStats;
 
     /**
      * A list of {@link Day} objects, each representing a day of the
@@ -80,18 +82,12 @@ public class StatisticsTargetModule extends TargetModule {
 
     /**
      * @see org.electrocodeogram.module.Module#propertyChanged(org.electrocodeogram.module.ModuleProperty)
+     * This method is not implemented in this module.
      */
     @Override
-    public final void propertyChanged(final ModuleProperty moduleProperty) {
-
-        logger.entering(this.getClass().getName(), "propertyChanged",
-            new Object[] {moduleProperty});
-
-        if (moduleProperty.getName().equals("Show Statistics")) {
-            openDialog();
-        }
-
-        logger.exiting(this.getClass().getName(), "propertyChanged");
+    public final void propertyChanged(@SuppressWarnings("unused")
+    final ModuleProperty moduleProperty) {
+        // not implemented
     }
 
     /**
@@ -126,18 +122,19 @@ public class StatisticsTargetModule extends TargetModule {
 
     /**
      * Shows the statistics window.
+     * @return The panel showing the statistics table
      */
-    private void openDialog() {
+    private JPanel openDialog() {
 
         logger.entering(this.getClass().getName(), "openDialog");
 
-        if (this.frmStats == null) {
-            this.frmStats = new StatsFrame(this);
+        if (this.pnlStats == null) {
+            this.pnlStats = new StatsFrame(this);
         }
 
-        this.frmStats.setVisible(true);
+        logger.exiting(this.getClass().getName(), "openDialog", this.pnlStats);
 
-        logger.exiting(this.getClass().getName(), "openDialog");
+        return this.pnlStats;
 
     }
 
@@ -221,7 +218,7 @@ public class StatisticsTargetModule extends TargetModule {
 
             this.dayList.add(dayOfPacket);
 
-            this.frmStats.updateTableModel();
+            this.pnlStats.updateTableModel();
         } else {
             if (this.dayList.contains(dayOfPacket)) {
                 int index = this.dayList.indexOf(dayOfPacket);
@@ -247,11 +244,11 @@ public class StatisticsTargetModule extends TargetModule {
 
                 this.dayList.add(dayOfPacket);
 
-                this.frmStats.updateTableModel();
+                this.pnlStats.updateTableModel();
             }
         }
 
-        this.frmStats.update();
+        this.pnlStats.update();
 
         logger.exiting(this.getClass().getName(), "write");
 
@@ -272,38 +269,9 @@ public class StatisticsTargetModule extends TargetModule {
     }
 
     /**
-     * @see org.electrocodeogram.module.target.TargetModule#stopWriter()
-     */
-    @Override
-    public final void stopWriter() {
-
-        logger.entering(this.getClass().getName(), "stopWriter");
-
-        closeWindow();
-
-        logger.exiting(this.getClass().getName(), "stopWriter");
-
-    }
-
-    /**
-     * Is used to close the statistics window.
-     */
-    private void closeWindow() {
-
-        logger.entering(this.getClass().getName(), "closeWindow");
-
-        this.frmStats.dispose();
-
-        this.frmStats = null;
-
-        logger.exiting(this.getClass().getName(), "closeWindow");
-
-    }
-
-    /**
      * This is the statistics window.
      */
-    private static class StatsFrame extends JFrame {
+    private static class StatsFrame extends JPanel {
 
         /**
          * This is the logger.
@@ -338,11 +306,7 @@ public class StatisticsTargetModule extends TargetModule {
 
             this.module = statsModule;
 
-            setTitle("Event Statisctics");
-
             setLayout(new GridLayout(1, 1));
-
-            setSize(500, 300);
 
             this.statsTable = new JTable(new StatsTableModel(this.module));
 
@@ -350,7 +314,7 @@ public class StatisticsTargetModule extends TargetModule {
 
             JScrollPane scrollPane = new JScrollPane(this.statsTable);
 
-            this.getContentPane().add(scrollPane);
+            this.add(scrollPane);
 
             statsFrameLogger.exiting(this.getClass().getName(),
                 "statsFramelogger");
@@ -426,7 +390,7 @@ public class StatisticsTargetModule extends TargetModule {
         /**
          * The <code>Date</code> of the <em>Day</em>.
          */
-        private Date date;
+        private Date myDate;
 
         /**
          * The <code>Date</code> of the first recorded event for
@@ -473,11 +437,11 @@ public class StatisticsTargetModule extends TargetModule {
             dayLogger.entering(this.getClass().getName(), "Day",
                 new Object[] {date});
 
-            this.date = date;
+            this.myDate = date;
 
             this.calendar = Calendar.getInstance();
 
-            this.calendar.setTime(this.date);
+            this.calendar.setTime(this.myDate);
 
             this.timeFormat = new SimpleDateFormat(TIME_FORMAT_PATTERN);
 
@@ -623,9 +587,9 @@ public class StatisticsTargetModule extends TargetModule {
             dayLogger.entering(this.getClass().getName(), "getDate");
 
             dayLogger.exiting(this.getClass().getName(), "getDate",
-                this.dateFormat.format(this.date));
+                this.dateFormat.format(this.myDate));
 
-            return this.dateFormat.format(this.date);
+            return this.dateFormat.format(this.myDate);
         }
 
         /**
@@ -683,7 +647,11 @@ public class StatisticsTargetModule extends TargetModule {
             dayLogger.exiting(this.getClass().getName(), "setEnd");
         }
 
-        public final boolean isEqual(final Object obj) {
+        /**
+         * @see java.lang.Object#equals(java.lang.Object)
+         */
+        @Override
+        public final boolean equals(final Object obj) {
 
             dayLogger.entering(this.getClass().getName(), "equals",
                 new Object[] {obj});
@@ -706,6 +674,18 @@ public class StatisticsTargetModule extends TargetModule {
                 false));
 
             return false;
+        }
+
+        /**
+         * @see java.lang.Object#hashCode()
+         */
+        @Override
+        public int hashCode() {
+            String concat = "" + this.getDayOfYear() + this.getYear();
+
+            int code = Integer.parseInt(concat);
+
+            return code;
         }
 
         /**
@@ -985,5 +965,30 @@ public class StatisticsTargetModule extends TargetModule {
 
         }
 
+    }
+
+    /**
+     * @see org.electrocodeogram.module.UIModule#getPanelName()
+     */
+    public final String getPanelName() {
+
+        return "Event Statistics";
+    }
+
+    /**
+     * @see org.electrocodeogram.module.UIModule#getPanel()
+     */
+    public final JPanel getPanel() {
+
+        return openDialog();
+    }
+
+    /**
+     * @see org.electrocodeogram.module.target.TargetModule#stopWriter()
+     * This method is not implemented fr this module.
+     */
+    @Override
+    public void stopWriter() {
+    // not implemented
     }
 }

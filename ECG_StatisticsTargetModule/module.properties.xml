@@ -1,31 +1,25 @@
 <?xml version="1.0"?>
 <module>
 	<id>
-		org.electrocodeogram.module.target.StatisticsTargetModule
+		org.electrocodeogram.module.target.implementation.StatisticsTargetModule
 	</id>
 	<provider-name>
 		Frank Schlesinger (Frank@Schlesinger.com)
 	</provider-name>
 	<version>
-		0.6
+		1.0
 	</version>
 	<name>
 		AdHoc Statistics
 	</name>
 	<class>
-		org.electrocodeogram.module.target.StatisticsTargetModule
+		org.electrocodeogram.module.target.implementation.StatisticsTargetModule
 	</class>
 	<description>
-		This module can be used to do statistical analysis on the event stream.
+		This module summarises incoming events on a per day basis. For example, it tells you how often a "codechange" event
+		has been recorded for a day.
 	</description>
 	<type>
 		TARGET
 	</type>
-	<properties>
-		<property>
-			<propertyName>Show Statistics</propertyName>
-			<propertyType>java.lang.reflect.Method</propertyType>
-			<propertyValue>Show Statistics</propertyValue>
-		</property>
-	</properties>
 </module>
