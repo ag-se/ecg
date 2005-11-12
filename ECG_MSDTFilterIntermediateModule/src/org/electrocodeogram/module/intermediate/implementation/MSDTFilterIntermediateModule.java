@@ -5,7 +5,7 @@
  * By: Frank@Schlesinger.com
  */
 
-package org.electrocodeogram.module.intermediate;
+package org.electrocodeogram.module.intermediate.implementation;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -20,12 +20,14 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.logging.LogHelper;
-import org.electrocodeogram.module.ModuleProperty;
+import org.electrocodeogram.modulepackage.ModuleProperty;
+import org.electrocodeogram.module.UIModule;
+import org.electrocodeogram.module.event.MessageEvent;
+import org.electrocodeogram.module.intermediate.IntermediateModule;
 import org.electrocodeogram.msdt.MicroSensorDataType;
 import org.electrocodeogram.system.ModuleSystem;
 
@@ -34,7 +36,7 @@ import org.electrocodeogram.system.ModuleSystem;
  * It provides a GUI dialog where the user can choose, which <em>MicroSensorDataTypes</em>
  * are to be filtered.
  */
-public class MSDTFilterIntermediateModule extends IntermediateModule {
+public class MSDTFilterIntermediateModule extends IntermediateModule implements UIModule {
 
     /**
      * This is the logger.
@@ -210,29 +212,19 @@ public class MSDTFilterIntermediateModule extends IntermediateModule {
         logger.entering(this.getClass().getName(), "configureFilter");
 
         if (this.msdtFilterMap.size() == 0) {
-            JOptionPane
-                .showMessageDialog(
-                    ModuleSystem.getInstance().getRootFrame(),
-                    "There are no MicroSensorDataTypes loaded yet. Please add at least one SourceModule to load the predefined MicroSensorDataTypes.",
-                    "Configure Filter Message", JOptionPane.INFORMATION_MESSAGE);
+
+            MessageEvent event = new MessageEvent(
+                "There are no MicroSensorDataTypes loaded yet. Please add at least one SourceModule to load the predefined MicroSensorDataTypes.",
+                MessageEvent.MessageType.INFO, getName(), getId());
+
+            getGuiNotifiator().fireMessageNotification(event);
 
             logger.exiting(this.getClass().getName(), "configureFilter");
 
             return;
         }
 
-        initializeCheckBoxes();
-
-        this.dlgFilterConfiguration = new JDialog(ModuleSystem.getInstance()
-            .getRootFrame(), "Configure Filter");
-
-        this.pnlCheckBoxes = createMainPanel();
-
-        this.dlgFilterConfiguration.getContentPane().add(this.pnlCheckBoxes);
-
-        this.dlgFilterConfiguration.pack();
-
-        this.dlgFilterConfiguration.setVisible(true);
+        
 
         logger.exiting(this.getClass().getName(), "configureFilter");
     }
@@ -311,7 +303,7 @@ public class MSDTFilterIntermediateModule extends IntermediateModule {
     final JPanel createCheckBoxPanel() {
 
         logger.entering(this.getClass().getName(), "createCheckBoxPanel");
-
+        initializeCheckBoxes();        
         this.pnlCheckBoxes = new JPanel();
 
         JPanel pnlLeft = new JPanel();
@@ -409,7 +401,7 @@ public class MSDTFilterIntermediateModule extends IntermediateModule {
 
         btnClearAll.addActionListener(new ActionListener() {
 
-            @SuppressWarnings({"synthetic-access", "unqualified-field-access"})
+            @SuppressWarnings( {"synthetic-access", "unqualified-field-access"})
             public void actionPerformed(@SuppressWarnings("unused")
             final ActionEvent e) {
                 for (JCheckBox chkMsdt : chkMsdtSelection.values()) {
@@ -444,6 +436,22 @@ public class MSDTFilterIntermediateModule extends IntermediateModule {
         logger.exiting(this.getClass().getName(), "getButtonPanel", pnlButtons);
 
         return pnlButtons;
+    }
+
+    /**
+     * @see org.electrocodeogram.module.UIModule#getPanelName()
+     */
+    public String getPanelName() {
+       
+        return "Configure Filter";
+    }
+
+    /**
+     * @see org.electrocodeogram.module.UIModule#getPanel()
+     */
+    public JPanel getPanel() {
+       
+        return createMainPanel();
     }
 
 }
