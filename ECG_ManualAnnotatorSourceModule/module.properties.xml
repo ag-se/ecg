@@ -1,22 +1,23 @@
 <?xml version="1.0"?>
 <module>
 	<id>
-		org.electrocodeogram.module.source.ManualAnnotatorSourceModule
+		org.electrocodeogram.module.source.implementation.ManualAnnotatorSourceModule
 	</id>
 	<provider-name>
 		Frank Schlesinger (Frank@Schlesinger.com)
 	</provider-name>
 	<version>
-		0.6
+		1.0
 	</version>
 	<name>
 		Manual Annotator
 	</name>
 	<class>
-		org.electrocodeogram.module.source.ManualAnnotatorSourceModule
+		org.electrocodeogram.module.source.implementation.ManualAnnotatorSourceModule
 	</class>
 	<description>
-		This module enables the user to manually generate events.
+		Provides a dialog to the user with buttons to generate events manually. Each button
+		is according to one event.
 	</description>
 	<type>
 		SOURCE
