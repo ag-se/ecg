@@ -17,67 +17,105 @@ import org.electrocodeogram.event.IllegalEventParameterException;
 import org.electrocodeogram.event.WellFormedEventPacket;
 
 /**
- * This class is a test data generator. It provides methods to create many types
- * of valid and invalid event data.
+ * Is used to create events of any kind for testing purposes.
  */
-public class EventGenerator
-{
+public class EventGenerator {
 
-    private static final String filename = "pseudorandom.strings";
+    /**
+     * The name of the file that contains the paylod strings.
+     */
+    private static final String FILENAME = "pseudorandom.strings";
 
+    /**
+     * Used to read in the {@link #FILENAME} file.
+     */
     private BufferedReader br = null;
 
-    private int lineCount = 100;
-
-    private int lineLength = 100;
-
-    private String[] randomStrings = new String[this.lineLength];
+    /**
+     * The number of lines in the {@link #FILENAME} file.
+     */
+    private static final int LINE_COUNT = 100;
 
     /**
-     * This enum collects represents all declared HackyStat SensorDataTypes.
+     * The length of each line in the {@link #FILENAME} file.
+     */
+    private static final int LINE_LENGTH = 100;
+
+    /**
+     * Contains each line from {@link #FILENAME} as an element.
+     */
+    private String[] randomStrings = new String[LINE_LENGTH];
+
+    /**
+     * All <em>HackyStat SensorDataTypes</em>.
      */
     public enum SensorDataType {
-        ACTIVITY, BUFFTRANS, BUILD, CLI, COMMIT, COVERAGE, DEPENDENCY, FILEMETRIC, ISSUE, PERF, REVIEWACTIVITY, REVIEWISSUE, UNITTEST
-    }
-
-    public enum MicroSensorDataType {
-        RESOURCEADDED, RESOURCEREMOVED, RESOURCECHANGED, RESOURCEACTIVITYUNKNOWN, CODECHANGE, WINDOWOPENED, WINDOWCLOSED, WINDOWACTIVATED, WINDOWDEACTIVATED, WINDOWACTIVITYUNKNOWN, PARTOPENED, PARTCLOSED, PARTACTIVATED, PARTDEACTIVATED, PARTACTIVITYUNKNOWN,RUNDEBUGNODEBUG, RUNDEBUGWITHDEBUG, RUNDEBUGWITHILLEGALDEBUG, EDITOROPENED, EDITORCLOSED, EDITORACTIVATED, EDITORDEACTIVATED, EDITORACTIVITYUNKNOWN
+        ACTIVITY, BUFFTRANS, BUILD, CLI, COMMIT, COVERAGE, DEPENDENCY,
+            FILEMETRIC, ISSUE, PERF, REVIEWACTIVITY, REVIEWISSUE, UNITTEST
     }
 
     /**
-     * This creates the EventGenerator and initializes the randomString Array by
-     * reading in the "pseudorandom.strings" file.
-     * 
-     * @throws IOException
-     *             If initialization of the Reader or the reading of the file
-     *             fails
+     * Contains multiple entries for each of the predefined
+     * <em>MicroSensorDataTypes</em>. For every
+     * <em>MicroSensorDataType</em> there is at least one entry for
+     * valid value variations and one invalid varitation.
      */
-    public EventGenerator() throws IOException
-    {
+    public enum MicroSensorDataType {
+        RESOURCEADDED, RESOURCEREMOVED, RESOURCECHANGED,
+            RESOURCEACTIVITYUNKNOWN, CODECHANGE, WINDOWOPENED, WINDOWCLOSED,
+            WINDOWACTIVATED, WINDOWDEACTIVATED, WINDOWACTIVITYUNKNOWN,
+            PARTOPENED, PARTCLOSED, PARTACTIVATED, PARTDEACTIVATED,
+            PARTACTIVITYUNKNOWN, RUNDEBUGNODEBUG, RUNDEBUGWITHDEBUG,
+            RUNDEBUGWITHILLEGALDEBUG, EDITOROPENED, EDITORCLOSED,
+            EDITORACTIVATED, EDITORDEACTIVATED, EDITORACTIVITYUNKNOWN,
+            TESTRUNSTARTED, TESTRUNENDED, TESTRUNSTOPPED,
+            TESTRUNACTIVITYUNKNOWN, TESTSTARTED, TESTENDED, TESTFAILED,
+            TESTRUNTERMINATED, TESTRERAN, TESTACTIVITYUNKNOWN
+    }
 
-        File file = new File(
-                ".." + File.separator + "ECG_TestHelper" + File.separator + filename);
+    /**
+     * Creates the <em>EventGenerator</em> and initializes
+     * {@link #randomStrings} by reading in the {@link #FILENAME}
+     * file. If the {@link #FILENAME} file is not found it is created
+     * by {@link #generateRandomStringFile()}.
+     * @throws IOException
+     *             If the reading of {@link #FILENAME} fails.
+     */
+    public EventGenerator() throws IOException {
+
+        File file = new File(".." + File.separator + "ECG_TestHelper"
+                             + File.separator + FILENAME);
 
         if (!file.exists()) {
-            file.createNewFile();
+            this.generateRandomStringFile();
         }
 
         this.br = new BufferedReader(new FileReader(file));
 
         int i = 0;
 
-        while (i < this.lineCount && (this.randomStrings[i++] = this.br.readLine()) != null) {
-            // do nothing
+        while (i < LINE_COUNT
+               && (this.randomStrings[i++] = this.br.readLine()) != null) {
+            // all happens in the condition, sorry ;)
         }
 
         this.br.close();
 
     }
 
-    // create a syntactically valid or invalid Date
-    private Date createDate(boolean syntValidDatePar)
-    {
-        if (syntValidDatePar) {
+    /**
+     * Creates a <em>Data</em> that is either the current
+     * <em>Date</em> or <code>null</code>.
+     * @param wellformed
+     *            If wellformed is <code>true</code> the current
+     *            <em>Date</em> is returned. Otherwise
+     *            <code>null</code> is returned.
+     * @return If wellformed is <code>true</code> the current
+     *         <em>Date</em> is returned. Otherwise
+     *         <code>null</code> is returned.
+     */
+    private Date createDate(final boolean wellformed) {
+        if (wellformed) {
             return new Date();
         }
 
@@ -85,24 +123,57 @@ public class EventGenerator
 
     }
 
-    // create a syntactically valid or invalid commandName
-    private String createCommandName(boolean syntValidCommandName, int line) throws NoTestDataException
-    {
-        if (!syntValidCommandName) {
+    /**
+     * Creates a wellformed <em>commandName</em> by returning the
+     * given line of the {@link #FILENAME} file or <code>null</code>.
+     * @param wellformed
+     *            If wellformed is <code>true</code> the line from
+     *            the {@link #FILENAME} file given by linenumber is
+     *            returned. Otherwise <code>null</code> is returned.
+     * @param linenumber
+     *            Is the number of the line from the {@link #FILENAME}
+     *            file to be returned as the <em>commandName</em>.
+     *            This is only used when wellfromed is
+     *            <code>true</code>.
+     * @return Is the number of the line from the {@link #FILENAME}
+     *         file to be returned as the <em>commandName</em>.
+     * @throws NoTestDataException
+     *             If linenumber exceeds the {@link #FILENAME} file
+     */
+    private String createCommandName(final boolean wellformed,
+        final int linenumber) throws NoTestDataException {
+        if (!wellformed) {
             return null;
         }
 
-        if (line < 0 || line > this.lineCount) {
+        if (linenumber < 0 || linenumber > LINE_COUNT) {
             throw new NoTestDataException();
         }
 
-        return this.randomStrings[line];
+        return this.randomStrings[linenumber];
 
     }
 
-    // create a syntactically valid or invalid argList of given size
-    private List createDeterministicArgList(boolean argListNotNull, boolean argListOfString, int argListLength, int argListEntrySize) throws NoTestDataException
-    {
+    /**
+     * Used to create a stringlist with the given attributes. The
+     * entries are comming from the {@link #FILENAME} file.
+     * @param argListNotNull
+     *            Shall the list be <code>null</code>?
+     * @param argListOfString
+     *            Shall it be a stringlist? If not, an integerlist is
+     *            returned
+     * @param argListLength
+     *            The length of the list
+     * @param argListEntrySize
+     *            The size of the list's entries
+     * @return The list with the given attributes with entries are
+     *         from the {@link #FILENAME} file
+     * @throws NoTestDataException
+     *             If linenumber exceeds the {@link #FILENAME} file
+     */
+    private List createDeterministicArgList(final boolean argListNotNull,
+        final boolean argListOfString, final int argListLength,
+        final int argListEntrySize) throws NoTestDataException {
         if (!argListNotNull) {
             return null;
         }
@@ -111,140 +182,150 @@ public class EventGenerator
             return createListOfIntegers(argListLength);
         }
 
-        return createValidArglist(createDeterministicPayloadStringArray(argListLength, argListEntrySize));
-
-    }
-
-    private List createNonDeterministicArgList(int argListLength, int argListEntrySize) throws NoTestDataException
-    {
-        return createValidArglist(createNonDeterministicPayloadStringArray(argListLength, argListEntrySize));
+        return Arrays.asList(createDeterministicPayloadStringArray(
+            argListLength, argListEntrySize));
 
     }
 
     /**
-     * This method creates and returns a single EventPacket. The data stored in
-     * the EventPacket is allowed to be syntactically invalid in respect to the
-     * event data rules. So this method is used for testing purposes.
-     * 
-     * @param syntValidDate
-     *            Shall the timestamp be syntactically valid?
-     * @param syntValidCommandName
-     *            Shall the commmandName be syntactically valid?
-     * @param line
-     *            Is the line number of the String to use as the commandName
-     *            from the "pseudorandom.strings" file
+     * Creates a stringlist with random entries.
+     * @param argListLength
+     *            The length of the list
+     * @param argListEntrySize
+     *            The size of each list's entry
+     * @return A list with the given attributes a random entries
+     * @throws NoTestDataException
+     *             If linenumber exceeds the {@link #FILENAME} file
+     */
+    private List createNonDeterministicArgList(final int argListLength,
+        final int argListEntrySize) throws NoTestDataException {
+        return Arrays.asList(createRandomPayloadStringArray(argListLength,
+            argListEntrySize));
+
+    }
+
+    /**
+     * Creates an event that can be malformed or wellformed.
+     * @param wellformedDate
+     *            Shall the timestamp be wellformed?
+     * @param wellformedCommandName
+     *            Shall the commmandName be wellformed?
+     * @param linenumber
+     *            Is the number of the line from the {@link #FILENAME}
+     *            file to be returned as the <em>commandName</em>.
      * @param argListNotNull
-     *            Shall the argList be not null?
+     *            Shall the argList be wellformed?
      * @param argListOfString
-     *            Shall the argList be of type List<String>?
+     *            Shall it be a stringlist?
      * @param argListLength
      *            The length of the argList
      * @param argListEntrySize
-     *            The size of each list element
-     * @return An EventPacket of the desired kind
+     *            The size of each list's element
+     * @return An event with the given attributes
      * @throws NoTestDataException
-     *             If a pseudo-random String is requested by a line number that
-     *             is not available or if the requested String size is to higher
-     *             then available
+     *             If a pseudo-random String is requested by a line
+     *             number that is not available or if the requested
+     *             String size is to higher then available
      */
-    public EventPacket createEventPacket(boolean syntValidDate, boolean syntValidCommandName, int line, boolean argListNotNull, boolean argListOfString, int argListLength, int argListEntrySize) throws NoTestDataException
-    {
+    public final EventPacket createEventPacket(final boolean wellformedDate,
+        final boolean wellformedCommandName, final int linenumber,
+        final boolean argListNotNull, final boolean argListOfString,
+        final int argListLength, final int argListEntrySize)
+        throws NoTestDataException {
         EventPacket eventPacket = null;
-        eventPacket = new EventPacket(
-                0,
-                createDate(syntValidDate),
-                createCommandName(syntValidCommandName, line),
-                createDeterministicArgList(argListNotNull, argListOfString, argListLength, argListEntrySize));
+        eventPacket = new EventPacket(0, createDate(wellformedDate),
+            createCommandName(wellformedCommandName, linenumber),
+            createDeterministicArgList(argListNotNull, argListOfString,
+                argListLength, argListEntrySize));
 
         return eventPacket;
     }
 
     /**
-     * This method creates and returns a single ValidEventPacket. If this method
-     * returns the ValidEventPacket it is assured that this object carries
-     * syntactically valid event data in it. If this method is not able to
-     * create an ValidEventPacket from the given event data parameters, am
-     * IllegalEventParameterException is thrown.
-     * 
-     * @param syntValidDate
-     *            Shall the timestamp be syntactically valid?
-     * @param syntValidCommandName
-     *            Shall the commmandName be syntactically valid?
-     * @param line
-     *            Is the line number of the String to use as the commandName
-     *            from the "pseudorandom.strings" file
+     * Creates an event that is wellformed.
+     * @param wellformedDate
+     *            Shall the timestamp be wellformed?
+     * @param wellformedCommandName
+     *            Shall the commmandName be wellformed?
+     * @param linenumber
+     *            Is the number of the line from the {@link #FILENAME}
+     *            file to be returned as the <em>commandName</em>.
      * @param argListNotNull
-     *            Shall the argList be not null?
+     *            Shall the argList be wellformed?
      * @param argListOfString
-     *            Shall the argList be of type List<String>?
+     *            Shall it be a stringlist?
      * @param argListLength
      *            The length of the argList
      * @param argListEntrySize
-     *            The size of each list element
-     * @return An EventPacket of the desired kind
+     *            The size of each list's element
+     * @return A wellformed event with the given attributes
      * @throws IllegalEventParameterException
-     *             This is thrown if the passes parameter data does not conform
-     *             to the syntax rules of event data.
+     *             If it is thrown by
+     *             {@link WellFormedEventPacket#WellFormedEventPacket(int, java.util.Date, java.lang.String, java.util.List)}
      * @throws NoTestDataException
-     *             If a pseudo-random String is requested by a line number that
-     *             is not available or if the requested String size is to higher
-     *             then available
+     *             If a pseudo-random String is requested by a line
+     *             number that is not available or if the requested
+     *             String size is to higher then available
      */
-    public WellFormedEventPacket createValidEventPacket(boolean syntValidDate, boolean syntValidCommandName, int line, boolean argListNotNull, boolean argListOfString, int argListLength, int argListEntrySize) throws IllegalEventParameterException, NoTestDataException
-    {
-    	WellFormedEventPacket eventPacket = null;
-        eventPacket = new WellFormedEventPacket(
-                0,
-                createDate(syntValidDate),
-                createCommandName(syntValidCommandName, line),
-                createDeterministicArgList(argListNotNull, argListOfString, argListLength, argListEntrySize));
+    public final WellFormedEventPacket createWellformedEventPacket(
+        final boolean wellformedDate, final boolean wellformedCommandName,
+        final int linenumber, final boolean argListNotNull,
+        final boolean argListOfString, final int argListLength,
+        final int argListEntrySize) throws IllegalEventParameterException,
+        NoTestDataException {
+        WellFormedEventPacket eventPacket = null;
+        eventPacket = new WellFormedEventPacket(0, createDate(wellformedDate),
+            createCommandName(wellformedCommandName, linenumber),
+            createDeterministicArgList(argListNotNull, argListOfString,
+                argListLength, argListEntrySize));
 
         return eventPacket;
     }
 
     /**
-     * This method creates and returns a ValidEventPacket with a payload of the
+     * This method creates a wellformed event with payload of the
      * given size.
-     * 
      * @param size
-     *            Is the size of the payload.
+     *            Is the number of chars in the payload.
      * @return The event with the payload
      * @throws IllegalEventParameterException
-     *             This is thrown if the passes parameter data does not conform
-     *             to the syntax rules of event data.
+     *             If it is thrown by
+     *             {@link WellFormedEventPacket#WellFormedEventPacket(int, java.util.Date, java.lang.String, java.util.List)}
      * @throws NoTestDataException
-     *             If a pseudo-random String is requested by a line number that
-     *             is not available or if the requested String size is to higher
-     *             then available
+     *             If a pseudo-random String is requested by a line
+     *             number that is not available or if the requested
+     *             String size is to higher then available
      */
-    public WellFormedEventPacket createPayloadEventPacket(int size) throws IllegalEventParameterException, NoTestDataException
-    {
-    	WellFormedEventPacket eventPacket = null;
+    public final WellFormedEventPacket createPayloadEventPacket(final int size)
+        throws IllegalEventParameterException, NoTestDataException {
+        WellFormedEventPacket eventPacket = null;
         eventPacket = new WellFormedEventPacket(0, createDate(true),
-                createCommandName(true, 0),
-                createNonDeterministicArgList(10, size / 10));
+            createCommandName(true, 0), createNonDeterministicArgList(10,
+                size / 10));
 
         return eventPacket;
     }
 
     /**
-     * This method creates and returns a valid HackyStat SensorDataType event.
-     * 
+     * Creates a valid <em>HackyStat</em> event of the given
+     * {@link SensorDataType}. SensorDataType event.
      * @param type
-     *            Is the SensorDataType to create
+     *            Is the <em>HackyStat SensorDataType</em> of the
+     *            event
      * @param line
-     *            Is the line number of the String to use as the commandName
-     *            from the "pseudorandom.strings" file
-     * @return A valid HackyStat event.
+     *            Is the number of the line from the {@link #FILENAME}
+     *            file to be returned as the <em>commandName</em>
+     * @return A valid <em>HackyStat</em> event of the given
+     *         <em>SensorDataType</em>
      * @throws NoTestDataException
-     *             If a pseudo-random String is requested by a line number that
-     *             is not available or if the requested String size is to higher
-     *             then available
+     *             If a pseudo-random String is requested by a line
+     *             number that is not available or if the requested
+     *             String size is to higher then available
      */
-    public WellFormedEventPacket createHackyStatEventPacket(SensorDataType type, int line) throws NoTestDataException
-    {
+    public final WellFormedEventPacket createHackyStatEventPacket(
+        final SensorDataType type, final int line) throws NoTestDataException {
 
-        if (line < 0 || line > this.lineCount) {
+        if (line < 0 || line > LINE_COUNT) {
             throw new NoTestDataException();
         }
 
@@ -252,521 +333,732 @@ public class EventGenerator
 
         String[] args = null;
 
-        switch (type)
-        {
-        case ACTIVITY:
+        switch (type) {
+            case ACTIVITY:
 
-            args = new String[] { "add", this.randomStrings[line], this.randomStrings[line] };
+                args = new String[] {"add", this.randomStrings[line],
+                    this.randomStrings[line]};
 
-            try {
-                eventPacket = new WellFormedEventPacket(0, createDate(true),
-                        "Activity", Arrays.asList(args));
-            }
-            catch (IllegalEventParameterException e) {
-                e.printStackTrace();
-            }
+                try {
+                    eventPacket = new WellFormedEventPacket(0,
+                        createDate(true), "Activity", Arrays.asList(args));
+                } catch (IllegalEventParameterException e) {
+                    e.printStackTrace();
+                }
 
-            break;
+                break;
 
-        case BUFFTRANS:
+            case BUFFTRANS:
 
-            args = new String[] { "add", this.randomStrings[line], this.randomStrings[line], this.randomStrings[line] };
+                args = new String[] {"add", this.randomStrings[line],
+                    this.randomStrings[line], this.randomStrings[line]};
 
-            try {
-                eventPacket = new WellFormedEventPacket(0, createDate(true),
-                        "BuffTrans", Arrays.asList(args));
-            }
-            catch (IllegalEventParameterException e) {
-                e.printStackTrace();
-            }
+                try {
+                    eventPacket = new WellFormedEventPacket(0,
+                        createDate(true), "BuffTrans", Arrays.asList(args));
+                } catch (IllegalEventParameterException e) {
+                    e.printStackTrace();
+                }
 
-            break;
+                break;
 
-        case BUILD:
+            case BUILD:
 
-            args = new String[] { "add", this.randomStrings[line], this.randomStrings[line], this.randomStrings[line], this.randomStrings[line] };
+                args = new String[] {"add", this.randomStrings[line],
+                    this.randomStrings[line], this.randomStrings[line],
+                    this.randomStrings[line]};
 
-            try {
-                eventPacket = new WellFormedEventPacket(0, createDate(true),
-                        "Build", Arrays.asList(args));
-            }
-            catch (IllegalEventParameterException e) {
-                e.printStackTrace();
-            }
+                try {
+                    eventPacket = new WellFormedEventPacket(0,
+                        createDate(true), "Build", Arrays.asList(args));
+                } catch (IllegalEventParameterException e) {
+                    e.printStackTrace();
+                }
 
-            break;
+                break;
 
-        case CLI:
+            case CLI:
 
-            args = new String[] { "add", this.randomStrings[line], this.randomStrings[line], this.randomStrings[line], this.randomStrings[line], this.randomStrings[line] };
+                args = new String[] {"add", this.randomStrings[line],
+                    this.randomStrings[line], this.randomStrings[line],
+                    this.randomStrings[line], this.randomStrings[line]};
 
-            try {
-                eventPacket = new WellFormedEventPacket(0, createDate(true), "CLI",
-                        Arrays.asList(args));
-            }
-            catch (IllegalEventParameterException e) {
-                e.printStackTrace();
-            }
+                try {
+                    eventPacket = new WellFormedEventPacket(0,
+                        createDate(true), "CLI", Arrays.asList(args));
+                } catch (IllegalEventParameterException e) {
+                    e.printStackTrace();
+                }
 
-            break;
+                break;
 
-        case COMMIT:
+            case COMMIT:
 
-            args = new String[] { "add", this.randomStrings[line], this.randomStrings[line], this.randomStrings[line], this.randomStrings[line], this.randomStrings[line], this.randomStrings[line], "" + line, "" + line, "" + line, this.randomStrings[line] };
+                args = new String[] {"add", this.randomStrings[line],
+                    this.randomStrings[line], this.randomStrings[line],
+                    this.randomStrings[line], this.randomStrings[line],
+                    this.randomStrings[line], "" + line, "" + line, "" + line,
+                    this.randomStrings[line]};
 
-            try {
-                eventPacket = new WellFormedEventPacket(0, createDate(true),
-                        "Commit", Arrays.asList(args));
-            }
-            catch (IllegalEventParameterException e) {
-                e.printStackTrace();
-            }
+                try {
+                    eventPacket = new WellFormedEventPacket(0,
+                        createDate(true), "Commit", Arrays.asList(args));
+                } catch (IllegalEventParameterException e) {
+                    e.printStackTrace();
+                }
 
-            break;
+                break;
 
-        case FILEMETRIC:
+            case FILEMETRIC:
 
-            args = new String[] { this.randomStrings[line], "C:\\cvs\\foobarproject\\src\foo\\bar\\Bar.java", "foo.bar.Bar", "cbo=1,loc=2", "1049798488530" };
+                args = new String[] {this.randomStrings[line],
+                    "C:\\cvs\\foobarproject\\src\foo\\bar\\Bar.java",
+                    "foo.bar.Bar", "cbo=1,loc=2", "1049798488530"};
 
-            try {
-                eventPacket = new WellFormedEventPacket(0, createDate(true),
-                        "FileMetric", Arrays.asList(args));
-            }
-            catch (IllegalEventParameterException e) {
-                e.printStackTrace();
-            }
+                try {
+                    eventPacket = new WellFormedEventPacket(0,
+                        createDate(true), "FileMetric", Arrays.asList(args));
+                } catch (IllegalEventParameterException e) {
+                    e.printStackTrace();
+                }
 
-            break;
+                break;
 
-        case UNITTEST:
+            case UNITTEST:
 
-            args = new String[] { this.randomStrings[line], this.randomStrings[line], this.randomStrings[line], "3", this.randomStrings[line], this.randomStrings[line] };
+                args = new String[] {this.randomStrings[line],
+                    this.randomStrings[line], this.randomStrings[line], "3",
+                    this.randomStrings[line], this.randomStrings[line]};
 
-            try {
-                eventPacket = new WellFormedEventPacket(0, createDate(true),
-                        "UnitTest", Arrays.asList(args));
-            }
-            catch (IllegalEventParameterException e) {
-                e.printStackTrace();
-            }
+                try {
+                    eventPacket = new WellFormedEventPacket(0,
+                        createDate(true), "UnitTest", Arrays.asList(args));
+                } catch (IllegalEventParameterException e) {
+                    e.printStackTrace();
+                }
 
-            break;
+                break;
 
-        default:
-            break;
+            default:
+                break;
         }
         return eventPacket;
     }
 
     /**
-     * This method creates and returns a valid ECG MicroSensorDataType event.
-     * 
+     * Creates a valid <em>MicroActivityEvent</em> of the given
+     * {@link MicroSensorDataType}.
      * @param type
-     *            Is the MicroSensorDataType to create
-     * @return A valid ECG event.
+     *            Is the <em>MicroSensorDataType</em> of the event
+     * @return A valid <em>MicroActivityEvent</em> of the given
+     *         <em>MicroSensorDataType</em>.
      */
-    public WellFormedEventPacket createECGEventPacket(MicroSensorDataType type)
-    {
+    public final WellFormedEventPacket createECGEventPacket(
+        final MicroSensorDataType type) {
 
-    	WellFormedEventPacket eventPacket = null;
+        WellFormedEventPacket eventPacket = null;
 
         String[] args = null;
 
         String activity = null;
-        
-        switch (type)
-        {
-        case RESOURCEADDED:
 
-            activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><resource><activity>added</activity><resourcename>testResourceName</resourcename><resourcetype>testResourceType</resourcetype></resource></microActivity>";
+        switch (type) {
+
+            case TESTRUNSTARTED:
+
+                activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+                           + "testusername"
+                           + "</username><projectname>"
+                           + "testprjectname"
+                           + "</projectname></commonData><testrun><activity>started</activity><elapsedtime>0</elapsedtime><testcount>"
+                           + 15 + "</testcount></testrun></microActivity>";
 
-            args = new String[] { "add", WellFormedEventPacket.MICRO_ACTIVITY_PREFIX+"msdt.resource.xsd", activity };
+                args = new String[] {"add", "msdt.testrun.xsd", activity};
+
+                try {
+                    eventPacket = new WellFormedEventPacket(0,
+                        createDate(true), "Activity", Arrays.asList(args));
+                } catch (IllegalEventParameterException e) {
+                    e.printStackTrace();
+                }
+
+                break;
+
+            case TESTRUNENDED:
+
+                activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+                           + "testusername"
+                           + "</username><projectname>"
+                           + "testprjectname"
+                           + "</projectname></commonData><testrun><activity>ended</activity><elapsedtime>"
+                           + 100
+                           + "</elapsedtime><testcount>"
+                           + 15
+                           + "</testcount></testrun></microActivity>";
+
+                args = new String[] {"add", "msdt.testrun.xsd", activity};
+
+                try {
+                    eventPacket = new WellFormedEventPacket(0,
+                        createDate(true), "Activity", Arrays.asList(args));
+                } catch (IllegalEventParameterException e) {
+                    e.printStackTrace();
+                }
+
+                break;
+
+            case TESTRUNSTOPPED:
+
+                activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+                           + "testusername"
+                           + "</username><projectname>"
+                           + "testprjectname"
+                           + "</projectname></commonData><testrun><activity>stopped</activity><elapsedtime>"
+                           + 100
+                           + "</elapsedtime><testcount>"
+                           + 15
+                           + "</testcount></testrun></microActivity>";
+
+                args = new String[] {"add", "msdt.testrun.xsd", activity};
+
+                try {
+                    eventPacket = new WellFormedEventPacket(0,
+                        createDate(true), "Activity", Arrays.asList(args));
+                } catch (IllegalEventParameterException e) {
+                    e.printStackTrace();
+                }
+
+                break;
+
+            case TESTRUNTERMINATED:
+
+                activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+                           + "testusername"
+                           + "</username><projectname>"
+                           + "testprjectname"
+                           + "</projectname></commonData><testrun><activity>terminated</activity><elapsedtime>0</elapsedtime><testcount>"
+                           + 15 + "</testcount></testrun></microActivity>";
+
+                args = new String[] {"add", "msdt.testrun.xsd", activity};
+
+                try {
+                    eventPacket = new WellFormedEventPacket(0,
+                        createDate(true), "Activity", Arrays.asList(args));
+                } catch (IllegalEventParameterException e) {
+                    e.printStackTrace();
+                }
+
+                break;
+
+            case TESTRUNACTIVITYUNKNOWN:
+
+                activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+                           + "testusername"
+                           + "</username><projectname>"
+                           + "testprjectname"
+                           + "</projectname></commonData><testrun><activity>unknownTestActivity</activity><elapsedtime>0</elapsedtime><testcount>"
+                           + 15 + "</testcount></testrun></microActivity>";
+
+                args = new String[] {"add", "msdt.testrun.xsd", activity};
+
+                try {
+                    eventPacket = new WellFormedEventPacket(0,
+                        createDate(true), "Activity", Arrays.asList(args));
+                } catch (IllegalEventParameterException e) {
+                    e.printStackTrace();
+                }
+
+                break;
+
+            case TESTSTARTED:
+
+                activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+                           + "testusername"
+                           + "</username><projectname>"
+                           + "testprojectname"
+                           + "</projectname></commonData><test><activity>started</activity><name>"
+                           + "testName"
+                           + "</name><id>"
+                           + "testId"
+                           + "</id><status>ok</status></test></microActivity>";
+
+                args = new String[] {"add", "msdt.test.xsd", activity};
+
+                try {
+                    eventPacket = new WellFormedEventPacket(0,
+                        createDate(true), "Activity", Arrays.asList(args));
+                } catch (IllegalEventParameterException e) {
+                    e.printStackTrace();
+                }
+
+                break;
+
+            case TESTACTIVITYUNKNOWN:
+
+                activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+                           + "testusername"
+                           + "</username><projectname>"
+                           + "testprojectname"
+                           + "</projectname></commonData><test><activity>unknownTestActivity</activity><name>"
+                           + "testName"
+                           + "</name><id>"
+                           + "testId"
+                           + "</id><status>ok</status></test></microActivity>";
+
+                args = new String[] {"add", "msdt.test.xsd", activity};
+
+                try {
+                    eventPacket = new WellFormedEventPacket(0,
+                        createDate(true), "Activity", Arrays.asList(args));
+                } catch (IllegalEventParameterException e) {
+                    e.printStackTrace();
+                }
+
+                break;
+
+            case TESTENDED:
+
+                activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+                           + "testusername"
+                           + "</username><projectname>"
+                           + "testprojectname"
+                           + "</projectname></commonData><test><activity>ended</activity><name>"
+                           + "testName"
+                           + "</name><id>"
+                           + "testId"
+                           + "</id><status>ok</status></test></microActivity>";
+
+                args = new String[] {"add", "msdt.test.xsd", activity};
+
+                try {
+                    eventPacket = new WellFormedEventPacket(0,
+                        createDate(true), "Activity", Arrays.asList(args));
+                } catch (IllegalEventParameterException e) {
+                    e.printStackTrace();
+                }
 
-            try {
-                eventPacket = new WellFormedEventPacket(0, createDate(true),
-                        "Activity", Arrays.asList(args));
-            }
-            catch (IllegalEventParameterException e) {
-                e.printStackTrace();
-            }
+                break;
 
-            break;
+            case TESTFAILED:
 
-        case RESOURCEREMOVED:
+                activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+                           + "testusername"
+                           + "</username><projectname>"
+                           + "testprojectname"
+                           + "</projectname></commonData><test><activity>failed</activity><name>"
+                           + "testName"
+                           + "</name><id>"
+                           + "testId"
+                           + "</id><status>"
+                           + "error"
+                           + "</status></test></microActivity>";
 
-            activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><resource><activity>removed</activity><resourcename>testResourceName</resourcename><resourcetype>testResourceType</resourcetype></resource></microActivity>";
+                args = new String[] {"add", "msdt.test.xsd", activity};
 
-            args = new String[] { "add", WellFormedEventPacket.MICRO_ACTIVITY_PREFIX+"msdt.resource.xsd", activity };
+                try {
+                    eventPacket = new WellFormedEventPacket(0,
+                        createDate(true), "Activity", Arrays.asList(args));
+                } catch (IllegalEventParameterException e) {
+                    e.printStackTrace();
+                }
 
-            try {
-                eventPacket = new WellFormedEventPacket(0, createDate(true),
-                        "Activity", Arrays.asList(args));
-            }
-            catch (IllegalEventParameterException e) {
-                e.printStackTrace();
-            }
+                break;
 
-            break;
+            case TESTRERAN:
 
-        case RESOURCECHANGED:
+                activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+                           + "testusername"
+                           + "</username><projectname>"
+                           + "testprojectname"
+                           + "</projectname></commonData><test><activity>reran</activity><name>"
+                           + "testName"
+                           + "</name><id>"
+                           + "testId"
+                           + "</id><status>ok</status></test></microActivity>";
 
-            activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><resource><activity>changed</activity><resourcename>testResourceName</resourcename><resourcetype>testResourceType</resourcetype></resource></microActivity>";
+                args = new String[] {"add", "msdt.test.xsd", activity};
 
-            args = new String[] { "add", WellFormedEventPacket.MICRO_ACTIVITY_PREFIX+"msdt.resource.xsd", activity };
+                try {
+                    eventPacket = new WellFormedEventPacket(0,
+                        createDate(true), "Activity", Arrays.asList(args));
+                } catch (IllegalEventParameterException e) {
+                    e.printStackTrace();
+                }
 
-            try {
-                eventPacket = new WellFormedEventPacket(0, createDate(true),
-                        "Activity", Arrays.asList(args));
-            }
-            catch (IllegalEventParameterException e) {
-                e.printStackTrace();
-            }
+                break;
 
-            break;
+            case RESOURCEADDED:
 
-        case RESOURCEACTIVITYUNKNOWN:
+                activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><resource><activity>added</activity><resourcename>testResourceName</resourcename><resourcetype>testResourceType</resourcetype></resource></microActivity>";
 
-            activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><resource><activity>unknownTestActivity</activity><resourcename>testResourceName</resourcename><resourcetype>testResourceType</resourcetype></resource></microActivity>";
+                args = new String[] {"add", "msdt.resource.xsd", activity};
 
-            args = new String[] { "add", WellFormedEventPacket.MICRO_ACTIVITY_PREFIX+"msdt.resource.xsd", activity };
+                try {
+                    eventPacket = new WellFormedEventPacket(0,
+                        createDate(true), "Activity", Arrays.asList(args));
+                } catch (IllegalEventParameterException e) {
+                    e.printStackTrace();
+                }
 
-            try {
-                eventPacket = new WellFormedEventPacket(0, createDate(true),
-                        "Activity", Arrays.asList(args));
-            }
-            catch (IllegalEventParameterException e) {
-                e.printStackTrace();
-            }
+                break;
 
-            break;
+            case RESOURCEREMOVED:
 
-        case CODECHANGE:
+                activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><resource><activity>removed</activity><resourcename>testResourceName</resourcename><resourcetype>testResourceType</resourcetype></resource></microActivity>";
 
-            activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><codechange><document>testDocument</document><documentname>testDocumentName</documentname></codechange></microActivity>";
+                args = new String[] {"add", "msdt.resource.xsd", activity};
 
-            args = new String[] { "add", WellFormedEventPacket.MICRO_ACTIVITY_PREFIX+"msdt.codechange.xsd", activity };
+                try {
+                    eventPacket = new WellFormedEventPacket(0,
+                        createDate(true), "Activity", Arrays.asList(args));
+                } catch (IllegalEventParameterException e) {
+                    e.printStackTrace();
+                }
 
-            try {
-                eventPacket = new WellFormedEventPacket(0, createDate(true),
-                        "Activity", Arrays.asList(args));
-            }
-            catch (IllegalEventParameterException e) {
-                e.printStackTrace();
-            }
+                break;
 
-            break;
+            case RESOURCECHANGED:
 
-        case EDITOROPENED:
+                activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><resource><activity>changed</activity><resourcename>testResourceName</resourcename><resourcetype>testResourceType</resourcetype></resource></microActivity>";
 
-            activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><editor><activity>opened</activity><editorname>testEditorName</editorname></editor></microActivity>";
+                args = new String[] {"add", "msdt.resource.xsd", activity};
 
-            args = new String[] { "add", WellFormedEventPacket.MICRO_ACTIVITY_PREFIX+"msdt.editor.xsd", activity };
+                try {
+                    eventPacket = new WellFormedEventPacket(0,
+                        createDate(true), "Activity", Arrays.asList(args));
+                } catch (IllegalEventParameterException e) {
+                    e.printStackTrace();
+                }
 
-            try {
-                eventPacket = new WellFormedEventPacket(0, createDate(true),
-                        "Activity", Arrays.asList(args));
-            }
-            catch (IllegalEventParameterException e) {
-                e.printStackTrace();
-            }
+                break;
 
-            break;
+            case RESOURCEACTIVITYUNKNOWN:
 
-        case EDITORCLOSED:
+                activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><resource><activity>unknownTestActivity</activity><resourcename>testResourceName</resourcename><resourcetype>testResourceType</resourcetype></resource></microActivity>";
 
-            activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><editor><activity>closed</activity><editorname>testEditorName</editorname></editor></microActivity>";
+                args = new String[] {"add", "msdt.resource.xsd", activity};
 
-            args = new String[] { "add", WellFormedEventPacket.MICRO_ACTIVITY_PREFIX+"msdt.editor.xsd", activity };
+                try {
+                    eventPacket = new WellFormedEventPacket(0,
+                        createDate(true), "Activity", Arrays.asList(args));
+                } catch (IllegalEventParameterException e) {
+                    e.printStackTrace();
+                }
 
-            try {
-                eventPacket = new WellFormedEventPacket(0, createDate(true),
-                        "Activity", Arrays.asList(args));
-            }
-            catch (IllegalEventParameterException e) {
-                e.printStackTrace();
-            }
-            break;
+                break;
 
-        case EDITORACTIVATED:
+            case CODECHANGE:
 
-            activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><editor><activity>activated</activity><editorname>testEditorName</editorname></editor></microActivity>";
+                activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><codechange><document>testDocument</document><documentname>testDocumentName</documentname></codechange></microActivity>";
 
-            args = new String[] { "add", WellFormedEventPacket.MICRO_ACTIVITY_PREFIX+"msdt.editor.xsd", activity };
+                args = new String[] {"add", "msdt.codechange.xsd", activity};
 
-            try {
-                eventPacket = new WellFormedEventPacket(0, createDate(true),
-                        "Activity", Arrays.asList(args));
-            }
-            catch (IllegalEventParameterException e) {
-                e.printStackTrace();
-            }
+                try {
+                    eventPacket = new WellFormedEventPacket(0,
+                        createDate(true), "Activity", Arrays.asList(args));
+                } catch (IllegalEventParameterException e) {
+                    e.printStackTrace();
+                }
 
-            break;
+                break;
 
-        case EDITORDEACTIVATED:
+            case EDITOROPENED:
 
-            activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><editor><activity>deactivated</activity><editorname>testEditorName</editorname></editor></microActivity>";
+                activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><editor><activity>opened</activity><editorname>testEditorName</editorname></editor></microActivity>";
 
-            args = new String[] { "add", WellFormedEventPacket.MICRO_ACTIVITY_PREFIX+"msdt.editor.xsd", activity };
+                args = new String[] {"add", "msdt.editor.xsd", activity};
 
-            try {
-                eventPacket = new WellFormedEventPacket(0, createDate(true),
-                        "Activity", Arrays.asList(args));
-            }
-            catch (IllegalEventParameterException e) {
-                e.printStackTrace();
-            }
+                try {
+                    eventPacket = new WellFormedEventPacket(0,
+                        createDate(true), "Activity", Arrays.asList(args));
+                } catch (IllegalEventParameterException e) {
+                    e.printStackTrace();
+                }
 
-            break;
+                break;
 
-        case EDITORACTIVITYUNKNOWN:
+            case EDITORCLOSED:
 
-            activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><editor><activity>unknownTestActivity</activity><editorname>testEditorName</editorname></editor></microActivity>";
+                activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><editor><activity>closed</activity><editorname>testEditorName</editorname></editor></microActivity>";
 
-            args = new String[] { "add", WellFormedEventPacket.MICRO_ACTIVITY_PREFIX+"msdt.editor.xsd", activity };
+                args = new String[] {"add", "msdt.editor.xsd", activity};
 
-            try {
-                eventPacket = new WellFormedEventPacket(0, createDate(true),
-                        "Activity", Arrays.asList(args));
-            }
-            catch (IllegalEventParameterException e) {
-                e.printStackTrace();
-            }
+                try {
+                    eventPacket = new WellFormedEventPacket(0,
+                        createDate(true), "Activity", Arrays.asList(args));
+                } catch (IllegalEventParameterException e) {
+                    e.printStackTrace();
+                }
+                break;
 
-            break;
+            case EDITORACTIVATED:
 
-            
-        case PARTOPENED:
+                activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><editor><activity>activated</activity><editorname>testEditorName</editorname></editor></microActivity>";
 
-            activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><part><activity>opened</activity><partname>testPartName</partname></part></microActivity>";
+                args = new String[] {"add", "msdt.editor.xsd", activity};
 
-            args = new String[] { "add", WellFormedEventPacket.MICRO_ACTIVITY_PREFIX+"msdt.part.xsd", activity };
+                try {
+                    eventPacket = new WellFormedEventPacket(0,
+                        createDate(true), "Activity", Arrays.asList(args));
+                } catch (IllegalEventParameterException e) {
+                    e.printStackTrace();
+                }
 
-            try {
-                eventPacket = new WellFormedEventPacket(0, createDate(true),
-                        "Activity", Arrays.asList(args));
-            }
-            catch (IllegalEventParameterException e) {
-                e.printStackTrace();
-            }
+                break;
 
-            break;
+            case EDITORDEACTIVATED:
 
-        case PARTCLOSED:
+                activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><editor><activity>deactivated</activity><editorname>testEditorName</editorname></editor></microActivity>";
 
-            activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><part><activity>closed</activity><partname>testPartName</partname></part></microActivity>";
+                args = new String[] {"add", "msdt.editor.xsd", activity};
 
-            args = new String[] { "add", WellFormedEventPacket.MICRO_ACTIVITY_PREFIX+"msdt.part.xsd", activity };
+                try {
+                    eventPacket = new WellFormedEventPacket(0,
+                        createDate(true), "Activity", Arrays.asList(args));
+                } catch (IllegalEventParameterException e) {
+                    e.printStackTrace();
+                }
 
-            try {
-                eventPacket = new WellFormedEventPacket(0, createDate(true),
-                        "Activity", Arrays.asList(args));
-            }
-            catch (IllegalEventParameterException e) {
-                e.printStackTrace();
-            }
-            break;
+                break;
 
-        case PARTACTIVATED:
+            case EDITORACTIVITYUNKNOWN:
 
-            activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><part><activity>activated</activity><partname>testPartName</partname></part></microActivity>";
+                activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><editor><activity>unknownTestActivity</activity><editorname>testEditorName</editorname></editor></microActivity>";
 
-            args = new String[] { "add", WellFormedEventPacket.MICRO_ACTIVITY_PREFIX+"msdt.part.xsd", activity };
+                args = new String[] {"add", "msdt.editor.xsd", activity};
 
-            try {
-                eventPacket = new WellFormedEventPacket(0, createDate(true),
-                        "Activity", Arrays.asList(args));
-            }
-            catch (IllegalEventParameterException e) {
-                e.printStackTrace();
-            }
+                try {
+                    eventPacket = new WellFormedEventPacket(0,
+                        createDate(true), "Activity", Arrays.asList(args));
+                } catch (IllegalEventParameterException e) {
+                    e.printStackTrace();
+                }
 
-            break;
+                break;
 
-        case PARTDEACTIVATED:
+            case PARTOPENED:
 
-            activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><part><activity>deactivated</activity><partname>testPartName</partname></part></microActivity>";
+                activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><part><activity>opened</activity><partname>testPartName</partname></part></microActivity>";
 
-            args = new String[] { "add", WellFormedEventPacket.MICRO_ACTIVITY_PREFIX+"msdt.part.xsd", activity };
+                args = new String[] {"add", "msdt.part.xsd", activity};
 
-            try {
-                eventPacket = new WellFormedEventPacket(0, createDate(true),
-                        "Activity", Arrays.asList(args));
-            }
-            catch (IllegalEventParameterException e) {
-                e.printStackTrace();
-            }
+                try {
+                    eventPacket = new WellFormedEventPacket(0,
+                        createDate(true), "Activity", Arrays.asList(args));
+                } catch (IllegalEventParameterException e) {
+                    e.printStackTrace();
+                }
 
-            break;
+                break;
 
-        case PARTACTIVITYUNKNOWN:
+            case PARTCLOSED:
 
-            activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><part><activity>unknownTestActivity</activity><partname>testPartName</partname></part></microActivity>";
+                activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><part><activity>closed</activity><partname>testPartName</partname></part></microActivity>";
 
-            args = new String[] { "add", WellFormedEventPacket.MICRO_ACTIVITY_PREFIX+"msdt.part.xsd", activity };
+                args = new String[] {"add", "msdt.part.xsd", activity};
 
-            try {
-                eventPacket = new WellFormedEventPacket(0, createDate(true),
-                        "Activity", Arrays.asList(args));
-            }
-            catch (IllegalEventParameterException e) {
-                e.printStackTrace();
-            }
+                try {
+                    eventPacket = new WellFormedEventPacket(0,
+                        createDate(true), "Activity", Arrays.asList(args));
+                } catch (IllegalEventParameterException e) {
+                    e.printStackTrace();
+                }
+                break;
 
-            break;
-            
-        case RUNDEBUGNODEBUG:
+            case PARTACTIVATED:
 
-            activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><run debug=\"false\"></run></microActivity>";
+                activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><part><activity>activated</activity><partname>testPartName</partname></part></microActivity>";
 
-            args = new String[] { "add", WellFormedEventPacket.MICRO_ACTIVITY_PREFIX+"msdt.rundebug.xsd", activity };
+                args = new String[] {"add", "msdt.part.xsd", activity};
 
-            try {
-                eventPacket = new WellFormedEventPacket(0, createDate(true),
-                        "Activity", Arrays.asList(args));
-            }
-            catch (IllegalEventParameterException e) {
-                e.printStackTrace();
-            }
+                try {
+                    eventPacket = new WellFormedEventPacket(0,
+                        createDate(true), "Activity", Arrays.asList(args));
+                } catch (IllegalEventParameterException e) {
+                    e.printStackTrace();
+                }
 
-            break;
+                break;
 
-        case RUNDEBUGWITHDEBUG:
+            case PARTDEACTIVATED:
 
-            activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><run debug=\"true\"></run></microActivity>";
+                activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><part><activity>deactivated</activity><partname>testPartName</partname></part></microActivity>";
 
-            args = new String[] { "add", WellFormedEventPacket.MICRO_ACTIVITY_PREFIX+"msdt.rundebug.xsd", activity };
+                args = new String[] {"add", "msdt.part.xsd", activity};
 
-            try {
-                eventPacket = new WellFormedEventPacket(0, createDate(true),
-                        "Activity", Arrays.asList(args));
-            }
-            catch (IllegalEventParameterException e) {
-                e.printStackTrace();
-            }
+                try {
+                    eventPacket = new WellFormedEventPacket(0,
+                        createDate(true), "Activity", Arrays.asList(args));
+                } catch (IllegalEventParameterException e) {
+                    e.printStackTrace();
+                }
 
-            break;
-            
-        case RUNDEBUGWITHILLEGALDEBUG:
+                break;
 
-            activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><run debug=\"illegalTestValue\"></run></microActivity>";
+            case PARTACTIVITYUNKNOWN:
 
-            args = new String[] { "add", WellFormedEventPacket.MICRO_ACTIVITY_PREFIX+"msdt.rundebug.xsd", activity };
+                activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><part><activity>unknownTestActivity</activity><partname>testPartName</partname></part></microActivity>";
 
-            try {
-                eventPacket = new WellFormedEventPacket(0, createDate(true),
-                        "Activity", Arrays.asList(args));
-            }
-            catch (IllegalEventParameterException e) {
-                e.printStackTrace();
-            }
+                args = new String[] {"add", "msdt.part.xsd", activity};
 
-            break;
+                try {
+                    eventPacket = new WellFormedEventPacket(0,
+                        createDate(true), "Activity", Arrays.asList(args));
+                } catch (IllegalEventParameterException e) {
+                    e.printStackTrace();
+                }
 
-        case WINDOWOPENED:
+                break;
 
-            activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><window><activity>opened</activity><windowname>testWindowName</windowname></window></microActivity>";
+            case RUNDEBUGNODEBUG:
 
-            args = new String[] { "add", WellFormedEventPacket.MICRO_ACTIVITY_PREFIX+"msdt.window.xsd", activity };
+                activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><run debug=\"false\"></run></microActivity>";
 
-            try {
-                eventPacket = new WellFormedEventPacket(0, createDate(true),
-                        "Activity", Arrays.asList(args));
-            }
-            catch (IllegalEventParameterException e) {
-                e.printStackTrace();
-            }
+                args = new String[] {"add", "msdt.rundebug.xsd", activity};
 
-            break;
+                try {
+                    eventPacket = new WellFormedEventPacket(0,
+                        createDate(true), "Activity", Arrays.asList(args));
+                } catch (IllegalEventParameterException e) {
+                    e.printStackTrace();
+                }
 
-        case WINDOWCLOSED:
+                break;
 
-            activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><window><activity>closed</activity><windowname>testWindowName</windowname></window></microActivity>";
+            case RUNDEBUGWITHDEBUG:
 
-            args = new String[] { "add", WellFormedEventPacket.MICRO_ACTIVITY_PREFIX+"msdt.window.xsd", activity };
+                activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><run debug=\"true\"></run></microActivity>";
 
-            try {
-                eventPacket = new WellFormedEventPacket(0, createDate(true),
-                        "Activity", Arrays.asList(args));
-            }
-            catch (IllegalEventParameterException e) {
-                e.printStackTrace();
-            }
-            break;
+                args = new String[] {"add", "msdt.rundebug.xsd", activity};
 
-        case WINDOWACTIVATED:
+                try {
+                    eventPacket = new WellFormedEventPacket(0,
+                        createDate(true), "Activity", Arrays.asList(args));
+                } catch (IllegalEventParameterException e) {
+                    e.printStackTrace();
+                }
 
-            activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><window><activity>activated</activity><windowname>testWindowName</windowname></window></microActivity>";
+                break;
 
-            args = new String[] { "add", WellFormedEventPacket.MICRO_ACTIVITY_PREFIX+"msdt.window.xsd", activity };
+            case RUNDEBUGWITHILLEGALDEBUG:
 
-            try {
-                eventPacket = new WellFormedEventPacket(0, createDate(true),
-                        "Activity", Arrays.asList(args));
-            }
-            catch (IllegalEventParameterException e) {
-                e.printStackTrace();
-            }
+                activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><run debug=\"illegalTestValue\"></run></microActivity>";
 
-            break;
+                args = new String[] {"add", "msdt.rundebug.xsd", activity};
 
-        case WINDOWDEACTIVATED:
+                try {
+                    eventPacket = new WellFormedEventPacket(0,
+                        createDate(true), "Activity", Arrays.asList(args));
+                } catch (IllegalEventParameterException e) {
+                    e.printStackTrace();
+                }
 
-            activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><window><activity>deactivated</activity><windowname>testWindowName</windowname></window></microActivity>";
+                break;
 
-            args = new String[] { "add", WellFormedEventPacket.MICRO_ACTIVITY_PREFIX+"msdt.window.xsd", activity };
+            case WINDOWOPENED:
 
-            try {
-                eventPacket = new WellFormedEventPacket(0, createDate(true),
-                        "Activity", Arrays.asList(args));
-            }
-            catch (IllegalEventParameterException e) {
-                e.printStackTrace();
-            }
+                activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><window><activity>opened</activity><windowname>testWindowName</windowname></window></microActivity>";
 
-            break;
-            
-        case WINDOWACTIVITYUNKNOWN:
+                args = new String[] {"add", "msdt.window.xsd", activity};
 
-            activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><window><activity>unknownTestActivity</activity><windowname>testWindowName</windowname></window></microActivity>";
+                try {
+                    eventPacket = new WellFormedEventPacket(0,
+                        createDate(true), "Activity", Arrays.asList(args));
+                } catch (IllegalEventParameterException e) {
+                    e.printStackTrace();
+                }
 
-            args = new String[] { "add", WellFormedEventPacket.MICRO_ACTIVITY_PREFIX+"msdt.window.xsd", activity };
+                break;
 
-            try {
-                eventPacket = new WellFormedEventPacket(0, createDate(true),
-                        "Activity", Arrays.asList(args));
-            }
-            catch (IllegalEventParameterException e) {
-                e.printStackTrace();
-            }
+            case WINDOWCLOSED:
 
-            break;
-            
-        default:
-            break;
+                activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><window><activity>closed</activity><windowname>testWindowName</windowname></window></microActivity>";
+
+                args = new String[] {"add", "msdt.window.xsd", activity};
+
+                try {
+                    eventPacket = new WellFormedEventPacket(0,
+                        createDate(true), "Activity", Arrays.asList(args));
+                } catch (IllegalEventParameterException e) {
+                    e.printStackTrace();
+                }
+                break;
+
+            case WINDOWACTIVATED:
+
+                activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><window><activity>activated</activity><windowname>testWindowName</windowname></window></microActivity>";
+
+                args = new String[] {"add", "msdt.window.xsd", activity};
+
+                try {
+                    eventPacket = new WellFormedEventPacket(0,
+                        createDate(true), "Activity", Arrays.asList(args));
+                } catch (IllegalEventParameterException e) {
+                    e.printStackTrace();
+                }
+
+                break;
+
+            case WINDOWDEACTIVATED:
+
+                activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><window><activity>deactivated</activity><windowname>testWindowName</windowname></window></microActivity>";
+
+                args = new String[] {"add", "msdt.window.xsd", activity};
+
+                try {
+                    eventPacket = new WellFormedEventPacket(0,
+                        createDate(true), "Activity", Arrays.asList(args));
+                } catch (IllegalEventParameterException e) {
+                    e.printStackTrace();
+                }
+
+                break;
+
+            case WINDOWACTIVITYUNKNOWN:
+
+                activity = "<?xml version=\"1.0\"?><microActivity><commonData><username>testUserName</username><projectname>testProjectName</projectname></commonData><window><activity>unknownTestActivity</activity><windowname>testWindowName</windowname></window></microActivity>";
+
+                args = new String[] {"add", "msdt.window.xsd", activity};
+
+                try {
+                    eventPacket = new WellFormedEventPacket(0,
+                        createDate(true), "Activity", Arrays.asList(args));
+                } catch (IllegalEventParameterException e) {
+                    e.printStackTrace();
+                }
+
+                break;
+
+            default:
+                break;
         }
         return eventPacket;
     }
 
+    // /**
+    // * Given a String[] this method returns a syntactically valid
+    // List
+    // * of it with "add" and "testdata" being the first to entries.
+    // * @param payload
+    // * The String[] that builds the payload for the argList
+    // * @return The argList for use in a syntactically valid
+    // * EventPacket
+    // */
+    // private List createValidArglist(String[] payload) {
+    // List list = Arrays.asList(payload);
+    //
+    // return list;
+    // }
+
     /**
-     * Given a String[] this method returns a syntactically valid List of it
-     * with "add" and "testdata" being the first to entries.
-     * 
-     * @param payload
-     *            The String[] that builds the payload for the argList
-     * @return The argList for use in a syntactically valid EventPacket
+     * Creates a list of <em>Integer</em> objects. This is used for
+     * the creation of malformed events.
+     * @param listSize
+     *            Is the length of the list.
+     * @return The <em>Integer</em> list.
      */
-    private List createValidArglist(String[] payload)
-    {
-        List list = Arrays.asList(payload);
-
-        return list;
-    }
-
-    // create a List of Integer objects
-    private List createListOfIntegers(int listSize)
-    {
-        List<Integer> linkedList = new LinkedList<Integer>();
+    private List createListOfIntegers(final int listSize) {
+        List < Integer > linkedList = new LinkedList < Integer >();
 
         for (int i = 0; i < listSize; i++) {
             Integer integer = new Integer(i);
@@ -778,61 +1070,37 @@ public class EventGenerator
     }
 
     /**
-     * This methods creates a String[] of pseudo-random payload by reading in
-     * the file "pseudorandom.strings".
-     * 
-     * @param arraySize
-     *            The size of the String[]
-     * @param stringSize
-     *            The size of each String element
-     * @return An Array of random Strings
+     * Creates a <code>String[]</code>, which elements are the
+     * lines from the {@link #FILENAME} file beginning with the first
+     * line.
+     * @param length
+     *            The length of the array.
+     * @param elementSize
+     *            The size of the elements
+     * @return The array with elements from the {@link #FILENAME} file
      * @throws NoTestDataException
-     *             If a pseudo-random String is requested by a line number that
-     *             is not available or if the requested String size is to higher
-     *             then available
+     *             If a pseudo-random String is requested by a line
+     *             number that is not available or if the requested
+     *             String size is to higher then available
      */
-    private String[] createDeterministicPayloadStringArray(int arraySize, int stringSize) throws NoTestDataException
-    {
+    private String[] createDeterministicPayloadStringArray(final int length,
+        final int elementSize) throws NoTestDataException {
 
-        if (arraySize < 0 || arraySize > this.lineCount) {
+        if (length < 0 || length > LINE_COUNT) {
             throw new NoTestDataException();
         }
 
-        if (stringSize < 0 || stringSize > this.lineLength) {
+        if (elementSize < 0 || elementSize > LINE_LENGTH) {
             throw new NoTestDataException();
         }
 
-        String[] payloadStringArray = new String[arraySize];
+        String[] payloadStringArray = new String[length];
 
-        for (int i = 0; i < arraySize; i++) {
+        for (int i = 0; i < length; i++) {
 
             String randomString = this.randomStrings[i];
 
-            payloadStringArray[i] = randomString.substring(0, stringSize);
-
-        }
-
-        return payloadStringArray;
-    }
-
-    private String[] createNonDeterministicPayloadStringArray(int arraySize, int stringSize) throws NoTestDataException
-    {
-
-        if (arraySize < 0) {
-            throw new NoTestDataException();
-        }
-
-        if (stringSize < 0) {
-            throw new NoTestDataException();
-        }
-
-        String[] payloadStringArray = new String[arraySize];
-
-        for (int i = 0; i < arraySize; i++) {
-
-            String randomString = this.createRandomString(stringSize);
-
-            payloadStringArray[i] = randomString.substring(0, stringSize);
+            payloadStringArray[i] = randomString.substring(0, elementSize);
 
         }
 
@@ -840,21 +1108,56 @@ public class EventGenerator
     }
 
     /**
-     * This methods creates and returns a random String of the given element
-     * count. It is used to generate the file "pseudorandom.strings".
-     * 
-     * @param stringSize
-     *            The number of elements in the String to create randomly
-     * @return The randomly created String
+     * Creates a <code>String[]</code>, which elements are ransom
+     * strings.
+     * @param length
+     *            The length of the array.
+     * @param elementSize
+     *            The size of the elements
+     * @return The array with random string elements
+     * @throws NoTestDataException
+     *             If a pseudo-random String is requested by a line
+     *             number that is not available or if the requested
+     *             String size is to higher then available
      */
-    private String createRandomString(int stringSize)
-    {
+    private String[] createRandomPayloadStringArray(final int length,
+        final int elementSize) throws NoTestDataException {
+
+        if (length < 0) {
+            throw new NoTestDataException();
+        }
+
+        if (elementSize < 0) {
+            throw new NoTestDataException();
+        }
+
+        String[] payloadStringArray = new String[length];
+
+        for (int i = 0; i < length; i++) {
+
+            String randomString = this.createRandomString(elementSize);
+
+            payloadStringArray[i] = randomString.substring(0, elementSize);
+
+        }
+
+        return payloadStringArray;
+    }
+
+    /**
+     * Creates a random string of the given size. It is used to
+     * generate the {@link  #FILENAME} file.
+     * @param size
+     *            The size of the string.
+     * @return The randomly created string
+     */
+    private String createRandomString(int size) {
 
         Random random = new Random();
 
         String string = "";
 
-        for (int i = 0; i < stringSize; i++) {
+        for (int i = 0; i < size; i++) {
             int rand = random.nextInt();
 
             int max = Character.MAX_VALUE;
@@ -870,36 +1173,34 @@ public class EventGenerator
     }
 
     /**
-     * Calling this method causes it to generate a file with randomized Strings
-     * to be used in the testcases through the ECG framework testing.
-     * 
+     * This method generates the {@link #FILENAME} file with
+     * randomized strings in each line.
      * @throws IOException
      *             If writing the file fails
      */
-    public void generateRandomStringFile() throws IOException
-    {
-        BufferedWriter bw = new BufferedWriter(new FileWriter(EventGenerator.filename));
+    public void generateRandomStringFile() throws IOException {
+        BufferedWriter bw = new BufferedWriter(new FileWriter(
+            EventGenerator.FILENAME));
 
-        for (int i = 0; i < this.lineCount; i++) {
-            bw.write(this.createRandomString(this.lineLength) + "\n");
+        for (int i = 0; i < LINE_COUNT; i++) {
+            bw.write(this.createRandomString(LINE_LENGTH) + "\n");
         }
 
         bw.close();
     }
 
     /**
-     * When the main method is called, the file "pseudorandom.strings" is (re)created.
-     * 
-     * @param args Is not used
+     * Calls {@link #generateRandomStringFile()} to create a new
+     * {@link #FILENAME} file.
+     * @param args
+     *            Is not used
      */
-    public static void main(String args[])
-    {
+    public static void main(final String args[]) {
         try {
             EventGenerator eventGenerator = new EventGenerator();
 
             eventGenerator.generateRandomStringFile();
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
 
             e.printStackTrace();
         }
