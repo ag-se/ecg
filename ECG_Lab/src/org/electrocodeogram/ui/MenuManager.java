@@ -388,7 +388,7 @@ public class MenuManager {
             try {
                 org.electrocodeogram.system.System.getInstance()
                     .getModuleRegistry().getModule(this._parentId)
-                    .disconnectReceiverModule(
+                    .disconnectModule(
                         org.electrocodeogram.system.System.getInstance()
                             .getModuleRegistry().getModule(this._childId));
             } catch (Exception e1) {

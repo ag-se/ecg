@@ -122,15 +122,11 @@
 							org/electrocodeogram/system/IModuleSystem.class*,
 							org/electrocodeogram/system/ModuleSystem.class*,
 							org/electrocodeogram/system/logging/*,
-							org/electrocodeogram/moduleapi/*,
-							org/electrocodeogram/moduleapi/module/*,
 							org/electrocodeogram/module/event/*,
-							org/electrocodeogram/moduleapi/module/registry/*,
-							org/electrocodeogram/moduleapi/msdt/registry/*,
 							org/electrocodeogram/msdt/*,
 							org/electrocodeogram/event/*,
 							org/electrocodeogram/ui/IGui.class,
-							org/electrocodeogram/xml/*"
+							org/electrocodeogram/misc/xml/*"
 					compress="true"
 					duplicate="fail"
 					jarfile="${build.lib}/moduleapi.jar"
@@ -274,6 +270,18 @@
 		</copy>
 		
 		<copy todir="../ECG_HackyStatTargetModule/lib/ecg/">
+
+			<fileset dir="${build.lib}" includes="moduleapi.jar" />
+
+		</copy>
+		
+		<copy todir="../ECG_TestFirstEpisodeRecognizerModule/lib/ecg/">
+
+			<fileset dir="${build.lib}" includes="moduleapi.jar" />
+
+		</copy>
+		
+		<copy todir="../ECG_HackyStatSourceModule/lib/ecg/">
 
 			<fileset dir="${build.lib}" includes="moduleapi.jar" />
 

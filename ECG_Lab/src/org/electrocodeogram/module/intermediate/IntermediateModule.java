@@ -13,6 +13,8 @@ import java.util.logging.Logger;
 import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.logging.LogHelper;
 import org.electrocodeogram.module.Module;
+import org.electrocodeogram.modulepackage.ModuleProperty;
+import org.electrocodeogram.modulepackage.ModulePropertyException;
 import org.electrocodeogram.modulepackage.ModuleType;
 
 /**
@@ -107,6 +109,19 @@ public abstract class IntermediateModule extends Module implements
         logger.exiting(this.getClass().getName(), "IntermediateModule");
 
     }
+
+    /**
+     * @see org.electrocodeogram.module.Module#update()
+     */
+    @Override
+    public abstract void update();
+
+    /**
+     * @see org.electrocodeogram.module.Module#propertyChanged(org.electrocodeogram.modulepackage.ModuleProperty)
+     */
+    @Override
+    protected abstract void propertyChanged(ModuleProperty moduleProperty)
+    throws ModulePropertyException;
 
     /**
      * This method returns the <em>AnnotationStyle</em> that is set

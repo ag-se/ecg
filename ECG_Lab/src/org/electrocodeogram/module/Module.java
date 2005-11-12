@@ -700,7 +700,7 @@ public abstract class Module implements MsdtProvider {
                 Module module = parentModules[i];
 
                 try {
-                    module.disconnectReceiverModule(this);
+                    module.disconnectModule(this);
                 } catch (ModuleInstanceNotFoundException e) {
                     logger.log(Level.WARNING,
                         "An Exception occured while disconnecting the module: "
@@ -771,7 +771,7 @@ public abstract class Module implements MsdtProvider {
      *             module or if the given module is already connected
      *             to this module.
      */
-    public final int connectReceiverModule(final Module module)
+    public final int connectModule(final Module module)
         throws ModuleConnectionException {
 
         logger.entering(this.getClass().getName(), "connectReceivingModules",
@@ -824,7 +824,7 @@ public abstract class Module implements MsdtProvider {
      *             If the given module is not connected to this
      *             module.
      */
-    public final void disconnectReceiverModule(final Module module)
+    public final void disconnectModule(final Module module)
         throws ModuleInstanceNotFoundException {
         logger.entering(this.getClass().getName(),
             "disconnectReceivingModules", new Object[] {module});
@@ -1134,7 +1134,7 @@ public abstract class Module implements MsdtProvider {
      * Makes the <em>GuiNotificator</em> accesible for all module implementations.
      * @return The <em>GuiNotificator</em> of this module
      */
-    public GuiNotificator getGuiNotifiator() {
+    public final GuiNotificator getGuiNotifiator() {
         logger.entering(this.getClass().getName(), "GuiNotificator");
 
         logger.exiting(this.getClass().getName(), "GuiNotificator",

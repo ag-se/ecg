@@ -92,7 +92,7 @@ public class ModulePackageLoadingTest extends TestCase implements Observer {
                 "testmodules" + File.separator + "emptyDirectory"));
 
             String[] modulePackage = this.moduleRegistry
-                .getAvailableModuleIds();
+                .geModulePackageIds();
 
             assertEquals(modulePackage.length, 0);
 
@@ -121,7 +121,7 @@ public class ModulePackageLoadingTest extends TestCase implements Observer {
                 "testmodules" + File.separator + "Duplicate ModulePackageId"));
 
             String[] modulePackage = this.moduleRegistry
-                .getAvailableModuleIds();
+                .geModulePackageIds();
 
             assertEquals(modulePackage.length, 1);
 
@@ -150,7 +150,7 @@ public class ModulePackageLoadingTest extends TestCase implements Observer {
                 "testmodules" + File.separator +"noModulePropertyFile"));
 
             String[] modulePackage = this.moduleRegistry
-                .getAvailableModuleIds();
+                .geModulePackageIds();
 
             assertEquals(modulePackage.length, 0);
 
@@ -179,7 +179,7 @@ public class ModulePackageLoadingTest extends TestCase implements Observer {
                 "testmodules" + File.separator + "emptyModulePropertyFile"));
 
             String[] modulePackage = this.moduleRegistry
-                .getAvailableModuleIds();
+                .geModulePackageIds();
 
             assertEquals(modulePackage.length, 0);
 
@@ -207,7 +207,7 @@ public class ModulePackageLoadingTest extends TestCase implements Observer {
                 "testmodules" + File.separator + "missingClassFile"));
 
             String[] modulePackage = this.moduleRegistry
-                .getAvailableModuleIds();
+                .geModulePackageIds();
 
             assertEquals(modulePackage.length, 0);
 
@@ -236,7 +236,7 @@ public class ModulePackageLoadingTest extends TestCase implements Observer {
                 "testmodules" + File.separator + "malformedA"));
 
             String[] modulePackage = this.moduleRegistry
-                .getAvailableModuleIds();
+                .geModulePackageIds();
 
             assertEquals(modulePackage.length, 0);
 
@@ -265,7 +265,7 @@ public class ModulePackageLoadingTest extends TestCase implements Observer {
                 "testmodules" + File.separator + "malformedB"));
 
             String[] modulePackage = this.moduleRegistry
-                .getAvailableModuleIds();
+                .geModulePackageIds();
 
             assertEquals(modulePackage.length, 0);
 
@@ -294,7 +294,7 @@ public class ModulePackageLoadingTest extends TestCase implements Observer {
                 "testmodules" + File.separator + "malformedC"));
 
             String[] modulePackage = this.moduleRegistry
-                .getAvailableModuleIds();
+                .geModulePackageIds();
 
             assertEquals(modulePackage.length, 0);
 
@@ -323,7 +323,7 @@ public class ModulePackageLoadingTest extends TestCase implements Observer {
                 "testmodules" + File.separator + "invalidA"));
 
             String[] modulePackage = this.moduleRegistry
-                .getAvailableModuleIds();
+                .geModulePackageIds();
 
             assertEquals(modulePackage.length, 0);
 
@@ -352,7 +352,7 @@ public class ModulePackageLoadingTest extends TestCase implements Observer {
                 "testmodules\\invalidB"));
 
             String[] modulePackage = this.moduleRegistry
-                .getAvailableModuleIds();
+                .geModulePackageIds();
 
             assertEquals(modulePackage.length, 0);
 
@@ -382,7 +382,7 @@ public class ModulePackageLoadingTest extends TestCase implements Observer {
                 "testmodules" + File.separator + "invalidC"));
 
             String[] modulePackage = this.moduleRegistry
-                .getAvailableModuleIds();
+                .geModulePackageIds();
 
             assertEquals(modulePackage.length, 0);
 
@@ -423,7 +423,7 @@ public class ModulePackageLoadingTest extends TestCase implements Observer {
 
         ra.start();
 
-        String[] modulePackage = this.moduleRegistry.getAvailableModuleIds();
+        String[] modulePackage = this.moduleRegistry.geModulePackageIds();
 
         assertEquals(modulePackage.length, 1);
     }
@@ -448,7 +448,7 @@ public class ModulePackageLoadingTest extends TestCase implements Observer {
                 "testmodules\\Duplicated validModule"));
 
             String[] modulePackage = this.moduleRegistry
-                .getAvailableModuleIds();
+                .geModulePackageIds();
 
             assertEquals(modulePackage.length, 0);
 

@@ -164,10 +164,10 @@ public class ModuleRegistry extends Observable implements IModuleRegistry {
     }
 
     /**
-     * @see org.electrocodeogram.module.registry.IModuleRegistry#getAvailableModuleIds()
+     * @see org.electrocodeogram.module.registry.IModuleRegistry#geModulePackageIds()
      */
     @SuppressWarnings("synthetic-access")
-    public final String[] getAvailableModuleIds() {
+    public final String[] geModulePackageIds() {
         logger.entering(this.getClass().getName(), "setModuleDirectory");
 
         if (this.modulePackageMap.availableModuleClassesMap.size() > 0) {
@@ -1050,7 +1050,7 @@ public class ModuleRegistry extends Observable implements IModuleRegistry {
                     Module receivingModule = getModule(assignedReceivingModuleId
                         .intValue());
 
-                    module.connectReceiverModule(receivingModule);
+                    module.connectModule(receivingModule);
 
                 }
             }

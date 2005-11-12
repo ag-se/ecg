@@ -27,7 +27,7 @@ public interface IModuleRegistry {
      * known <em>ModulePackages</em>.
      * @return The ids of all <em>ModulePackages</em>
      */
-    String[] getAvailableModuleIds();
+    String[] geModulePackageIds();
 
     /**
      * This method returns the module instance with the given uniique int id.

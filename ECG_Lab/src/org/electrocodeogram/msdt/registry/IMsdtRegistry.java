@@ -7,10 +7,7 @@
 
 package org.electrocodeogram.msdt.registry;
 
-import java.io.File;
-
 import org.electrocodeogram.msdt.MicroSensorDataType;
-import org.electrocodeogram.msdt.MicroSensorDataTypeException;
 
 /**
  * This <code>Interface</code> declares methods that are used by ECG
@@ -40,18 +37,5 @@ public interface IMsdtRegistry {
      */
     void deregisterMsdt(MicroSensorDataType msdt)
         throws MicroSensorDataTypeRegistrationException;
-
-    /**
-     * This method is used to parse a given XML schema file and create
-     * a {@link MicroSensorDataType} from it.
-     * @param msdtFile
-     *            Is the file containing the XML schema
-     * @return The <em>MicroSensorDataType</em> defined by the file
-     * @throws MicroSensorDataTypeException
-     *             If the file does not contain a valid XML schema or
-     *             if any other error occures during parsing
-     */
-    MicroSensorDataType parseMicroSensorDataType(File msdtFile)
-        throws MicroSensorDataTypeException;
 
 }

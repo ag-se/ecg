@@ -301,67 +301,6 @@ public class MsdtRegistry extends Observable implements IMsdtRegistry {
             new MicroSensorDataType[this.predefinedMsdt.size()]);
     }
 
-    /**
-     * @see org.electrocodeogram.msdt.registry.IMsdtRegistry#parseMicroSensorDataType(java.io.File)
-     */
-    public final MicroSensorDataType parseMicroSensorDataType(final File defFile)
-        throws MicroSensorDataTypeException {
-        logger.entering(this.getClass().getName(), "parseMicroSensorDataType",
-            new Object[] {defFile});
-
-        if (!defFile.exists()) {
-
-            logger.exiting(this.getClass().getName(),
-                "parseMicroSensorDataType");
-
-            throw new MicroSensorDataTypeException(
-                "Error while loading MSDT:\nThe schema file "
-                                + defFile.getAbsolutePath()
-                                + " does not exist.");
-        }
-
-        if (!defFile.isFile()) {
-
-            logger.exiting(this.getClass().getName(),
-                "parseMicroSensorDataType");
-
-            throw new MicroSensorDataTypeException(
-                "Error while loading MSDT:\nThe schema file "
-                                + defFile.getAbsolutePath()
-                                + " is not a plain file.");
-        }
-
-        SchemaFactory schemaFactory = SchemaFactory
-            .newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-
-        Schema schema = null;
-
-        try {
-
-            schema = schemaFactory.newSchema(defFile);
-
-            MicroSensorDataType microSensorDataType = new MicroSensorDataType(
-                defFile.getName(), schema, defFile);
-
-            logger.log(Level.INFO, "Loaded additional MicroSensorDatyType "
-                                   + defFile.getName());
-
-            logger.exiting(this.getClass().getName(),
-                "parseMicroSensorDataType");
-
-            return microSensorDataType;
-
-        } catch (SAXException e) {
-
-            logger.exiting(this.getClass().getName(),
-                "parseMicroSensorDataType");
-
-            throw new MicroSensorDataTypeException(
-                "Error while reading the XML schema file " + defFile.getName()
-                                + "\n" + e.getMessage());
-        }
-
-    }
 
     /**
      * The method is called to notify the ECG system of state

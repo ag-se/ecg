@@ -16,6 +16,10 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.xml.XMLConstants;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+
 import org.apache.xerces.parsers.DOMParser;
 import org.electrocodeogram.logging.LogHelper;
 import org.electrocodeogram.logging.LogHelper.ECGLevel;
@@ -318,6 +322,125 @@ public final class ECGParser {
     }
 
     /**
+     * This method parses the given <code>String</code> that usually
+     * comes from a
+     * {@link org.electrocodeogram.event.ValidEventPacket} beeing a
+     * <em>MicroActivityEvent</em>.
+     * @param string
+     *            The <em>MicroActivityEvent's</em> content
+     * @param schemaLocation
+     *            The path to the XMl schmema
+     * @return A XMl <code>Document</code> object
+     * @throws SAXException
+     *             If the file does not contain a wellformed and valid
+     *             XML document
+     * @throws IOException
+     *             If an error occurs while reading from the file
+     */
+    public static Document parseAsDocument(final String string,
+        final String schemaLocation) throws SAXException, IOException {
+
+        logger.entering(ECGParser.class.getName(), "parseAsMicroActivity",
+            new Object[] {string, schemaLocation});
+
+        InputSource inputSource = null;
+
+        // read the property file
+
+        inputSource = new InputSource(new StringReader(string));
+        // create the XML parser
+        DOMParser parser = new DOMParser();
+
+        // set the parsing properties
+//        try {
+//            parser.setFeature("http://xml.org/sax/features/validation", true);
+//            parser.setFeature(
+//                "http://apache.org/xml/features/validation/schema", true);
+//            parser
+//                .setFeature(
+//                    "http://apache.org/xml/features/validation/schema-full-checking",
+//                    true);
+//            parser.setFeature(
+//                "http://apache.org/xml/features/validation/dynamic", true);
+//
+//            // parse the property file against the
+//            // "module.properties.xsd
+//            // XML schema
+//            parser
+//                .setProperty(
+//                    "http://apache.org/xml/properties/schema/external-schemaLocation",
+//                    schemaLocation);
+//
+//        } catch (SAXNotRecognizedException e1) {
+//            // is checked and schould never occure
+//
+//            logger.log(Level.SEVERE,
+//                "A requested feature is not recognized by the parser.");
+//
+//            logger.log(Level.SEVERE, e1.getMessage());
+//
+//        } catch (SAXNotSupportedException e1) {
+//            // is checked and schould never occure
+//
+//            logger.log(Level.SEVERE,
+//                "A requested feature is not supported by the parser.");
+//
+//            logger.log(Level.SEVERE, e1.getMessage());
+//
+//        }
+
+        // parse
+
+        parser.setErrorHandler(new ErrorHandler() {
+
+            @SuppressWarnings( {"synthetic-access", "synthetic-access"})
+            public void warning(final SAXParseException exception)
+                throws SAXException {
+
+                logger.log(Level.SEVERE, exception.getMessage());
+
+                logger.exiting(ECGParser.class.getName(),
+                    "parseAsMicroActivity");
+
+                throw new SAXException(exception.getMessage());
+            }
+
+            @SuppressWarnings("synthetic-access")
+            public void error(final SAXParseException exception)
+                throws SAXException {
+                logger.log(Level.SEVERE, exception.getMessage());
+
+                logger.exiting(ECGParser.class.getName(),
+                    "parseAsMicroActivity");
+
+                throw new SAXException(exception.getMessage());
+
+            }
+
+            @SuppressWarnings("synthetic-access")
+            public void fatalError(final SAXParseException exception)
+                throws SAXException {
+                logger.log(Level.SEVERE, exception.getMessage());
+
+                logger.exiting(ECGParser.class.getName(),
+                    "parseAsMicroActivity");
+
+                throw new SAXException(exception.getMessage());
+
+            }
+        });
+
+        parser.parse(inputSource);
+
+        logger.exiting(ECGParser.class.getName(), "parseAsMicroActivity",
+            parser.getDocument());
+
+        // get the XML document
+        return parser.getDocument();
+
+    }
+    
+    /**
      * This method parses the given "module.properties.xml" file. If
      * this file is wellformed and valid a <em>ModuleDescriptor</em>
      * is created, which contains the information form the properties
@@ -396,7 +519,7 @@ public final class ECGParser {
      *             If the given XML <code>Document</code> is not
      *             containing a module description
      */
-    private static ModuleType getModuleType(final Document document)
+    public static ModuleType getModuleType(final Document document)
         throws NodeException {
 
         logger.entering(ECGParser.class.getName(), "getModuleType",
@@ -469,9 +592,9 @@ public final class ECGParser {
 
             ModuleConfiguration moduleConfiguration;
 
-            ArrayList<ModuleProperty> modulePropertyList = null;
+            ArrayList < ModuleProperty > modulePropertyList = null;
 
-            ArrayList<Integer> connectedToList = null;
+            ArrayList < Integer > connectedToList = null;
 
             String moduleName;
 
@@ -516,7 +639,7 @@ public final class ECGParser {
 
             fromClassId = getNodeValue(fromClassIdNode);
 
-            connectedToList = new ArrayList<Integer>();
+            connectedToList = new ArrayList < Integer >();
 
             Node connectedToNode = getChildNode(moduleNode, "connectedTo");
 
@@ -560,7 +683,7 @@ public final class ECGParser {
 
             }
 
-            modulePropertyList = new ArrayList<ModuleProperty>();
+            modulePropertyList = new ArrayList < ModuleProperty >();
 
             Node propertiesNode = getChildNode(moduleNode, "properties");
 
@@ -597,7 +720,8 @@ public final class ECGParser {
             moduleConfiguration = new ModuleConfiguration(connectedToList
                 .toArray(new Integer[0]), storedModuleId.intValue(),
                 moduleName, active, modulePropertyList
-                    .toArray(new ModuleProperty[modulePropertyList.size()]), fromClassId);
+                    .toArray(new ModuleProperty[modulePropertyList.size()]),
+                fromClassId);
 
             moduleSetup.addModuleConfiguration(moduleConfiguration);
         }
@@ -620,7 +744,7 @@ public final class ECGParser {
      *             If an error occurs while accessing the document's
      *             nodes.
      */
-    private static ModuleProperty[] getModuleProperties(final Document document)
+    public static ModuleProperty[] getModuleProperties(final Document document)
         throws NodeException {
 
         logger.entering(ECGParser.class.getName(), "getModuleProperties",
@@ -628,7 +752,7 @@ public final class ECGParser {
 
         Node properties;
 
-        ArrayList<ModuleProperty> moduleProperties = null;
+        ArrayList < ModuleProperty > moduleProperties = null;
 
         Node[] propertyNodes;
 
@@ -646,7 +770,7 @@ public final class ECGParser {
             return null;
         }
 
-        moduleProperties = new ArrayList<ModuleProperty>();
+        moduleProperties = new ArrayList < ModuleProperty >();
 
         for (Node propertyNode : propertyNodes) {
 
@@ -714,9 +838,11 @@ public final class ECGParser {
         }
 
         logger.exiting(ECGParser.class.getName(), "getModuleProperties",
-            moduleProperties.toArray(new ModuleProperty[moduleProperties.size()]));
+            moduleProperties
+                .toArray(new ModuleProperty[moduleProperties.size()]));
 
-        return moduleProperties.toArray(new ModuleProperty[moduleProperties.size()]);
+        return moduleProperties.toArray(new ModuleProperty[moduleProperties
+            .size()]);
 
     }
 
@@ -732,7 +858,7 @@ public final class ECGParser {
      * @throws ClassLoadingException
      *             If loading of the named class failed
      */
-    private static Class getClass(final String classPath, final String className)
+    public static Class getClass(final String classPath, final String className)
         throws ClassLoadingException {
 
         logger.entering(ECGParser.class.getName(), "getClass", new Object[] {
@@ -741,7 +867,7 @@ public final class ECGParser {
         Class moduleClass;
 
         if (classPath != null) {
-            ModuleClassLoader.addClassPath(classPath);
+            ModuleClassLoader.addPath(classPath);
         }
 
         try {
@@ -774,7 +900,7 @@ public final class ECGParser {
      *             If an error occurs while accessing the
      *             <code>Node</code>
      */
-    private static String getSingleNodeValue(final String nodeName,
+    public static String getSingleNodeValue(final String nodeName,
         final Document document) throws NodeException {
 
         logger.entering(ECGParser.class.getName(), "getSingleNodeValue",
@@ -809,7 +935,7 @@ public final class ECGParser {
      *             <em>MicroSensorDataType</em> is created from the
      *             <em>ModuleDescription's</em> definiton
      */
-    private static MicroSensorDataType[] getMicroSensorDataTypes(
+    public static MicroSensorDataType[] getMicroSensorDataTypes(
         final Document document, final String modulePath)
         throws MicroSensorDataTypeException, NodeException {
 
@@ -828,12 +954,12 @@ public final class ECGParser {
             return null;
         }
 
-        ArrayList<MicroSensorDataType> microSensorDataTypes = null;
+        ArrayList < MicroSensorDataType > microSensorDataTypes = null;
 
         Node[] msdtNodes = getChildNodes(microSensorDataTypesNode,
             "microsensordatatype");
 
-        microSensorDataTypes = new ArrayList<MicroSensorDataType>();
+        microSensorDataTypes = new ArrayList < MicroSensorDataType >();
 
         for (Node msdtNode : msdtNodes) {
 
@@ -844,16 +970,89 @@ public final class ECGParser {
             File msdtFile = new File(modulePath + File.separator + "msdt"
                                      + File.separator + msdtFileString);
 
-            microSensorDataTypes.add(org.electrocodeogram.system.System
-                .getInstance().getMsdtRegistry().parseMicroSensorDataType(
-                    msdtFile));
+            // microSensorDataTypes.add(org.electrocodeogram.system.System
+            // .getInstance().getMsdtRegistry().parseMicroSensorDataType(
+            // msdtFile));
+
+            microSensorDataTypes.add(parseMicroSensorDataType(msdtFile));
 
         }
 
         logger.exiting(ECGParser.class.getName(), "getMicroSensorDataTypes",
-            microSensorDataTypes.toArray(new MicroSensorDataType[microSensorDataTypes.size()]));
+            microSensorDataTypes
+                .toArray(new MicroSensorDataType[microSensorDataTypes.size()]));
 
-        return microSensorDataTypes.toArray(new MicroSensorDataType[microSensorDataTypes.size()]);
+        return microSensorDataTypes
+            .toArray(new MicroSensorDataType[microSensorDataTypes.size()]);
+    }
+
+    /**
+     * This method is used to parse a given XML schema file and create
+     * a {@link MicroSensorDataType} from it.
+     * @param file
+     *            Is the file containing the XML schema
+     * @return The <em>MicroSensorDataType</em> defined by the file
+     * @throws MicroSensorDataTypeException
+     *             If the file does not contain a valid XML schema or
+     *             if any other error occures during parsing
+     */
+    public static MicroSensorDataType parseMicroSensorDataType(
+        final File file) throws MicroSensorDataTypeException {
+        logger.entering(ECGParser.class.getName(), "parseMicroSensorDataType",
+            new Object[] {file});
+
+        if (!file.exists()) {
+
+            logger.exiting(ECGParser.class.getName(),
+                "parseMicroSensorDataType");
+
+            throw new MicroSensorDataTypeException(
+                "Error while loading MSDT:\nThe schema file "
+                                + file.getAbsolutePath()
+                                + " does not exist.");
+        }
+
+        if (!file.isFile()) {
+
+            logger.exiting(ECGParser.class.getName(),
+                "parseMicroSensorDataType");
+
+            throw new MicroSensorDataTypeException(
+                "Error while loading MSDT:\nThe schema file "
+                                + file.getAbsolutePath()
+                                + " is not a plain file.");
+        }
+
+        SchemaFactory schemaFactory = SchemaFactory
+            .newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+
+        Schema schema = null;
+
+        try {
+
+            schema = schemaFactory.newSchema(file);
+
+            MicroSensorDataType microSensorDataType = new MicroSensorDataType(
+                file.getName(), schema, file);
+
+            logger.log(Level.INFO, "Loaded additional MicroSensorDatyType "
+                                   + file.getName());
+
+            logger.exiting(ECGParser.class.getName(),
+                "parseMicroSensorDataType");
+
+            return microSensorDataType;
+
+        } catch (SAXException e) {
+
+            logger.exiting(ECGParser.class.getName(),
+                "parseMicroSensorDataType");
+
+            throw new MicroSensorDataTypeException(
+                "Error while reading the XML schema file " + file.getName()
+                                + "\n" + e.getMessage());
+        }
+
     }
 
     /**
@@ -871,7 +1070,7 @@ public final class ECGParser {
      *             If an error occurs while accessing the document's
      *             nodes.
      */
-    private static Node[] getChildNodes(final Node parentNode,
+    public static Node[] getChildNodes(final Node parentNode,
         final String nodeName) throws NodeException {
 
         logger.entering(ECGParser.class.getName(), "getChildNodes",
@@ -884,7 +1083,7 @@ public final class ECGParser {
             return new Node[0];
         }
 
-        ArrayList<Node> nodeList = new ArrayList<Node>();
+        ArrayList < Node > nodeList = new ArrayList < Node >();
 
         NodeList childNodes = parentNode.getChildNodes();
 
@@ -926,7 +1125,7 @@ public final class ECGParser {
      *             If an error occurs while accessing the document's
      *             nodes.
      */
-    private static Node getChildNode(final Node parentNode,
+    public static Node getChildNode(final Node parentNode,
         final String nodeName) throws NodeException {
 
         logger.entering(ECGParser.class.getName(), "getChildNode",
@@ -956,7 +1155,7 @@ public final class ECGParser {
      *            Is the XML <code>Node</code>
      * @return The value of the <code>Node</code>
      */
-    private static String getNodeValue(final Node node) {
+    public static String getNodeValue(final Node node) {
 
         logger.entering(ECGParser.class.getName(), "getNodeValue",
             new Object[] {node});
@@ -1005,14 +1204,15 @@ public final class ECGParser {
      *         <code>Node</code> is null, <code>false</code> is
      *         returned.
      */
-    private static boolean isNode(final Node node, final String nodeName) {
+    public static boolean isNode(final Node node, final String nodeName) {
 
         logger.entering(ECGParser.class.getName(), "isNode", new Object[] {
             node, nodeName});
 
         if (node == null) {
 
-            logger.exiting(ECGParser.class.getName(), "isNode", Boolean.valueOf(false));
+            logger.exiting(ECGParser.class.getName(), "isNode", Boolean
+                .valueOf(false));
 
             return false;
         }
@@ -1021,13 +1221,14 @@ public final class ECGParser {
             logger.log(Level.SEVERE, "Misspelled element " + node.getNodeName()
                                      + ". Should be " + nodeName);
 
-            logger.exiting(ECGParser.class.getName(), "isNode", Boolean.valueOf(
-                false));
+            logger.exiting(ECGParser.class.getName(), "isNode", Boolean
+                .valueOf(false));
 
             return false;
         }
 
-        logger.exiting(ECGParser.class.getName(), "isNode", Boolean.valueOf(true));
+        logger.exiting(ECGParser.class.getName(), "isNode", Boolean
+            .valueOf(true));
 
         return true;
     }
@@ -1046,7 +1247,7 @@ public final class ECGParser {
      *             If an error occurs while accessing the document's
      *             nodes.
      */
-    private static String getAttributeValue(final Node node,
+    public static String getAttributeValue(final Node node,
         final String attributeName) throws NodeException {
 
         logger.entering(ECGParser.class.getName(), "getAttributeValue",

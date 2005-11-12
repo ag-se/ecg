@@ -97,10 +97,10 @@ public class ModuleTestHelper {
 
             if (i == 0) {
 
-                this.rootModule.connectReceiverModule(next);
+                this.rootModule.connectModule(next);
             } else {
 
-                lastModule.connectReceiverModule(next);
+                lastModule.connectModule(next);
             }
 
             next.activate();
@@ -108,7 +108,7 @@ public class ModuleTestHelper {
             lastModule = next;
         }
 
-        lastModule.connectReceiverModule(this.leafModule);
+        lastModule.connectModule(this.leafModule);
 
         this.rootModule.activate();
 
@@ -134,9 +134,9 @@ public class ModuleTestHelper {
 
         rightChild.activate();
 
-        this.rootModule.connectReceiverModule(leftChild);
+        this.rootModule.connectModule(leftChild);
 
-        this.rootModule.connectReceiverModule(rightChild);
+        this.rootModule.connectModule(rightChild);
 
         Module leftleftChild = new TestModule();
 
@@ -154,13 +154,13 @@ public class ModuleTestHelper {
 
         rightrightChild.activate();
 
-        leftChild.connectReceiverModule(leftleftChild);
+        leftChild.connectModule(leftleftChild);
 
-        leftChild.connectReceiverModule(leftrightChild);
+        leftChild.connectModule(leftrightChild);
 
-        rightChild.connectReceiverModule(rightleftChild);
+        rightChild.connectModule(rightleftChild);
 
-        rightChild.connectReceiverModule(rightrightChild);
+        rightChild.connectModule(rightrightChild);
 
         Module leftleftleftChild = new TestModule();
 
@@ -194,37 +194,37 @@ public class ModuleTestHelper {
 
         rightrightrightChild.activate();
 
-        leftleftChild.connectReceiverModule(leftleftleftChild);
+        leftleftChild.connectModule(leftleftleftChild);
 
-        leftleftChild.connectReceiverModule(leftleftrightChild);
+        leftleftChild.connectModule(leftleftrightChild);
 
-        leftrightChild.connectReceiverModule(leftrightleftChild);
+        leftrightChild.connectModule(leftrightleftChild);
 
-        leftrightChild.connectReceiverModule(leftrightrightChild);
+        leftrightChild.connectModule(leftrightrightChild);
 
-        rightleftChild.connectReceiverModule(rightleftleftChild);
+        rightleftChild.connectModule(rightleftleftChild);
 
-        rightleftChild.connectReceiverModule(rightleftrightChild);
+        rightleftChild.connectModule(rightleftrightChild);
 
-        rightrightChild.connectReceiverModule(rightrightleftChild);
+        rightrightChild.connectModule(rightrightleftChild);
 
-        rightrightChild.connectReceiverModule(rightrightrightChild);
+        rightrightChild.connectModule(rightrightrightChild);
 
-        leftleftleftChild.connectReceiverModule(this.leafModule);
+        leftleftleftChild.connectModule(this.leafModule);
 
-        leftleftrightChild.connectReceiverModule(this.leafModule);
+        leftleftrightChild.connectModule(this.leafModule);
 
-        leftrightleftChild.connectReceiverModule(this.leafModule);
+        leftrightleftChild.connectModule(this.leafModule);
 
-        leftrightrightChild.connectReceiverModule(this.leafModule);
+        leftrightrightChild.connectModule(this.leafModule);
 
-        rightleftleftChild.connectReceiverModule(this.leafModule);
+        rightleftleftChild.connectModule(this.leafModule);
 
-        rightleftrightChild.connectReceiverModule(this.leafModule);
+        rightleftrightChild.connectModule(this.leafModule);
 
-        rightrightleftChild.connectReceiverModule(this.leafModule);
+        rightrightleftChild.connectModule(this.leafModule);
 
-        rightrightrightChild.connectReceiverModule(this.leafModule);
+        rightrightrightChild.connectModule(this.leafModule);
 
         this.rootModule.activate();
 

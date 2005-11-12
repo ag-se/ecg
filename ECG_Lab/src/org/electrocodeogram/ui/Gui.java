@@ -45,6 +45,7 @@ import org.electrocodeogram.module.Module;
 import org.electrocodeogram.modulepackage.ModuleType;
 import org.electrocodeogram.module.event.MessageEvent;
 import org.electrocodeogram.module.registry.ModuleInstanceNotFoundException;
+import org.electrocodeogram.module.registry.ModuleInstantiationException;
 import org.electrocodeogram.module.registry.ModulePackageNotFoundException;
 import org.electrocodeogram.module.registry.ModuleRegistry;
 import org.electrocodeogram.module.registry.ModuleSetupLoadException;
@@ -338,7 +339,7 @@ public class Gui extends JFrame implements IGui {
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        setExtendedState(Frame.MAXIMIZED_BOTH);
+        //setExtendedState(Frame.MAXIMIZED_BOTH);
 
         setBounds(0, 0, UIConstants.DEFAULT_WINDOW_HEIGHT,
             UIConstants.DEFAULT_WINDOW_WIDTH);
@@ -965,13 +966,14 @@ public class Gui extends JFrame implements IGui {
                             ModulePackageLabel.this.getHeight()
                                             - UIConstants.POPUP_MENU_YOFFSET);
                     } else if (e.getButton() == MouseEvent.BUTTON1) {
-                        try {
-                            org.electrocodeogram.system.System.getInstance()
-                                .getModuleRegistry().createModule(
-                                    ModulePackageLabel.this.modulePackageId,
-                                    ModulePackageLabel.this.modulePackageName);
-                        } catch (Exception e1) {
-                            JOptionPane
+                       
+                            try {
+                                org.electrocodeogram.system.System.getInstance()
+                                    .getModuleRegistry().createModule(
+                                        ModulePackageLabel.this.modulePackageId,
+                                        ModulePackageLabel.this.modulePackageName);
+                            } catch (ModuleInstantiationException e1) {
+                                JOptionPane
                                 .showMessageDialog(
                                     org.electrocodeogram.system.System
                                         .getInstance().getMainWindow(),
@@ -980,8 +982,18 @@ public class Gui extends JFrame implements IGui {
                                                     + ModulePackageLabel.this.modulePackageName
                                                     + " module",
                                     JOptionPane.ERROR_MESSAGE);
-                        }
-
+                            } catch (ModulePackageNotFoundException e1) {
+                                JOptionPane
+                                .showMessageDialog(
+                                    org.electrocodeogram.system.System
+                                        .getInstance().getMainWindow(),
+                                    e1.getMessage(),
+                                    "Add "
+                                                    + ModulePackageLabel.this.modulePackageName
+                                                    + " module",
+                                    JOptionPane.ERROR_MESSAGE);
+                            }
+                         
                     }
 
                 }

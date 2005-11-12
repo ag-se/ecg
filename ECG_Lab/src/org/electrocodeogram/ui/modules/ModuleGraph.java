@@ -127,7 +127,7 @@ public class ModuleGraph extends JGraph {
                                                 org.electrocodeogram.system.System
                                                     .getInstance().getGui()
                                                     .getSourceModule())
-                                            .connectReceiverModule(
+                                            .connectModule(
                                                 org.electrocodeogram.system.System
                                                     .getInstance()
                                                     .getModuleRegistry()
