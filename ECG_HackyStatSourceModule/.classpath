@@ -3,7 +3,7 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/ecg/event.jar"/>
-	<classpathentry kind="lib" path="lib/ecg/moduleapi.jar"/>
+	<classpathentry sourcepath="/ECG_Lab/src" kind="lib" path="lib/ecg/moduleapi.jar"/>
 	<classpathentry kind="lib" path="lib/hackystat/sensorshell.jar"/>
 	<classpathentry kind="lib" path="lib/runtime/javax.servlet.jar"/>
 	<classpathentry sourcepath="/Mortbey" kind="lib" path="lib/runtime/org.mortbay.jetty.jar"/>

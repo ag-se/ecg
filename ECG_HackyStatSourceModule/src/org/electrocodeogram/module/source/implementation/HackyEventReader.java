@@ -8,6 +8,8 @@ package org.electrocodeogram.module.source.implementation;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.event.WellFormedEventPacket;
 import org.electrocodeogram.logging.LogHelper;
 import org.electrocodeogram.module.source.*;
@@ -67,7 +69,7 @@ public class HackyEventReader extends EventReader
             synchronized (this) {
                 this.queue.add(packet);
 
-                this.eventQueueLogger.log(Level.FINE,
+                this.eventQueueLogger.log(Level.FINER,
                     "Added a packet... Size is " + this.queue.size());
 
                 notifyAll();
@@ -89,7 +91,7 @@ public class HackyEventReader extends EventReader
 
                 if (this.queue.size() > 0) {
 
-                    this.eventQueueLogger.log(Level.INFO,
+                    this.eventQueueLogger.log(Level.FINER,
                         "Remove a packet... Size is " + this.queue.size());
 
                     WellFormedEventPacket toReturn = this.queue.remove(0);
@@ -103,7 +105,7 @@ public class HackyEventReader extends EventReader
 
                 try {
 
-                    this.eventQueueLogger.log(Level.INFO,
+                    this.eventQueueLogger.log(Level.FINER,
                         "Wating to remove a packet... Size is "
                                         + this.queue.size());
 
@@ -149,6 +151,14 @@ public class HackyEventReader extends EventReader
         throws EventReaderException
     {
         return eventBuffer.remove();
+    }
+
+    /**
+     * @param event
+     */
+    public void add(WellFormedEventPacket event) {
+        this.eventBuffer.add(event);
+        
     }
 
     

@@ -21,6 +21,10 @@ import org.mortbay.http.SocketListener;
 public class HackyStatSourceModule extends SourceModule
     implements ServerModule
 {
+    
+    private HttpServer server;
+    
+    private HackyEventReader eventReader;
 
     public HackyStatSourceModule(String id, String name)
     {
@@ -29,29 +33,39 @@ public class HackyStatSourceModule extends SourceModule
 
     public void initialize()
     {
-        eventReader = new HackyEventReader(this);
+        this.eventReader = new HackyEventReader(this);
     }
 
     public EventReader[] getEventReader()
     {
-        return null;
+        return new EventReader[] {this.eventReader};
     }
 
     public void preStart()
         throws SourceModuleException
     {
-        HttpServer server = new HttpServer();
+        this.server = new HttpServer();
+        
         SocketListener listener = new SocketListener();
+        
         listener.setPort(10557);
-        server.addListener(listener);
+        
+        this.server.addListener(listener);
+        
         HttpContext context = new HttpContext();
+        
         context.setContextPath("/");
-        server.addContext(context);
-        org.mortbay.http.HttpHandler handler = new HackyHandler(eventReader);
+        
+        this.server.addContext(context);
+        
+        org.mortbay.http.HttpHandler handler = new HackyHandler(this.eventReader);
+        
         context.addHandler(handler);
+        
+        
         try
         {
-            server.start();
+            this.server.start();
         }
         catch(Exception e)
         {
@@ -61,6 +75,16 @@ public class HackyStatSourceModule extends SourceModule
 
     public void postStop()
     {
+        if(this.server != null)
+        {
+            try {
+                this.server.stop();
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+        
     }
 
     public void update()
@@ -72,5 +96,5 @@ public class HackyStatSourceModule extends SourceModule
     {
     }
 
-    private HackyEventReader eventReader;
+    
 }
