@@ -1,3 +1,10 @@
+/*
+ * Classname: ModulePackageLoadingTest
+ * Version: 1.0
+ * Date: 18.10.2005
+ * By: Frank@Schlesinger.com
+ */
+
 package org.electrocodeogram.test.modulepackage;
 
 import java.io.File;
@@ -56,7 +63,7 @@ public class ModulePackageLoadingTest extends TestCase implements Observer {
      * higher. This testcase is trying to load the
      * <em>ModulePackage</em> from
      * "testmodules/notExistingDirectory". This <em>ModulePackage</em>
-     * is not existing. The expected result is that the test is 
+     * is not existing. The expected result is that the test is
      * throwing a {@link ModuleClassLoaderInitializationException}.
      */
     public final void testIfNotExistingModuleDirectoryCausesException() {

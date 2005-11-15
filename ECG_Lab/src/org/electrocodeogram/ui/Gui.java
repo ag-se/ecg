@@ -7,7 +7,6 @@
 
 package org.electrocodeogram.ui;
 
-import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -42,7 +41,6 @@ import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.logging.LogHelper;
 import org.electrocodeogram.misc.constants.UIConstants;
 import org.electrocodeogram.module.Module;
-import org.electrocodeogram.modulepackage.ModuleType;
 import org.electrocodeogram.module.event.MessageEvent;
 import org.electrocodeogram.module.registry.ModuleInstanceNotFoundException;
 import org.electrocodeogram.module.registry.ModuleInstantiationException;
@@ -51,10 +49,9 @@ import org.electrocodeogram.module.registry.ModuleRegistry;
 import org.electrocodeogram.module.registry.ModuleSetupLoadException;
 import org.electrocodeogram.module.registry.ModuleSetupStoreException;
 import org.electrocodeogram.modulepackage.ModuleDescriptor;
+import org.electrocodeogram.modulepackage.ModuleType;
 import org.electrocodeogram.ui.event.EventWindow;
 import org.electrocodeogram.ui.modules.ModuleGraph;
-
-//import com.zfqjava.swing.JStatusBar;
 
 /**
  * This is the graphical user interface of the ECG Lab.
@@ -85,7 +82,6 @@ public class Gui extends JFrame implements IGui {
     /**
      * A reference to the statusbar.
      */
-    //private JStatusBar statusBar;
 
     /**
      * A reference to the panel, where the <em>ModulePackages</em>
@@ -112,7 +108,7 @@ public class Gui extends JFrame implements IGui {
     private boolean moduleConnectionMode;
 
     /**
-     * 
+     * The id of the module that is the source of a conection.
      */
     private int sourceModuleId;
 
@@ -161,23 +157,6 @@ public class Gui extends JFrame implements IGui {
 
         getContentPane().add(this.splitPane, c);
     }
-
-    /**
-     * Sets up the status bar.
-     */
-//    private void initializeStatusBar() {
-//        this.statusBar = new JStatusBar(JStatusBar.EXPLORER);
-//
-//        GridBagConstraints c2 = new GridBagConstraints();
-//        c2.anchor = GridBagConstraints.SOUTHWEST;
-//        c2.fill = GridBagConstraints.HORIZONTAL;
-//        c2.gridx = 0;
-//        c2.gridy = 2;
-//        c2.weighty = 0;
-//        c2.weightx = 2;
-//
-//        getContentPane().add(this.statusBar, c2);
-//    }
 
     /**
      * Sets up the menu.
@@ -373,9 +352,7 @@ public class Gui extends JFrame implements IGui {
     }
 
     /**
-     * This method brings the event window to front and creates it if
-     * needed. The event window is showing which events are currently
-     * passing a module.
+     * @see org.electrocodeogram.ui.IGui#showMessagesWindow()
      */
     public final void showMessagesWindow() {
 
@@ -390,8 +367,7 @@ public class Gui extends JFrame implements IGui {
             try {
                 window = new EventWindow(id);
             } catch (ModuleInstanceNotFoundException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                JOptionPane.showMessageDialog(this,e.getClass().getName(),e.getMessage(),JOptionPane.ERROR_MESSAGE);
 
                 return;
             }
@@ -438,7 +414,7 @@ public class Gui extends JFrame implements IGui {
                 } else {
 
                     this.pnlModules.createModuleCell(module.getModuleType(),
-                        module.getId(), module.getName(), module.getState());
+                        module.getId(), module.getName());
 
                 }
             } else if (arg instanceof ModuleDescriptor) {
@@ -518,21 +494,16 @@ public class Gui extends JFrame implements IGui {
 
     }
 
+    
     /**
-     * When a module is selected by the user, the module menu is
-     * accesible. When no module is selcted, the module menu is
-     * disabled.
-     * @param enable
-     *            <code>true</code> to enable the module menu and
-     *            <code>false</code> to disable it
+     * @see org.electrocodeogram.ui.IGui#enableModuleMenu(boolean)
      */
     public final void enableModuleMenu(final boolean enable) {
         this.menuModule.setEnabled(enable);
     }
 
     /**
-     * Brings up a dialog showing detailed information about the
-     * selected module.
+     * @see org.electrocodeogram.ui.IGui#showModuleDetails()
      */
     public final void showModuleDetails() {
 
@@ -557,8 +528,7 @@ public class Gui extends JFrame implements IGui {
     }
 
     /**
-     * Brings up a dialog showing detailed information about the
-     * selected <em>ModulePackage</em>.
+     * @see org.electrocodeogram.ui.IGui#showModuleFinderDetails()
      */
     @SuppressWarnings("synthetic-access")
     public final void showModuleFinderDetails() {
@@ -587,13 +557,7 @@ public class Gui extends JFrame implements IGui {
     }
 
     /**
-     * When the user has initiated to enter a new module connection,
-     * the GUI will go into the <em>ModuleConnectionMode</em>,
-     * until the connection has been made or the action is aborted by
-     * the user.
-     * @param id
-     *            Is the unique int id of the currently selected
-     *            module.
+     * @see org.electrocodeogram.ui.IGui#enterModuleConnectionMode(int)
      */
     public final void enterModuleConnectionMode(final int id) {
 
@@ -604,10 +568,7 @@ public class Gui extends JFrame implements IGui {
     }
 
     /**
-     * Tells if the GUI is currently in <em>ModuleConnectionMode</em>.
-     * @return <code>true</code> idf the GUi is in
-     *         <em>ModuleConnectionMode</em> and <code>false</code>
-     *         if not.
+     * @see org.electrocodeogram.ui.IGui#getModuleConnectionMode()
      */
     public final boolean getModuleConnectionMode() {
 
@@ -615,7 +576,7 @@ public class Gui extends JFrame implements IGui {
     }
 
     /**
-     * @return
+     * @see org.electrocodeogram.ui.IGui#getSourceModule()
      */
     public final int getSourceModule() {
 
@@ -623,10 +584,7 @@ public class Gui extends JFrame implements IGui {
     }
 
     /**
-     * When the user has initiated to enter a new module connection,
-     * the GUI will go into the <em>ModuleConnectionMode</em>,
-     * until the connection has been made or the action is aborted by
-     * the user.
+     * @see org.electrocodeogram.ui.IGui#exitModuleConnectionMode()
      */
     public final void exitModuleConnectionMode() {
         this.moduleConnectionMode = false;
@@ -670,7 +628,7 @@ public class Gui extends JFrame implements IGui {
         public ModuleLabPanel(final Gui gui) {
             this.rootFrame = gui;
 
-            this.moduleGraph = new ModuleGraph(this.rootFrame);
+            this.moduleGraph = new ModuleGraph();
 
             this.setLayout(new GridLayout(1, 1));
 
@@ -705,12 +663,10 @@ public class Gui extends JFrame implements IGui {
          * @param name
          *            Is the name of the module, that is given to the
          *            cell
-         * @param active
-         *            Is the state of the module
          */
         public final void createModuleCell(final ModuleType moduleType,
-            final int id, final String name, final boolean active) {
-            this.moduleGraph.createModuleCell(moduleType, id, name, active);
+            final int id, final String name) {
+            this.moduleGraph.createModuleCell(moduleType, id, name);
 
         }
 
@@ -959,21 +915,20 @@ public class Gui extends JFrame implements IGui {
                         ModulePackagePanel.selectedModuleButton = ModulePackageLabel.this.modulePackageId;
 
                         MenuManager.showModuleFinderMenu(
-                            ModulePackagePanel.selectedModuleButton,
                             ModulePackageLabel.this,
                             ModulePackageLabel.this.getWidth()
                                             - UIConstants.POPUP_MENU_XOFFSET,
                             ModulePackageLabel.this.getHeight()
                                             - UIConstants.POPUP_MENU_YOFFSET);
                     } else if (e.getButton() == MouseEvent.BUTTON1) {
-                       
-                            try {
-                                org.electrocodeogram.system.System.getInstance()
-                                    .getModuleRegistry().createModule(
-                                        ModulePackageLabel.this.modulePackageId,
-                                        ModulePackageLabel.this.modulePackageName);
-                            } catch (ModuleInstantiationException e1) {
-                                JOptionPane
+
+                        try {
+                            org.electrocodeogram.system.System.getInstance()
+                                .getModuleRegistry().createModule(
+                                    ModulePackageLabel.this.modulePackageId,
+                                    ModulePackageLabel.this.modulePackageName);
+                        } catch (ModuleInstantiationException e1) {
+                            JOptionPane
                                 .showMessageDialog(
                                     org.electrocodeogram.system.System
                                         .getInstance().getMainWindow(),
@@ -982,8 +937,8 @@ public class Gui extends JFrame implements IGui {
                                                     + ModulePackageLabel.this.modulePackageName
                                                     + " module",
                                     JOptionPane.ERROR_MESSAGE);
-                            } catch (ModulePackageNotFoundException e1) {
-                                JOptionPane
+                        } catch (ModulePackageNotFoundException e1) {
+                            JOptionPane
                                 .showMessageDialog(
                                     org.electrocodeogram.system.System
                                         .getInstance().getMainWindow(),
@@ -992,8 +947,8 @@ public class Gui extends JFrame implements IGui {
                                                     + ModulePackageLabel.this.modulePackageName
                                                     + " module",
                                     JOptionPane.ERROR_MESSAGE);
-                            }
-                         
+                        }
+
                     }
 
                 }

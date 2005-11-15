@@ -14,12 +14,12 @@ import java.util.logging.Logger;
 import org.electrocodeogram.logging.LogHelper;
 
 /**
- * A <em>ModuleProperty</em> is a property of a module that is changeable by
- * the user during runtime. <em>ModuleProperties</em> are declared in the
- * module's <em>"module.properties.xml"</em> file, that is provided by the
- * module's developer for each module. This file is parsed in the
- * ECG's initialization phase and each declared <em>ModuleProperty</em>
- * becomes a <em>ModuleProperty</em> object registered along with the rest of a
+ * A <code>ModuleProperty</code> is a property of a module that is changeable by
+ * the user at runtime. Thos properties are declared in the
+ * module's <em>module.properties.xml</em> file, that is provided by the
+ * module developer for each module. This file is parsed in the
+ * ECG's initialization phase and each declared property
+ * becomes a <code>ModuleProperty</code>-object registered along with the rest of a
  * module's information in the {@link org.electrocodeogram.module.registry.ModuleRegistry}.
  */
 public class ModuleProperty extends Observable {
@@ -51,12 +51,12 @@ public class ModuleProperty extends Observable {
     private Class propType;
 
     /**
-     * This creates the ModuleProperty.
+     * This creates the <code>ModuleProperty</code>.
      * @param name
      *            Is the name of the property
      * @param value
      *            Is a default value to use before the user sets
-     *            antoher value
+     *            another value
      * @param type
      *            Is the type of the property. The type must always be
      *            a java class like "java.lang.Integer"

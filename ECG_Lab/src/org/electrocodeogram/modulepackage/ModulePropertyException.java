@@ -14,8 +14,8 @@ import org.electrocodeogram.logging.LogHelper;
 
 /**
  * When a module is requestet to set a property to a value that is
- * causing a problem in the moduke this <em>Exception</em> is
- * thrown.
+ * causing a problem in the module this exception is
+ * thrown. After that the property is reset to its original value.
  */
 public class ModulePropertyException extends Exception {
 
@@ -31,15 +31,15 @@ public class ModulePropertyException extends Exception {
     private static final long serialVersionUID = -7100538090443553026L;
 
     /**
-     * This creates the <em>Exception</em> with the given message.
+     * This creates the exception with the given message.
      * @param message
      *            Is the message
      * @param moduleName
      *            Is the name of the module that caused the
-     *            <code>Exception</code>
+     *            exception
      * @param moduleId
      *            Is the unique int of the module that caused the
-     *            <code>Exception</code>
+     *            exception
      * @param propertyName
      *            Is the name of the property
      * @param propertyValue

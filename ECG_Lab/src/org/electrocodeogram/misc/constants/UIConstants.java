@@ -1,43 +1,37 @@
+/*
+ * Class: UIConstants
+ * Version: 1.0
+ * Date: 16.10.2005
+ * By: Frank@Schlesinger.com
+ */
 
 package org.electrocodeogram.misc.constants;
 
 import java.awt.Color;
 
 /**
- *
+ * This class contains some constants that are used in the graphical user interface of the ECG Lab.
  */
-public class UIConstants {
+public final class UIConstants {
 
     /**
-     * 
+     * The constuctor is private for the helper class.
+     *
      */
+    private UIConstants() {
+    // not implemented
+    }
+
     public static final int DEFAULT_EVENT_WINDOW_HEIGHT = 300;
 
-    /**
-     * 
-     */
     public static final int DEFAULT_EVENT_WINDOW_WIDTH = 400;
-    
-    /**
-     * This is the default windo height.
-     */
+
     public static final int DEFAULT_WINDOW_WIDTH = 600;
 
-    /**
-     * This is the default window width.
-     */
     public static final int DEFAULT_WINDOW_HEIGHT = 800;
 
-    /**
-     * This is the default horizontal offset for displaying a popup
-     * menu.
-     */
     public static final int POPUP_MENU_YOFFSET = 10;
 
-    /**
-     * This is the default vertical offset for displaying a popup
-     * menu.
-     */
     public static final int POPUP_MENU_XOFFSET = 10;
 
     public static final Color ECG_GREEN = new Color(112, 234, 118);
@@ -121,11 +115,26 @@ public class UIConstants {
     public static Color MED_LINE_COLOR = ECG_BLUE;
 
     public static int MED_LINE_WIDTH = MEDIUM_BORDER_WIDTH;
-    
+
     public static Color FRM_EVENT_WINDOW_BORDER_COLOR = ECG_BLUE;
 
     public static int FRM_EVENT_WINDOW_BORDER_WIDTH = MEDIUM_BORDER_WIDTH;
-    
+
     public static Color FRM_EVENT_WINDOW_BACKGROUND_COLOR = ECG_LIGHT_GREEN;
+    
+    public static final int MODULE_CELL_DEFAULT_HEIGHT = 25;
+
+    public static final int MODULE_CELL_DEFAULT_WIDTH = 100;
+
+    public static final int MODULE_CELL_DEFAULT_Y_POS = 0;
+
+    public static final int MODULE_CELL_DEFAULT_X_POS = 0;
+
+    public static final int MODULE_CELL_DEFAULT_INSETS = 10;
+    
+    public static final int MODULE_GRAPH_DEFAULT_X_DISTANCE = 100;
+
+    public static final int MODULE_GRAPH_DEFAULT_MARGIN = 10;
+
 
 }

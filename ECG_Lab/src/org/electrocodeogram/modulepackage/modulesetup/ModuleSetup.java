@@ -13,10 +13,10 @@ import java.util.logging.Logger;
 import org.electrocodeogram.logging.LogHelper;
 
 /**
- * A <em>ModuleSetup</em> is a list of {@link ModuleConfiguration} elements, each
+ * A <code>ModuleSetup</code> is a list of {@link ModuleConfiguration} elements, each
  * containing the confiiguration of one module instance from the ECG Lab.
- * The <em>ModuleSetup</em> therefore is an image of the configuration of modules
- * in the ECG Lab and can be stored into a file. Of course a <em>ModuleSetup</em>
+ * The <code>ModuleSetup</code> therefore is an image of the configuration of modules
+ * in the ECG Lab and can be stored into a file. Of course a <code>ModuleSetup</code>
  * can also be loaded from a file into the ECG Lab.
  */
 public class ModuleSetup {
@@ -33,7 +33,7 @@ public class ModuleSetup {
     private ArrayList<ModuleConfiguration> moduleSetupList;
 
     /**
-     * Creates a <em>ModuleSetup</em>.
+     * Creates a <code>ModuleSetup</code>.
      *
      */
     public ModuleSetup() {
@@ -46,8 +46,8 @@ public class ModuleSetup {
     }
 
     /**
-     * Adds a <em>ModuleConfiguration</em> for a module instance to this <em>ModuleSetup</em>.
-     * @param moduleConfiguration Is the new <em>ModuleConfiguration</em> to add
+     * Adds a <code>ModuleConfiguration</code> for a module instance to this <code>ModuleSetup</code>.
+     * @param moduleConfiguration Is the new <code>ModuleConfiguration</code> to add
      */
     public final void addModuleConfiguration(
         final ModuleConfiguration moduleConfiguration) {
@@ -61,8 +61,8 @@ public class ModuleSetup {
     }
 
     /**
-     * Returns all <em>ModuleConfigurations</em> of this <em>ModuleSetup</em>.
-     * @return All <em>ModuleConfigurations</em> of this <em>ModuleSetup</em>
+     * Returns all <code>ModuleConfigurations</code> of this <em>ModuleSetup</em>.
+     * @return All <code>ModuleConfigurations</code>
      */
     public final ModuleConfiguration[] getModuleConfigurations() {
 

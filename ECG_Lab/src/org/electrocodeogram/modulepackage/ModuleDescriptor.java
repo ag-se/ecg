@@ -9,11 +9,10 @@ package org.electrocodeogram.modulepackage;
 import java.util.logging.Logger;
 
 import org.electrocodeogram.logging.LogHelper;
-import org.electrocodeogram.module.Module;
 import org.electrocodeogram.msdt.MicroSensorDataType;
 
 /**
- * This is representing the information from a <em>ModulePackage</em>.
+ * Collects the information from a <em>module.properties.xml</em> file of a <em>ModulePackage</em>.
  */
 public class ModuleDescriptor {
 
@@ -24,7 +23,7 @@ public class ModuleDescriptor {
         .createLogger(ModuleDescriptor.class.getName());
 
     /**
-     * Is the unique <code>String</code> id of a
+     * Is the unique string id of a
      * <em>ModulePackage</em>.
      */
     private String packageId;
@@ -45,18 +44,18 @@ public class ModuleDescriptor {
     private String moduleVersion;
 
     /**
-     * Is the module's <code>Class</code>, from eich it will be
+     * Is the module's <code>Class</code>, from which it will be
      * created.
      */
     private Class moduleClazz;
 
     /**
-     * Is containing the <em>ModuleProperties</em>.
+     * Contains the <em>ModuleProperties</em>.
      */
     private ModuleProperty[] moduleProperties;
 
     /**
-     * Is containing the module's <em>MicroSensorDataTypes</em>.
+     * Contains the module's <em>MicroSensorDataTypes</em>.
      */
     private MicroSensorDataType[] microSensorDataTypes;
 
@@ -74,7 +73,7 @@ public class ModuleDescriptor {
      * This creates a new <em>ModuleDescriptor</em> with the given
      * values.
      * @param id
-     *            Is the unique <code>String</code> id of the
+     *            Is the unique string id of the
      *            <em>ModulePackage</em>
      * @param name
      *            Is the name of the module
@@ -89,10 +88,10 @@ public class ModuleDescriptor {
      * @param type
      *            Is the <em>MODULE_TYPE</em> of the module
      * @param properties
-     *            Is an Array of <em>ModuleProperties</em> for the
+     *            Is an array of <em>ModuleProperties</em> for the
      *            module
      * @param msdts
-     *            Is an Array of <em>MicroSensorDataType</em> for
+     *            Is an array of <em>MicroSensorDataType</em> for
      *            the module
      */
     public ModuleDescriptor(final String id, final String name,
@@ -183,9 +182,9 @@ public class ModuleDescriptor {
     }
 
     /**
-     * This method returns an <code>Array</code> of
+     * This method returns an array of
      * <em>ModuleProperties</em>.
-     * @return An <code>Array</code> of <em>ModuleProperties</em>
+     * @return An array of <em>ModuleProperties</em>
      */
     public final ModuleProperty[] getProperties() {
 
@@ -219,9 +218,10 @@ public class ModuleDescriptor {
     }
 
     /**
-     * This method returns the unique <code>String</code> id of this
-     * module.
-     * @return The unique <code>String</code> id of this module
+     * This method returns the unique string id of the
+     * <em>ModulePackage</em> for this <code>ModuleDescriptor</code>.
+     * @return The unique string id of the
+     * <em>ModulePackage</em>
      */
     public final String getId() {
 
@@ -234,9 +234,8 @@ public class ModuleDescriptor {
 
     /**
      * This method returns the <em>MicroSensorDataTypes</em> that
-     * are provided by this module.
-     * @return The <em>MicroSensorDataTypes</em> that are provided
-     *         by this module
+     * are provided.
+     * @return The <em>MicroSensorDataTypes</em> that are provided.
      */
     public final MicroSensorDataType[] getMicroSensorDataTypes() {
 
@@ -265,8 +264,8 @@ public class ModuleDescriptor {
     }
 
     /**
-     * This method returns the module's provider name.
-     * @return The module's provider name
+     * This method returns the <em>ModulePackage's</em> provider name.
+     * @return The <em>ModulePackage's</em> provider name
      */
     public final String getProviderName() {
 
@@ -279,8 +278,8 @@ public class ModuleDescriptor {
     }
 
     /**
-     * This method returns the module's version.
-     * @return The module version
+     * This method returns the <em>ModulePackage's</em> version.
+     * @return The <em>ModulePackage's</em> version
      */
 
     public final String getVersion() {
@@ -294,8 +293,8 @@ public class ModuleDescriptor {
     }
 
     /**
-     * This returns the module's <em>MODULE_TYYPE</em>.
-     * @return The module's <em>MODULE_TYYPE</em>
+     * This returns the <em>ModulePackage's</em> <em>MODULE_TYYPE</em>.
+     * @return The <em>ModulePackage's</em> <em>MODULE_TYYPE</em>
      */
     public final ModuleType getModuleType() {
 

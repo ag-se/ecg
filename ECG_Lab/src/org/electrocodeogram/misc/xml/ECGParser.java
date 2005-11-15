@@ -25,7 +25,6 @@ import org.electrocodeogram.logging.LogHelper;
 import org.electrocodeogram.logging.LogHelper.ECGLevel;
 import org.electrocodeogram.modulepackage.ModuleDescriptor;
 import org.electrocodeogram.modulepackage.ModuleProperty;
-import org.electrocodeogram.modulepackage.ModulePropertyException;
 import org.electrocodeogram.modulepackage.ModuleType;
 import org.electrocodeogram.modulepackage.classloader.ModuleClassLoader;
 import org.electrocodeogram.modulepackage.modulesetup.ModuleConfiguration;
@@ -44,8 +43,8 @@ import org.xml.sax.SAXParseException;
 
 /**
  * This is a static utility class providing methods to parse XML files
- * for different information. These methods are used widley in the ECG
- * subsystems.
+ * for different information. These methods are used widely in the ECG
+ * subsystems and by ECG's modules.
  */
 public final class ECGParser {
 
@@ -62,13 +61,13 @@ public final class ECGParser {
     private static final String MODULE_PROPERTIES_XSD = "lib/ecg/module.properties.xsd";
 
     /**
-     * The path to the XML schema file, which defines the structure
+     * The path to the XML schema file, which defines the structure of
      * <em>ModuleSetup</em> files.
      */
     private static final String MODULE_SETUP_XSD = "lib/ecg/module.setup.xsd";
 
     /**
-     * The construcotr is hidden for this utility class.
+     * The constructor is hidden for this utility class.
      */
     private ECGParser() {
     // empty
@@ -77,7 +76,7 @@ public final class ECGParser {
     /**
      * This parses a given file and validates it against the given XML
      * schema. If parsing is successfull a <code>Document</code>
-     * object is returned. Parsing is done with the
+     * object is returned. Parsing is done by the
      * <em>Apache Xerces2 DOMParser</em>.
      * @param file
      *            Is the file to parse
@@ -91,7 +90,7 @@ public final class ECGParser {
      * @throws IOException
      *             If an error occurs while reading from the file
      */
-    private static Document parseFile(final File file,
+     public static Document parseFile(final File file,
         final String schemaLocation) throws SAXException, IOException {
 
         logger.entering(ECGParser.class.getName(), "parseFile", new Object[] {
@@ -203,17 +202,17 @@ public final class ECGParser {
     }
 
     /**
-     * This method parses the given <code>String</code> that usually
+     * This method parses the given string that usually
      * comes from a
      * {@link org.electrocodeogram.event.ValidEventPacket} beeing a
      * <em>MicroActivityEvent</em>.
      * @param string
      *            The <em>MicroActivityEvent's</em> content
      * @param schemaLocation
-     *            The path to the XMl schmema
-     * @return A XMl <code>Document</code> object
+     *            The path to the XML schmema
+     * @return A XML <code>Document</code> object
      * @throws SAXException
-     *             If the file does not contain a wellformed and valid
+     *             If the string does not contain a wellformed and valid
      *             XML document
      * @throws IOException
      *             If an error occurs while reading from the file
@@ -274,7 +273,7 @@ public final class ECGParser {
 
         parser.setErrorHandler(new ErrorHandler() {
 
-            @SuppressWarnings( {"synthetic-access", "synthetic-access"})
+            @SuppressWarnings({"synthetic-access", "synthetic-access" })
             public void warning(final SAXParseException exception)
                 throws SAXException {
 
@@ -322,15 +321,12 @@ public final class ECGParser {
     }
 
     /**
-     * This method parses the given <code>String</code> that usually
-     * comes from a
-     * {@link org.electrocodeogram.event.ValidEventPacket} beeing a
-     * <em>MicroActivityEvent</em>.
+     * This method parses the given string ans returns a <code>Document</code> from it.
      * @param string
-     *            The <em>MicroActivityEvent's</em> content
+     *            The string that is containing the XML document.
      * @param schemaLocation
-     *            The path to the XMl schmema
-     * @return A XMl <code>Document</code> object
+     *            The path to the XML schmema
+     * @return A XML <code>Document</code> object
      * @throws SAXException
      *             If the file does not contain a wellformed and valid
      *             XML document
@@ -351,49 +347,9 @@ public final class ECGParser {
         // create the XML parser
         DOMParser parser = new DOMParser();
 
-        // set the parsing properties
-//        try {
-//            parser.setFeature("http://xml.org/sax/features/validation", true);
-//            parser.setFeature(
-//                "http://apache.org/xml/features/validation/schema", true);
-//            parser
-//                .setFeature(
-//                    "http://apache.org/xml/features/validation/schema-full-checking",
-//                    true);
-//            parser.setFeature(
-//                "http://apache.org/xml/features/validation/dynamic", true);
-//
-//            // parse the property file against the
-//            // "module.properties.xsd
-//            // XML schema
-//            parser
-//                .setProperty(
-//                    "http://apache.org/xml/properties/schema/external-schemaLocation",
-//                    schemaLocation);
-//
-//        } catch (SAXNotRecognizedException e1) {
-//            // is checked and schould never occure
-//
-//            logger.log(Level.SEVERE,
-//                "A requested feature is not recognized by the parser.");
-//
-//            logger.log(Level.SEVERE, e1.getMessage());
-//
-//        } catch (SAXNotSupportedException e1) {
-//            // is checked and schould never occure
-//
-//            logger.log(Level.SEVERE,
-//                "A requested feature is not supported by the parser.");
-//
-//            logger.log(Level.SEVERE, e1.getMessage());
-//
-//        }
-
-        // parse
-
         parser.setErrorHandler(new ErrorHandler() {
 
-            @SuppressWarnings( {"synthetic-access", "synthetic-access"})
+            @SuppressWarnings({"synthetic-access", "synthetic-access" })
             public void warning(final SAXParseException exception)
                 throws SAXException {
 
@@ -439,7 +395,7 @@ public final class ECGParser {
         return parser.getDocument();
 
     }
-    
+
     /**
      * This method parses the given "module.properties.xml" file. If
      * this file is wellformed and valid a <em>ModuleDescriptor</em>
@@ -457,21 +413,17 @@ public final class ECGParser {
      *             <em>MicroSensorDataTypes</em>, which are defined
      *             in the properties file
      * @throws NodeException
-     *             If a expected XML <code>Node</code> or its value
+     *             If an expected XML node or its value
      *             can not be found
      * @throws SAXException
      *             If the file does not contain a wellformed and valid
      *             XML document
      * @throws IOException
      *             If an error occurs while reading from the file
-     * @throws ModulePropertyException
-     *             If an error occurs while loading the
-     *             <em>ModuleProperties</em>, which are defined in
-     *             the properties file
      */
     public static ModuleDescriptor parseAsModuleDescriptor(final File file)
         throws ClassLoadingException, MicroSensorDataTypeException,
-        NodeException, SAXException, IOException, ModulePropertyException {
+        NodeException, SAXException, IOException {
 
         logger.entering(ECGParser.class.getName(), "parseAsModuleDescriptor",
             new Object[] {file});
@@ -513,13 +465,13 @@ public final class ECGParser {
      * <code>Document</code> that should be a parsed
      * "module.properties.xml" file.
      * @param document
-     *            Is the XML <code>Document</code>
+     *            Is the XML document
      * @return The <em>MODULE_TYPE</em>
      * @throws NodeException
-     *             If the given XML <code>Document</code> is not
-     *             containing a module description
+     *             If the given XML document does not
+     *             contain a module description
      */
-    public static ModuleType getModuleType(final Document document)
+    private static ModuleType getModuleType(final Document document)
         throws NodeException {
 
         logger.entering(ECGParser.class.getName(), "getModuleType",
@@ -556,10 +508,8 @@ public final class ECGParser {
      * @throws IOException
      *             If an error occurs while reading from the file
      * @throws NodeException
-     *             If a expected XML <code>Node</code> or its value
-     *             can not be found If an error occurs while loading
-     *             the <em>ModuleProperties</em> from the
-     *             <em>ModuleSetup</em>
+     *             If a expected XML node or its value
+     *             can not be found
      * @throws ClassLoadingException
      *             If an error occurs while loading the module class
      *             from the <em>ModuleSetup</em>
@@ -735,16 +685,16 @@ public final class ECGParser {
 
     /**
      * Returns the <em>ModuleProperties</em> form the given XML
-     * <code>Document</code>, wich is expected to be a parsed
+     * document, wich is expected to be a parsed
      * "module.properties.xml" file.
      * @param document
-     *            The XML <code>Document</code>
+     *            The XML document
      * @return The <em>ModuleProperties</em>
      * @throws NodeException
      *             If an error occurs while accessing the document's
      *             nodes.
      */
-    public static ModuleProperty[] getModuleProperties(final Document document)
+    private static ModuleProperty[] getModuleProperties(final Document document)
         throws NodeException {
 
         logger.entering(ECGParser.class.getName(), "getModuleProperties",
@@ -858,7 +808,7 @@ public final class ECGParser {
      * @throws ClassLoadingException
      *             If loading of the named class failed
      */
-    public static Class getClass(final String classPath, final String className)
+    private static Class getClass(final String classPath, final String className)
         throws ClassLoadingException {
 
         logger.entering(ECGParser.class.getName(), "getClass", new Object[] {
@@ -886,27 +836,36 @@ public final class ECGParser {
     }
 
     /**
-     * This method returns the value of a given XML <code>node</code>
-     * in a given XML <code>Document</code>. There is only one
-     * <code>Node</code> of the given name expected to be in the
-     * <code>Document</code>.
+     * This method returns the value of a given XML node
+     * in a given XML document. There is only one
+     * node of the given name expected to be in the
+     * document. Otherwiese the value of the first
+     * occurance of the given node is returned.
      * @param nodeName
-     *            Is the name of the XML <code>Node</code> to return
+     *            Is the name of the XML node to return
      *            the value from
      * @param document
-     *            Is the value from the given XML <code>Node</code>
-     * @return The value of the <code>Node</code>
+     *            Is the value from the given XML node
+     * @return The value of the node
      * @throws NodeException
      *             If an error occurs while accessing the
-     *             <code>Node</code>
+     *             node
      */
-    public static String getSingleNodeValue(final String nodeName,
+     public static String getSingleNodeValue(final String nodeName,
         final Document document) throws NodeException {
 
         logger.entering(ECGParser.class.getName(), "getSingleNodeValue",
             new Object[] {nodeName, document});
 
-        Node node = getChildNode(document.getDocumentElement(), nodeName);
+        NodeList nodeList = document.getElementsByTagName(nodeName);
+
+        if (nodeList == null || nodeList.getLength() == 0) {
+            throw new NodeException(
+                "The requested element could not be found.", nodeName, document
+                    .getNodeName());
+        }
+
+        Node node = nodeList.item(0);
 
         logger.exiting(ECGParser.class.getName(), "getSingleNodeValue",
             getNodeValue(node));
@@ -918,24 +877,24 @@ public final class ECGParser {
      * Returns the <em>MicroSensorDataTypes</em> form the given XML
      * <code>Document</code>, wich is expected to be a parsed
      * "module.properties.xml" file. This method uses
-     * {@link org.electrocodeogram.msdt.registry.MsdtRegistry#parseMicroSensorDataType(File)}
+     * {@link #parseMicroSensorDataType(File)}
      * to actually parse the XML schemata into
      * {@link javax.xml.validation.Schema} objects.
      * @param document
-     *            The XML <code>Document</code>
+     *            The XML document
      * @param modulePath
-     *            Is the path to the module wich
+     *            Is the path to the module whose
      *            <em>ModuleDescription</em> is currently parsed.
      * @return The <em>MicroSensorDataTypes</em>
      * @throws NodeException
      *             If an error occurs while accessing the document's
-     *             nodes.
+     *             nodes
      * @throws MicroSensorDataTypeException
-     *             If an error occured while a
+     *             If an error occures while a
      *             <em>MicroSensorDataType</em> is created from the
-     *             <em>ModuleDescription's</em> definiton
+     *             <em>ModuleDescription</em>
      */
-    public static MicroSensorDataType[] getMicroSensorDataTypes(
+     private static MicroSensorDataType[] getMicroSensorDataTypes(
         final Document document, final String modulePath)
         throws MicroSensorDataTypeException, NodeException {
 
@@ -970,9 +929,6 @@ public final class ECGParser {
             File msdtFile = new File(modulePath + File.separator + "msdt"
                                      + File.separator + msdtFileString);
 
-            // microSensorDataTypes.add(org.electrocodeogram.system.System
-            // .getInstance().getMsdtRegistry().parseMicroSensorDataType(
-            // msdtFile));
 
             microSensorDataTypes.add(parseMicroSensorDataType(msdtFile));
 
@@ -996,8 +952,8 @@ public final class ECGParser {
      *             If the file does not contain a valid XML schema or
      *             if any other error occures during parsing
      */
-    public static MicroSensorDataType parseMicroSensorDataType(
-        final File file) throws MicroSensorDataTypeException {
+    private static MicroSensorDataType parseMicroSensorDataType(final File file)
+        throws MicroSensorDataTypeException {
         logger.entering(ECGParser.class.getName(), "parseMicroSensorDataType",
             new Object[] {file});
 
@@ -1008,8 +964,7 @@ public final class ECGParser {
 
             throw new MicroSensorDataTypeException(
                 "Error while loading MSDT:\nThe schema file "
-                                + file.getAbsolutePath()
-                                + " does not exist.");
+                                + file.getAbsolutePath() + " does not exist.");
         }
 
         if (!file.isFile()) {
@@ -1056,15 +1011,15 @@ public final class ECGParser {
     }
 
     /**
-     * This helper method is returning an <code>Array</code> of XML
-     * <code>Nodes</code> with the given name and of the given
-     * parent <code>Node</code>.
+     * This helper method is returning an array of XML
+     * nodes with the given name and of the given
+     * parent node.
      * @param parentNode
-     *            Is the parent <code>Node</code>
+     *            Is the parent node
      * @param nodeName
-     *            Is the name of the child <code>Nodes</code> to
+     *            Is the name of the child nodes to
      *            return
-     * @return An <code>Array</code> of child <code>Nodes</code>
+     * @return An array of child nodes
      *         with the given name
      * @throws NodeException
      *             If an error occurs while accessing the document's
@@ -1113,20 +1068,20 @@ public final class ECGParser {
     }
 
     /**
-     * This helper method is returning the first XML <code>Node</code>
-     * with the given name and of the given parent <code>Node</code>.
+     * This helper method is returning the first XML node
+     * with the given name and of the given parent node.
      * @param parentNode
-     *            Is the parent <code>Node</code>
+     *            Is the parent node
      * @param nodeName
-     *            Is the name of the child <code>Node</code> to
+     *            Is the name of the child node to
      *            return
-     * @return The first child <code>Node</code> with the given name
+     * @return The first child node with the given name
      * @throws NodeException
      *             If an error occurs while accessing the document's
      *             nodes.
      */
-    public static Node getChildNode(final Node parentNode,
-        final String nodeName) throws NodeException {
+    public static Node getChildNode(final Node parentNode, final String nodeName)
+        throws NodeException {
 
         logger.entering(ECGParser.class.getName(), "getChildNode",
             new Object[] {parentNode, nodeName});
@@ -1150,10 +1105,10 @@ public final class ECGParser {
 
     /**
      * This helper methos returns the value of a given XML
-     * <code>Node</code>.
+     * node.
      * @param node
-     *            Is the XML <code>Node</code>
-     * @return The value of the <code>Node</code>
+     *            Is the XML node
+     * @return The value of the node
      */
     public static String getNodeValue(final Node node) {
 
@@ -1193,15 +1148,15 @@ public final class ECGParser {
     }
 
     /**
-     * This helper method is checking if an given <code>Node</code>
+     * This helper method is checking if an given node
      * has the given name.
      * @param node
-     *            Is the <code>Node</code> to check
+     *            Is the node to check
      * @param nodeName
      *            Is the name to check
      * @return <code>true</code> if the name is right and
      *         <code>false</code> otherwise. If the
-     *         <code>Node</code> is null, <code>false</code> is
+     *         node is null, <code>false</code> is
      *         returned.
      */
     public static boolean isNode(final Node node, final String nodeName) {
@@ -1237,7 +1192,7 @@ public final class ECGParser {
      * This helper method is used to return the value of an XML
      * attribute.
      * @param node
-     *            Is the XML <code>Node</code> containing the
+     *            Is the XML node containing the
      *            attribute
      * @param attributeName
      *            Is the name of the attribute from which the value is

@@ -18,13 +18,14 @@ import org.electrocodeogram.logging.LogHelper;
 import org.electrocodeogram.msdt.registry.MicroSensorDataTypeRegistrationException;
 
 /**
- * A <em>MicroSensorDataType</em> is a type of an actual
- * <em>MicroActivityEvent</em>. Each <em>MicroActivityEvent</em>
- * is an instance of one <em>MicroSensorDataType</em>. A
- * <em>MicroSensorDataType</em> contains a XML schema object and
+ * A <code>MicroSensorDataType</code> is a type of an actual
+ * <em>MicroActivityEvent</em>. These events are carried inside
+ * {@link org.electrocodeogram.event.ValidEventPacket} in thh ECG.
+ * Each <em>MicroActivityEvent</em> is an instance of one <em>MicroSensorDataType</em>. A
+ * <em>MicroSensorDataType</em> contains a XML schema and
  * each <em>MicroActivityEvent</em> accroding to this type is
  * containing an XML document that is an instance of this type's XML
- * schema. In addition a <em>MicroSensorDataType</em> has a uniique
+ * schema. In addition a <em>MicroSensorDataType</em> has a unique
  * name in the ECG, which is the name of its XML schema file.
  */
 public class MicroSensorDataType {
@@ -36,14 +37,13 @@ public class MicroSensorDataType {
         .createLogger(MicroSensorDataType.class.getName());
 
     /**
-     * This is the XML schema that is contained in this
+     * This is the XML schema contained in this
      * <em>MicroSensorDataType</em>.
      */
     private Schema mySchema;
 
     /**
-     * The name of the <em>MicroSensorDataType</em>. In the ECg it
-     * is always the name of the XML schema file.
+     * The unique name of the <code>MicroSensorDataType</code>.
      */
     private String myName;
 
@@ -53,7 +53,7 @@ public class MicroSensorDataType {
     private static int count;
 
     /**
-     * The unique int id of this <em>MicroSensorDataType</em>.
+     * The unique int id of this <code>MicroSensorDataType</code>.
      */
     private int id;
 
@@ -63,21 +63,20 @@ public class MicroSensorDataType {
     private File myDefFile;
 
     /**
-     * A <em>MicroSensorDataType</em> can be provided by multiple
-     * modules. Each module is kept as a reference here.
+     * A <code>MicroSensorDataType</code> can be provided by multiple
+     * modules. Each module which provides this MSDT is kept as a reference here.
      */
     private ArrayList<MsdtProvider> providingModules;
 
     /**
-     * This creates a <em>MicroSensorDataType</em> and assigns a
+     * This creates a <code>MicroSensorDataType</code> and assigns a
      * unique int id to it.
      * @param name
-     *            Is the name for the new <em>MicroSensorDataType</em>.
-     *            It is always the name of the XML schema file
+     *            Is the name for the new <code>MicroSensorDataType</code>.
      * @param schema
      *            Is the XML schema that actually defines this type
      * @param defFile
-     *            Is the filecontaining the XML schema
+     *            Is the file containing the XML schema
      * @throws MicroSensorDataTypeException
      *             If the given name is empty or if the XML schema is
      *             null
@@ -119,8 +118,8 @@ public class MicroSensorDataType {
     }
 
     /**
-     * This returns the name of the <em>MicroSensorDataType</em>.
-     * @return The name of the <em>MicroSensorDataType</em>
+     * This returns the name of the <code>MicroSensorDataType</code>.
+     * @return The name of the <code>MicroSensorDataType</code>
      */
     public final String getName() {
 
@@ -145,9 +144,9 @@ public class MicroSensorDataType {
     }
 
     /**
-     * This method returns the XML Schema of this
-     * <em>MicroSensorDataType</em>.
-     * @return The XML Schema of the <em>MicroSensorDataType</em>
+     * This method returns the XML schema of this
+     * <code>MicroSensorDataType</code>.
+     * @return The XML schema of the <code>MicroSensorDataType</code>
      */
     public final Schema getSchema() {
 
@@ -160,9 +159,9 @@ public class MicroSensorDataType {
 
     /**
      * This method returns the unique integer id of the
-     * <em>MicroSensorDataType</em>.
+     * <code>MicroSensorDataType</code>.
      * @return The unique integer id of the
-     *         <em>MicroSensorDataType</em>
+     *         <code>MicroSensorDataType</code>
      */
     public final int getId() {
 
@@ -175,15 +174,15 @@ public class MicroSensorDataType {
     }
 
     /**
-     * Every module that provides this <em>MicroSensorDataType</em>
-     * calls this method during its creation and the module is then added to the
+     * Every module that provides this <code>MicroSensorDataType</code>
+     * calls this method during its creation and is then added to this
      * {@link #providingModules} list. A
-     * <em>MicroSensorDataType</em> is unloaded from the {@link org.electrocodeogram.msdt.registry.MsdtRegistry}
+     * <code>MicroSensorDataType</code> is unloaded from the {@link org.electrocodeogram.msdt.registry.MsdtRegistry}
      * when there are no more module instances in the ECG Lab that are providing it.
      * @param provider
-     *            Is the module that provides this <em>MicroSensordataTyp</em>
+     *            Is the module that provides this <code>MicroSensorDataTyp</code>
      * @throws MicroSensorDataTypeRegistrationException
-     *             If the module parameter is "null"
+     *             If the module parameter is <code>null</code>
      */
     public final void addProvidingModule(final MsdtProvider provider)
         throws MicroSensorDataTypeRegistrationException {
@@ -215,15 +214,15 @@ public class MicroSensorDataType {
     }
 
     /**
-     * Every module that provides this <em>MicroSensorDataType</em>
-     * calls this method during its removal and the module is then removed from the
+     * Every module that provides this <code>MicroSensorDataType</code>
+     * calls this method during its removal and is then removed from the
      * {@link #providingModules} list. A
      * <em>MicroSensorDataType</em> is unloaded from the {@link org.electrocodeogram.msdt.registry.MsdtRegistry}
      * when there are no more module instances in the ECG Lab that are providing it.
      * @param provider
      *            Is the module to remove
      * @throws MicroSensorDataTypeRegistrationException
-     *             If the given module parameter is "null"
+     *             If the given module parameter is <code>null</code>
      */
     public final void removeProvidingModule(final MsdtProvider provider)
         throws MicroSensorDataTypeRegistrationException {

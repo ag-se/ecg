@@ -23,8 +23,8 @@ public final class System {
 
     /**
      * A call to this method returns the <em>Singleton</em> instance
-     * the ISystem implementation.
-     * @return The <em>Singleton</em> instance the ISystem
+     * the <code>ISystem</code> implementation.
+     * @return The <em>Singleton</em> instance the <code>ISystem</code>
      *         implementation
      */
     public static ISystem getInstance() {

@@ -1,3 +1,10 @@
+/*
+ * Classname: ModuleTestHelper
+ * Version: 1.0
+ * Date: 18.10.2005
+ * By: Frank@Schlesinger.com
+ */
+
 package org.electrocodeogram.test.eventtransport;
 
 import org.electrocodeogram.event.ValidEventPacket;
@@ -8,10 +15,10 @@ import org.electrocodeogram.module.ModuleConnectionException;
 import org.electrocodeogram.test.module.TestModule;
 
 /**
- * Is helper class for the
+ * Is a helper class for the
  * {@link org.electrocodeogram.test.eventtransport.ModuleEventTransportTests}.
  * It provides methods to create graphs of connected modules and to
- * send,receive and compare events on the modules.
+ * send, receive and compare events on the modules.
  */
 public class ModuleTestHelper {
 
@@ -60,21 +67,6 @@ public class ModuleTestHelper {
         this.leafModule = new MockTargetModule(this);
 
     }
-
-    // /**
-    // * This is cleaning up by deleting all connected modules before
-    // * a new module graph is created.
-    // * @param node
-    // */
-    // private void removeConnectedModules(final Module node) {
-    // Module[] connectedModules = node.getReceivingModules();
-    //
-    // for (Module module : connectedModules) {
-    // removeConnectedModules(module);
-    //
-    // module.remove();
-    // }
-    // }
 
     /**
      * Creates a list of connected {@link TestModule}.

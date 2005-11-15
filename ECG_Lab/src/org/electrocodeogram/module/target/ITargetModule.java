@@ -8,22 +8,22 @@
 package org.electrocodeogram.module.target;
 
 /**
- * This <code>Interface</code> is used by
+ * This interface is used by
  * {@link org.electrocodeogram.module.Module} to avoid circular
  * dependencies.
  */
 public interface ITargetModule {
 
     /**
-     * This is to be implemented by all actual <em>TargetModules</em>.
+     * This is to be implemented by all actual <code>TargetModule</code> implementations.
      * @throws TargetModuleException
-     *             If an <code>Exception</code> occurs while
+     *             If an exception occurs while
      *             starting the writer.
      */
     void startWriter() throws TargetModuleException;
 
     /**
-     * This is to be implemented by all actual <em>TargetModules</em>.
+     * This is to be implemented by all actual <code>TargetModule</code>.
      */
     void stopWriter();
 

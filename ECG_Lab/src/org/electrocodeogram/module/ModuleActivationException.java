@@ -13,8 +13,8 @@ import java.util.logging.Logger;
 import org.electrocodeogram.logging.LogHelper;
 
 /**
- * When an error occures during the activation of a module, this
- * <em>Exception</em> is thrown.
+ * When an error occurs during activation of a module, this
+ * exception is thrown.
  */
 public class ModuleActivationException extends Exception {
 
@@ -30,7 +30,7 @@ public class ModuleActivationException extends Exception {
         .createLogger(ModuleActivationException.class.getName());
 
     /**
-     * Creates the <em>Exception</em> and logs the message.
+     * Creates the exception and logs the message.
      * @param message
      *            Is the message
      * @param moduleName

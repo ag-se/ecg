@@ -10,8 +10,8 @@ package org.electrocodeogram.module.intermediate;
 import org.electrocodeogram.module.intermediate.IntermediateModule.ProcessingMode;
 
 /**
- * This <code>Interface</code> is used by {@link org.electrocodeogram.module.Module}
- * to access <em>IntermediateModules</em> to avoid circular dependencies.
+ * This interface is used by {@link org.electrocodeogram.module.Module}
+ * to access {@link IntermediateModule} to avoid circular dependencies.
  */
 public interface IIntermediateModule {
 

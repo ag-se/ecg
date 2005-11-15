@@ -12,7 +12,7 @@ import java.util.logging.Logger;
 import org.electrocodeogram.logging.LogHelper;
 
 /**
- * This <code>Exception</code> is thrown if an error occurs while
+ * This exception is thrown if an error occurs while
  * storing a <em>ModuleSetup</em>.
  */
 public class ModuleSetupStoreException extends Exception {
@@ -29,9 +29,9 @@ public class ModuleSetupStoreException extends Exception {
         .createLogger(ModuleSetupStoreException.class.getName());
 
     /**
-     * Creates the <code>Exception</code>.
+     * Creates the exception.
      * @param message Is the message
-     * @param filename Is the filename from which the <em>ModuleSetup</em> has been loaded
+     * @param filename Is the filename into which the <em>ModuleSetup</em> should have been stored
      */
     public ModuleSetupStoreException(final String message, final String filename) {
         super(message);

@@ -1,3 +1,10 @@
+/*
+ * Class: ModuleGraph
+ * Version: 1.0
+ * Date: 16.10.2005
+ * By: Frank@Schlesinger.com
+ */
+
 package org.electrocodeogram.ui.modules;
 
 import java.awt.Point;
@@ -20,38 +27,50 @@ import org.jgraph.event.GraphSelectionEvent;
 import org.jgraph.event.GraphSelectionListener;
 import org.jgraph.graph.DefaultGraphModel;
 
+/**
+ * This is the panel where the module instances are displayed as {@link org.electrocodeogram.ui.modules.ModuleCell}.
+ *
+ */
 public class ModuleGraph extends JGraph {
 
-    private static final int DEFAULT_X_DISTANCE = 100;
+    /**
+     * The <em>Serialization</em> id.
+     */
+    private static final long serialVersionUID = 1357439970926255409L;
 
-    private static final int DEFAULT_MARGIN = 10;
 
-    Gui _gui;
+    /**
+     * Contains all cells displayed in this panel.
+     */
+    private HashMap < Integer, ModuleCell > cellMap;
 
-    private HashMap < Integer, ModuleCell > _cellMap;
+    /**
+     * The id of the selected cell or -1 if no cell is selected.
+     */
+    private static int selected = -1;
 
-    private static int _selectedBefore = -1;
 
-    private static int _selected = -1;
+    /**
+     * The margin for the cells.
+     */
+    private int margin;
 
-    ModuleGraphObserverDummy _observerDummy = null;
+    /**
+     * The default distance for new cells.
+     */
+    private int dinstanceX;
 
-    private int _margin;
-
-    private int _dinstanceX;
-
-    public ModuleGraph(Gui configurator) {
+    /**
+     * Creates the panel.
+     */
+    public ModuleGraph() {
         super(new DefaultGraphModel());
 
-        this._margin = DEFAULT_MARGIN;
+        this.margin = UIConstants.MODULE_GRAPH_DEFAULT_MARGIN;
 
-        this._dinstanceX = DEFAULT_X_DISTANCE;
+        this.dinstanceX = UIConstants.MODULE_GRAPH_DEFAULT_X_DISTANCE;
 
-        this._gui = configurator;
-
-        this._observerDummy = new ModuleGraphObserverDummy(configurator, this);
-
-        this._cellMap = new HashMap < Integer, ModuleCell >();
+        this.cellMap = new HashMap < Integer, ModuleCell >();
 
         this.setSizeable(true);
 
@@ -64,26 +83,20 @@ public class ModuleGraph extends JGraph {
 
         addGraphSelectionListener(new GraphSelectionListener() {
 
-            public void valueChanged(GraphSelectionEvent arg0) {
+            @SuppressWarnings("synthetic-access")
+            public void valueChanged(final GraphSelectionEvent arg0) {
                 if (arg0.isAddedCell()
                     && (arg0.getCell() instanceof ModuleCell)) {
 
-                    ModuleGraph._selected = ((ModuleCell) (arg0.getCell()))
+                    ModuleGraph.selected = ((ModuleCell) (arg0.getCell()))
                         .getId();
 
-                    // ModuleGraph.this._cellMap.get(new
-                    // Integer(ModuleGraph.this._selected)).select();
-
-                    ModuleGraph.this._gui.enableModuleMenu(true);
+                    org.electrocodeogram.system.System.getInstance().getGui().enableModuleMenu(true);
                 } else {
-                    ModuleGraph._selectedBefore = ModuleGraph.this._selected;
 
-                    // ModuleGraph.this._cellMap.get(new
-                    // Integer(ModuleGraph.this._selectedBefore)).deselect();
+                    ModuleGraph.selected = -1;
 
-                    ModuleGraph._selected = -1;
-
-                    ModuleGraph.this._gui.enableModuleMenu(false);
+                    org.electrocodeogram.system.System.getInstance().getGui().enableModuleMenu(false);
                 }
 
             }
@@ -91,13 +104,11 @@ public class ModuleGraph extends JGraph {
 
         addMouseListener(new MouseAdapter() {
 
-            public void mouseClicked(MouseEvent e) {
-                ISystem systemRoot = org.electrocodeogram.system.System
-                    .getInstance();
+            @SuppressWarnings("synthetic-access")
+            @Override
+            public void mouseClicked(final MouseEvent e) {
 
-                IGui gui = systemRoot.getGui();
-
-                boolean mode = gui.getModuleConnectionMode();
+                boolean mode = org.electrocodeogram.system.System.getInstance().getGui().getModuleConnectionMode();
 
                 if (mode) {
                     if (e.getButton() == MouseEvent.BUTTON1) {
@@ -107,13 +118,12 @@ public class ModuleGraph extends JGraph {
                             if (o instanceof ModuleCell) {
                                 ModuleCell mc = (ModuleCell) o;
 
-                                _selected = mc.getId();
+                                selected = mc.getId();
 
-                                if (_selected == org.electrocodeogram.system.System
+                                if (selected == org.electrocodeogram.system.System
                                     .getInstance().getGui().getSourceModule()) {
                                     JOptionPane
-                                        .showMessageDialog(
-                                            getGui(),
+                                        .showMessageDialog(org.electrocodeogram.system.System.getInstance().getMainWindow(),
                                             "You can not connect a module to itself.",
                                             "Connect Module",
                                             JOptionPane.ERROR_MESSAGE);
@@ -131,14 +141,14 @@ public class ModuleGraph extends JGraph {
                                                 org.electrocodeogram.system.System
                                                     .getInstance()
                                                     .getModuleRegistry()
-                                                    .getModule(_selected));
+                                                    .getModule(selected));
 
                                         org.electrocodeogram.system.System
                                             .getInstance().getGui()
                                             .exitModuleConnectionMode();
                                     } catch (Exception e1) {
 
-                                        JOptionPane.showMessageDialog(getGui(),
+                                        JOptionPane.showMessageDialog(org.electrocodeogram.system.System.getInstance().getMainWindow(),
                                             e1.getMessage(), "Connect Module",
                                             JOptionPane.ERROR_MESSAGE);
                                     }
@@ -159,9 +169,9 @@ public class ModuleGraph extends JGraph {
                             if (o instanceof ModuleCell) {
                                 ModuleCell mc = (ModuleCell) o;
 
-                                _selected = mc.getId();
+                                selected = mc.getId();
 
-                                MenuManager.showModuleMenu(_selected,
+                                MenuManager.showModuleMenu(selected,
                                     ModuleGraph.this, e.getPoint().x, e
                                         .getPoint().y);
 
@@ -181,22 +191,27 @@ public class ModuleGraph extends JGraph {
         });
     }
 
-    private Gui getGui() {
-        return this._gui;
-    }
-
-    private void addModuleCell(ModuleCell cell) {
-        this._cellMap.put(new Integer(cell.getId()), cell);
+    /**
+     * Adds a new <code>ModuleCell</code> to this panel.
+     * @param cell The new cell
+     */
+    private void addModuleCell(final ModuleCell cell) {
+        this.cellMap.put(new Integer(cell.getId()), cell);
 
         this.getGraphLayoutCache().insert(cell);
     }
 
-    public void updateModuleCell(int id, Module module) {
+    /**
+     * When a module's state changes this method changes the corresponding <code>ModuleCell</code>.
+     * @param id The is of the changed module and the module cell
+     * @param module The changed module
+     */
+    public final void updateModuleCell(final int id, final Module module) {
         if (containsModuleCell(id)) {
 
-            ModuleCell moduleCell = this._cellMap.get(new Integer(id));
+            ModuleCell moduleCell = this.cellMap.get(new Integer(id));
 
-            if (module.getState()) {
+            if (module.isActive()) {
                 moduleCell.activate();
             } else {
                 moduleCell.deactivate();
@@ -214,7 +229,7 @@ public class ModuleGraph extends JGraph {
 
             if (modules != null) {
                 for (Module receivingModule : modules) {
-                    ModuleCell childModuleCell = (ModuleCell) this._cellMap
+                    ModuleCell childModuleCell = this.cellMap
                         .get(new Integer(receivingModule.getId()));
 
                     ModuleEdge edge = new ModuleEdge(moduleCell.getId(),
@@ -231,15 +246,24 @@ public class ModuleGraph extends JGraph {
         }
     }
 
-    public boolean containsModuleCell(int id) {
-        boolean flag = _cellMap.containsKey(new Integer(id));
+    /**
+     * Checks if this panel contains a cell with the given id.
+     * @param id The id to search for
+     * @return <code>true</code> if a cell with the given id is displayed and <code>false</code> otherwise
+     */
+    public final boolean containsModuleCell(final int id) {
+        boolean flag = this.cellMap.containsKey(new Integer(id));
 
         return flag;
     }
 
-    public void removeModuleCell(int id) {
+    /**
+     * Removes a cell from this panel.
+     * @param id The id of the cell to removef
+     */
+    public final void removeModuleCell(final int id) {
         if (containsModuleCell(id)) {
-            ModuleCell cell = (ModuleCell) _cellMap.get(new Integer(id));
+            ModuleCell cell =  this.cellMap.get(new Integer(id));
 
             Object[] o = new Object[] {cell};
 
@@ -251,17 +275,16 @@ public class ModuleGraph extends JGraph {
 
             getGraphLayoutCache().remove(o);
 
-            _cellMap.remove(new Integer(id));
+            this.cellMap.remove(new Integer(id));
         }
     }
 
     /**
-     * @param moduleCell
-     * @param edge
-     * @param childModuleCell
-     * @param parentModuleCell
-     */
-    public void addChildEdge(ModuleCell moduleCell, ModuleEdge edge) {
+     * Adds a module connection to the panel.
+     * @param moduleCell the cell, which is the source of the connection
+     * @param edge The connection
+      */
+    public final void addChildEdge(final ModuleCell moduleCell, final ModuleEdge edge) {
 
         moduleCell.addEdge(edge);
 
@@ -269,46 +292,24 @@ public class ModuleGraph extends JGraph {
 
     }
 
-    private static class ModuleGraphObserverDummy extends Observable {
-
-        private ModuleGraph parent = null;
-
-        public ModuleGraphObserverDummy(Gui configurator, ModuleGraph parent) {
-            super();
-
-            this.parent = parent;
-
-            this.addObserver(configurator);
-
-        }
-
-        public void notifyUI(int moduleId) {
-            setChanged();
-
-            notifyObservers(moduleId);
-
-            clearChanged();
-        }
-    }
 
     /**
-     * @param moduleType
-     * @param id
-     * @param name
-     * @param b
+     * Creates a new <code>ModuleCell</code> for a module with the given atttributes.
+     * @param moduleType Is the type of the module
+     * @param id Is the id of the module
+     * @param name Is the name to be displayed for the module
      */
-    public void createModuleCell(ModuleType moduleType, int id, String name,
-        boolean b) {
-        ModuleCell cell = new ModuleCell(moduleType, id, name, b);
+    public final void createModuleCell(final ModuleType moduleType, final int id, final String name) {
+        ModuleCell cell = new ModuleCell(moduleType, id, name);
 
-        int x = this._margin;
+        int x = this.margin;
 
-        int y = this._margin;
+        int y = this.margin;
 
         switch (moduleType) {
             case SOURCE_MODULE:
 
-                x = this.getX() + this._margin;
+                x = this.getX() + this.margin;
 
                 break;
 
@@ -322,7 +323,7 @@ public class ModuleGraph extends JGraph {
             case TARGET_MODULE:
 
                 x = this.getWidth() - (int) (cell.getBounds().getWidth())
-                    - this._margin;
+                    - this.margin;
 
                 break;
 
@@ -336,7 +337,7 @@ public class ModuleGraph extends JGraph {
 
         while (o != null) {
             if (o instanceof ModuleCell) {
-                y += this._dinstanceX;
+                y += this.dinstanceX;
             } else {
                 break;
             }
@@ -350,27 +351,12 @@ public class ModuleGraph extends JGraph {
 
     }
 
-    public void setMargin(int margin) {
-        this._margin = margin;
-    }
-
-    public static int getSelectedModule() {
-        return _selected;
-    }
-
     /**
-     * @param id
+     * Returns the id of the currently selected cell.
+     * @return The id of the currently selected cell or -1 if no module cell is selected
      */
-    public void highlight(int id) {
-        ModuleCell cell = this._cellMap.get(new Integer(id));
-
-        if (cell == null) {
-            return;
-        }
-
-        cell.eventReceived();
-
-        this.getGraphLayoutCache().insert(cell);
+    public static int getSelectedModule() {
+        return selected;
     }
 
 }

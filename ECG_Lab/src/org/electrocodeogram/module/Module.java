@@ -40,29 +40,29 @@ import org.electrocodeogram.system.ISystem;
 import org.electrocodeogram.system.ModuleSystem;
 
 /**
- * This abstract class represents an <em> ElectroCodeoGram Module</em>.
+ * This abstract class represents an <em>ElectroCodeoGram Module</em>.
  * A module is an object able to receive events from other modules and
  * to send events to other modules. For that purpose modules are
  * connected to each other. Multiple modules are allowed to be
- * connected to another module. In that case the multiple moduleas are
+ * connected to another module. In that case the multiple modules are
  * receiving events from the one module. The multiple modules are
  * called receiver modules and the one module is called the sender
  * module. The event sending is realized with use of the
  * <em>Observer</em> design pattern, where every module is an
  * <em>Observer</em> and an <em>Observable</em>. In fact each
- * module contains nested classed that are acting as
+ * module contains member classes that are acting as
  * <em>Observers</em> and <em>Observables</em>. These are
  * <ul>
  * <li> {@link Module.EventSender} in an <em>Observable</em> role
  * and
  * <li> {@link Module.EventReceiver} in an <em>Observer</em> role.
  * </ul>
- * When the <em>EventSender</em> of the sender module has a new
- * event, it notifies all registered <em>EventReceivers</em> of
+ * When the <code>EventSender</code> of the sender module has a new
+ * event, it notifies all registered <code>EventReceivers</code> of
  * other modules, passing the new event with the notification.
  * Additionally modules are observing the system state for relevant
  * state changes and modules are telling the system about their state
- * on state changes. This is realized with another two nested classes:
+ * changes. This is realized with two other member classes:
  * <ul>
  * <li> {@link Module.SystemObserver} in is notified about system
  * state changes and
@@ -70,11 +70,11 @@ import org.electrocodeogram.system.ModuleSystem;
  * changes in this module.
  * </ul>
  * The abstract class <code>Module</code> must be implemented. This
- * is done by implementing one of thir abstract subclasses.
+ * is done by implementing one of its abstract subclasses.
  * <ul>
  * <li>{@link org.electrocodeogram.module.source.SourceModule} must
  * be implemented for modules to read in events from locations
- * externalk to the <em>ECG Lab</em>.
+ * external to the <em>ECG Lab</em>.
  * <li>{@link org.electrocodeogram.module.intermediate.IntermediateModule}
  * must be implemented for modules to analyse incoming events and
  * <li>{@link org.electrocodeogram.module.target.TargetModule} must
@@ -82,11 +82,11 @@ import org.electrocodeogram.system.ModuleSystem;
  * to the <em>ECG Lab</em>.
  * </ul>
  * Each module is created from classes defined in a
- * <em>ModulePacket</em> in the file system. From the module's
- * <em>PropertyFile</em> inside the <em>ModulePacket</em>, each
+ * <em>ModulePackage</em> in the file system. From the module's
+ * <em>module.properties.xml</em> inside the <em>ModulePackage</em>, each
  * module is given its defined <em>MicroSensorDataTypes</em>, its
- * <em>ModuleProperties</em> and the uniquw <code>String</code> id
- * of the <em>ModulePacket</em> itself. During its creation every
+ * <em>ModuleProperties</em> and the unique string id
+ * of the <em>ModulePackage</em>. During its creation every
  * module instance also gets a unique int id.
  */
 public abstract class Module implements MsdtProvider {
@@ -118,19 +118,19 @@ public abstract class Module implements MsdtProvider {
     private String moduleName;
 
     /**
-     * This <code>Map</code> contains the modules, which are
+     * This map contains the modules, which are
      * connected to this module as a receiver of events.
      */
     private HashMap < Integer, Module > receiverModuleMap;
 
     /**
-     * This <code>Map</code> contains the modules, which this module
+     * This map contains the modules, which this module
      * is connected to and that are sending events to this module.
      */
     private HashMap < Integer, Module > senderModuleMap;
 
     /**
-     * This <code>List</code> contains the
+     * This list contains the
      * <em>MicroSensorDataTypes</em> that are provided by this
      * module.
      */
@@ -142,34 +142,34 @@ public abstract class Module implements MsdtProvider {
     private boolean active;
 
     /**
-     * Is the unique <code>String</code> id of this module's
-     * <em>ModulePacket</em>.
+     * Is the unique string id of this module's
+     * <em>ModulePackage</em>.
      */
     private String modulePacketId;
 
     /**
-     * A reference to the inner class object <em>EventSender</em>.
+     * A reference to the member class object <em>EventSender</em>.
      */
     private EventSender eventSender;
 
     /**
-     * A reference to the inner class object <em>EventReceiver</em>.
+     * A reference to the member class object <em>EventReceiver</em>.
      */
     private EventReceiver eventReceiver;
 
     /**
-     * A reference to the inner class object <em>SystemObserver</em>.
+     * A reference to the member class object <em>SystemObserver</em>.
      */
     private SystemObserver systemObserver;
 
     /**
-     * A reference to the inner class object
+     * A reference to the member class object
      * <em>GuiNotificator</em>.
      */
     private GuiNotificator guiNotificator;
 
     /**
-     * A reference to the inner class <em>PropertyListener</em>.
+     * A reference to the member class <em>PropertyListener</em>.
      */
     private PropertyListener propertyListener;
 
@@ -185,22 +185,22 @@ public abstract class Module implements MsdtProvider {
      * This constructor is not to be used directly. Instead use
      * {@link org.electrocodeogram.module.registry.ModuleRegistry#createModule(String, String)}
      * to create a new module. This creates a new module of the given
-     * type, with the given <em>ModulePacket</em> id and assigns the
+     * type, with the given <em>ModulePackage</em> id and assigns the
      * given name to it. The module is registered with the
-     * {@registry.ModuleRegistry} and if the any
-     * {@org.electrocodeogram.msdt.MicroSensorDataType} is provided by
-     * this module it is registered with the
+     * {@registry.ModuleRegistry} and if any
+     * {@org.electrocodeogram.msdt.MicroSensorDataType} are provided by
+     * this module they are registered with the
      * {@link org.electrocodeogram.msdt.registry.MsdtRegistry}.
      * @param type
      *            Is the module type
      * @param id
-     *            Is the unique <code>String</code> id of the
-     *            <em>ModulePacket</em>
+     *            Is the unique string id of the
+     *            <em>ModulePackage</em>
      * @param name
      *            Is the name to be assigned to the module
      */
     @SuppressWarnings("synthetic-access")
-    public Module(final ModuleType type, final String id, final String name) {
+    protected Module(final ModuleType type, final String id, final String name) {
         logger.entering(this.getClass().getName(), "Module", new Object[] {
             type, id, name});
 
@@ -283,32 +283,32 @@ public abstract class Module implements MsdtProvider {
     /**
      * This method is called whenever this module gets a notification
      * of a state change form the system. It is left to the actual
-     * module implementation to react on such an event.
+     * module implementation to react to such an event.
      */
     public abstract void update();
 
     /**
      * The nested {@link Module.PropertyListener} calls this, whenever
-     * a <em>ModuleProperty</em> ha changed.
+     * a <em>ModuleProperty</em> has changed.
      * @param moduleProperty
      *            Is the <em>ModuleProperty</em> that has been
      *            changed
      * @throws ModulePropertyException
      *             If the property value is causing an
-     *             <em>Exception</em> in the actual module
+     *             exception in the actual module
      *             implementation
      */
     protected abstract void propertyChanged(ModuleProperty moduleProperty)
         throws ModulePropertyException;
 
     /**
-     * This method initializes the actual module. It must be
-     * implementes by all modules.
+     * This method initializes the actual module. It can be
+     * implemented by all modules that are in need of additional initialisation.
      */
     public abstract void initialize();
 
     /**
-     * This abstract method is to be implemented by all modules. Its
+     * This abstract method is implemented by the three direct subclasses od <code>Module</code>. Its
      * implementation tells what to do with a received event.
      * @param eventPacket
      *            Is the received event
@@ -380,9 +380,9 @@ public abstract class Module implements MsdtProvider {
     }
 
     /**
-     * This method returns an <code>Array</code> of all modules that
+     * This method returns an array of all modules that
      * are connected to this module.
-     * @return An <code>Array</code> of all modules that are
+     * @return An array of all modules that are
      *         connected to this module
      */
     public final Module[] getReceivingModules() {
@@ -497,10 +497,10 @@ public abstract class Module implements MsdtProvider {
     }
 
     /**
-     * This method returns the unique <code>String</code> id of the
-     * <em>ModulePacket</em> of this module.
-     * @return The <code>String</code> id of the
-     *         <em>ModulePacket</em>
+     * This method returns the unique string id of the
+     * <em>ModulePackage</em> of this module.
+     * @return The string id of the
+     *         <em>ModulePackaga</em>
      */
     public final String getModulePacketId() {
         logger.entering(this.getClass().getName(), "getClassId");
@@ -516,7 +516,7 @@ public abstract class Module implements MsdtProvider {
      * @return <code>true</code> if the module is active and
      *         <code>false</code> if not.
      */
-    public final boolean getState() {
+    public final boolean isActive() {
         logger.entering(this.getClass().getName(), "getState");
 
         logger.exiting(this.getClass().getName(), "getState", Boolean.valueOf(this.active));
@@ -594,7 +594,7 @@ public abstract class Module implements MsdtProvider {
 
     /**
      * This method deactivates the module. The module might be already
-     * deactivated.
+     * deactivated. In that case nothing happens.
      */
     public final void deactivate() {
 
@@ -636,9 +636,9 @@ public abstract class Module implements MsdtProvider {
 
     /**
      * This method activates the module. The module might be already
-     * activated.
+     * activated. In that case nothing happens.
      * @throws ModuleActivationException
-     *             If an <code>Exception</code> occurs during module
+     *             If an exception occurs during module
      *             activation.
      */
     public final void activate() throws ModuleActivationException {
@@ -763,7 +763,7 @@ public abstract class Module implements MsdtProvider {
      * This method is used to connect a given module to this module.
      * @param module
      *            Is the module that should be connected to this
-     *            module.
+     *            module
      * @return The unique int id of the connected module
      * @throws ModuleConnectionException
      *             If the given module could not be connected to this
@@ -822,7 +822,7 @@ public abstract class Module implements MsdtProvider {
      *            The module to disconnect
      * @throws ModuleInstanceNotFoundException
      *             If the given module is not connected to this
-     *             module.
+     *             module
      */
     public final void disconnectModule(final Module module)
         throws ModuleInstanceNotFoundException {
@@ -891,11 +891,9 @@ public abstract class Module implements MsdtProvider {
     }
 
     /**
-     * Actual module implementations are using this method to send
-     * events.
+     * Uused to send events.
      * @param packet
-     *            Is the event packet that contains the analysis
-     *            result
+     *            Is the event packet to send
      */
     protected final void sendEventPacket(final ValidEventPacket packet) {
         logger.entering(this.getClass().getName(), "sendEventPacket",
@@ -1028,9 +1026,7 @@ public abstract class Module implements MsdtProvider {
             logger.log(Level.INFO,
                 "No ModuleDescriptor was found for the module "
                                 + this.getName());
-        }
-
-        catch (MicroSensorDataTypeRegistrationException e) {
+        } catch (MicroSensorDataTypeRegistrationException e) {
             logger
                 .log(
                     Level.SEVERE,
@@ -1042,13 +1038,12 @@ public abstract class Module implements MsdtProvider {
     }
 
     /**
-     * During the module creation, this method reads the
+     * During module creation, this method reads the
      * <em>ModuleProperties</em> from the <em>ModulePackage</em>
-     * and sets the module's properties to them.
+     * and sets the {@link #runtimeProperties} accordignly.
      * @throws ModulePropertyException
-     *             If an <em>Exception</em> occures while setting
-     *             the <em>ModuleProperty</em> in the actual module
-     *             implementation
+     *             If an exception occurs while setting
+     *             a <em>ModuleProperty</em>
      */
     private void initializeRuntimeProperties() throws ModulePropertyException {
 
@@ -1145,12 +1140,12 @@ public abstract class Module implements MsdtProvider {
     }
 
     /**
-     * The <em>EventSender</em> is the part of a module that sends
+     * The <code>EventSender</code> is the part of a module that sends
      * events to other modules. It is an <em>Observable</em> and
      * notifies registered <em>Observers</em> about new events in
      * this module. Only <em>SOURCE_MODULES</em> or
      * <em>INTERMEDIATE_MODULE</em> are having are having an
-     * <em>EventSender</em>, which is not <code>null</code>.
+     * <code>EventSender</code>, which is not <code>null</code>.
      */
     private static class EventSender extends Observable {
 
@@ -1246,7 +1241,7 @@ public abstract class Module implements MsdtProvider {
             eventSenderLogger.entering(this.getClass().getName(),
                 "sendEventPacket", new Object[] {eventPacket});
 
-            if (this.myModule.getState() && (eventPacket != null)) {
+            if (this.myModule.isActive() && (eventPacket != null)) {
                 setChanged();
 
                 try {
@@ -1288,12 +1283,12 @@ public abstract class Module implements MsdtProvider {
     }
 
     /**
-     * The <em>EventReceiver</em> is the part of a module that
+     * The <code>EventReceiver</code> is the part of a module that
      * receives events from other modules. It is an <em>Observer</em>
      * and uses the {@link #update(Observable, Object)} method to
-     * receive events from orther module's <em>EventSenders</em> it
+     * receive events from orther module's <code>EventSenders</code> it
      * has been registered to. Only <em>INTERMEDIATE_MODULES</em> or
-     * <em>TARGET_MODULES</em> are having an <em>EventReceiver</em>,
+     * <em>TARGET_MODULES</em> are having an <code>EventReceiver</code>,
      * which is not <code>null</code>. EventReceiver.
      */
     private static class EventReceiver implements Observer {
@@ -1398,7 +1393,7 @@ public abstract class Module implements MsdtProvider {
     }
 
     /**
-     * The <em>SystemObserver</em> is the part of each module that
+     * The <code>SystemObserver</code> is the part of each module that
      * gets notifications from the system about system state changes.
      */
     private static class SystemObserver implements Observer {
@@ -1459,7 +1454,7 @@ public abstract class Module implements MsdtProvider {
     }
 
     /**
-     * The <em>SystemNotificator</em> is used by the module to
+     * The <code>SystemNotificator</code> is used by the module to
      * notify the system about state changes in the module.
      */
     public static final class GuiNotificator extends Observable {
@@ -1545,7 +1540,12 @@ public abstract class Module implements MsdtProvider {
                 "fireStatechangeNotification");
         }
 
-        public void fireMessageNotification(MessageEvent event) {
+        /**
+         * Used in a module implementation to tell the GUI to bring up a message
+         * dialog with the given message.
+         * @param event Is the message
+         */
+        public void fireMessageNotification(final MessageEvent event) {
             systemNotificatorlogger.entering(this.getClass().getName(),
                 "fireMessageNotification");
 
@@ -1560,8 +1560,8 @@ public abstract class Module implements MsdtProvider {
         }
 
         /**
-         * This returns the module of this <em>SystemNotificator</em>.
-         * @return The module of this <em>SystemNotificator</em>
+         * This returns the module of this <code>SystemNotificator</code>.
+         * @return The module of this <code>SystemNotificator</code>
          */
         public Module getModule() {
             systemNotificatorlogger.entering(this.getClass().getName(),
@@ -1578,8 +1578,8 @@ public abstract class Module implements MsdtProvider {
      * When a <em>ModuleProperty</em> is changed at runtime by the
      * user, this <em>PropertyListener</em> is notfied about it. Its
      * {@link #update(Observable, Object)} method is calling the
-     * abstract method ..., which handles the property change for the
-     * actual odule implementation.
+     * abstract method {@link Module#propertyChanged(ModuleProperty)} which handles the property change for the
+     * actual module implementation.
      */
     private static class PropertyListener implements Observer {
 

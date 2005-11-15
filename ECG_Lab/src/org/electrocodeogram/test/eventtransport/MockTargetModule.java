@@ -1,3 +1,10 @@
+/*
+ * Classname: MockTargetModule
+ * Version: 1.0
+ * Date: 18.10.2005
+ * By: Frank@Schlesinger.com
+ */
+
 package org.electrocodeogram.test.eventtransport;
 
 import org.electrocodeogram.event.ValidEventPacket;
@@ -7,7 +14,7 @@ import org.electrocodeogram.modulepackage.ModuleProperty;
 /**
  * Is a {@link org.electrocodeogram.module.target.TargetModule} implementation
  * used by the {@link org.electrocodeogram.test.eventtransport.ModuleEventTransportTests}.
- * Instead of writing an event to a external location like any other <em>TargetModule</em>,
+ * Instead of writing an event to a external location like any other <em>TargetModule</em> would do,
  * this module passes every received event to {@link org.electrocodeogram.test.eventtransport.ModuleTestHelper#comparePackets(ValidEventPacket)}.
  */
 public class MockTargetModule extends TargetModule {

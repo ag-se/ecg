@@ -18,7 +18,7 @@ import org.electrocodeogram.modulepackage.ModuleType;
 
 /**
  * This abstract class must be subclassed by all
- * <em>TargetModules</em> that are intended to write out the event
+ * target modules that are intended to write out the event
  * they receive.
  */
 public abstract class TargetModule extends Module implements ITargetModule {
@@ -32,7 +32,7 @@ public abstract class TargetModule extends Module implements ITargetModule {
     /**
      * This creates the module.
      * @param id
-     *            Is the id of this <em>ModulePackage</em>
+     *            Is the id of the <em>ModulePackage</em>
      * @param name
      *            Is the name to be assigned to this module
      */

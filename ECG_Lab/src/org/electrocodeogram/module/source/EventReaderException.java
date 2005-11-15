@@ -13,8 +13,8 @@ import java.util.logging.Logger;
 import org.electrocodeogram.logging.LogHelper;
 
 /**
- * When an error occures during event reading in a
- * <em>SourceModule</em> this <code>Exception</code> is thrown.
+ * When an error occurs during event reading in a
+ * <code>SourceModule</code> this exception is thrown.
  */
 public class EventReaderException extends Exception {
 
@@ -30,7 +30,7 @@ public class EventReaderException extends Exception {
         .createLogger(EventReaderException.class.getName());
 
     /**
-     * Creates the <code>Exception</code>.
+     * Creates the exception.
      * @param message
      *            Is the message
      */

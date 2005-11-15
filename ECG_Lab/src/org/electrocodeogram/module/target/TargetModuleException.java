@@ -12,8 +12,8 @@ import java.util.logging.Logger;
 import org.electrocodeogram.logging.LogHelper;
 
 /**
- * This is thrown if an error occurs while activatin a
- * <em>TargetModule</em>.
+ * This is thrown if an exception occurs while activating a
+ * <<code>TargetModule</code>.
  */
 public class TargetModuleException extends Exception {
 
@@ -29,12 +29,12 @@ public class TargetModuleException extends Exception {
         .createLogger(TargetModuleException.class.getName());
 
     /**
-     * This creates the <code>Exception</code>.
+     * This creates the exception.
      * @param message
      *            Is the message
      * @param moduleName
      *            Is the name of <em>TargetModule</em> that has
-     *            caused the <code>Exception</code>
+     *            caused the exception
      */
     public TargetModuleException(final String message, final String moduleName) {
         super(message);

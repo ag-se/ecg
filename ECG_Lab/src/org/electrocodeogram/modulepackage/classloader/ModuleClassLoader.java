@@ -34,7 +34,7 @@ import org.electrocodeogram.logging.LogHelper;
  * file system, which is the module directory. It has support for
  * loading resources too. Resources and classes can be either located
  * in plain files inside the <em>ModulePackages</em> or in
- * jar-libraries directly present in the "lib/runtime/" folder of a
+ * jar-libraries directly stored in the "lib/runtime/" folder of a
  * <em>ModulePackage</em>.
  */
 public class ModuleClassLoader extends java.lang.ClassLoader {
@@ -56,7 +56,7 @@ public class ModuleClassLoader extends java.lang.ClassLoader {
     private static ModuleClassLoader theInstance;
 
     /**
-     * This creates the <em>ModuleClassLoader</em> and sets the
+     * This creates the <code>ModuleClassLoader</code> and sets the
      * given <code>ClassLoader</code> to be its parent.
      * @param loader
      *            Is the parent <code>ClassLoader</code>
@@ -179,8 +179,8 @@ public class ModuleClassLoader extends java.lang.ClassLoader {
     }
 
     /**
-     * Looks for the requested file in the known
-     * <em>ModulePackage</em> directories. The given name is
+     * Looks for the requested file in the list of known
+     * <em>ModulePackage</em> folders. The given name is
      * expected to be fully-qualified and the file is either a class
      * or a resource.
      * @param name
@@ -255,22 +255,6 @@ public class ModuleClassLoader extends java.lang.ClassLoader {
         return file;
     }
 
-    // private InputStream getInputStream(File file) throws
-    // FileNotFoundException {
-    // if (file != null) {
-    // return new FileInputStream(file);
-    // } else {
-    // return null;
-    // }
-    // }
-
-    // private InputStream getInputStream(JarURLConnection conn,
-    // JarEntry jarEntry)
-    // throws IOException {
-    // JarFile jarFile = conn.getJarFile();
-    //
-    // return jarFile.getInputStream(jarEntry);
-    // }
 
     /**
      * This is reading a <code>Class</code> file from the given
@@ -431,7 +415,7 @@ public class ModuleClassLoader extends java.lang.ClassLoader {
 
     /**
      * @see java.lang.ClassLoader#findClass(java.lang.String) Looks
-     *      for class files in the known <em>ModulePackages</em>.
+     *      for class files in the known list of <em>ModulePackage</em> folders.
      */
     @Override
     protected final Class < ? > findClass(final String name) {
@@ -552,7 +536,7 @@ public class ModuleClassLoader extends java.lang.ClassLoader {
 
     /**
      * Converts the full qualified class name into a file system path.
-     * org.foo.bar -> org\\foo\\bar for example.
+     * (org.foo.bar -> org\\foo\\bar for example)
      * @param name
      *            The full qualified class name
      * @return A file system path
@@ -584,8 +568,8 @@ public class ModuleClassLoader extends java.lang.ClassLoader {
     }
 
     /**
-     * Converts the full qualified class name into a URL-path. *
-     * org.foo.bar -> org/foo/bar for example.
+     * Converts the full qualified class name into a URL-path.
+     * (org.foo.bar -> org/foo/bar for example)
      * @param name
      *            The full qualified class name
      * @return A URL-path

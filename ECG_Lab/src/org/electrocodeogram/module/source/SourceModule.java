@@ -20,7 +20,7 @@ import org.electrocodeogram.modulepackage.ModuleType;
 
 /**
  * This is the superclass for all
- * {@link org.electrocodeogram.module.Module.ModuleType#SOURCE_MODULE}
+ * {@link org.electrocodeogram.modulepackage.ModuleType#SOURCE_MODULE}
  * implementations.
  */
 public abstract class SourceModule extends Module {
@@ -32,7 +32,7 @@ public abstract class SourceModule extends Module {
         .getName());
 
     /**
-     * Creates the <em>SourceModule</em>.
+     * Creates the <code>SourceModule</code>.
      * @param id
      *            Is the id of the <em>ModulePackage</em>
      * @param name
@@ -51,9 +51,9 @@ public abstract class SourceModule extends Module {
 
     /**
      * This method is called during module activation and starts the
-     * {@link EventReader} of this <em>SourceModule</em>.
+     * {@link EventReader} of this <code>SourceModule</code>.
      * @throws SourceModuleException
-     *             In <code>Exception</code> is thrown while the
+     *             If an exception is thrown while the
      *             module is activated
      */
     public final void startReader() throws SourceModuleException {
@@ -158,10 +158,10 @@ public abstract class SourceModule extends Module {
     }
 
     /**
-     * This method is called by the {@link EventReader} implementation
+     * This method is called by the {@link EventReader} implementations
      * to pass read or received
      * {@link org.electrocodeogram.event.ValidEventPacket} events to
-     * this <em>SourceModule</em>.
+     * this <code>SourceModule</code>.
      * @param eventPacket
      *            Is the read event
      */
@@ -204,7 +204,7 @@ public abstract class SourceModule extends Module {
     }
 
     /**
-     * This method is not implemented for a <em>SourceModule</em>.
+     * This method is not implemented for a <code>SourceModule</code>.
      * @param eventPacket
      *            not used
      */
@@ -226,21 +226,22 @@ public abstract class SourceModule extends Module {
     public abstract void initialize();
 
     /**
-     * This is to be implemented by all actual <em>SourceMosules</em>.
-     * It returns the module's {@link EventReader}.
+     * This is to be implemented by all actual <code>SourceModule</code> implementations.
+     * It returns the module's {@link EventReader} as an array.
      * @return The module's {@link EventReader}
      */
     public abstract EventReader[] getEventReader();
 
     /**
-     * This is to be implemented by all actual <em>SourceMosules</em>.
-     * It is called during module activation before the
+     * This is to be implemented by all actual <code>SourceModule</code> implementations.
+     * It is called during module activation before its
      * {@link EventReader} are started.
+     * @throws SourceModuleException If an exception occurs while starting the module
      */
     public abstract void preStart() throws SourceModuleException;
 
     /**
-     * This is to be implemented by all actual <em>SourceMosules</em>.
+     * This is to be implemented by all actual <code>SourceModule</code> implemenations.
      * It is called during module deactivation after the
      * {@link EventReader} are stopped.
      */

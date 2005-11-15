@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 import org.electrocodeogram.logging.LogHelper;
 
 /**
- * This <code>Exception</code> is thrown if an error occurs while
+ * This exception is thrown if an error occurs while
  * loading a <em>ModuleSetup</em>.
  */
 public class ModuleSetupLoadException extends Exception {
@@ -30,9 +30,9 @@ public class ModuleSetupLoadException extends Exception {
     private static final long serialVersionUID = 8611067658025512073L;
 
     /**
-     * Creates the <code>Exception</code>.
+     * Creates the exception.
      * @param string Is the message
-     * @param filename Is the filename from which the <em>ModuleSetup</em> has been loaded
+     * @param filename Is the filename from which the <em>ModuleSetup</em> should have been loaded
      */
     public ModuleSetupLoadException(final String string, final String filename) {
         super(string);

@@ -73,7 +73,7 @@ import org.electrocodeogram.ui.SmallUI;
  * There are severall command line parameters to toggle logging,
  * disable the gui, or load an existing <em>ModuleSetup</em>, which
  * are listed when the ECG Lab is started with
- * <code>java -jar ECGLab-jar -help</code>.
+ * <code>java -jar ecglab.jar -help</code>.
  * @see org.electrocodeogram.system.ISystem
  * @see org.electrocodeogram.system.IModuleSystem
  */
@@ -81,7 +81,7 @@ public final class Core extends Observable implements ISystem, IModuleSystem,
     Observer {
 
     /**
-     * This is the default <em>ModuleDirectoryPath</em>.
+     * This is the default <em>ModuleDirectory</em> path.
      */
     private static final String DEFAULT_MODULE_DIRECTORY = "modules";
 
@@ -411,8 +411,8 @@ public final class Core extends Observable implements ISystem, IModuleSystem,
 
     /**
      * The main method starts the ECG Lab. <br>
-     * After it has set up a DefaultExceptionHandler the command line
-     * parameters are parsed ans at last the ECG Lab is started.
+     * After it has set up a <code>DefaultExceptionHandler</code> the command line
+     * parameters are parsed and at last the ECG Lab is started.
      * @param args
      *            The command line parameters as listet when called
      *            with <code>java -jar ECGLab.jar -help</code>
@@ -792,17 +792,6 @@ public final class Core extends Observable implements ISystem, IModuleSystem,
     }
 
     /**
-     * @see org.electrocodeogram.system.IModuleSystem#getRootFrame()
-     */
-    public JFrame getRootFrame() {
-        logger.entering(Core.class.getName(), "getRootFrame");
-
-        logger.exiting(Core.class.getName(), "getRootFrame");
-
-        return this.gui;
-    }
-
-    /**
      * The DefaultExceptionHandler implementation to react on all
      * unforeseen Exceptions.
      */
@@ -838,7 +827,7 @@ public final class Core extends Observable implements ISystem, IModuleSystem,
     }
 
     /**
-     * The <em>Console</em> is reading commands from <em>SDTIN</em>.
+     * The <code>Console</code> is reading commands from <em>SDTIN</em>.
      * It is currently only used to quit the ECG Lab, but could easily
      * be extended to be an alternative to the GUI.
      */

@@ -27,12 +27,12 @@ import org.xml.sax.SAXException;
 /**
  * Representation for an event, that has allready passed the
  * validation. Depending on the {@link VALIDATION_LEVEL} a
- * ValideventPacket is either nothing more than a
- * WellformedEventPacket or it can be assured that the
- * ValideventPacket is containing a <em>HackyStat</em> event or it
+ * <code>ValidEventPacket</code> is either nothing more than a
+ * {@link WellFormedEventPacket} or it can be assured that the
+ * <code>ValidEventPacket</code> is containing a <em>Hackystat</em> event or it
  * can be assured it is containing an <em>ECG</em> event. A
- * <em>HackyStat</em> event is an instance of an
- * <em>HackyStat</em> <em>SensorDataType</em> and an <em>ECG</em>
+ * <em>Hackystat</em> event is an instance of a
+ * <em>Hackystat</em> <em>SensorDataType</em> and an <em>ECG</em>
  * event is an instance of an <em>ECG</em>
  * {@link org.electrocodeogram.msdt.MicroSensorDataType}.
  */
@@ -46,14 +46,14 @@ public class ValidEventPacket extends WellFormedEventPacket {
 
     /**
      * This constant integer value is giving the location of the
-     * <em>HackyStat ActivityType</em> value in the event's
+     * <em>Hackystat ActivityType</em> value in the event's
      * stringlist.
      */
     public static final int ACTIVITY_TYPE_INDEX = 1;
 
     /**
      * This constant integer value is giving the location of the
-     * <em>MicroActivity</em> in the event's stringlist.
+     * <em>MicroActivityEvent</em> in the event's stringlist.
      */
     public static final int MICROACTIVITY_INDEX = 2;
 
@@ -70,7 +70,7 @@ public class ValidEventPacket extends WellFormedEventPacket {
 
     /**
      * Represents the three levels of validity for events contained in
-     * ValideventPackets.
+     * <code>ValidEventPackets</code>.
      */
     public enum VALIDATION_LEVEL {
         /**
@@ -105,15 +105,15 @@ public class ValidEventPacket extends WellFormedEventPacket {
     public static final VALIDATION_LEVEL DEFAULT_VALIDITY_LEVEL = VALIDATION_LEVEL.ECG;
 
     /**
-     * The curretn <em>VALIDATION_LEVEL</em>.
+     * The current <em>VALIDATION_LEVEL</em>.
      */
     private static VALIDATION_LEVEL validationLevel = DEFAULT_VALIDITY_LEVEL;
 
     /**
-     * Every module is using an ValideventPacket twice. It receives
-     * them and creates a new one that is then sended to other
-     * modules. The DELIVERY_STATE as gotten by
-     * {@link ValidEventPacket#getDeliveryState()} tells if the event
+     * Every module is handling <code>ValidEventPackets</code> twice. It receives
+     * them and creates a new one that is then sent to other
+     * modules. The DELIVERY_STATE as told by
+     * {@link ValidEventPacket#getDeliveryState()} says if the event
      * is the received one or if it is the sent one. This is actually
      * only used in the GUI to toggle which events to display.
      */
@@ -136,7 +136,7 @@ public class ValidEventPacket extends WellFormedEventPacket {
 
     /**
      * If the event is an <em>ECG</em> event, it is containing the
-     * <em>Microprocess event</em> as a XML document, which is an
+     * <em>MicroActivtiyEvent</em> as a XML document, which is an
      * instance of a
      * {@link org.electrocodeogram.msdt.MicroSensorDataType}.
      */
@@ -148,14 +148,14 @@ public class ValidEventPacket extends WellFormedEventPacket {
     private VALIDATION_LEVEL validatedWith;
 
     /**
-     * Creates the object.
+     * Creates the event.
      * @param sourceId
-     *            Is the id of the module that sent this packet at
+     *            Is the id of the module that sent this event at
      *            last
      * @param timeStamp
      *            Is the timestamp of the event
      * @param sensorDataType
-     *            Is the <em>HackyStat SensorDataType</em> of the
+     *            Is the <em>Hackystat SensorDataType</em> of the
      *            event
      * @param argList
      *            Is the stringlist of the event
@@ -181,7 +181,7 @@ public class ValidEventPacket extends WellFormedEventPacket {
      * This method is used to get the current
      * <em>VALIDATION_LEVEL</em>. To get the
      * <em>VALIDATION_LEVEL</em> that has been used to validate an
-     * actual ValidEventPacket, please use
+     * actual <code>ValidEventPacket</code>, please use
      * @return The current <em>VALIDATION_LEVEL</em>
      */
     public static VALIDATION_LEVEL getValidationLevel() {
@@ -197,7 +197,7 @@ public class ValidEventPacket extends WellFormedEventPacket {
     /**
      * This method is used to get the <em>VALIDATION_LEVEL</em> that
      * has been used to validate this event.
-     * @return The event's <em>VALIDATION_LE'VEL</em>
+     * @return The event's <em>VALIDATION_LEVEL</em>
      */
     public final VALIDATION_LEVEL getValidatedWith() {
 
@@ -250,9 +250,7 @@ public class ValidEventPacket extends WellFormedEventPacket {
                 this.getSensorDataType(), this.getArgList());
 
             hackyStatValidate();
-        }
-
-        else if (validationLevel == VALIDATION_LEVEL.ECG) {
+        } else if (validationLevel == VALIDATION_LEVEL.ECG) {
 
             new WellFormedEventPacket(this.getSourceId(), this.getTimeStamp(),
                 this.getSensorDataType(), this.getArgList());
@@ -273,10 +271,10 @@ public class ValidEventPacket extends WellFormedEventPacket {
     }
 
     /**
-     * This is checking if this event is an
+     * This is checking if the event is a
      * <em>MicroActivityEvent</em>.
      * @throws IllegalEventParameterException
-     *             If this event is not a <em>MicroActivityevent</em>.
+     *             If this event is not a <em>MicroActivityEvent</em>.
      */
     private void ecgValidate() throws IllegalEventParameterException {
 
@@ -408,8 +406,8 @@ public class ValidEventPacket extends WellFormedEventPacket {
             logger
                 .log(Level.FINE,
                     "The event is not valid in respect to his MicroSensorDataType.");
-            
-            throw new IllegalEventParameterException("The event is not valid in respect to this MicroSensorDataType.\n"+e.getMessage());
+
+            throw new IllegalEventParameterException("The event is not valid in respect to this MicroSensorDataType.\n" + e.getMessage());
 
         } catch (IOException e) {
             logger.log(Level.FINE,
@@ -419,15 +417,15 @@ public class ValidEventPacket extends WellFormedEventPacket {
             logger
                 .log(Level.FINE,
                     "The event is not valid in respect to his MicroSensorDataType.");
-            
-            throw new IllegalEventParameterException("The event is not valid in respect to this MicroSensorDataType.\n"+e.getMessage());
+
+            throw new IllegalEventParameterException("The event is not valid in respect to this MicroSensorDataType.\n" + e.getMessage());
         }
     }
 
     /**
-     * This is checking if this event is a <em>HackyStat</em> event.
+     * This is checking if this event is a <em>Hackystat</em> event.
      * @throws IllegalEventParameterException
-     *             If the event is not a <em>HackyStat</em>
+     *             If the event is not a <em>Hackystat</em>
      */
     private void hackyStatValidate() throws IllegalEventParameterException {
         logger.entering(this.getClass().getName(), "hackyStatValidate");
@@ -479,9 +477,9 @@ public class ValidEventPacket extends WellFormedEventPacket {
     }
 
     /**
-     * This method returns the MicroSensorDataType of the
-     * MicroActivity event that is packet in this
-     * TypedValidEventPacket.
+     * This method returns the <em>MicroSensorDataType</em> of the
+     * <em>MicroActivityEvent</em> that is packed in this
+     * <code>ValidEventPacket</code>.
      * @return The MicroSensorDataType of the MicroActivity
      */
     public final MicroSensorDataType getMicroSensorDataType() {
@@ -494,7 +492,7 @@ public class ValidEventPacket extends WellFormedEventPacket {
     }
 
     /**
-     * This returns the delivery state of this event.
+     * This returns the delivery state of the event.
      * @return the delivery state of this event
      */
     public final DELIVERY_STATE getDeliveryState() {
@@ -507,7 +505,7 @@ public class ValidEventPacket extends WellFormedEventPacket {
     }
 
     /**
-     * This sets the delivery state of this event.
+     * This sets the delivery state of the event.
      * @param state
      *            Is the delivery state
      */

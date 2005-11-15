@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 import org.electrocodeogram.logging.LogHelper;
 
 /**
- * If the connection of modules fails, this <em>Exception</em> is
+ * If the connection of modules fails, this exception is
  * thrown.
  */
 public class ModuleConnectionException extends Exception {
@@ -30,10 +30,10 @@ public class ModuleConnectionException extends Exception {
         .createLogger(ModuleConnectionException.class.getName());
 
     /**
-     * This creates the <em>Exception</em> with the given error
+     * This creates the exception with the given error
      * message and logs it.
      * @param msg
-     *            Gives the error message for the Exception
+     *            Gives the error message for the exception
      * @param fromModule
      *            Is the name of the module to connect to
      * @param fromModuleId

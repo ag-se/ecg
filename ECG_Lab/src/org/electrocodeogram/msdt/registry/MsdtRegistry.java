@@ -25,16 +25,15 @@ import org.electrocodeogram.msdt.MsdtProvider;
 import org.xml.sax.SAXException;
 
 /**
- * The <em>MicroSensorDataType</em> registry is a database for
- * <em>MicroSensorDataTypes</em>. Every ECG module is able to bring
+ * The database for <em>MicroSensorDataTypes</em>. Every ECG module is able to bring
  * in its own <em>MicroSensorDataTypes</em>, which are the types of
- * events that the actual module is sending. During the module
- * registration process the module's <em>MicroSensorDataType</em>
- * definitions are registered with this <em>MsdtRegistry</em>.<br>
+ * events that the module is creating. During the module
+ * registration process the module's <em>MicroSensorDataType</em>-definitions
+ * are registered with this <code>MsdtRegistry</code>.<br>
  * When a module is removed from ECG Lab and deregistering takes
  * place, the module's <em>MicroSensorDataTypes</em> are also
  * deregistered. A core set of <em>MicroSensorDataTypes</em> is
- * provided by the ECG.
+ * provided by the ECG and is automatically registered when the first <em>SourceModule</em> is created.
  */
 public class MsdtRegistry extends Observable implements IMsdtRegistry {
 
@@ -56,7 +55,7 @@ public class MsdtRegistry extends Observable implements IMsdtRegistry {
         .getName());
 
     /**
-     * This creates the MsdtRegistry.
+     * This creates the <code>MsdtRegistry<code>.
      */
     public MsdtRegistry() {
 
@@ -81,9 +80,9 @@ public class MsdtRegistry extends Observable implements IMsdtRegistry {
     }
 
     /**
-     * This method parses the XML schema files in the "msdt"
+     * This method parses the XML schema files in the <em>"msdt"</em>
      * subdirectory and stores each XML schema as a
-     * {@link MicroSensorDataType} in the <em>MsdtRegitry</em>.
+     * {@link MicroSensorDataType} in the <code>MsdtRegitry</code>.
      * @throws FileNotFoundException
      *             If the "msdt" subdirectory could not be found
      */
@@ -161,9 +160,9 @@ public class MsdtRegistry extends Observable implements IMsdtRegistry {
     }
 
     /**
-     * This returns an <code>Array</code> of all currently
+     * This returns an array of all currently
      * registered {@link MicroSensorDataType}.
-     * @return An <code>Array</code> of all currently registered
+     * @return An array of all currently registered
      *         {@link MicroSensorDataType}
      */
     public final MicroSensorDataType[] getMicroSensorDataTypes() {
@@ -181,7 +180,7 @@ public class MsdtRegistry extends Observable implements IMsdtRegistry {
     /**
      * This is called by modules that are providing their own
      * {@link MicroSensorDataType}. The module's MSDT is then
-     * registered with the <em>MsdtRegistry</em> and available in
+     * registered with the <code>MsdtRegistry</code> and available in
      * the ECG Lab.
      * @param msdt
      *            Is the <em>MicroSensorDataType</em> provided by a
@@ -189,7 +188,7 @@ public class MsdtRegistry extends Observable implements IMsdtRegistry {
      * @param provider
      *            Is the module that provides the
      *            <em>MicroSensorDataType</em>
-     * @return The <em>MicroSensorDataType</em> object
+     * @return The <code>MicroSensorDataType</code>-object
      * @throws MicroSensorDataTypeRegistrationException
      *             If the parameters are null
      */
@@ -285,8 +284,8 @@ public class MsdtRegistry extends Observable implements IMsdtRegistry {
     }
 
     /**
-     * Returns an <code>Array</code> of {@link MicroSensorDataType} entries, that
-     * are predefined in by the ECG.
+     * Returns an array of {@link MicroSensorDataType} entries, that
+     * are predefined and loacted in the <em>"msdt"</em> folder.
      * @return The predefined <em>MicroSensorDatatTypes</em>
      */
     public final MicroSensorDataType[] getPredefinedMicroSensorDataTypes() {
@@ -304,7 +303,7 @@ public class MsdtRegistry extends Observable implements IMsdtRegistry {
 
     /**
      * The method is called to notify the ECG system of state
-     * changes in the module.
+     * changes in this registry.
      */
     private void fireStatechangeNotification() {
         logger.entering(this.getClass().getName(),

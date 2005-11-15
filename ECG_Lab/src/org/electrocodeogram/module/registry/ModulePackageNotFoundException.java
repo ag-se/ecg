@@ -13,10 +13,10 @@ import java.util.logging.Logger;
 import org.electrocodeogram.logging.LogHelper;
 
 /**
- * If the unique <code>String</code> id that is given to get a
+ * If the unique string id that is given to get a
  * <em>ModulePackage</em> is null or empty or if a
  * <em>ModulePackage</em> with this id can not be found, this
- * <code>Exception</code> is thrown.
+ * exception is thrown.
  */
 public class ModulePackageNotFoundException extends Exception {
 
@@ -26,18 +26,18 @@ public class ModulePackageNotFoundException extends Exception {
     private static final long serialVersionUID = 8400526904223267328L;
 
     /**
-     * < The logger.
+     * The logger.
      */
     private static Logger logger = LogHelper
         .createLogger(ModulePackageNotFoundException.class.getName());
 
     /**
-     * This creates the <code>Exception</code> with the given
+     * This creates the exception with the given
      * message.
      * @param message
-     *            Is the message for the Exception
+     *            Is the message for the exception
      * @param id
-     *            Is the unique <code>String</code> id that has been
+     *            Is the unique string id that has been
      *            requested
      */
     public ModulePackageNotFoundException(final String message, final String id) {

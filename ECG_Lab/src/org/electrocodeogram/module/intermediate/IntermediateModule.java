@@ -18,15 +18,15 @@ import org.electrocodeogram.modulepackage.ModulePropertyException;
 import org.electrocodeogram.modulepackage.ModuleType;
 
 /**
- * This abstract class shall be subclassed for every new intermediate
- * module. The abstract method analyse is to be implemented to do the
+ * This abstract class needs to be subclassed for every new intermediate
+ * module. The abstract method {@link #analyse(ValidEventPacket)} is to be implemented to do the
  * actual analysis that is required by the module.
  */
 public abstract class IntermediateModule extends Module implements
     IIntermediateModule {
 
     /**
-     * Thisis the default separator <code>String</code>.
+     * This is the default separator string.
      */
     private static final String DEFAULT_SEPARATOR = "";
 
@@ -37,7 +37,7 @@ public abstract class IntermediateModule extends Module implements
         .createLogger(IntermediateModule.class.getName());
 
     /**
-     * If an <em>IntermediateModule</em> is operating in annotation
+     * If an <code>IntermediateModule</code> is operating in annotation
      * mode, the <em>AnnotationStyle</em> tells when the module will
      * send its annotation events.
      */
@@ -72,7 +72,7 @@ public abstract class IntermediateModule extends Module implements
     }
 
     /**
-     * This is the currently used seperator <code>String</code>.
+     * This is the currently used seperator string.
      */
     private String separator = DEFAULT_SEPARATOR;
 
@@ -90,7 +90,7 @@ public abstract class IntermediateModule extends Module implements
      * Creates a new <em>IntermediateModule</em> with the given
      * <em>ProcessingMode</em>.
      * @param id
-     *            Is the id of the <em>ModulePackage</em>.
+     *            Is the string id of the <em>ModulePackage</em>.
      * @param name
      *            The name to assign to this module
      */
@@ -201,9 +201,9 @@ public abstract class IntermediateModule extends Module implements
     }
 
     /**
-     * This method returns the separator <code>String</code> that is
+     * This method returns the separator string that is
      * used by this module.
-     * @return The separator <code>String</code>
+     * @return The separator string
      */
     public final String getSeparator() {
         logger.entering(this.getClass().getName(), "getSeparator");
@@ -215,11 +215,11 @@ public abstract class IntermediateModule extends Module implements
     }
 
     /**
-     * This sets the separator <code>String</code> of the module to
-     * the given <code>String</code> value.
+     * This sets the separator string of the module to
+     * the given string value.
      * @param string
-     *            Is the <code>String</code> value to use a the new
-     *            separator <code>String</code>
+     *            Is the string value to use a the new
+     *            separator string
      */
     public final void setSeparator(final String string) {
         logger.entering(this.getClass().getName(), "setSeparator",
@@ -241,7 +241,7 @@ public abstract class IntermediateModule extends Module implements
     /**
      * @see org.electrocodeogram.module.Module#receiveEventPacket(org.electrocodeogram.event.ValidEventPacket)
      *      In addition to its superclass method this method gets the
-     *      analysis result events of the module and sends them
+     *      analysis result event of the module and sends them
      *      according to the processing mode and annotation style of
      *      the module.
      */
@@ -289,9 +289,10 @@ public abstract class IntermediateModule extends Module implements
 
     /**
      * This method is to be implemented by all subclassing
-     * <em>IntermediateModules</em>. For any given input event it
+     * modules. For any given input event it
      * shall compute and return an output event. That is the analysis
-     * result.
+     * result. If the module does not want to generate any output events
+     * at the moment, <code>null</code> can be returned.
      * @param eventPacket
      *            Is the original incoming event
      * @return The data of an event that is a result of the analysis

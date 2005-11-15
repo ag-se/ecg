@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 import org.electrocodeogram.logging.LogHelper;
 
 /**
- * This is thrown when an error occurs while operatin with a
+ * This is thrown when an error occurs while operating with a
  * {@link MicroSensorDataType}.
  */
 public class MicroSensorDataTypeException extends Exception {
@@ -30,7 +30,7 @@ public class MicroSensorDataTypeException extends Exception {
         .createLogger(MicroSensorDataType.class.getName());
 
     /**
-     * This creates the <code>Exception</code>.
+     * This creates the exception.
      * @param message
      *            Is the message
      */

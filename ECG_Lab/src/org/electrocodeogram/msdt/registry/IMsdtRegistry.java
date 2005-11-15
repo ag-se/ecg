@@ -10,16 +10,16 @@ package org.electrocodeogram.msdt.registry;
 import org.electrocodeogram.msdt.MicroSensorDataType;
 
 /**
- * This <code>Interface</code> declares methods that are used by ECG
+ * This interface declares methods that are used by ECG
  * subsystems to access the
  * {@link org.electrocodeogram.msdt.registry.MsdtRegistry}.
  */
 public interface IMsdtRegistry {
 
     /**
-     * This method returns an <code>Array</code> of all currently
+     * This method returns an array of all currently
      * registered {@link MicroSensorDataType}.
-     * @return An <code>Array</code> of all currently registered
+     * @return An array of all currently registered
      *         {@link MicroSensorDataType}
      */
     MicroSensorDataType[] getMicroSensorDataTypes();
@@ -28,7 +28,7 @@ public interface IMsdtRegistry {
      * This method is used by modules to deregister their
      * {@link MicroSensorDataType} when the modules are removed.
      * @param msdt
-     *            Is the actual <em>MicroSensorDataType</em> to
+     *            Is the actual <code>MicroSensorDataType</code> to
      *            deregister
      * @throws MicroSensorDataTypeRegistrationException
      *             Is thrown by this method, if the provided MSDT is

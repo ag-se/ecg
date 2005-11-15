@@ -1,3 +1,10 @@
+/*
+ * Classname: ModuleEventTransportTests
+ * Version: 1.0
+ * Date: 18.10.2005
+ * By: Frank@Schlesinger.com
+ */
+
 package org.electrocodeogram.test.eventtransport;
 
 import junit.framework.TestCase;
@@ -30,13 +37,13 @@ public class ModuleEventTransportTests extends TestCase {
     private static final int MODULE_LIST_LENGTH = 100;
 
     /**
-     * A refrence to the object, which is creating the
-     * <em>ModuleSetups</em>.
+     * A reference to the object, which is creating the
+     * <em>ModuleSetup</em>.
      */
     private ModuleTestHelper moduleTestHelper;
 
     /**
-     * A refrence to the object, which is generating the test events.
+     * A reference to the object, which is generating the test events.
      */
     private EventGenerator eventGenerator = null;
 

@@ -23,19 +23,18 @@ import org.electrocodeogram.ui.IGui;
 public interface ISystem extends Observer {
 
     /**
-     * This method returns a reference to the implementation of an
+     * This method returns a reference to the implementation of the
      * {@link org.electrocodeogram.msdt.registry.IMsdtRegistry}
-     * object, which is in fact the system's view for the
+     * interface, which is in fact the system's view on the
      * {@link org.electrocodeogram.msdt.registry.MsdtRegistry}.
-     * @return A reference to the <em>MicroSensorDataType</em>
-     *         registry
+     * @return A reference to the <code>MsdtRegistry</code>
      */
     IMsdtRegistry getMsdtRegistry();
 
     /**
-     * This method returns a reference to the implementation of an
-     * {@link org.electrocodeogram.moduleapi.msdt.registry.IModuleMsdtRegistry}
-     * object, which is in fact the module's view for the
+     * This method returns a reference to the implementation of the
+     * {@link org.electrocodeogram.msdt.registry.IMsdtRegistry}
+     * interface, which is in fact the system's view on the
      * {@link org.electrocodeogram.msdt.registry.MsdtRegistry}.
      * @return A reference to the <em>MicroSensorDataType</em>
      *         registry
@@ -43,8 +42,8 @@ public interface ISystem extends Observer {
     IModuleRegistry getModuleRegistry();
 
     /**
-     * This method returns a reference to the implementation of an
-     * {@link org.electrocodeogram.ui.IGui} object.
+     * This method returns a reference to the implementation of the
+     * {@link org.electrocodeogram.ui.IGui} interface.
      * {@link org.electrocodeogram.msdt.registry.MsdtRegistry}.
      * @return A reference to the GUI object.
      */
@@ -64,7 +63,7 @@ public interface ISystem extends Observer {
 
     /**
      * When an ECG Lab subsystem has changed its state in a way that
-     * is interesting to modules, it calls this method. It will lead
+     * is interesting to modules, it calls this method. This will lead
      * to a notification to all modules about the statechange.
      * @param object Is the object that has changed its state
      */

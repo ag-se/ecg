@@ -16,11 +16,11 @@ import org.electrocodeogram.logging.LogHelper.ECGLevel;
 /**
  * A {@link org.electrocodeogram.module.source.SourceModule} is
  * reading events into the ECG Lab by using one or multiple
- * <em>EventReader</em>. Each <em>EventReader</em> is a Thread,
+ * <code>EventReader</code>. Each <code>EventReader</code> is a <code>Thread</code>,
  * so that reading is done asynchroneously. The actual implementation
- * of an <em>EventReader</em> has to provide the {@link #read()}
- * method, which shall read in one single event from the source and
- * return it.
+ * of an <code>EventReader</code> has to provide the {@link #read()}
+ * method, which reads in one single event from the source and
+ * returns it.
  */
 public abstract class EventReader extends Thread {
 
@@ -31,7 +31,7 @@ public abstract class EventReader extends Thread {
         .getName());
 
     /**
-     * The state of the <em>EventReader</em>.
+     * The state of the <code>EventReader</code>.
      */
     private boolean run;
 
@@ -41,7 +41,7 @@ public abstract class EventReader extends Thread {
     private SourceModule mySourceModule;
 
     /**
-     * Creates the <em>EventReader</em>.
+     * Creates the <code>EventReader</code>.
      * @param sourceModule
      *            Is the module to pass events to
      */
@@ -103,17 +103,17 @@ public abstract class EventReader extends Thread {
 
     /**
      * This method is to be implemented by all actual
-     * <em>EventReader</em> implementations. It shall read one
+     * <code>EventReader</code> implementations. It shall read one
      * single event from the source and return it.
-     * @return The single event that has been read
+     * @return The event that has been read
      * @throws EventReaderException
-     *             If any <em>Exception</em> occurs during event
+     *             If any exception occurs during event
      *             reading
      */
     public abstract WellFormedEventPacket read() throws EventReaderException;
 
     /**
-     * Starts the <em>EventReader</em>.
+     * Starts the <code>EventReader</code>.
      */
     public final void startReader() {
 
@@ -137,7 +137,7 @@ public abstract class EventReader extends Thread {
     }
 
     /**
-     * Stops the <em>EventReader</em>.
+     * Stops the <code>EventReader</code>.
      */
     public final void stopReader() {
 
@@ -153,11 +153,11 @@ public abstract class EventReader extends Thread {
     }
 
     /**
-     * This method returns the <em>SourceModule</em> to which this <em>EventReader</em>
+     * This method returns the <code>SourceModule</code> to which this <code>EventReader</code>
      * is appending read events.
-     * @return The <em>SourceModule</em> of this <em>EventReader</em>
+     * @return The <code>SourceModule</code> of this <code>EventReader</code>
      */
-    public SourceModule getSourceModule() {
+    public final SourceModule getSourceModule() {
         logger.entering(this.getClass().getName(), "getSourceModule");
 
         logger.exiting(this.getClass().getName(), "getSourceModule",

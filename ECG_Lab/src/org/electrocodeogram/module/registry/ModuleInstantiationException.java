@@ -14,7 +14,7 @@ import org.electrocodeogram.logging.LogHelper;
 
 /**
  * Whenever an error occurs during module instantiation, this
- * <code>Exception</code> is thrown.
+ * exception is thrown.
  */
 public class ModuleInstantiationException extends Exception {
 
@@ -30,12 +30,12 @@ public class ModuleInstantiationException extends Exception {
         .createLogger(ModuleInstantiationException.class.getName());
 
     /**
-     * This creates the <code>Exception</code> with the given
+     * This creates the exception with the given
      * message.
      * @param message
      *            Is the message
      * @param id
-     *            Is the unique <code>String</code> id of the
+     *            Is the unique string id of the
      *            <em>ModulePackage</em> from which the module
      *            instance should have been created
      */

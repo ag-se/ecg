@@ -1,3 +1,10 @@
+/*
+ * Classname: MockSourceModule
+ * Version: 1.0
+ * Date: 18.10.2005
+ * By: Frank@Schlesinger.com
+ */
+
 package org.electrocodeogram.test.eventtransport;
 
 import org.electrocodeogram.event.WellFormedEventPacket;
@@ -9,9 +16,9 @@ import org.electrocodeogram.modulepackage.ModuleProperty;
 /**
  * Is a {@link org.electrocodeogram.module.source.SourceModule} implementation
  * used by the {@link org.electrocodeogram.test.eventtransport.ModuleEventTransportTests}.
- * Instead of reading events from an external location like any other <em>SourceModule</em>,
+ * Instead of reading events from an external location like any other <em>SourceModule</em> is doing,
  * the method {@link #appendDirectly(WellFormedEventPacket)} is called to pass
- * an event dircetly to this module.
+ * an event dircetly into this module.
  */
 public class MockSourceModule extends SourceModule implements ServerModule {
 
@@ -85,10 +92,10 @@ public class MockSourceModule extends SourceModule implements ServerModule {
 
     /**
      * This is the only addition to a {@link SourceModule}. This method
-     * is used by {@link ModuleTestHelper} to directly pass an event to
+     * is used by {@link ModuleTestHelper} to directly pass an event into
      * this module.
      * Normally a <em>SourceModule</em> has to read in events by using
-     * an {@link EventReader}. This would not have been appropriate here.
+     * an {@link EventReader}. This is not appropriate here.
      * @param event Is the event
      */
     public final void appendDirectly(final WellFormedEventPacket event) {

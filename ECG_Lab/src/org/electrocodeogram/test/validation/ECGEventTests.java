@@ -1,3 +1,10 @@
+/*
+ * Classname: ECGEventTests
+ * Version: 1.0
+ * Date: 18.10.2005
+ * By: Frank@Schlesinger.com
+ */
+
 package org.electrocodeogram.test.validation;
 
 import java.io.IOException;

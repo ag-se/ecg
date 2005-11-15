@@ -13,15 +13,15 @@ import org.electrocodeogram.logging.LogHelper;
 import org.electrocodeogram.modulepackage.ModuleProperty;
 
 /**
- * A <em>ModuleConfiguration</em> is a collection of information
+ * A <code>ModuleConfiguration</code> is a collection of information
  * about a module instance in the ECG Lab.
- * <em>ModuleConfigurations</em> are defined per module and are
+ * <code>ModuleConfigurations</code> are defined per module and are
  * telling for example to which other modules a module is connected,
- * which <em>ModuleProperties</em> and if the module is active or
+ * which <em>ModuleProperties</em> it has and if the module is active or
  * inactive.<br>
- * The set of <em>ModuleConfigurations</em> for each module instance
+ * The set of <code>ModuleConfigurations</code> for each module instance
  * is a <em>ModuleSetup</em> and is represented by
- * {@link ModuleSetup}. <em>ModuleSetups</em> can be stored into
+ * {@link ModuleSetup}. <code>ModuleSetups</code> can be stored into
  * files and loaded from files into the ECG Lab.
  */
 public class ModuleConfiguration {
@@ -48,19 +48,19 @@ public class ModuleConfiguration {
     private boolean isActive;
 
     /**
-     * This is an <code>Array</code> containing all
+     * This is an array containing all
      * <em>ModuleProperties</em> with their runtime values.
      */
     private ModuleProperty[] moduleProperties;
 
     /**
-     * An <code>Array</code> of unique module ids from modules this
+     * An array of unique module ids from modules this
      * module is connected to.
      */
     private Integer[] connectedTo;
 
     /**
-     * The unique <code>String</code> id of the
+     * The unique string id of the
      * <em>ModulePackage</em>.
      */
     private String modulePackageId;
@@ -80,21 +80,21 @@ public class ModuleConfiguration {
     }
 
     /**
-     * This creates a new <em>ModuleConfiguration</em> for a module
+     * This creates a new <code>ModuleConfiguration</code> for a module
      * instance.
      * @param to
-     *            Is an <code>Arrray</code> of nique int ids from
+     *            Is an array of unique int ids from
      *            modules that the module is connected to
      * @param id
      *            Is the unique int id of the module
      * @param name
      *            Is the name of the module
      * @param properties
-     *            Is an <code>Array</code> of the
+     *            Is an array of the
      *            <em>ModuleProperties</em> with their runtime
      *            values
      * @param packageId
-     *            Is the unique <code>String</code> id of the
+     *            Is the unique strings id of the
      *            <em>ModulePackage</em>
      * @param active
      *            Is the state of the module

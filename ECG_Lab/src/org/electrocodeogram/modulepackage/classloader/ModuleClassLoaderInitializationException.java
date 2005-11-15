@@ -13,9 +13,9 @@ import java.util.logging.Logger;
 import org.electrocodeogram.logging.LogHelper;
 
 /**
- * This <code>Exception</code> is thrown during the initialization
+ * This exception is thrown during the initialization
  * of the {@link ModuleClassLoaderInitializationException} if any
- * error occured.
+ * error occurs.
  */
 public class ModuleClassLoaderInitializationException extends Exception {
 
@@ -31,7 +31,7 @@ public class ModuleClassLoaderInitializationException extends Exception {
     private static final long serialVersionUID = 3786132315837665255L;
 
     /**
-     * This creates the <code>Exception</code> with the given
+     * This creates the exception with the given
      * message.
      * @param message
      *            Is the message for the Exception

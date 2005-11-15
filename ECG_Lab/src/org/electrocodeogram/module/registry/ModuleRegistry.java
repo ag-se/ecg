@@ -38,17 +38,17 @@ import org.electrocodeogram.msdt.MicroSensorDataTypeException;
 import org.xml.sax.SAXException;
 
 /**
- * This is the <em>ModuleRegistry</em>, which maintains information
+ * The <em>ModuleRegistry</em>, maintains information
  * about all currently available <em>ModulePackages</em> in the
- * module directory and all module instancec in the ECG Lab. A
- * <em>ModulePackages</em> is a directory containing a module class
+ * module directory and all module instances in the ECG Lab. A
+ * <em>ModulePackage</em> is a directory containing a module class
  * that extends the class {@link org.electrocodeogram.module.Module}
  * or one of its subclasses. A <em>ModulePackage</em> can also
  * contain additonal classes and must contain a
  * <em>"module.properties.xml"</em> file that is an instance of the
  * <em>"module.properties.xsd"</em> XML schema and provides the
- * neccessary information about he module. At runtime multiple modules
- * instances can be created from each <em>ModulePackages</em>.
+ * neccessary information about the module. At runtime multiple modules
+ * instances can be created from each <em>ModulePackage</em>.
  */
 public class ModuleRegistry extends Observable implements IModuleRegistry {
 
@@ -59,13 +59,13 @@ public class ModuleRegistry extends Observable implements IModuleRegistry {
         .getName());
 
     /**
-     * A reference to the nested class containing the module
+     * A reference to the member class containing the module
      * instances.
      */
     private ModuleInstanceMap moduleInstanceMap;
 
     /**
-     * A reference to the nested class containing the
+     * A reference to the member class containing the
      * <em>ModulePackages</em>.
      */
     private ModulePackagesMap modulePackageMap;
@@ -90,8 +90,8 @@ public class ModuleRegistry extends Observable implements IModuleRegistry {
      * @param moduleDirectory
      *            This directory is looked for <em>ModulePackages</em>
      * @throws ModuleClassLoaderInitializationException
-     *             If an <code>Exception</code> occurs while
-     *             inititalizing the
+     *             If an exception occurs while
+     *             initialising the
      *             {@link org.electrocodeogram.modulepackage.classloader.ModuleClassLoader}
      */
     public ModuleRegistry(final File moduleDirectory)
@@ -126,13 +126,13 @@ public class ModuleRegistry extends Observable implements IModuleRegistry {
 
     /**
      * If the module directory is not known at
-     * <em>ModuleRegistry's</em> creation this method is used set
-     * the module later.
+     * <em>ModuleRegistry's</em> creation this method is used to set
+     * the module directory later.
      * @param moduleDirectory
      *            This directory is looked for <em>ModulePackages</em>
      * @throws ModuleClassLoaderInitializationException
-     *             If an <code>Exception</code> occurs while
-     *             inititalizing the
+     *             If an exception occurs while
+     *             inititalising the
      *             {@link org.electrocodeogram.modulepackage.classloader.ModuleClassLoader}
      */
     public final void setModuleDirectory(final File moduleDirectory)
@@ -194,16 +194,17 @@ public class ModuleRegistry extends Observable implements IModuleRegistry {
     }
 
     /**
-     * This methos is used to get the <em>ModulePackage</em> for a
-     * given unique <code>String</code> id.
+     * Used to get the <em>ModulePackage</em> with the
+     * given unique string id.
      * @param id
-     *            Is the unique <code>String</code> id
+     *            Is the unique string id
      * @return The <em>ModulePackage</em> having the requested id
      * @throws ModulePackageNotFoundException
-     *             If either the id is illegal (id < 0) or no
+     *             If either the id is empty or no
      *             <em>ModulePackage</em> could be found with the
      *             given id
      */
+    @SuppressWarnings({"synthetic-access","synthetic-access"})
     private Class getModulePackage(final String id)
         throws ModulePackageNotFoundException {
         logger.entering(this.getClass().getName(), "getModulePackage",
@@ -237,11 +238,12 @@ public class ModuleRegistry extends Observable implements IModuleRegistry {
     }
 
     /**
-     * Fires a notification that a new <em>ModuleDescriptor</em> has been registered.
+     * Fires a notification that a new <em>ModuleDescriptor</em> has been registered,
+     * which means that a new <em>ModulePackage</em> has been successfully loaded.
      * The event handling is done in {@link Core#update(Observable, Object)}.
      * @param moduleDescriptor Is the newly registered <em>ModuleDescriptor</em>
      */
-    void fireNewModulePackage(ModuleDescriptor moduleDescriptor) {
+    final void fireNewModulePackage(final ModuleDescriptor moduleDescriptor) {
         logger
             .entering(this.getClass().getName(), "fireNewModulePackage");
 
@@ -255,8 +257,8 @@ public class ModuleRegistry extends Observable implements IModuleRegistry {
     }
 
     /**
-     * This nested class contains a <code>Map</code> with every
-     * created {@link Module} in it as a value and the module's unique
+     * This member class contains a map with of
+     * every created {@link Module} instance as a value and the module's unique
      * int id as the key.
      */
     private static class ModuleInstanceMap {
@@ -265,9 +267,9 @@ public class ModuleRegistry extends Observable implements IModuleRegistry {
     }
 
     /**
-     * This nested class contains a <code>Map</code> with every
-     * found <em>ModulePackage</em> in it as a value and the
-     * <em>ModulePackage's</em> unique <code>String</code> id as
+     * This member class contains a map with every
+     * registered <em>ModuleDescriptor</em> as a value and the
+     * <em>ModulePackage's</em> unique string id as
      * the key.
      */
     private static final class ModulePackagesMap {
@@ -290,7 +292,7 @@ public class ModuleRegistry extends Observable implements IModuleRegistry {
         private static final String MODULE_PROPERTY_FILE = "module.properties.xml";
 
         /**
-         * This is the <code>Map</code> itself.
+         * This is the map itself.
          */
         private HashMap<String, ModuleDescriptor> availableModuleClassesMap = null;
 
@@ -300,16 +302,16 @@ public class ModuleRegistry extends Observable implements IModuleRegistry {
         private File moduleDirectory;
 
         /**
-         * A reference to the sorrounding <em>ModuleRegistry</em>.
+         * A reference to the surrounding <em>ModuleRegistry</em>.
          */
         private ModuleRegistry moduleRegistry;
 
         /**
-         * Creates the <em>ModulePackagesMap</em> and starts looking
+         * Creates the <code>ModulePackagesMap</code> and starts looking
          * up for <em>ModulePackages</em> by calling
          * {@link #initialize()}.
          * @param registry
-         *            Is the sorrounding <em>ModuleRegistry</em>
+         *            Is the surrounding <em>ModuleRegistry</em>
          * @param directory
          *            Is the module directory
          */
@@ -330,13 +332,13 @@ public class ModuleRegistry extends Observable implements IModuleRegistry {
         }
 
         /**
-         * This methos is looking for <em>ModulePackages</em> inside
+         * This method is looking for <em>ModulePackages</em> inside
          * the module directory. For every found
          * <em>ModulePackage</em> the module property file is parsed
          * and a {@link ModuleDescriptor} is build and stored inside
-         * the <code>Map</code>.
+         * the map.
          * @throws ModuleClassLoaderInitializationException
-         *             If an <code>Exception</code> occures while
+         *             If an exception occurs while
          *             initializing the
          *             {@link org.electrocodeogram.modulepackage.classloader.ModuleClassLoader}
          */
@@ -426,14 +428,6 @@ public class ModuleRegistry extends Observable implements IModuleRegistry {
 
                     continue;
 
-                } catch (ModulePropertyException e) {
-                    modulePackagesMapLogger.log(Level.WARNING,
-                        "Error while loading the module: "
-                                        + modulePropertyFileString);
-
-                    modulePackagesMapLogger.log(Level.FINEST, e.getMessage());
-
-                    continue;
                 }
                 if (moduleDescriptor == null) {
                     modulePackagesMapLogger.log(Level.WARNING,
@@ -473,11 +467,11 @@ public class ModuleRegistry extends Observable implements IModuleRegistry {
         }
 
         /**
-         * Returns all <em>ModulePackage</em> directories inside the
+         * Returns all <em>ModulePackage</em> folder-names inside the
          * module directory.
-         * @return All <em>ModulePackage</em> directories
+         * @return All <em>ModulePackage</em> folder-names as ana array.
          * @throws ModuleClassLoaderInitializationException
-         *             If an <code>Exception</code> occures while
+         *             If an exception occurs while
          *             initializing the
          *             {@link org.electrocodeogram.modulepackage.classloader.ModuleClassLoader}
          */
@@ -540,8 +534,8 @@ public class ModuleRegistry extends Observable implements IModuleRegistry {
     }
 
     /**
-     * This is used to register a new module instance. The method is
-     * called from the constructor of every {@link Module}.
+     * Used to register a new module instance. The method is
+     * called directly from the constructor of every {@link Module}.
      * @param module
      *            Is the module to register
      */
@@ -582,7 +576,7 @@ public class ModuleRegistry extends Observable implements IModuleRegistry {
     }
 
     /**
-     * Fires a notification about a module instance that has either been registered or deregistered with the <em>ModuleRegistry</em>.
+     * Fires a notification about a module instance that has either been registered or deregistered with the <code>ModuleRegistry</code>.
      * @param module Is the module instance
      */
     private void fireModuleInstance(final Module module) {
@@ -712,6 +706,7 @@ public class ModuleRegistry extends Observable implements IModuleRegistry {
     /**
      * @see org.electrocodeogram.module.registry.IModuleRegistry#getModuleDescriptor(java.lang.String)
      */
+    @SuppressWarnings({"synthetic-access","synthetic-access", "synthetic-access"})
     public final ModuleDescriptor getModuleDescriptor(final String id)
         throws ModulePackageNotFoundException {
         logger.entering(this.getClass().getName(), "getModuleDescriptor",
@@ -802,7 +797,7 @@ public class ModuleRegistry extends Observable implements IModuleRegistry {
             logger.log(Level.INFO, "Storing module " + module.getName());
 
             writer.println("<module id=\"" + module.getId() + "\" active=\""
-                           + (module.getState()) + "\">");
+                           + (module.isActive()) + "\">");
 
             writer.println("<name>");
 

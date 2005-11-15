@@ -4,6 +4,7 @@
  * Date: 18.10.2005
  * By: Frank@Schlesinger.com
  */
+
 package org.electrocodeogram.misc.xml;
 
 import java.util.logging.Level;
@@ -12,9 +13,9 @@ import java.util.logging.Logger;
 import org.electrocodeogram.logging.LogHelper;
 
 /**
- * If a module class is loaded while parsing <em>ModuleSetup</em> or
- * <em>ModuleProperties</em> files and an error occurs, this
- * <code>Exception</code> is thrown.
+ * If a module class is loaded from a <em>ModuleSetup</em> or
+ * a <em>ModulePackage</em> and an error occurs, this
+ * exception is thrown.
  */
 public class ClassLoadingException extends Exception {
 
@@ -30,7 +31,7 @@ public class ClassLoadingException extends Exception {
     private static final long serialVersionUID = 2292155480118662068L;
 
     /**
-     * This creates the <code>Exception</code>.
+     * This creates the exception.
      */
     public ClassLoadingException() {
         logger.entering(this.getClass().getName(), "ClassLoadingException");

@@ -13,9 +13,9 @@ import java.util.logging.Logger;
 import org.electrocodeogram.logging.LogHelper;
 
 /**
- * If the unique int id given to get a module instance is invalid (id <
+ * If the unique int id provided to get a module instance is invalid (id &lt;
  * 0) or if a module instance with the given unique int id can not be
- * found, this <code>Exception</code> is thrown.
+ * found, this exception is thrown.
  */
 public class ModuleInstanceNotFoundException extends Exception {
 
@@ -31,10 +31,10 @@ public class ModuleInstanceNotFoundException extends Exception {
     private static final long serialVersionUID = 2250598659169570982L;
 
     /**
-     * This creates the <code>Exception</code> with the given
+     * This creates the exception with the given
      * message.
      * @param message
-     *            Is the message for the Exception
+     *            Is the message for the exception
      * @param id Is the unique int id of the module instance that has been requested
      */
     public ModuleInstanceNotFoundException(final String message, final int id) {

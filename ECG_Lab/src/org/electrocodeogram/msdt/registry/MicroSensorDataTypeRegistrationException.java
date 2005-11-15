@@ -14,9 +14,9 @@ import org.electrocodeogram.logging.LogHelper;
 
 /**
  * If an attempt is made to register a {@link org.electrocodeogram.msdt.MicroSensorDataType} with either
- * the MSDT's value or the module's value beeing "null" or if the
- * <em>MicroSensorDataType</em> is allready
- * registered this <code>Exception</code> is thrown.
+ * the MSDT's value or the module's value beeing <code>null</code> or if the
+ * <em>MicroSensorDataType</em> is already
+ * registered this exception is thrown.
  */
 public class MicroSensorDataTypeRegistrationException extends Exception {
 
@@ -32,7 +32,7 @@ public class MicroSensorDataTypeRegistrationException extends Exception {
         .createLogger(MicroSensorDataTypeRegistrationException.class.getName());
 
     /**
-     * This creates the <code>Exception</code>.
+     * This creates the exception.
      * @param message
      *            Is the message
      */

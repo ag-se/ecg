@@ -1,3 +1,10 @@
+/*
+ * Class: MenuManager
+ * Version: 1.0
+ * Date: 16.10.2005
+ * By: Frank@Schlesinger.com
+ */
+
 package org.electrocodeogram.ui;
 
 import java.awt.Component;
@@ -6,7 +13,6 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -16,24 +22,25 @@ import javax.swing.WindowConstants;
 
 import org.electrocodeogram.module.Module;
 import org.electrocodeogram.module.UIModule;
-import org.electrocodeogram.modulepackage.ModuleType;
 import org.electrocodeogram.module.intermediate.IntermediateModule;
 import org.electrocodeogram.module.intermediate.IntermediateModule.ProcessingMode;
 import org.electrocodeogram.module.registry.ModuleInstanceNotFoundException;
 import org.electrocodeogram.module.registry.ModulePackageNotFoundException;
 import org.electrocodeogram.modulepackage.ModuleDescriptor;
 import org.electrocodeogram.modulepackage.ModuleProperty;
+import org.electrocodeogram.modulepackage.ModuleType;
 import org.electrocodeogram.system.System;
 import org.electrocodeogram.ui.modules.ModuleGraph;
 
 /**
- * @author 7oas7er TODO To change the template for this generated type
- *         comment go to Window - Preferences - Java - Code Style -
- *         Code Templates
+ * Creates the module menus dynamically.
  */
-public class MenuManager {
+public final class MenuManager {
 
-    static JFrame _frame;
+    /**
+     * A reference to the ECG Lab's root frame.
+     */
+    private static JFrame frame;
 
     private static JPopupMenu modulePopupMenu = null;
 
@@ -61,7 +68,16 @@ public class MenuManager {
 
     private static JMenuItem mniMakeFilter = new JMenuItem("Filter");
 
-    public static void populateModuleMenu(JMenu menu, int id) {
+    /**
+     * Generates the entries for the module menu and for the module
+     * with the given id.
+     * @param menu
+     *            A reference to the module menu.
+     * @param id
+     *            The id of the module, which custom entries must be
+     *            added to the menu
+     */
+    public static void populateModuleMenu(final JMenu menu, final int id) {
         if (id == -1) {
             return;
         }
@@ -86,7 +102,7 @@ public class MenuManager {
             moduleId = org.electrocodeogram.system.System.getInstance()
                 .getModuleRegistry().getModule(id).getModulePacketId();
         } catch (ModuleInstanceNotFoundException e) {
-            JOptionPane.showMessageDialog(MenuManager._frame, e.getMessage(),
+            JOptionPane.showMessageDialog(MenuManager.frame, e.getMessage(),
                 "Menu Initialisation", JOptionPane.ERROR_MESSAGE);
         }
 
@@ -95,7 +111,7 @@ public class MenuManager {
             moduleDescriptor = org.electrocodeogram.system.System.getInstance()
                 .getModuleRegistry().getModuleDescriptor(moduleId);
         } catch (ModulePackageNotFoundException e) {
-            JOptionPane.showMessageDialog(MenuManager._frame, e.getMessage(),
+            JOptionPane.showMessageDialog(MenuManager.frame, e.getMessage(),
                 "Menu Initialisation", JOptionPane.ERROR_MESSAGE);
         }
 
@@ -103,11 +119,6 @@ public class MenuManager {
 
         if (moduleProperties != null) {
             for (ModuleProperty moduleProperty : moduleProperties) {
-                //                String propertyName = moduleProperty.getName();
-                //
-                //                Class propertyType = moduleProperty.getType();
-                //
-                //                String propertyValue = moduleProperty.getValue();
 
                 JMenuItem menuItem = new JMenuItem(moduleProperty.getName());
 
@@ -125,12 +136,14 @@ public class MenuManager {
     }
 
     static {
-        _frame = org.electrocodeogram.system.System.getInstance()
+        frame = org.electrocodeogram.system.System.getInstance()
             .getMainWindow();
 
         mniModuleRemove.addActionListener(new ActionListener() {
 
-            public void actionPerformed(ActionEvent e) {
+            @SuppressWarnings("synthetic-access")
+            public void actionPerformed(@SuppressWarnings("unused")
+            final ActionEvent e) {
 
                 try {
                     org.electrocodeogram.system.System.getInstance()
@@ -138,7 +151,7 @@ public class MenuManager {
                             ModuleGraph.getSelectedModule()).remove();
                 } catch (ModuleInstanceNotFoundException e1) {
 
-                    JOptionPane.showMessageDialog(_frame, e1.getMessage(),
+                    JOptionPane.showMessageDialog(frame, e1.getMessage(),
                         "Remove Module", JOptionPane.ERROR_MESSAGE);
                 }
 
@@ -147,7 +160,8 @@ public class MenuManager {
 
         mniModuleDetails.addActionListener(new ActionListener() {
 
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(@SuppressWarnings("unused")
+            final ActionEvent e) {
                 org.electrocodeogram.system.System.getInstance().getGui()
                     .showModuleDetails();
             }
@@ -155,7 +169,8 @@ public class MenuManager {
 
         mniModuleFinderDetails.addActionListener(new ActionListener() {
 
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(@SuppressWarnings("unused")
+            final ActionEvent e) {
                 org.electrocodeogram.system.System.getInstance().getGui()
                     .showModuleFinderDetails();
             }
@@ -163,7 +178,9 @@ public class MenuManager {
 
         mniModuleStop.addActionListener(new ActionListener() {
 
-            public void actionPerformed(ActionEvent e) {
+            @SuppressWarnings("synthetic-access")
+            public void actionPerformed(@SuppressWarnings("unused")
+            final ActionEvent e) {
 
                 try {
                     org.electrocodeogram.system.System.getInstance()
@@ -171,7 +188,7 @@ public class MenuManager {
                             ModuleGraph.getSelectedModule()).deactivate();
                 } catch (ModuleInstanceNotFoundException e1) {
 
-                    JOptionPane.showMessageDialog(_frame, e1.getMessage(),
+                    JOptionPane.showMessageDialog(frame, e1.getMessage(),
                         "Stop Module", JOptionPane.ERROR_MESSAGE);
                 }
 
@@ -180,14 +197,16 @@ public class MenuManager {
 
         mniModuleStart.addActionListener(new ActionListener() {
 
-            public void actionPerformed(ActionEvent e) {
+            @SuppressWarnings("synthetic-access")
+            public void actionPerformed(@SuppressWarnings("unused")
+            final ActionEvent e) {
 
                 try {
                     org.electrocodeogram.system.System.getInstance()
                         .getModuleRegistry().getModule(
                             ModuleGraph.getSelectedModule()).activate();
                 } catch (Exception e1) {
-                    JOptionPane.showMessageDialog(_frame, e1.getMessage(),
+                    JOptionPane.showMessageDialog(frame, e1.getMessage(),
                         "Start Module", JOptionPane.ERROR_MESSAGE);
                 }
 
@@ -196,7 +215,8 @@ public class MenuManager {
 
         mniMsgWindowShow.addActionListener(new ActionListener() {
 
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(@SuppressWarnings("unused")
+            final ActionEvent e) {
                 org.electrocodeogram.system.System.getInstance().getGui()
                     .showMessagesWindow();
 
@@ -205,7 +225,9 @@ public class MenuManager {
 
         mniMakeAnnotator.addActionListener(new ActionListener() {
 
-            public void actionPerformed(ActionEvent e) {
+            @SuppressWarnings("synthetic-access")
+            public void actionPerformed(@SuppressWarnings("unused")
+            final ActionEvent e) {
                 Module module = null;
 
                 try {
@@ -213,7 +235,7 @@ public class MenuManager {
                         .getModuleRegistry().getModule(
                             ModuleGraph.getSelectedModule());
                 } catch (ModuleInstanceNotFoundException e1) {
-                    JOptionPane.showMessageDialog(_frame, e1.getMessage(),
+                    JOptionPane.showMessageDialog(frame, e1.getMessage(),
                         "Annotator", JOptionPane.ERROR_MESSAGE);
                 }
 
@@ -229,7 +251,8 @@ public class MenuManager {
 
         mniModuleConnectTo.addActionListener(new ActionListener() {
 
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(@SuppressWarnings("unused")
+            final ActionEvent e) {
                 org.electrocodeogram.system.System.getInstance().getGui()
                     .enterModuleConnectionMode(ModuleGraph.getSelectedModule());
 
@@ -238,7 +261,9 @@ public class MenuManager {
 
         mniMakeFilter.addActionListener(new ActionListener() {
 
-            public void actionPerformed(ActionEvent e) {
+            @SuppressWarnings("synthetic-access")
+            public void actionPerformed(@SuppressWarnings("unused")
+            final ActionEvent e) {
                 Module module = null;
 
                 try {
@@ -246,7 +271,7 @@ public class MenuManager {
                         .getModuleRegistry().getModule(
                             ModuleGraph.getSelectedModule());
                 } catch (ModuleInstanceNotFoundException e1) {
-                    JOptionPane.showMessageDialog(_frame, e1.getMessage(),
+                    JOptionPane.showMessageDialog(frame, e1.getMessage(),
                         "Filter", JOptionPane.ERROR_MESSAGE);
                 }
 
@@ -263,7 +288,26 @@ public class MenuManager {
 
     }
 
-    public static void showModuleFinderMenu(String id, Component c, int x, int y) {
+    /**
+     * The constructor is hidden for this utility class.
+     */
+    private MenuManager() {
+    // not implemented
+    }
+
+    /**
+     * Brigs up the context menu for <em>ModulePackages</em> in the
+     * ECG Lab.
+     * @param c
+     *            Is the component to be the parent od the context
+     *            menu
+     * @param x
+     *            The x value to display the context menu
+     * @param y
+     *            The y value to display the context menu
+     */
+    public static void showModuleFinderMenu(final Component c, final int x,
+        final int y) {
         moduleFinderMenu = new JPopupMenu();
 
         moduleFinderMenu.add(mniModuleFinderDetails);
@@ -271,7 +315,20 @@ public class MenuManager {
         moduleFinderMenu.show(c, x, y);
     }
 
-    public static void showModuleMenu(int moduleId, Component c, int x, int y) {
+    /**
+     * Brings up a context menu for an individual module in the ECG
+     * Lab.
+     * @param moduleId
+     *            The id of the module
+     * @param c
+     *            The parent off the context menu
+     * @param x
+     *            The x value to display the context menu
+     * @param y
+     *            The y value to display the context menu
+     */
+    public static void showModuleMenu(final int moduleId, final Component c,
+        final int x, final int y) {
 
         Module module = null;
 
@@ -280,7 +337,7 @@ public class MenuManager {
                 moduleId);
         } catch (ModuleInstanceNotFoundException e) {
 
-            JOptionPane.showMessageDialog(MenuManager._frame, e.getMessage(), e
+            JOptionPane.showMessageDialog(MenuManager.frame, e.getMessage(), e
                 .getClass().getSimpleName(), JOptionPane.ERROR_MESSAGE);
 
             return;
@@ -317,11 +374,6 @@ public class MenuManager {
             modulePopupMenu.addSeparator();
 
             for (ModuleProperty moduleProperty : moduleProperties) {
-                // String propertyName = moduleProperty.getName();
-                //
-                // Class propertyType = moduleProperty.getType();
-                //
-                // String propertyValue = moduleProperty.getValue();
 
                 JMenuItem menuItem = new JMenuItem("Set: "
                                                    + moduleProperty.getName());
@@ -357,8 +409,23 @@ public class MenuManager {
         modulePopupMenu.show(c, x, y);
     }
 
-    public static void showEdgeMenu(int parentId, int childId, Component c,
-        int x, int y) {
+    /**
+     * Brings up the context menu of a module connection.
+     * @param parentId
+     *            The id of the module which is the source of the
+     *            connection
+     * @param childId
+     *            The id of the module which is the target of the
+     *            connection
+     * @param c
+     *            The parent off the context menu
+     * @param x
+     *            The x value to display the context menu
+     * @param y
+     *            The y value to display the context menu
+     */
+    public static void showEdgeMenu(final int parentId, final int childId,
+        final Component c, final int x, final int y) {
         edgePopupMenu = new JPopupMenu();
 
         mniEdgeRemove
@@ -370,29 +437,53 @@ public class MenuManager {
 
     }
 
+    /**
+     * Is reacting, when the user selects to remove a module
+     * connnection.
+     */
     private static class EdgeRemoveAdapter implements ActionListener {
 
-        private int _parentId;
+        /**
+         * The id of the module that is the source of the connection
+         */
+        private int parentId;
 
-        private int _childId;
+        /**
+         * The id of the module that is the target of the connection
+         */
+        private int childId;
 
-        public EdgeRemoveAdapter(int parentId, int childId) {
+        /**
+         * Creates the adapter.
+         * @param parent
+         *            The id of the module that is the source of the
+         *            connection
+         * @param child
+         *            The id of the module that is the target of the
+         *            connection
+         */
+        public EdgeRemoveAdapter(final int parent, final int child) {
 
-            this._parentId = parentId;
+            this.parentId = parent;
 
-            this._childId = childId;
+            this.childId = child;
         }
 
-        public void actionPerformed(ActionEvent e) {
+        /**
+         * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+         */
+        @SuppressWarnings("synthetic-access")
+        public void actionPerformed(@SuppressWarnings("unused")
+        final ActionEvent e) {
 
             try {
                 org.electrocodeogram.system.System.getInstance()
-                    .getModuleRegistry().getModule(this._parentId)
+                    .getModuleRegistry().getModule(this.parentId)
                     .disconnectModule(
                         org.electrocodeogram.system.System.getInstance()
-                            .getModuleRegistry().getModule(this._childId));
+                            .getModuleRegistry().getModule(this.childId));
             } catch (Exception e1) {
-                JOptionPane.showMessageDialog(MenuManager._frame, e1
+                JOptionPane.showMessageDialog(MenuManager.frame, e1
                     .getMessage(), "Remove Edge", JOptionPane.ERROR_MESSAGE);
             }
 
@@ -400,42 +491,54 @@ public class MenuManager {
 
     }
 
+    /**
+     * Reacts, when the user selects to change the value of a
+     * <em>ModuleProerty</em> in the ECG Lab.
+     */
     private static class PropertyActionAdapter implements ActionListener {
 
-        // private int _moduleId;
-        //
-        // private String _propertyName;
-        //
+        /**
+         * Takes the new value for the property.
+         */
         private String propertyResult;
 
-        //
-        // private String _propertyValue;
-        //
-        // private Class _propertyType;
-
+        /**
+         * A reference to the property the user is changing.
+         */
         private ModuleProperty myModuleProperty;
 
-        public PropertyActionAdapter(ModuleProperty moduleProperty) {
+        /**
+         * Creates the adapter.
+         * @param moduleProperty
+         *            A reference to the property the user is changing
+         */
+        public PropertyActionAdapter(final ModuleProperty moduleProperty) {
 
             this.myModuleProperty = moduleProperty;
 
         }
 
-        public void actionPerformed(ActionEvent e) {
+        /**
+         * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+         */
+        @SuppressWarnings( {"synthetic-access", "synthetic-access",
+            "synthetic-access", "synthetic-access", "synthetic-access"})
+        public void actionPerformed(@SuppressWarnings("unused")
+        final ActionEvent e) {
 
             try {
                 if (this.myModuleProperty.getType().equals(
                     Class.forName("java.lang.String"))) {
                     this.propertyResult = JOptionPane.showInputDialog(
-                        MenuManager._frame, "Please enter a new value for "
-                                            + this.myModuleProperty.getName(),
+                        MenuManager.frame, "Please enter a new value for "
+                                           + this.myModuleProperty.getName(),
                         this.myModuleProperty.getName(),
                         JOptionPane.QUESTION_MESSAGE);
                 } else if (this.myModuleProperty.getType().equals(
                     Class.forName("java.lang.Integer"))) {
                     this.propertyResult = JOptionPane.showInputDialog(
-                        MenuManager._frame, "Please enter a new value for "
-                                            + this.myModuleProperty.getName(),
+                        MenuManager.frame, "Please enter a new value for "
+                                           + this.myModuleProperty.getName(),
                         this.myModuleProperty.getName(),
                         JOptionPane.QUESTION_MESSAGE);
                 } else if (this.myModuleProperty.getType().equals(
@@ -443,7 +546,7 @@ public class MenuManager {
 
                     JFileChooser fileChooser = new JFileChooser();
 
-                    int result = fileChooser.showOpenDialog(MenuManager._frame);
+                    int result = fileChooser.showOpenDialog(MenuManager.frame);
 
                     switch (result) {
                         case JFileChooser.CANCEL_OPTION:
@@ -463,9 +566,9 @@ public class MenuManager {
                 } else if (this.myModuleProperty.getType().equals(
                     Class.forName("java.lang.Boolean"))) {
                     int result = JOptionPane.showConfirmDialog(
-                        MenuManager._frame, "Do you want to enable the "
-                                            + this.myModuleProperty.getName()
-                                            + " property?",
+                        MenuManager.frame, "Do you want to enable the "
+                                           + this.myModuleProperty.getName()
+                                           + " property?",
                         this.myModuleProperty.getName(),
                         JOptionPane.YES_NO_OPTION);
 
@@ -476,7 +579,7 @@ public class MenuManager {
                     }
                 }
             } catch (Exception e2) {
-                JOptionPane.showMessageDialog(MenuManager._frame, e2
+                JOptionPane.showMessageDialog(MenuManager.frame, e2
                     .getMessage(), this.myModuleProperty.getName(),
                     JOptionPane.ERROR_MESSAGE);
             }
@@ -491,11 +594,22 @@ public class MenuManager {
 
     }
 
+    /**
+     * Reacts, when the user selects to bring up a module's panel.
+     */
     private static class UIModuleActionAdapter implements ActionListener {
 
+        /**
+         * The module itself.
+         */
         private UIModule uiModule;
 
-        public UIModuleActionAdapter(UIModule module) {
+        /**
+         * Creates the adapter.
+         * @param module
+         *            The module itself
+         */
+        public UIModuleActionAdapter(final UIModule module) {
 
             this.uiModule = module;
         }
@@ -503,7 +617,8 @@ public class MenuManager {
         /**
          * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
          */
-        public void actionPerformed(ActionEvent e) {
+        public void actionPerformed(@SuppressWarnings("unused")
+        final ActionEvent e) {
 
             JPanel panel = this.uiModule.getPanel();
 
@@ -514,15 +629,15 @@ public class MenuManager {
                 return;
             }
 
-            JFrame frame = new JFrame(title);
+            JFrame frm = new JFrame(title);
 
-            frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+            frm.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
-            frame.add(panel);
+            frm.add(panel);
 
-            frame.pack();
+            frm.pack();
 
-            frame.setVisible(true);
+            frm.setVisible(true);
 
         }
 

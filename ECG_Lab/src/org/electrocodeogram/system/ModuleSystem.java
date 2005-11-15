@@ -9,7 +9,7 @@ package org.electrocodeogram.system;
 
 /**
  * This class is providing access to the class {@link Core} for the
- * modules.
+ * ECG modules.
  */
 public final class ModuleSystem {
 
@@ -22,8 +22,8 @@ public final class ModuleSystem {
 
     /**
      * A call to this method returns the <em>Singleton</em> instance
-     * the IModuleSystem implementation.
-     * @return The <em>Singleton</em> instance the IModuleSystem
+     * of the <code>IModuleSystem</code> implementation.
+     * @return The <em>Singleton</em> instance the <code>IModuleSystem</code>
      *         implementation
      */
     public static IModuleSystem getInstance() {
