@@ -121,7 +121,7 @@ public class MSDTFilterIntermediateModule extends IntermediateModule implements 
     }
 
     /**
-     * @see org.electrocodeogram.module.Module#propertyChanged(org.electrocodeogram.module.ModuleProperty)
+     * @see org.electrocodeogram.module.Module#propertyChanged(org.electrocodeogram.modulepackage.ModuleProperty)
      */
     @Override
     public final void propertyChanged(final ModuleProperty moduleProperty) {
@@ -224,7 +224,7 @@ public class MSDTFilterIntermediateModule extends IntermediateModule implements 
             return;
         }
 
-        
+
 
         logger.exiting(this.getClass().getName(), "configureFilter");
     }
@@ -303,7 +303,7 @@ public class MSDTFilterIntermediateModule extends IntermediateModule implements 
     final JPanel createCheckBoxPanel() {
 
         logger.entering(this.getClass().getName(), "createCheckBoxPanel");
-        initializeCheckBoxes();        
+        initializeCheckBoxes();
         this.pnlCheckBoxes = new JPanel();
 
         JPanel pnlLeft = new JPanel();
@@ -441,16 +441,16 @@ public class MSDTFilterIntermediateModule extends IntermediateModule implements 
     /**
      * @see org.electrocodeogram.module.UIModule#getPanelName()
      */
-    public String getPanelName() {
-       
+    public final String getPanelName() {
+
         return "Configure Filter";
     }
 
     /**
      * @see org.electrocodeogram.module.UIModule#getPanel()
      */
-    public JPanel getPanel() {
-       
+    public final JPanel getPanel() {
+
         return createMainPanel();
     }
 
