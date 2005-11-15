@@ -5,7 +5,7 @@
  * By: Frank@Schlesinger.com
  */
 
-package org.electrocodeogram.module.target;
+package org.electrocodeogram.module.target.implementation;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -17,12 +17,14 @@ import java.util.logging.Logger;
 
 import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.logging.LogHelper;
-import org.electrocodeogram.module.ModuleProperty;
-import org.electrocodeogram.module.ModulePropertyException;
+import org.electrocodeogram.modulepackage.ModuleProperty;
+import org.electrocodeogram.modulepackage.ModulePropertyException;
+import org.electrocodeogram.module.target.TargetModule;
+import org.electrocodeogram.module.target.TargetModuleException;
 
 /**
- * This class is an ECG module used to write ECG events into a file in the file
- * system.
+ * This class is an ECG module used to write ECG events into a file in
+ * the file system.
  */
 public class FileSystemTargetModule extends TargetModule {
 
@@ -38,7 +40,8 @@ public class FileSystemTargetModule extends TargetModule {
     private File outputFile;
 
     /**
-     * The <em>PrintWriter</em> is used to write events into the file.
+     * The <em>PrintWriter</em> is used to write events into the
+     * file.
      */
     private PrintWriter writer;
 
@@ -53,12 +56,14 @@ public class FileSystemTargetModule extends TargetModule {
     private static final String DEFAULT_FILENAME_SUFFIX = ".log";
 
     /**
-     * This is the default output directory under the user's home directory.
+     * This is the default output directory under the user's home
+     * directory.
      */
     private static final String LOG_SUBDIR = "ecg_log";
 
     /**
-     * This is the default maximum file size for the rotation of output files.
+     * This is the default maximum file size for the rotation of
+     * output files.
      */
     private static final int DEFAULT_FILE_SIZE = 1024 * 1024 * 10;
 
@@ -88,12 +93,13 @@ public class FileSystemTargetModule extends TargetModule {
     private File logDir;
 
     /**
-     * This creates the module instance. It is not to be
-     * called by developers, instead it is called from the ECG
-     * <em>ModuleRegistry</em> subsystem, when the user requested a new instance of this
-     * module.
+     * This creates the module instance. It is not to be called by
+     * developers, instead it is called from the ECG
+     * <em>ModuleRegistry</em> subsystem, when the user requested a
+     * new instance of this module.
      * @param id
-     *            This is the unique <code>String</code> id of the module
+     *            This is the unique <code>String</code> id of the
+     *            module
      * @param name
      *            This is the name which is assigned to the module
      *            instance
@@ -153,7 +159,7 @@ public class FileSystemTargetModule extends TargetModule {
     }
 
     /**
-     * @see org.electrocodeogram.module.Module#propertyChanged(org.electrocodeogram.module.ModuleProperty)
+     * @see org.electrocodeogram.module.Module#propertyChanged(org.electrocodeogram.modulepackage.ModuleProperty)
      */
     @Override
     public final void propertyChanged(final ModuleProperty moduleProperty)
@@ -183,7 +189,9 @@ public class FileSystemTargetModule extends TargetModule {
 
             this.outputFile = propertyValueFile;
 
-            this.writer.close();
+            if (this.writer != null) {
+                this.writer.close();
+            }
 
             try {
                 this.writer = new PrintWriter(new FileWriter(this.outputFile));
@@ -279,10 +287,10 @@ public class FileSystemTargetModule extends TargetModule {
     }
 
     /**
-     * @see org.electrocodeogram.module.Module#update()
-     *      This method is not implemented in this module, as
-     *      this module does not need to be informed about
-     *      ECG Lab subsystem's state changes.
+     * @see org.electrocodeogram.module.Module#update() This method is
+     *      not implemented in this module, as this module does not
+     *      need to be informed about ECG Lab subsystem's state
+     *      changes.
      */
     @Override
     public void update() {
@@ -292,67 +300,71 @@ public class FileSystemTargetModule extends TargetModule {
 
     /**
      * @see org.electrocodeogram.module.Module#initialize()
-     * The method creates the default output file and a <em>PrintWriter</em> to write to it.
      */
     @Override
     public final void initialize() {
-        logger.entering(this.getClass().getName(), "initialize");
-
-        this.homeDir = System.getProperty("user.home");
-
-        if (this.homeDir == null) {
-
-            logger.log(Level.WARNING,
-                "The user's home directory can not be determined.");
-
-            this.homeDir = ".";
-
-            logger.log(Level.WARNING, "Using the current working directory "
-                                      + new File(".").getAbsolutePath()
-                                      + "instead.");
-        }
-
-        this.logDir = new File(this.homeDir + File.separator + LOG_SUBDIR);
-
-        if (!this.logDir.exists()) {
-            this.logDir.mkdir();
-        }
-
-        String outputFileName = DEFAULT_FILENAME_PREFIX
-                                + DEFAULT_FILENAME_SUFFIX;
-
-        this.outputFile = new File(this.logDir.getAbsolutePath()
-                                   + File.separator + outputFileName);
-
-        try {
-            this.writer = new PrintWriter(new BufferedWriter(new FileWriter(
-                this.outputFile, true)));
-
-        } catch (IOException e) {
-            logger.log(Level.SEVERE, "Error while opening the output file: "
-                                     + this.outputFile.getAbsolutePath());
-
-            logger.log(Level.FINEST, e.getMessage());
-        }
-
-        logger.exiting(this.getClass().getName(), "initialize");
-    }
-
-    /**
-     * @see org.electrocodeogram.module.target.TargetModule#startWriter()
-     *  This method is not implemented in this module.
-     */
-    @SuppressWarnings("unused")
-    @Override
-    public void startWriter() throws TargetModuleException {
 
     // not implemented
 
     }
 
     /**
+     * @see org.electrocodeogram.module.target.TargetModule#startWriter()
+     */
+    @SuppressWarnings("unused")
+    @Override
+    public final void startWriter() throws TargetModuleException {
+
+        logger.entering(this.getClass().getName(), "startWriter");
+
+        if (this.outputFile == null) {
+
+            this.homeDir = System.getProperty("user.home");
+
+            if (this.homeDir == null) {
+
+                logger.log(Level.WARNING,
+                    "The user's home directory can not be determined.");
+
+                this.homeDir = ".";
+
+                logger.log(Level.WARNING,
+                    "Using the current working directory "
+                                    + new File(".").getAbsolutePath()
+                                    + "instead.");
+            }
+
+            this.logDir = new File(this.homeDir + File.separator + LOG_SUBDIR);
+
+            if (!this.logDir.exists()) {
+                this.logDir.mkdir();
+            }
+
+            String outputFileName = DEFAULT_FILENAME_PREFIX
+                                    + DEFAULT_FILENAME_SUFFIX;
+
+            this.outputFile = new File(this.logDir.getAbsolutePath()
+                                       + File.separator + outputFileName);
+
+            try {
+                this.writer = new PrintWriter(new BufferedWriter(
+                    new FileWriter(this.outputFile, true)));
+
+            } catch (IOException e) {
+                logger.log(Level.SEVERE,
+                    "Error while opening the output file: "
+                                    + this.outputFile.getAbsolutePath());
+
+                logger.log(Level.FINEST, e.getMessage());
+            }
+        }
+        logger.exiting(this.getClass().getName(), "startWriter");
+
+    }
+
+    /**
      * @see org.electrocodeogram.module.target.TargetModule#stopWriter()
-     *  This method is not implemented in this module.
+     *      This method is not implemented in this module.
      */
     @Override
     public void stopWriter() {
