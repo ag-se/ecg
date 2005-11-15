@@ -83,7 +83,7 @@ AND CONDITIONS PRIOR TO USE OF THIS CONTENT.
    </requires>
 
    <plugin
-         id="org.electrocodeogram.sensor.eclipse"
+         id="org.electrocodeogram.sensor.eclipse.ecg.sensorshell"
          download-size="0"
          install-size="0"
          version="0.0.0"/>
