@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.0"?>
 <plugin
-   id="org.electrocodeogram.sensor.eclipse"
+   id="org.electrocodeogram.sensor.eclipse.ecg.sensorshell"
    name="ElectroCodeoGram Eclipse Sensor (Extending HackyStat Sensor)"
-   version="0.9"
+   version="1.0"
    provider-name="Frank Schlesinger (Frank@Schlesinger.com)"
    class="org.hackystat.stdext.sensor.eclipse.EclipseSensorPlugin">
 
    <runtime>
-      <library name="sensorshell.jar">
+      <library name="sensor.eclipse.jar">
          <export name="*"/>
       </library>
-      <library name="sensor.eclipse.jar">
+      <library name="sensorshell.jar">
          <export name="*"/>
       </library>
       <library name="lib/jar/3x/org.eclipse.cdt.core_2.0.0/cdtcore.jar">
@@ -21,6 +21,9 @@
          <export name="*"/>
       </library>
       <library name="lib/hackystat/sensor.eclipse.3x.jar">
+         <export name="*"/>
+      </library>
+      <library name="ecg_moduleapi.jar">
          <export name="*"/>
       </library>
    </runtime>
@@ -52,14 +55,5 @@
 <!-- Instantiates EclipseSensorPlugin when workbench starts up -->
    <extension
          point="org.eclipse.ui.startup">
-   </extension>
-   <extension
-         point="org.eclipse.ui.preferencePages">
-         	
-         	<page id="org.electrocodeogram.sensor.eclipse.Page"
-				class="org.electrocodeogram.sensor.eclipse.Page"
-				name="ElectroCodeoGram - Sensor">
-			</page>
-         
    </extension>
 </plugin>

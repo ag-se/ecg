@@ -42,7 +42,6 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.texteditor.DocumentProviderRegistry;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.electrocodeogram.event.WellFormedEventPacket;
@@ -1464,28 +1463,6 @@ public final class ECGEclipseSensor {
                                     + this.name
                                     + "</documentname></codechange></microActivity>");
 
-            // while(true)
-            // {
-            // try
-            // {
-            // Thread.sleep(1000);
-            // }
-            // catch (InterruptedException e)
-            // {
-            // // TODO Auto-generated catch block
-            // e.printStackTrace();
-            // }
-            // _logger.log(ECGLevel.PACKET,"A codechange event has
-            // been recorded.");
-            // sensor.processActivity("msdt.codechange.xsd","<?xml
-            // version=\"1.0\"?><microActivity><commonData><username>"
-            // + sensor.getUsername() + "</username><projectname>" +
-            // sensor.getProjectname() +
-            // "</projectname></commonData><codechange><document><![CDATA["
-            // + this._document.get() + "]]></document><documentname>"
-            // + this._documentName +
-            // "</documentname></codechange></microActivity>");
-            // }
 
             logger.exiting(this.getClass().getName(), "run");
 

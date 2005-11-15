@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.ui.IStartup;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.electrocodeogram.logging.LogHelper;
+import org.electrocodeogram.modulepackage.ModuleType;
 import org.electrocodeogram.sensor.eclipse.ECGEclipseSensor;
 import org.hackystat.kernel.shell.SensorShell;
 import org.osgi.framework.Bundle;
@@ -39,6 +40,8 @@ import org.osgi.framework.BundleContext;
  */
 public class EclipseSensorPlugin extends AbstractUIPlugin implements IStartup {
 
+    private static ModuleType type = ModuleType.INTERMEDIATE_MODULE;
+    
     /**
      * The <em>Singleton</em> instance.
      */
