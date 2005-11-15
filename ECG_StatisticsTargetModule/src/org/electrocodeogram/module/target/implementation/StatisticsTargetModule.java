@@ -7,26 +7,45 @@
 
 package org.electrocodeogram.module.target.implementation;
 
+import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
+import javax.swing.border.LineBorder;
+import javax.swing.border.TitledBorder;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumnModel;
 
 import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.logging.LogHelper;
-import org.electrocodeogram.modulepackage.ModuleProperty;
+import org.electrocodeogram.misc.constants.UIConstants;
+import org.electrocodeogram.misc.xml.ECGParser;
+import org.electrocodeogram.misc.xml.NodeException;
 import org.electrocodeogram.module.UIModule;
 import org.electrocodeogram.module.target.TargetModule;
+import org.electrocodeogram.modulepackage.ModuleProperty;
 import org.electrocodeogram.msdt.MicroSensorDataType;
 import org.electrocodeogram.system.ModuleSystem;
+import org.w3c.dom.Document;
 
 /**
  * This module makes some statistics of incoming events like the total
@@ -81,13 +100,13 @@ public class StatisticsTargetModule extends TargetModule implements UIModule {
     }
 
     /**
-     * @see org.electrocodeogram.module.Module#propertyChanged(org.electrocodeogram.module.ModuleProperty)
-     * This method is not implemented in this module.
+     * @see org.electrocodeogram.module.Module#propertyChanged(org.electrocodeogram.modulepackage.ModuleProperty)
+     *      This method is not implemented in this module.
      */
     @Override
     public final void propertyChanged(@SuppressWarnings("unused")
     final ModuleProperty moduleProperty) {
-        // not implemented
+    // not implemented
     }
 
     /**
@@ -214,7 +233,7 @@ public class StatisticsTargetModule extends TargetModule implements UIModule {
 
             dayOfPacket.setEnd(arg0.getTimeStamp());
 
-            dayOfPacket.addEvent(arg0.getMicroSensorDataType());
+            dayOfPacket.addEvent(arg0);
 
             this.dayList.add(dayOfPacket);
 
@@ -231,7 +250,7 @@ public class StatisticsTargetModule extends TargetModule implements UIModule {
 
                 day.setEnd(arg0.getTimeStamp());
 
-                day.addEvent(arg0.getMicroSensorDataType());
+                day.addEvent(arg0);
 
             } else {
                 dayOfPacket.addEvents();
@@ -240,7 +259,7 @@ public class StatisticsTargetModule extends TargetModule implements UIModule {
 
                 dayOfPacket.setEnd(arg0.getTimeStamp());
 
-                dayOfPacket.addEvent(arg0.getMicroSensorDataType());
+                dayOfPacket.addEvent(arg0);
 
                 this.dayList.add(dayOfPacket);
 
@@ -310,11 +329,25 @@ public class StatisticsTargetModule extends TargetModule implements UIModule {
 
             this.statsTable = new JTable(new StatsTableModel(this.module));
 
+            TableCellRenderer defaultRenderer = this.statsTable
+                .getDefaultRenderer(Object.class);
+
+            this.statsTable.setDefaultRenderer(Object.class, null);
+
+            this.statsTable.setDefaultRenderer(Object.class,
+                new JTableButtonRenderer(defaultRenderer));
+
             this.statsTable.setAutoCreateColumnsFromModel(true);
+
+            this.statsTable.setPreferredScrollableViewportSize(new Dimension(
+                300, 180));
 
             JScrollPane scrollPane = new JScrollPane(this.statsTable);
 
             this.add(scrollPane);
+
+            this.statsTable.addMouseListener(new JTableButtonMouseListener(
+                this.statsTable));
 
             statsFrameLogger.exiting(this.getClass().getName(),
                 "statsFramelogger");
@@ -406,16 +439,20 @@ public class StatisticsTargetModule extends TargetModule implements UIModule {
         private Date end;
 
         /**
-         * All files that are changed according to <em>Codechange</em>
-         * events are lsited here.
-         */
-        private ArrayList < String > changedFiles;
-
-        /**
          * This map is used to count the <em>MicroSensordataTypes</em>
          * of the incoming events.
          */
-        private HashMap < MicroSensorDataType, Integer > eventTypeCounterMap;
+        private HashMap < MicroSensorDataType, Integer > msdtMap;
+
+        /**
+         * A map of changed files.
+         */
+        private HashMap < String, Integer > filenameMap;
+
+        /**
+         * A map of changed projects.
+         */
+        private HashMap < String, Integer > projects;
 
         /**
          * Used to calculate the date and time values.
@@ -447,9 +484,13 @@ public class StatisticsTargetModule extends TargetModule implements UIModule {
 
             this.dateFormat = new SimpleDateFormat(DATE_FORMAT_PATTERN);
 
-            this.changedFiles = new ArrayList < String >();
+            //this.changedFiles = new ArrayList < String >();
 
-            this.eventTypeCounterMap = new HashMap < MicroSensorDataType, Integer >();
+            this.msdtMap = new HashMap < MicroSensorDataType, Integer >();
+
+            this.filenameMap = new HashMap < String, Integer >();
+
+            this.projects = new HashMap < String, Integer >();
 
             dayLogger.exiting(this.getClass().getName(), "Day");
         }
@@ -457,56 +498,81 @@ public class StatisticsTargetModule extends TargetModule implements UIModule {
         /**
          * Adds the <em>MicroSensorDataType</em> of an received
          * event to the <em>Day</em>.
-         * @param msdt
-         *            Is the <em>MicroSensorDataType</em> of the
-         *            received event.
+         * @param event
+         *            Is the received event.
          */
-        public final void addEvent(final MicroSensorDataType msdt) {
+        @SuppressWarnings("synthetic-access")
+        public final void addEvent(final ValidEventPacket event) {
 
             dayLogger.entering(this.getClass().getName(), "addEvent",
-                new Object[] {msdt});
+                new Object[] {event});
 
-            if (this.eventTypeCounterMap.containsKey(msdt)) {
-                Integer count = this.eventTypeCounterMap.get(msdt);
+            if (this.msdtMap.containsKey(event.getMicroSensorDataType())) {
+                Integer count = this.msdtMap
+                    .get(event.getMicroSensorDataType());
 
                 count = new Integer(count.intValue() + 1);
 
-                this.eventTypeCounterMap.remove(msdt);
+                this.msdtMap.remove(event.getMicroSensorDataType());
 
-                this.eventTypeCounterMap.put(msdt, count);
+                this.msdtMap.put(event.getMicroSensorDataType(), count);
             } else {
-                this.eventTypeCounterMap.put(msdt, new Integer(1));
+                this.msdtMap
+                    .put(event.getMicroSensorDataType(), new Integer(1));
+            }
+
+            Document document = event.getDocument();
+
+            try {
+                String projectName = ECGParser.getSingleNodeValue(
+                    "projectname", document);
+
+                if (this.projects.containsKey(projectName)) {
+                    Integer count = this.projects.get(projectName);
+
+                    count = new Integer(count.intValue() + 1);
+
+                    this.projects.remove(projectName);
+
+                    this.projects.put(projectName, count);
+                } else {
+                    this.projects.put(projectName, new Integer(1));
+                }
+
+            } catch (NodeException e1) {
+                logger.log(Level.INFO, "NodeException: " + e1.getMessage());
+
+            }
+
+            if (event.getMicroSensorDataType().getName().equals(
+                "msdt.codechange.xsd")) {
+
+                try {
+                    String filename = ECGParser.getSingleNodeValue(
+                        "documentname", document);
+
+                    if (this.filenameMap.containsKey(filename)) {
+                        Integer count = this.filenameMap.get(filename);
+
+                        count = new Integer(count.intValue() + 1);
+
+                        this.filenameMap.remove(filename);
+
+                        this.filenameMap.put(filename, count);
+                    } else {
+                        this.filenameMap.put(filename, new Integer(1));
+                    }
+
+                } catch (NodeException e) {
+
+                    logger.log(Level.INFO, "NodeException: " + e.getMessage());
+                }
             }
 
             dayLogger.exiting(this.getClass().getName(), "addEvent");
         }
 
-        /**
-         * Adds a filename of a file changed as reported by an
-         * incoming <em>Codechange</em> event, to the <em>Day</em>.
-         * @param filename
-         *            A filename of a changed file
-         */
-        public final void addChangedFile(final String filename) {
 
-            dayLogger.entering(this.getClass().getName(), "addChangedFile",
-                new Object[] {filename});
-
-            if (filename == null) {
-
-                dayLogger.exiting(this.getClass().getName(), "addChangedFile");
-
-                return;
-            }
-
-            if (this.changedFiles.size() == 0) {
-                this.changedFiles.add(filename);
-            } else if (!this.changedFiles.contains(filename)) {
-                this.changedFiles.add(filename);
-            }
-
-            dayLogger.exiting(this.getClass().getName(), "addChangedFile");
-        }
 
         /**
          * Returns the number of events for this day.
@@ -610,18 +676,18 @@ public class StatisticsTargetModule extends TargetModule implements UIModule {
         /**
          * Sets the time-string of the first recorded event of this
          * day.
-         * @param begin
+         * @param beginDate
          *            The time-string of the first recorded event
          */
-        public final void setBegin(final Date begin) {
+        public final void setBegin(final Date beginDate) {
 
             dayLogger.entering(this.getClass().getName(), "setBegin",
-                new Object[] {begin});
+                new Object[] {beginDate});
 
             if (this.begin == null) {
-                this.begin = begin;
-            } else if (this.begin.compareTo(begin) > 0) {
-                this.begin = begin;
+                this.begin = beginDate;
+            } else if (this.begin.compareTo(beginDate) > 0) {
+                this.begin = beginDate;
             }
 
             dayLogger.exiting(this.getClass().getName(), "setBegin");
@@ -630,18 +696,18 @@ public class StatisticsTargetModule extends TargetModule implements UIModule {
         /**
          * Sets the time-string of the last recorded event of this
          * day.
-         * @param end
+         * @param endDate
          *            The time-string of the last recorded event
          */
-        public final void setEnd(final Date end) {
+        public final void setEnd(final Date endDate) {
 
             dayLogger.entering(this.getClass().getName(), "setEnd",
-                new Object[] {end});
+                new Object[] {endDate});
 
             if (this.end == null) {
-                this.end = end;
-            } else if (this.end.compareTo(end) < 0) {
-                this.end = end;
+                this.end = endDate;
+            } else if (this.end.compareTo(endDate) < 0) {
+                this.end = endDate;
             }
 
             dayLogger.exiting(this.getClass().getName(), "setEnd");
@@ -693,22 +759,263 @@ public class StatisticsTargetModule extends TargetModule implements UIModule {
          * <code>String</code> separated by newlines.
          * @return The names of changed files
          */
-        public String getChangedFiles() {
+        public String[] getChangedFiles() {
 
             dayLogger.entering(this.getClass().getName(), "getChangedFiles");
 
-            String toReturn = "";
-
-            for (String filename : this.changedFiles) {
-                toReturn += filename + "\n";
-            }
-
-            dayLogger.exiting(this.getClass().getName(), "getChangedFiles",
-                toReturn);
-
-            return toReturn;
+            return this.filenameMap.keySet().toArray(
+                new String[this.filenameMap.size()]);
         }
 
+        /**
+         * Returns the names of changed projects in this day.
+         * @return The names of changed projects
+         */
+        public String[] getProjects() {
+            return this.projects.keySet().toArray(
+                new String[this.projects.size()]);
+        }
+
+    }
+
+    /**
+     * Used to react on button clicks in the table.
+     *
+     */
+    private static class JTableButtonMouseListener implements MouseListener {
+
+        /**
+         * A reference to the table.
+         */
+        private JTable tbl;
+
+        /**
+         * Forwards table-mouse-events to the right button.
+         * @param e The event
+         */
+        private void forwardEventToButton(final MouseEvent e) {
+            TableColumnModel columnModel = this.tbl.getColumnModel();
+            int column = columnModel.getColumnIndexAtX(e.getX());
+            int row = e.getY() / this.tbl.getRowHeight();
+            Object value;
+            JButton button;
+            MouseEvent buttonEvent;
+
+            if (row >= this.tbl.getRowCount() || row < 0
+                || column >= this.tbl.getColumnCount() || column < 0) {
+                    return;
+            }
+
+            value = this.tbl.getValueAt(row, column);
+
+            if (!(value instanceof JButton)) {
+                return;
+            }
+
+            button = (JButton) value;
+
+            buttonEvent = SwingUtilities.convertMouseEvent(
+                this.tbl, e, button);
+            button.dispatchEvent(buttonEvent);
+
+            this.tbl.repaint();
+        }
+
+        /**
+         * Creates the listener.
+         * @param table A reference to the table
+         */
+        public JTableButtonMouseListener(final JTable table) {
+            this.tbl = table;
+        }
+
+        /**
+         * @see java.awt.event.MouseListener#mouseClicked(java.awt.event.MouseEvent)
+         */
+        public void mouseClicked(final MouseEvent e) {
+            forwardEventToButton(e);
+        }
+
+        /**
+         * @see java.awt.event.MouseListener#mouseEntered(java.awt.event.MouseEvent)
+         */
+        public void mouseEntered(final MouseEvent e) {
+            forwardEventToButton(e);
+        }
+
+        /**
+         * @see java.awt.event.MouseListener#mouseExited(java.awt.event.MouseEvent)
+         */
+        public void mouseExited(final MouseEvent e) {
+            forwardEventToButton(e);
+        }
+
+        /**
+         * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
+         */
+        public void mousePressed(final MouseEvent e) {
+            forwardEventToButton(e);
+        }
+
+        /**
+         * @see java.awt.event.MouseListener#mouseReleased(java.awt.event.MouseEvent)
+         */
+        public void mouseReleased(final MouseEvent e) {
+            forwardEventToButton(e);
+        }
+    }
+
+    /**
+     * Used to render the buttons for the "codechange"-events.
+     *
+     */
+    private static class JTableButtonRenderer implements TableCellRenderer {
+
+        /**
+         * The parent renderer.
+         */
+        private TableCellRenderer renderer;
+
+        /**
+         * Creates this renderer and assings the parent renderer.
+         * @param parent Is the parent renderer
+         */
+        public JTableButtonRenderer(final TableCellRenderer parent) {
+            this.renderer = parent;
+        }
+
+        /**
+         * @see javax.swing.table.TableCellRenderer#getTableCellRendererComponent(javax.swing.JTable, java.lang.Object, boolean, boolean, int, int)
+         */
+        public Component getTableCellRendererComponent(final JTable table,
+            final Object value, final boolean isSelected,
+            final boolean hasFocus, final int row, final int column) {
+            if (value instanceof Component) {
+                return (Component) value;
+            }
+            return this.renderer.getTableCellRendererComponent(table, value,
+                isSelected, hasFocus, row, column);
+        }
+    }
+
+    /**
+     * This is a button to be displayed in the table.
+     *
+     */
+    private static class StatsButton extends JButton {
+
+        /**
+         * The <em>Serialization</em> id.
+         */
+        private static final long serialVersionUID = -279871491903771677L;
+
+        /**
+         * A reference to the module.
+         */
+        private StatisticsTargetModule statsModule;
+
+        /**
+         * Creates the button.
+         * @param title The name of the button
+         * @param module A reference to the module
+         * @param day Is the day of the column where this button is placed
+         */
+        public StatsButton(final String title, final StatisticsTargetModule module, final Day day) {
+
+            super(title);
+
+            this.statsModule = module;
+
+            this.setToolTipText("Click to get details");
+
+            this.addMouseListener(new MouseAdapter() {
+
+                @SuppressWarnings("synthetic-access")
+                @Override
+                public void mouseClicked(@SuppressWarnings("unused") MouseEvent e) {
+
+                    String[] files = day.getChangedFiles();
+
+                    String[] projects = day.getProjects();
+
+                    String fileString = "";
+
+                    String projectString = "";
+
+                    if (files == null || files.length == 0) {
+                        fileString = "No changed files recorded.";
+                    } else {
+                        for (String str : files) {
+                            fileString += str + "\n";
+                        }
+                    }
+
+                    if (projects == null || projects.length == 0) {
+                        projectString = "No projects recorded.";
+                    } else {
+                        for (String str : projects) {
+                            projectString += str + "\n";
+                        }
+
+                    }
+
+                    JDialog dlg = new JDialog(
+                        (JFrame) StatsButton.this.statsModule.pnlStats
+                            .getRootPane().getParent(),
+                        "Codechange details for " + day.getDate());
+
+                    dlg.getContentPane().setLayout(new GridLayout(1, 2));
+
+                    dlg.setBackground(UIConstants.ECG_LIGHT_GREEN);
+
+                    JPanel pnlLeft = new JPanel();
+
+                    pnlLeft.setBackground(UIConstants.ECG_LIGHT_GREEN);
+
+                    JPanel pnlRight = new JPanel();
+
+                    pnlRight.setBackground(UIConstants.ECG_LIGHT_GREEN);
+
+                    pnlLeft.setBorder(new TitledBorder(new LineBorder(
+                        UIConstants.FRM_EVENT_WINDOW_BORDER_COLOR,
+                        UIConstants.FRM_EVENT_WINDOW_BORDER_WIDTH,
+                        UIConstants.BORDER_ROUNDED), "List of changed files"));
+
+                    pnlRight
+                        .setBorder(new TitledBorder(new LineBorder(
+                            UIConstants.FRM_EVENT_WINDOW_BORDER_COLOR,
+                            UIConstants.FRM_EVENT_WINDOW_BORDER_WIDTH,
+                            UIConstants.BORDER_ROUNDED),
+                            "List of changed projects"));
+
+                    JTextArea txaFiles = new JTextArea();
+
+                    txaFiles.setBackground(UIConstants.ECG_LIGHT_GREEN);
+
+                    txaFiles.append(fileString);
+
+                    JTextArea txaProjects = new JTextArea();
+
+                    txaProjects.setBackground(UIConstants.ECG_LIGHT_GREEN);
+
+                    txaProjects.append(projectString);
+
+                    pnlLeft.add(txaFiles);
+
+                    pnlRight.add(txaProjects);
+
+                    dlg.getContentPane().add(pnlLeft, 0);
+
+                    dlg.getContentPane().add(pnlRight, 1);
+
+                    dlg.pack();
+
+                    dlg.setVisible(true);
+
+                 }
+            });
+
+        }
     }
 
     /**
@@ -745,15 +1052,15 @@ public class StatisticsTargetModule extends TargetModule implements UIModule {
 
         /**
          * This creates the <code>TableModel</code>.
-         * @param statsModule
+         * @param module
          *            Is the module
          */
-        public StatsTableModel(final StatisticsTargetModule statsModule) {
+        public StatsTableModel(final StatisticsTargetModule module) {
 
             statsTableModelLogger.entering(this.getClass().getName(),
-                "StatsTableModel", new Object[] {statsModule});
+                "StatsTableModel", new Object[] {module});
 
-            this.statsModule = statsModule;
+            this.statsModule = module;
 
             this.rowCount = 4 + this.msdtCount;
 
@@ -790,7 +1097,7 @@ public class StatisticsTargetModule extends TargetModule implements UIModule {
                 statsTableModelLogger.exiting(this.getClass().getName(),
                     "getColumnName", "");
 
-                return "";
+                return " ";
             }
 
             Day day = this.statsModule.getDay(columnIndex - 1);
@@ -855,7 +1162,9 @@ public class StatisticsTargetModule extends TargetModule implements UIModule {
             statsTableModelLogger.exiting(this.getClass().getName(),
                 "getValueAt", getRowContent(day, rowIndex));
 
-            return getRowContent(day, rowIndex);
+            Object o = getRowContent(day, rowIndex);
+
+            return o;
 
         }
 
@@ -892,8 +1201,8 @@ public class StatisticsTargetModule extends TargetModule implements UIModule {
 
                 return day.getEnd();
             } else if (rowIndex > 2 && rowIndex < this.msdtCount + 3) {
-                Integer count = day.eventTypeCounterMap.get(ModuleSystem
-                    .getInstance().getMicroSensorDataTypes()[rowIndex - 3]);
+                Integer count = day.msdtMap.get(ModuleSystem.getInstance()
+                    .getMicroSensorDataTypes()[rowIndex - 3]);
 
                 if (count == null) {
 
@@ -906,7 +1215,13 @@ public class StatisticsTargetModule extends TargetModule implements UIModule {
                 statsTableModelLogger.exiting(this.getClass().getName(),
                     "getRowContent", count.toString());
 
+                if (getRowHeadline(rowIndex).equals("msdt.codechange.xsd")) {
+                    return new StatsButton(count.toString(),
+                        this.statsModule, day);
+                }
+
                 return count.toString();
+
 
             } else {
 
@@ -985,7 +1300,7 @@ public class StatisticsTargetModule extends TargetModule implements UIModule {
 
     /**
      * @see org.electrocodeogram.module.target.TargetModule#stopWriter()
-     * This method is not implemented fr this module.
+     *      This method is not implemented fr this module.
      */
     @Override
     public void stopWriter() {
