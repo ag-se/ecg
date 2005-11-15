@@ -2,7 +2,7 @@
 
 <!-- Buildfile for the ECG SocketSourceModule -->
 
-<project name="ECG SocketSourceModule" default="help" basedir=".">
+<project name="ECG SocketSourceModule" basedir=".">
 
 	<!-- Project-wide settings. All directories are relative to the -->
 	<!-- project root directory -->
@@ -14,7 +14,7 @@
 
 	<property name="doc.dir" value="doc"/>
 
-	<property name="lib.dir" value="lib"/>
+	<property name="lib.dir" value="../ECG Build/dist/lib"/>
 
 	<property name="module.dir" value="modules"/>
 
@@ -39,18 +39,6 @@
 		</fileset>
 
 	</path>
-
-
-	<target name="help">
-		<echo message="Build the ServerAndLab component"/>
-		<echo message="Usage: ant [ant options] target1 [ target2 | target3 | ... ]"/>
-		<echo message=""/>
-		<echo message="Build the ECG SocketSourceModule"/>
-		<echo message="javadoc - Generate the API documentation."/>
-		<echo message="clean - Delete class files built during previous builds. Leave directories."/>
-		<echo message="cleanall - clean + Delete any created directories and their contents."/>
-		<echo message="deploy - build + Deploy the ECG SocketSourceModule."/>
-	</target>
 
 	<!-- Target to create the build directories prior to a compile target -->
 	<!-- The start time of the build is marked as well for the log -->
@@ -84,20 +72,6 @@
 
 	</target>
 
-
-	<!-- Generate the API documentation. -->
-	<target name="javadoc">
-
-		<javadoc
-			packagenames="org.*"
-			sourcepath="${src.dir}"
-			destdir="${doc.dir}">
-
-			<classpath refid="classpath"/>
-
-		</javadoc>
-
-	</target>
 
 	<!-- Delete class files built during previous builds. Leave directories. -->
 	<target name="clean">
@@ -147,7 +121,7 @@
 		</copy>
 
 
-		<!-- Copy module into ECG ServerAndLab module directory -->
+		<!-- Copy module into ECG Lab module directory -->
 		<mkdir dir="../ECG_Lab/modules/ECG_SocketSourceModule/"/>
 		
 		<copy todir="../ECG_Lab/modules/ECG_SocketSourceModule/">
