@@ -76,7 +76,7 @@ public class ManualAnnotatorSourceModule extends SourceModule {
             new Object[] {moduleProperty});
 
         if (moduleProperty.getName().equals("Show Dialog")) {
-            if (!this.getState()) {
+            if (!this.isActive()) {
 
                 logger.exiting(this.getClass().getName(), "propertyChanged");
 

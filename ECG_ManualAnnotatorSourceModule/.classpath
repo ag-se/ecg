@@ -3,6 +3,6 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry sourcepath="/ECG_Lab/src" kind="lib" path="lib/ecg/moduleapi.jar"/>
-	<classpathentry kind="lib" path="lib/ecg/event.jar"/>
+	<classpathentry kind="lib" path="/ECG Build/dist/lib/ecg_support.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
