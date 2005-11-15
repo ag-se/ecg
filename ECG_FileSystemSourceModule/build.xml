@@ -2,7 +2,7 @@
 
 <!-- Buildfile for the ECG FileSystemSourceModule -->
 
-<project name="FileSystemSourceModule" default="help" basedir=".">
+<project name="FileSystemSourceModule" basedir=".">
 
 	<!-- Project-wide settings. All directories are relative to the -->
 	<!-- project root directory -->
@@ -14,9 +14,7 @@
 
 	<property name="doc.dir" value="doc"/>
 
-	<property name="lib.dir" value="lib"/>
-
-	<property name="module.dir" value="modules"/>
+	<property name="lib.dir" value="../ECG Build/dist/lib"/>
 
 	<property name="msdt.dir" value="msdt"/>
 
@@ -40,17 +38,7 @@
 
 	</path>
 
-
-	<target name="help">
-		<echo message="FileSystemSourceModule"/>
-		<echo message="Usage: ant [ant options] target1 [ target2 | target3 | ... ]"/>
-		<echo message=""/>
-		<echo message="javadoc - Generate the API documentation."/>
-		<echo message="clean - Delete class files built during previous builds. Leave directories."/>
-		<echo message="cleanall - clean + Delete any created directories and their contents."/>
-		<echo message="deploy - build + Deploy the ECG FileSystemTargetModule."/>
-	</target>
-
+	
 	<!-- Target to create the build directories prior to a compile target -->
 	<!-- The start time of the build is marked as well for the log -->
 	<target name="prepare">
@@ -65,7 +53,7 @@
 
 	</target>
 
-	<!-- Build the ECG IOSourceModule. -->
+	<!-- Build the ECG FileSystemSourceModule -->
 	<target name="build" depends="prepare">
 
 		<echo message="Building the ECG FileSystemSourceModule..."/>
@@ -82,23 +70,8 @@
 		</javac>
 
 	</target>
-
-
-	<!-- Generate the API documentation. -->
-	<target name="javadoc">
-
-		<javadoc
-			packagenames="org.*"
-			sourcepath="${src.dir}"
-			destdir="${doc.dir}">
-
-			<classpath refid="classpath"/>
-
-		</javadoc>
-
-	</target>
-
-	<!-- Delete class files built during previous builds. Leave directories. -->
+	
+	<!-- Delete class files built during previous builds. Leave directories -->
 	<target name="clean">
 
 		<delete failonerror="no">
@@ -107,20 +80,20 @@
 
 	</target>
 
-	<!-- Delete any created directories and their contents. -->
+	<!-- Delete any created directories and their contents -->
 	<target name="cleanall" depends="clean">
 
 		<delete dir="${build.dir}"/>
 		<delete dir="${dist.dir}"/>
 		<delete dir="${doc.dir}"/>
-		
+
 		<delete failonerror="no">
-				<fileset dir="${lib.dir}/ecg" includes="**/*.jar"/>
+			<fileset dir="${lib.dir}/ecg" includes="**/*.jar"/>
 		</delete>
 
 	</target>
 
-	<!-- Deploy the ECG FileSystemSourceModule. -->
+	<!-- Deploy the ECG FileSystemSourceModule -->
 	<target name="deploy" depends="build">
 
 		<echo message="Deploying FileSystemSourceModule..."/>
@@ -128,7 +101,6 @@
 		<!-- Create the distribuition directories -->
 		<mkdir dir="${dist.dir}"/>
 		<mkdir dir="${dist.dir}/ECG_FileSystemSourceModule"/>
-		<mkdir dir="${dist.dir}/doc"/>
 
 		<!-- Copy the libraries -->
 		<copy todir="${dist.dir}/ECG_FileSystemSourceModule">
@@ -138,17 +110,9 @@
 
 		</copy>
 
-		<!-- Copy the documentation -->
-		<copy todir="${dist.dir}/doc">
-
-			<fileset dir="${doc.dir}"/>
-
-		</copy>
-
-
 		<!-- Copy module into ECG FileSystemSourceModule module directory -->
 		<mkdir dir="../ECG_Lab/modules/ECG_FileSystemSourceModule/"/>
-		
+
 		<copy todir="../ECG_Lab/modules/ECG_FileSystemSourceModule/">
 
 			<fileset dir="${dist.dir}/ECG_FileSystemSourceModule/"/>
@@ -156,5 +120,6 @@
 		</copy>
 	</target>
 
+	
 </project>
 

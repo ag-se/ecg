@@ -5,17 +5,24 @@
  * By: Frank@Schlesinger.com
  */
 
-package org.electrocodeogram.module.source;
+package org.electrocodeogram.module.source.implementation;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.electrocodeogram.logging.LogHelper;
-import org.electrocodeogram.module.ModuleProperty;
-import org.electrocodeogram.module.ModulePropertyException;
+import org.electrocodeogram.module.ModuleActivationException;
+import org.electrocodeogram.modulepackage.ModuleProperty;
+import org.electrocodeogram.modulepackage.ModulePropertyException;
+import org.electrocodeogram.module.source.EventReader;
+import org.electrocodeogram.module.source.SourceModule;
+import org.electrocodeogram.module.source.SourceModuleException;
 
 /**
- * This class is an ECG module used to read events from a file into the ECG Lab.
+ * This class is an ECG module used to read events from a file into
+ * the ECG Lab.
  */
 public class FileSystemSourceModule extends SourceModule {
 
@@ -58,18 +65,20 @@ public class FileSystemSourceModule extends SourceModule {
     private File inputFile;
 
     /**
-     * This <em>EventReader</em> can either read events as fast as possible,
-     * or it can read in the events in the same time as they were written into the file.
+     * This <em>EventReader</em> can either read events as fast as
+     * possible, or it can read in the events in the same time as they
+     * were written into the file.
      */
     private ReadMode readMode;
 
     /**
-     * The creates the module instance. It is not to be
-     * called by developers, instead it is called from the {@link ModuleRegistry}
-     * when the user requested a new instance of this
-     * module.
+     * The creates the module instance. It is not to be called by
+     * developers, instead it is called from the
+     * <code>ModuleRegistry</code> when the user requested a new instance
+     * of this module.
      * @param id
-     *            This is the unique <code>String</code> id of the module
+     *            This is the unique string id of the
+     *            module
      * @param name
      *            This is the name which is assigned to the module
      *            instance
@@ -85,13 +94,13 @@ public class FileSystemSourceModule extends SourceModule {
     }
 
     /**
-     * @see org.electrocodeogram.module.Module#propertyChanged(org.electrocodeogram.module.ModuleProperty)
+     * @see org.electrocodeogram.module.Module#propertyChanged(org.electrocodeogram.modulepackage.ModuleProperty)
      */
     @Override
     public final void propertyChanged(final ModuleProperty moduleProperty)
         throws ModulePropertyException {
 
-        logger.entering(this.getClass().getName(), "FileSystemSourceModule",
+        logger.entering(this.getClass().getName(), "propertyChanged",
             new Object[] {moduleProperty});
 
         if (moduleProperty.getName().equals("Input File")) {
@@ -100,6 +109,18 @@ public class FileSystemSourceModule extends SourceModule {
 
             this.inputFile = propertyValueFile;
 
+            if (isActive()) {
+                deactivate();
+
+                try {
+                    activate();
+                } catch (ModuleActivationException e) {
+
+                    throw new ModulePropertyException(e.getMessage(), this
+                        .getName(), this.getId(), moduleProperty.getName(),
+                        moduleProperty.getValue());
+                }
+            }
         } else if (moduleProperty.getName().equals("Enable Realtime Mode")) {
             if (moduleProperty.getValue().equalsIgnoreCase("true")) {
                 this.readMode = ReadMode.REALTIME;
@@ -114,7 +135,7 @@ public class FileSystemSourceModule extends SourceModule {
             }
         } else {
 
-            logger.exiting(this.getClass().getName(), "FileSystemSourceModule");
+            logger.exiting(this.getClass().getName(), "propertyChanged");
 
             throw new ModulePropertyException(
                 "The module does not support this property.", this.getName(),
@@ -122,11 +143,12 @@ public class FileSystemSourceModule extends SourceModule {
                     .getValue());
         }
 
-        logger.exiting(this.getClass().getName(), "FileSystemSourceModule");
+        logger.exiting(this.getClass().getName(), "propertyChanged");
     }
 
     /**
-     * This method sets the <em>ReadMode</em> for the <em>FileReaderThread</em>.
+     * This method sets the <em>ReadMode</em> for the
+     * <em>FileReaderThread</em>.
      */
     private void setMode() {
 
@@ -141,10 +163,10 @@ public class FileSystemSourceModule extends SourceModule {
     }
 
     /**
-     * @see org.electrocodeogram.module.Module#update()
-     *      This method is not implemented in this module, as
-     *      this module does not need to be informed about
-     *      ECG Lab subsystem's state changes.
+     * @see org.electrocodeogram.module.Module#update() This method is
+     *      not implemented in this module, as this module does not
+     *      need to be informed about ECG Lab subsystem's state
+     *      changes.
      */
     @Override
     public void update() {
@@ -175,29 +197,49 @@ public class FileSystemSourceModule extends SourceModule {
     }
 
     /**
+     * @throws SourceModuleException
      * @see org.electrocodeogram.module.source.SourceModule#preStart()
      */
     @Override
-    public final void preStart() {
+    public final void preStart() throws SourceModuleException {
 
         logger.entering(this.getClass().getName(), "preStart");
 
         if (this.inputFile == null) {
 
+            logger.log(Level.WARNING, "There is no input file selected.");
+
             logger.exiting(this.getClass().getName(), "preStart");
 
-            return;
+            throw new SourceModuleException("There is no input file selected.",
+                this.getName());
+
         }
 
-        this.readerThread = new FileReaderThread(this, this.inputFile,
-            this.readMode);
+        this.readerThread = new FileReaderThread(this, this.readMode);
+
+        logger.log(Level.FINE, "FileReader created.");
+
+        try {
+            this.readerThread.setInputFile(this.inputFile);
+
+            logger.log(Level.FINE, "input file set.");
+        } catch (IOException e) {
+
+            logger.log(Level.WARNING,
+                "An error has occured while starting this module.");
+
+            throw new SourceModuleException(
+                "An error has occured while starting this module.", this
+                    .getName());
+        }
 
         logger.exiting(this.getClass().getName(), "preStart");
     }
 
     /**
      * @see org.electrocodeogram.module.source.SourceModule#postStop()
-     * This method is not implemented in this module.
+     *      This method is not implemented in this module.
      */
     @Override
     public final void postStop() {

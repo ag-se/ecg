@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <module>
 	<id>
-		org.electrocodeogram.module.source.FileSystemSourceModule
+		org.electrocodeogram.module.source.implementation.FileSystemSourceModule
 	</id>
 	<provider-name>
 		Frank Schlesinger (Frank@Schlesinger.com)
@@ -13,10 +13,10 @@
 		File Reader
 	</name>
 	<class>
-		org.electrocodeogram.module.source.FileSystemSourceModule
+		org.electrocodeogram.module.source.implementation.FileSystemSourceModule
 	</class>
 	<description>
-		This module is able to read a file system source for previously written events.
+		This module reads in a file for previously written events.
 	</description>
 	<type>
 		SOURCE
@@ -30,6 +30,7 @@
 				java.io.File
 			</propertyType>
 			<propertyValue>
+				out.log
 			</propertyValue>
 		</property>
 		<property>
