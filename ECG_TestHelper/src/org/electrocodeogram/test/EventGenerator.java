@@ -1,3 +1,11 @@
+/*
+ * Class: EventGenerator
+ * Version: 1.0
+ * Date: 19.10.2005
+ * By: Frank@Schlesinger.com
+ */
+
+
 package org.electrocodeogram.test;
 
 import java.io.BufferedReader;
@@ -1034,22 +1042,7 @@ public class EventGenerator {
         }
         return eventPacket;
     }
-
-    // /**
-    // * Given a String[] this method returns a syntactically valid
-    // List
-    // * of it with "add" and "testdata" being the first to entries.
-    // * @param payload
-    // * The String[] that builds the payload for the argList
-    // * @return The argList for use in a syntactically valid
-    // * EventPacket
-    // */
-    // private List createValidArglist(String[] payload) {
-    // List list = Arrays.asList(payload);
-    //
-    // return list;
-    // }
-
+  
     /**
      * Creates a list of <em>Integer</em> objects. This is used for
      * the creation of malformed events.
@@ -1151,7 +1144,7 @@ public class EventGenerator {
      *            The size of the string.
      * @return The randomly created string
      */
-    private String createRandomString(int size) {
+    private String createRandomString(final int size) {
 
         Random random = new Random();
 

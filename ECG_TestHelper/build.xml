@@ -14,7 +14,7 @@
 
 	<property name="doc.dir" value="doc"/>
 
-	<property name="lib.dir" value="lib"/>
+	<property name="lib.dir" value="../ECG Build/dist/lib"/>
 
 	<property name="bin.dir" value="bin"/>
 
@@ -93,7 +93,7 @@
 		<jar
 				compress="true"
 				duplicate="fail"
-				jarfile="${build.lib}/testHelper.jar"
+				jarfile="${build.lib}/ecg_test.jar"
 				basedir="${build.classes}"/>
 
 	</target>
@@ -140,7 +140,7 @@
 	<!-- Deploy the ECG TestHelper component into ./dist/lib. -->
 	<target name="deploy" depends="jar">
 
-		<echo message="Deploying testHelper.jar"/>
+		<echo message="Deploying ecg_test.jar"/>
 
 
 		<!-- Create the distribuition directories -->
@@ -151,7 +151,7 @@
 		<!-- Copy the libraries -->
 		<copy todir="${dist.dir}/lib">
 
-			<fileset dir="${build.lib}" includes="testHelper.jar" />
+			<fileset dir="${build.lib}" includes="ecg_test.jar" />
 
 		</copy>
 
@@ -162,7 +162,15 @@
 
 		</copy>
 
-		<!-- Copy the JARs to the other projects -->
+		
+		<copy todir="../ECG Build/dist/lib">
+
+				<fileset dir="${build.lib}" includes="ecg_test.jar" />
+
+				</copy>
+
+		
+		<!-- Copy the JARs to the other projects 
 		<copy todir="../ECG_SensorShell/lib/ecg">
 
 			<fileset dir="${build.lib}" includes="testHelper.jar" />
@@ -170,12 +178,14 @@
 		</copy>
 
 
-		<!-- Copy the JARs to the other projects -->
+		
 		<copy todir="../ECG_Lab/lib/ecg">
 
 			<fileset dir="${build.lib}" includes="testHelper.jar" />
 
 		</copy>
+
+Copy the JARs to the other projects -->
 
 	</target>
 
