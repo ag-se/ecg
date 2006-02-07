@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
+ 
 <!-- Buildfile for the ECG SensorShell component -->
 
 <project name="ElectroCodeoGram" default="all" basedir=".">
@@ -22,6 +22,21 @@
 		<dirset dir="../ECG_StatisticsTargetModule/src" />
 	</path>
 
+	
+	<target name="CleanAll ECG Build">
+	
+		
+		<echo message="######################" />
+		<echo message="CLEANING DIST FOLDER #" />
+		<echo message="######################" />
+		
+		<delete failonerror="no">
+				<fileset dir="dist/ecg" />
+				<exclude name="dist/lib/*.jar"/>
+		</delete>
+		
+	</target>
+		
 
 	<!-- Calls the ant script of the ECG SensorShell component to clean it -->
 	<target name="CleanAll ECG SensorShell">
@@ -162,7 +177,7 @@
 		<echo message="CLEANING ECG MANUALANNOTATORSOURCEMODULE" />
 		<echo message="########################################" />
 
-		<ant dir="../ECG_IOSourceModule" target="cleanall" />
+		<ant dir="../ECG_ManualAnnotatorSourceModule" target="cleanall" />
 
 	</target>
 	
@@ -189,7 +204,7 @@
 	</target>
 
 	<!-- Cleans all ECG components -->
-	<target name="cleanAll" depends="CleanAll ECG SensorShell,CleanAll ECG TestHelper,CleanAll ECG ServerAndLab,CleanAll ECG SocketSourceModule, CleanAll ECG FileSystemTargetModule, CleanAll ECG FileSystemSourceModule, CleanAll ECG MSDTFilterIntermediateModule, CleanAll ECG CodechangeDifferIntermediateModule, CleanAll ECG ManualAnnotatorSourceModule, CleanAll ECG HackyStatTargetModule, CleanAll ECG HackyStatSourceModule, CleanAll ECG StatisticsTargetModule, CleanAll ECG TestFirstEpisodeRecognizerModule, CleanAll ECG Installer" />
+	<target name="cleanAll" depends="CleanAll ECG Build, CleanAll ECG SensorShell,CleanAll ECG TestHelper,CleanAll ECG ServerAndLab,CleanAll ECG SocketSourceModule, CleanAll ECG FileSystemTargetModule, CleanAll ECG FileSystemSourceModule, CleanAll ECG MSDTFilterIntermediateModule, CleanAll ECG ManualAnnotatorSourceModule, CleanAll ECG HackyStatTargetModule, CleanAll ECG HackyStatSourceModule, CleanAll ECG StatisticsTargetModule, CleanAll ECG Installer" />
 
 
 	<!-- Calls the ant script of the ECG SensorShell component to build it -->
@@ -399,14 +414,12 @@
 
 
 	<!-- Builds all ECG components -->
-	<target name="buildAll" depends="Build ECG SensorShell Event,Build ECG TestHelper, Build ECG SensorShell Shell,Build ECG ServerAndLab Module-API, Build ECG FileSystemTargetModule, Build ECG FileSystemSourceModule, Build ECG MSDTFilterIntermediateModule, Build ECG CodechangeDifferIntermediateModule,Build ECG SocketSourceModule, Build ECG ManualAnnotatorSourceModule, Build ECG HackyStatTargetModule, Build ECG HackyStatSourceModule, Build ECG StatisticsTargetModule, Build ECG TestFirstEpisodeRecognizerModule, Build ECG Installer, Assemble ECG ServerAndLab" />
+	<target name="buildAll" depends="Build ECG SensorShell Event,Build ECG TestHelper, Build ECG SensorShell Shell,Build ECG ServerAndLab Module-API, Build ECG FileSystemTargetModule, Build ECG FileSystemSourceModule, Build ECG MSDTFilterIntermediateModule, Build ECG SocketSourceModule, Build ECG ManualAnnotatorSourceModule, Build ECG HackyStatTargetModule, Build ECG HackyStatSourceModule, Build ECG StatisticsTargetModule, Build ECG Installer, Assemble ECG ServerAndLab" />
 
 	<!-- Package release -->
 	<target name="Package release" depends="cleanAll,buildAll">
 
-		<delete failonerror="no">
-			<fileset dir="dist" />
-		</delete>
+		
 
 		<mkdir dir="dist" />
 
@@ -478,13 +491,14 @@
 
 	<group title="ECG Eclipse Sensor" packages="org.electrocodeogram.sensor.eclipse:org.hackystat.stdext.sensor.eclipse" />
 	<group title="ECG SensorShell" packages="org.electrocodeogram.client:org.hackystat.kernel.shell:org.hackystat.kernel.admin" />
-	<group title="ECG Module API" packages="org.electrocodeogram.module:org.electrocodeogram.module.source:org.electrocodeogram.module.intermediate:org.electrocodeogram.module.target:org.electrocodeogram.module.event" />			
+	<group title="ECG Module API" packages="org.electrocodeogram.module:org.electrocodeogram.module.source:org.electrocodeogram.module.intermediate:org.electrocodeogram.module.target:org.electrocodeogram.module.event" />
+	<group title="ECG ModulePackage" packages="org.electrocodeogram.modulepackage:org.electrocodeogram.modulepackage.classloader:org.electrocodeogram.modulepackage.modulesetup" />			
 	<group title="ECG Event API" packages="org.electrocodeogram.event" />
 	<group title="ECG Lab" packages="org.electrocodeogram.module.classloader:org.electrocodeogram.module.registry:org.electrocodeogram.module.setup:org.electrocodeogram.msdt:org.electrocodeogram.msdt.registry:org.electrocodeogram.system:org.electrocodeogram.ui:org.electrocodeogram.ui.*" />						
 	<group title="ECG SourceModules" packages="org.electrocodeogram.module.source.implementation" />						
 	<group title="ECG IntermediateModules" packages="org.electrocodeogram.module.intermediate.implementation" />						
 	<group title="ECG TargetModules" packages="org.electrocodeogram.module.target.implementation" />						
-	<group title="ECG Helper Packages" packages="org.electrocodeogram.logging:org.electrocodeogram.xml:org.electrocodeogram.installer:org.electrocodeogram.constants" />
+	<group title="ECG Helper Packages" packages="org.electrocodeogram.logging:org.electrocodeogram.misc.xml:org.electrocodeogram.installer:org.electrocodeogram.misc.constants" />
 	<group title="ECG Test Packages" packages="org.electrocodeogram.test:org.electrocodeogram.test.*" />
 			
 			
