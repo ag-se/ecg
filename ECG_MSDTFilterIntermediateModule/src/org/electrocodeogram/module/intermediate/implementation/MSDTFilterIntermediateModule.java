@@ -52,7 +52,7 @@ public class MSDTFilterIntermediateModule extends IntermediateModule implements 
     /**
      * A reference to the GUi dialog.
      */
-    private JDialog dlgFilterConfiguration;
+    //private JDialog dlgFilterConfiguration;
 
     /**
      * This is a map containing the checkboxes from the user dialog.
@@ -150,19 +150,19 @@ public class MSDTFilterIntermediateModule extends IntermediateModule implements 
 
     }
 
-    /**
-     * Returns the user dialog.
-     * @return The user dialog
-     */
-    final JDialog getDialog() {
-
-        logger.entering(this.getClass().getName(), "getDialog");
-
-        logger.exiting(this.getClass().getName(), "getDialog",
-            this.dlgFilterConfiguration);
-
-        return this.dlgFilterConfiguration;
-    }
+//    /**
+//     * Returns the user dialog.
+//     * @return The user dialog
+//     */
+//    final JDialog getDialog() {
+//
+//        logger.entering(this.getClass().getName(), "getDialog");
+//
+//        logger.exiting(this.getClass().getName(), "getDialog",
+//            this.dlgFilterConfiguration);
+//
+//        return this.dlgFilterConfiguration;
+//    }
 
     /**
      * This method fills the {@link #msdtFilterMap}
@@ -381,7 +381,8 @@ public class MSDTFilterIntermediateModule extends IntermediateModule implements 
             final ActionEvent e) {
                 updateMsdtFilterMap();
 
-                getDialog().dispose();
+                //getDialog().dispose();
+                
 
             }
         });
@@ -392,7 +393,7 @@ public class MSDTFilterIntermediateModule extends IntermediateModule implements 
 
             public void actionPerformed(@SuppressWarnings("unused")
             final ActionEvent e) {
-                getDialog().dispose();
+                //getDialog().dispose();
 
             }
         });
@@ -451,7 +452,9 @@ public class MSDTFilterIntermediateModule extends IntermediateModule implements 
      */
     public final JPanel getPanel() {
 
-        return createMainPanel();
+        this.pnlMain = createMainPanel(); 
+        
+        return this.pnlMain;
     }
 
 }
