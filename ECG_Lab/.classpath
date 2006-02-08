@@ -13,6 +13,6 @@
 	<classpathentry kind="lib" path="lib/misc/tray.jar"/>
 	<classpathentry kind="lib" path="/ECG Build/dist/lib/ecg_support.jar"/>
 	<classpathentry kind="lib" path="/ECG Build/dist/lib/ecg_test.jar"/>
-	<classpathentry kind="lib" path="/ECG Build/dist/ecg/lib/hackystat/sensorshell.jar"/>
+	<classpathentry kind="lib" path="/ECG Build/dist/lib/hackystat/sensorshell.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
