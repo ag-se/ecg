@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<module>
+	<id>
+		org.electrocodeogram.module.target.implementation.HackyStatTargetModule
+	</id>
+	<provider-name>
+		Frank Schlesinger (Frank@Schlesinger.com)
+	</provider-name>
+	<version>
+		1.0
+	</version>
+	<name>
+		HackyStat Writer
+	</name>
+	<class>
+		org.electrocodeogram.module.target.implementation.HackyStatTargetModule
+	</class>
+	<description>
+		This module sends incoming events to a HackyStat server.
+	</description>
+	<type>
+		TARGET
+	</type>
+	<properties>
+		<property>
+			<propertyName>
+				HackyStat Host
+			</propertyName>
+			<propertyType>
+				java.lang.String
+			</propertyType>
+			<propertyValue>
+			</propertyValue>
+		</property>
+		<property>
+			<propertyName>
+				HackyStat Key
+			</propertyName>
+			<propertyType>
+				java.lang.String
+			</propertyType>
+			<propertyValue>
+			</propertyValue>
+		</property>
+	</properties>
+	
+</module>
