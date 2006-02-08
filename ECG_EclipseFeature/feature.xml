@@ -3,8 +3,7 @@
       id="ECG_SensorAndLab"
       label="ElectroCodeoGram EclipseSensor with ECG Lab"
       version="1.0.0"
-      provider-name="Frank Schlesinger (Frank@Schlesinger.com)"
-      plugin="org.electrocodeogram.sensor.eclipse">
+      provider-name="Frank Schlesinger (Frank@Schlesinger.com)">
    <install-handler library="installer.jar" handler="org.electrocodeogram.installer.Installer"/>
 
    <description url="http://www.electrocodeogram.org">
