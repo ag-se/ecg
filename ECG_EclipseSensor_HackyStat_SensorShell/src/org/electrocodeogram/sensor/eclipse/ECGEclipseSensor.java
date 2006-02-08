@@ -7,9 +7,7 @@
 
 package org.electrocodeogram.sensor.eclipse;
 
-import java.io.File;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
@@ -50,7 +48,6 @@ import org.electrocodeogram.logging.LogHelper.ECGLevel;
 import org.hackystat.kernel.admin.SensorProperties;
 import org.hackystat.kernel.shell.SensorShell;
 import org.hackystat.stdext.sensor.eclipse.EclipseSensor;
-import org.hackystat.stdext.sensor.eclipse.EclipseSensorPlugin;
 
 /**
  * This is the <em>ECG EclipseSensor</em>. It is a collection of
@@ -151,25 +148,12 @@ public final class ECGEclipseSensor {
          * the PlugIn directory name itself and are adding the "ecg"
          * subdirectory.
          */
-        // String id =
-        // EclipseSensorPlugin.getInstance().getDescriptor()
-        // .getUniqueIdentifier();
-        //
-        // String version =
-        // EclipseSensorPlugin.getInstance().getDescriptor()
-        // .getVersionIdentifier().toString();
-        String[] path = {EclipseSensorPlugin.getInstance().getSensorPath()
-                         + File.separator + "ecg"};
-
-        List list = Arrays.asList(path);
 
         /*
          * The only way to communicate with the ECG SensorShell is by
          * using the HackyStat's EclipseSensorShell, since we are not
          * having a reference to the SensorShell itself.
          */
-        // this.eclipseSensorShell.doCommand(SensorShell.ECG_LAB_PATH,
-        // list);
         logger.log(Level.FINE,
             "The Sensorpath has been sent to the SensorShell.");
 
@@ -1468,29 +1452,6 @@ public final class ECGEclipseSensor {
                                     + "]]></document><documentname>"
                                     + this.name
                                     + "</documentname></codechange></microActivity>");
-
-//            while (true) {
-//                try {
-//                    Thread.sleep(1000);
-//                } catch (InterruptedException e) {
-//                    // TODO Auto-generated catch block
-//                    e.printStackTrace();
-//                }
-//                logger.log(ECGLevel.PACKET,
-//                    "A codechange event has been recorded.");
-//                sensor
-//                    .processActivity(
-//                        "msdt.codechange.xsd",
-//                        "<?xml version=\"1.0\"?><microActivity><commonData><username>"
-//                                        + sensor.getUsername()
-//                                        + "</username><projectname>"
-//                                        + sensor.getProjectname()
-//                                        + "</projectname></commonData><codechange><document><![CDATA["
-//                                        + this.doc.get()
-//                                        + "]]></document><documentname>"
-//                                        + this.name
-//                                        + "</documentname></codechange></microActivity>");
-//            }
 
             logger.exiting(this.getClass().getName(), "run");
 
