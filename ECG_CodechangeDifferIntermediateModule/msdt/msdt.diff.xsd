@@ -7,14 +7,26 @@
 				<xs:element name="diff">
 					<xs:complexType>
 						<xs:sequence>
-							<xs:element name="result">
+							<xs:element name="delta" maxOccurs="unbounded" minOccurs="1">
 								<xs:complexType>
 									<xs:sequence>
+										<xs:element name="type">
+											<xs:simpleType>
+  												<xs:restriction base="xs:string">
+  													<xs:enumeration value="changed"/>
+				 	   								<xs:enumeration value="inserted before"/>
+	 	   											<xs:enumeration value="deleted"/>
+	 	   											<xs:enumeration value="moved"/>
+  												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>										
+									
 										<xs:element name="linenumber" type="xs:integer"/>
-										<xs:element name="before" type="xs:token"/>
-										<xs:element name="after" type="xs:token"/>
+										<xs:element name="from" type="xs:token"/>
+										<xs:element name="to" type="xs:token"/>
+							
 									</xs:sequence>
-								</xs:complexType>	
+								</xs:complexType>
 							</xs:element>
 						</xs:sequence>
 					</xs:complexType>			
