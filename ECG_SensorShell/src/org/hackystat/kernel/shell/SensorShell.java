@@ -40,17 +40,17 @@ import org.hackystat.kernel.admin.SensorProperties;
  * href="http://www.hackystat.org">www.hackystat.org</a> for more
  * information).<br>
  * Its shall be used by sensors from the ECG and the
- * <em>HackyStat</em> system and so this class has the same
- * signature as the <em>HackyStat
+ * <em>Hackystat</em> system and so this class has the same
+ * signature as the <em>Hackystat
  * SensorShell</em>. The
  * <em>SensorShell's</em> purpose is to send recorded events ECG
  * Lab, where they are analysed and stored. A sensor developer does
  * not have to implement the functionality of sending data to the ECG
  * Lab by himself. Because the ECG shall directly support the use of
  * original HackyStat sensors, this class acts like the original
- * <em>HackyStat SensorShell</em> class. That means that every
- * original <em>HackyStat</em> sensor is able to collect data for
- * the ECG by simply replacing the <em>HackyStat's</em>
+ * <em>Hackystat SensorShell</em> class. That means that every
+ * original <em>Hackystat</em> sensor is able to collect data for
+ * the ECG by simply replacing the <em>Hackystat's</em>
  * sensorshell.jar library with the ECG sensorshell.jar. Sensors are
  * able to use this class in to different ways depending on the sensor
  * programming language. If the sensor is written in Java, this class

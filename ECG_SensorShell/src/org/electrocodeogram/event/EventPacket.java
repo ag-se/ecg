@@ -24,7 +24,7 @@ import org.electrocodeogram.logging.LogHelper;
  * Instead events with a legal syntax are stored in
  * {@link org.electrocodeogram.event.WellFormedEventPacket} objetcs
  * and events with validated content are stored in
- * {@link org.electrocodeogram.event.ValidEventPackets}.
+ * <code>ValidEventPacket</code>.
  */
 public class EventPacket implements Serializable {
 
@@ -51,7 +51,7 @@ public class EventPacket implements Serializable {
     private Date myTimeStamp;
 
     /**
-     * The <em>HackyStat SensorDataType</em> of the event.
+     * The <em>Hackystat SensorDataType</em> of the event.
      */
     private String mySensorDataType;
 
@@ -95,10 +95,10 @@ public class EventPacket implements Serializable {
      * processing this event at last.
      * @return The id of the last processing module
      */
-    public int getSourceId() {
+    public final int getSourceId() {
         logger.entering(this.getClass().getName(), "getSourceId");
 
-        logger.exiting(this.getClass().getName(), "getSourceId", this.sourceId);
+        logger.exiting(this.getClass().getName(), "getSourceId", new Integer(this.sourceId));
 
         return this.sourceId;
     }
@@ -107,7 +107,7 @@ public class EventPacket implements Serializable {
      * This method returns the timestamp of the event.
      * @return The timestamp
      */
-    public Date getTimeStamp() {
+    public final Date getTimeStamp() {
         logger.entering(this.getClass().getName(), "getTimeStamp");
 
         if (this.myTimeStamp != null) {
@@ -128,7 +128,7 @@ public class EventPacket implements Serializable {
      * the event.
      * @return The <em>HackyStat SensorDataType</em>
      */
-    public String getSensorDataType() {
+    public final String getSensorDataType() {
         logger.entering(this.getClass().getName(), "getSensorDataType");
 
         logger.exiting(this.getClass().getName(), "getSensorDataType",
@@ -138,10 +138,10 @@ public class EventPacket implements Serializable {
     }
 
     /**
-     * This method returns the stringlist of the event
+     * This method returns the stringlist of the event.
      * @return The stringlist
      */
-    public List getArgList() {
+    public final List getArgList() {
         logger.entering(this.getClass().getName(), "getArglist");
 
         logger.exiting(this.getClass().getName(), "getArglist", this.myArgList);
@@ -155,7 +155,7 @@ public class EventPacket implements Serializable {
      * @return A <code>String</code> representation of the event
      */
     @Override
-    public String toString() {
+    public final String toString() {
         logger.entering(this.getClass().getName(), "toString");
 
         String string = "";
@@ -204,7 +204,7 @@ public class EventPacket implements Serializable {
      *         timestamps, SensorDataTypes and stringlists and
      *         <code>false</code> otherwise
      */
-    public boolean isEqual(Object packet) {
+    public final boolean isEqual(final Object packet) {
         logger.entering(this.getClass().getName(), "isEqual",
             new Object[] {packet});
 

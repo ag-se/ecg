@@ -13,7 +13,7 @@ import org.electrocodeogram.logging.LogHelper;
 
 /**
  * When more events are added to the buffer as allowed by
- * {@link EventSender#MAX_QUEUE_SIZE}, this <em>Exceptiony</em> is
+ * {@link EventSender#MAX_QUEUE_SIZE}, this exception is
  * thrown.
  */
 public class EventPacketQueueOverflowException extends Exception {
@@ -30,7 +30,7 @@ public class EventPacketQueueOverflowException extends Exception {
     private static final long serialVersionUID = 870916601241806158L;
 
     /**
-     * Creates the <em>Exception</em>.
+     * Creates the exception.
      */
     public EventPacketQueueOverflowException() {
         logger.entering(this.getClass().getName(),

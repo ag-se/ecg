@@ -2,7 +2,7 @@
 
 <!-- Buildfile for the Event-API and ECG SensorShell component -->
 
-<project name="ECG SensorShell" default="help" basedir=".">
+<project name="ECG SensorShell" basedir=".">
 
 	<!-- Project-wide settings. All directories are relative to the -->
 	<!-- project root directory -->
@@ -14,7 +14,7 @@
 
 	<property name="doc.dir" value="doc"/>
 
-	<property name="lib.dir" value="lib"/>
+	<property name="lib.dir" value="../ECG Build/dist/lib"/>
 
 	<property name="bin.dir" value="bin"/>
 
@@ -40,22 +40,6 @@
 
 	</path>
 
-
-	<target name="help">
-		<echo message="Build the ECG SensorShell component"/>
-		<echo message="Usage: ant [ant options] target1 [ target2 | target3 | ... ]"/>
-		<echo message=""/>
-		<echo message="help - print out this help."/>
-		<echo message="buildEvent - Build the Event-API."/>
-		<echo message="buildShell - Build the ECG SensorShell component."/>
-		<echo message="jarEvent - buildEvent + Package the Event-API to event.jar."/>
-		<echo message="jarShell - buildShell + Package the ECG SensorShell component to sensorshell.jar."/>
-		<echo message="javadoc - Generate the API documentation."/>
-		<echo message="clean - Delete class files built during previous builds. Leave directories."/>
-		<echo message="cleanall - clean + Delete any created directories and their contents."/>
-		<echo message="deployEvent - jarEvent + Deploy the event.jar to ./dist/lib/."/>
-		<echo message="deployShell - jarShell + Deploy the sensorshell.jar to ./dist/lib/."/>
-	</target>
 
 	<!-- Target to create the build directories prior to a compile target -->
 	<!-- The start time of the build is marked as well for the log -->
@@ -125,16 +109,16 @@
 
 	</target>
 
-	<!-- Package the Event-APT to event.jar. -->
+	<!-- Package the Event-APT to ecg_support.jar. -->
 	<target name="jarEvent" depends="buildEvent,buildLogging">
 
-		<echo message="Packaging the Event-APT to event.jar...."/>
+		<echo message="Packaging the Event-APT to ecg_support.jar...."/>
 
 		<jar
 				excludes="org.hackystat.*,org.electrocodeogram.test.*"
 				compress="true"
 				duplicate="fail"
-				jarfile="${build.lib}/event.jar"
+				jarfile="${build.lib}/ecg_support.jar"
 				basedir="${build.classes}" />
 	</target>
 
@@ -209,92 +193,14 @@
 
 		</copy>
 
-		<!-- Copy the documentation -->
-		<copy todir="${dist.dir}/doc">
-
-			<fileset dir="${doc.dir}"/>
-
-		</copy>
-
 		<!-- Copy the JARs to the other projects -->
-		<copy todir="../ECG_TestHelper/lib/ecg">
+		
+		<copy todir="../ECG Build/dist/lib/">
 
-			<fileset dir="${build.lib}" includes="event.jar" />
+				<fileset dir="${build.lib}" includes="ecg_support.jar" />
 
 		</copy>
 		
-		<copy todir="../ECG_Lab/lib/ecg">
-
-			<fileset dir="${build.lib}" includes="event.jar" />
-
-		</copy>
-		
-		<copy todir="../ECG_SocketSourceModule/lib/ecg">
-
-				<fileset dir="${build.lib}" includes="event.jar" />
-
-		</copy>
-		
-		<copy todir="../ECG_FileSystemTargetModule/lib/ecg">
-
-				<fileset dir="${build.lib}" includes="event.jar" />
-
-		</copy>
-		
-		<copy todir="../ECG_HackyStatTargetModule/lib/ecg">
-
-				<fileset dir="${build.lib}" includes="event.jar" />
-
-		</copy>
-		
-		<copy todir="../ECG_FileSystemSourceModule/lib/ecg">
-
-				<fileset dir="${build.lib}" includes="event.jar" />
-
-		</copy>
-		
-		<copy todir="../ECG_MSDTFilterIntermediateModule/lib/ecg">
-
-				<fileset dir="${build.lib}" includes="event.jar" />
-
-		</copy>
-		
-		<copy todir="../ECG_StatisticsTargetModule/lib/ecg">
-
-				<fileset dir="${build.lib}" includes="event.jar" />
-
-		</copy>
-		
-		<copy todir="../ECG_CodechangeDifferIntermediateModule/lib/ecg">
-
-				<fileset dir="${build.lib}" includes="event.jar" />
-
-		</copy>
-		
-		<copy todir="../ECG_IOSourceModule/lib/ecg">
-
-				<fileset dir="${build.lib}" includes="event.jar" />
-
-		</copy>
-		
-		<copy todir="../ECG_ManualAnnotatorSourceModule/lib/ecg">
-
-				<fileset dir="${build.lib}" includes="event.jar" />
-
-		</copy>
-		
-		<copy todir="../ECG_TestFirstEpisodeRecognizerModule/lib/ecg">
-
-				<fileset dir="${build.lib}" includes="event.jar" />
-
-		</copy>
-		
-		<copy todir="../ECG_HackyStatSourceModule/lib/ecg">
-
-				<fileset dir="${build.lib}" includes="event.jar" />
-
-		</copy>
-
 	</target>
 
 	<!-- Deploy the sensorshell.jar to ./dist/lib/. -->
@@ -313,18 +219,6 @@
 			<fileset dir="${build.lib}" includes="sensorshell.jar" />
 
 		</copy>
-
-		<copy todir="../HackyStat EclipseSensor/">
-		
-			<fileset dir="${build.lib}" includes="sensorshell.jar" />
-			
-		</copy>
-
-		<copy todir="../hackyEclipse/">
-		
-			<fileset dir="${build.lib}" includes="sensorshell.jar" />
-			
-		</copy>
 		
 		<copy todir="../ECG_EclipseSensor/">
 				
@@ -332,12 +226,6 @@
 					
 		</copy>
 
-		
-		<copy todir="../ECG_ConnectionTests/lib/ecg">
-						
-				<fileset dir="${build.lib}" includes="sensorshell.jar" />
-							
-		</copy>
 		
 		<!-- Copy the documentation -->
 		<copy todir="${dist.dir}/doc">

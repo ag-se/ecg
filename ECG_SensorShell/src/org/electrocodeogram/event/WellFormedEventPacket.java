@@ -60,7 +60,7 @@ public class WellFormedEventPacket extends EventPacket {
      * This constant holds the
      * <em>HackyStat Activity SensorDataType</em> <code>String</code>,
      * which indicates that an event is in <em>HackyStat Activity</em>
-     * event. This is also true for all <rm>ECG MicroActivity</em>
+     * event. This is also true for all <em>ECG MicroActivity</em>
      * events.
      */
     public static final String HACKYSTAT_ACTIVITY_STRING = "Activity";
@@ -81,7 +81,7 @@ public class WellFormedEventPacket extends EventPacket {
      * This is the pattern used to format the timeStamp values of an
      * event's <code>String</code> representation. The pattern
      * symbols are accroding to the
-     * {@link java.text.DataFormatSymbols} class.
+     * {@link java.text.DateFormatSymbols} class.
      */
     public static final String DATE_FORMAT_PATTERN = "EE dd.MM.yyyy HH:mm:ss z";
 

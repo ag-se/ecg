@@ -14,7 +14,7 @@ import org.electrocodeogram.logging.LogHelper;
 
 /**
  * If the "host" or "port" values are malformed when being passed to the
- * <em>EventSender</em> for connection to the ECG Lab, this <code>Exception</code> is thrown.
+ * <em>EventSender</em> for connection to the ECG Lab, this exception is thrown.
  */
 public class IllegalHostOrPortException extends Exception {
 
@@ -30,7 +30,7 @@ public class IllegalHostOrPortException extends Exception {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Creates the <em>Exception</em>.
+     * Creates the exception.
      */
     public IllegalHostOrPortException() {
         logger

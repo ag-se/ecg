@@ -19,24 +19,24 @@ import org.electrocodeogram.event.WellFormedEventPacket;
 import org.electrocodeogram.logging.LogHelper;
 
 /**
- * The class <em>EventSender</em> provides asynchronous transfer of
- * events to the ECG Lab. The <em>EventSender</em> has an event
+ * The class <code>EventSender</code> provides asynchronous transfer of
+ * events to the ECG Lab. The <code>EventSender</code> has an event
  * buffer the {@link EventSender.EventPacketQueue}, which is filled
  * continously by the ECG sensor that uses this
- * <em>ECG SensorShell</em> component. The <em>EventPacketQueue</em>
- * is implemented as a Monitor making the <em>EventSender</em> wait
- * when the buffer size is 0 and notifies the <em>EventSender</em>
- * when new events are added. So the <em>EventSender</em> only works
+ * <em>ECG SensorShell</em> component. The <code>EventPacketQueue</code>
+ * is implemented as a Monitor making the <code>EventSender</code> wait
+ * when the buffer size is 0 and waking it up
+ * when new events are added. So the <code>EventSender</code> only works
  * when it has work to do. If new events are added and a connection to
- * the ECG Lab is established they are sent to the ECG Lab via
- * serialisation over sockets. If the connection is not established a
+ * the ECG Lab is established they are sent to the ECG Lab as
+ * serialised objects over a socket. If the connection is not established a
  * new connection approach is initiated after a delay.
  */
 public class EventSender extends Thread {
 
     /**
      * When working with <em>Serialization</em> the
-     * <em>ObjectStreams</em> need to be reset periodicallly to
+     * <em>ObjectStreams</em> needs to be reset periodicallly to
      * avoid <em>OutOfMemoryErrors</em>. This constant tells how
      * often this occurs.
      */

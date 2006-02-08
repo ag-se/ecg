@@ -13,7 +13,7 @@ import org.electrocodeogram.logging.LogHelper;
 
 /**
  * when the event buffer contains no events but an event shall be
- * removed, this <em>Exception</em> is thrown.
+ * removed, this exception is thrown.
  */
 public class EventPacketQueueUnderflowException extends Exception {
 
@@ -29,7 +29,7 @@ public class EventPacketQueueUnderflowException extends Exception {
     private static final long serialVersionUID = 870916601241806158L;
 
     /**
-     * Creates the <em>Exception</em>.
+     * Creates the exception.
      */
     public EventPacketQueueUnderflowException() {
         logger.entering(this.getClass().getName(),

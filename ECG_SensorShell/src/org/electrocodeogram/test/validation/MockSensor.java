@@ -1,3 +1,10 @@
+/*
+ * Class: MockSensor
+ * Version: 1.0
+ * Date: 16.10.2005
+ * By: Frank@Schlesinger.com
+ */
+
 package org.electrocodeogram.test.validation;
 
 import org.electrocodeogram.event.EventPacket;
@@ -6,17 +13,17 @@ import org.hackystat.kernel.shell.SensorShell;
 
 /**
  * This simulates a sensor. Where a real sensor is running inside another
- * appplication and is recording events there, this <em>MockSensor</em>
+ * appplication and is recording events there, this <code>MockSensor</code>
  * is getting its recoded events from a call to {@link #sendEvent(EventPacket)}.
- * Like the real sensor this <em>MockSensor</em> then passes the event to
+ * Like the real sensor this <code>MockSensor</code> then passes the event to
  * his instance of the {@link org.hackystat.kernel.shell.SensorShell}.
- * This <em>MockSensor</em> is used in {@link org.electrocodeogram.test.validation.WellformedEventTests}
- * to check how the <em>SensorShell</em> deals with wellformed and malformed events.
+ * This <code>MockSensor</code> is used in {@link org.electrocodeogram.test.validation.WellformedEventTests}
+ * to check how the <code>SensorShell</code> deals with wellformed and malformed events.
  */
 public class MockSensor {
 
     /**
-     * A reference to the <em>SensorShelll</em>.
+     * A reference to the <code>SensorShelll</code>.
      */
     private SensorShell shell = null;
 
@@ -26,7 +33,7 @@ public class MockSensor {
     private SensorProperties properties = null;
 
     /**
-     * Creates the <em>MockSensor</em>.
+     * Creates the <code>MockSensor</code>.
      */
     public MockSensor() {
 

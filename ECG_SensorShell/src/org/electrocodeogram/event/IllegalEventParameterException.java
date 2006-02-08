@@ -1,3 +1,10 @@
+/*
+ * Class: IllegalEventParameterException
+ * Version: 1.0
+ * Date: 16.10.2005
+ * By: Frank@Schlesinger.com
+ */
+
 package org.electrocodeogram.event;
 
 import java.util.logging.Level;
@@ -6,21 +13,31 @@ import java.util.logging.Logger;
 import org.electrocodeogram.logging.LogHelper;
 
 /**
- * If the parameters given to an EventPacket are not valid in syntax,
- * this exception is thrown during EventPacket creation.
+ * If event data is not wellformed or not valid this exception is thrown.
  */
-public class IllegalEventParameterException extends Exception
-{
+public class IllegalEventParameterException extends Exception {
+
+    /**
+     * The <em>Serialization</em> id.
+     */
     private static final long serialVersionUID = 1871343961009715536L;
 
-    private static Logger _logger = LogHelper.createLogger(IllegalEventParameterException.class.getName());
-       
-    public IllegalEventParameterException(String message)
-    {
-    	super(message);
-    	
-    	_logger.log(Level.WARNING,"An IllegalEventParameterException occured.");
-    	
-    	_logger.log(Level.WARNING,this.getMessage());
+    /**
+     * The logger.
+     */
+    private static Logger logger = LogHelper
+        .createLogger(IllegalEventParameterException.class.getName());
+
+    /**
+     * Creates the exception.
+     * @param message The message
+     */
+    public IllegalEventParameterException(final String message) {
+        super(message);
+
+        logger
+            .log(Level.WARNING, "An IllegalEventParameterException occured.");
+
+        logger.log(Level.WARNING, this.getMessage());
     }
 }

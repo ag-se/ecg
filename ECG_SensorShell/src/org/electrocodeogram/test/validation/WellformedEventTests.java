@@ -1,3 +1,10 @@
+/*
+ * Class: WellformedEventTests
+ * Version: 1.0
+ * Date: 16.10.2005
+ * By: Frank@Schlesinger.com
+ */
+
 package org.electrocodeogram.test.validation;
 
 import junit.framework.TestCase;
