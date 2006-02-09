@@ -32,7 +32,7 @@
 		
 		<delete failonerror="no">
 				<fileset dir="dist/ecg" />
-				<exclude name="dist/lib/*.jar"/>
+				<!-- <exclude name="dist/lib/*.jar"/> -->
 		</delete>
 		
 	</target>
