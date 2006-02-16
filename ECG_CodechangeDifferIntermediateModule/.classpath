@@ -1,12 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="lib/ecg/event.jar"/>
-	<classpathentry kind="lib" path="lib/ecg/moduleapi.jar"/>
-	<classpathentry kind="lib" path="lib/misc/resolver.jar"/>
-	<classpathentry kind="lib" path="lib/misc/xercesImpl.jar"/>
-	<classpathentry kind="lib" path="lib/misc/xercesSamples.jar"/>
-	<classpathentry kind="lib" path="lib/misc/xml-apis.jar"/>
-	<classpathentry kind="output" path="bin"/>
+	<classpathentry kind="src" path="src">
+		<attributes>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
+		<attributes>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/misc/resolver.jar">
+		<attributes>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/misc/xercesImpl.jar">
+		<attributes>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/misc/xercesSamples.jar">
+		<attributes>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/misc/xml-apis.jar">
+		<attributes>
+		</attributes>
+	</classpathentry>
+	<classpathentry combineaccessrules="false" kind="src" path="/ECG_Lab">
+		<attributes>
+		</attributes>
+	</classpathentry>
+	<classpathentry combineaccessrules="false" kind="src" path="/ECG_Support">
+		<attributes>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="output" path="build/classes"/>
 </classpath>
