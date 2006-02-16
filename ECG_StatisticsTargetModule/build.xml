@@ -2,7 +2,7 @@
 
 <!-- Buildfile for the ECG StatisticsTargetModule -->
 
-<project name="ECG StatisticsTargetModule" basedir=".">
+<project name="ECG StatisticsTargetModule" default="all" basedir=".">
 
 	<!-- Project-wide settings. All directories are relative to the -->
 	<!-- project root directory -->
@@ -95,6 +95,9 @@
 		</delete>
 		
 	</target>
+
+	<!-- This shall be the default target. -->
+	<target name="all" depends="deploy"/>
 
 	<!-- Deploy the ECG StatisticsTargetModule. -->
 	<target name="deploy" depends="build">
