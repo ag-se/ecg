@@ -2,7 +2,7 @@
 
 <!-- Buildfile for the ECG FileSystemSourceModule -->
 
-<project name="FileSystemSourceModule" basedir=".">
+<project name="FileSystemSourceModule" default="all" basedir=".">
 
 	<!-- Project-wide settings. All directories are relative to the -->
 	<!-- project root directory -->
@@ -92,6 +92,9 @@
 		</delete>
 
 	</target>
+
+	<!-- This shall be the default target. -->
+	<target name="all" depends="deploy"/>
 
 	<!-- Deploy the ECG FileSystemSourceModule -->
 	<target name="deploy" depends="build">
