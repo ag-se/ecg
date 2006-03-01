@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Buildfile for the ECG_Build component -->
+
+<project name="ECG_Build" default="all" basedir=".">
+
+	<property name="dist.dir" value="dist"/>
+
+	<property name="doc.dir" value="${dist.dir}/doc" />
+
+	<!-- Sourcepath setting -->
+	<path id="sourcepath">
+		<dirset dir="../ECG_Lab/src" />
+		<dirset dir="../ECG_SensorShell/src" />
+		<dirset dir="../ECG_TestHelper/src" />
+		<dirset dir="../ECG_Support/src" />
+		<dirset dir="../ECG_EclipseSensor/src" />
+		<dirset dir="../ECG_FileSystemSourceModule/src" />
+		<dirset dir="../ECG_FileSystemTargetModule/src" />
+		<dirset dir="../ECG_HackyStatTargetModule/src" />
+		<dirset dir="../ECG_HackyStatSourceModule/src" />
+		<dirset dir="../ECG_Installer/src" />
+		<dirset dir="../ECG_ManualAnnotatorSourceModule/src" />
+		<dirset dir="../ECG_MSDTFilterIntermediateModule/src" />
+		<dirset dir="../ECG_CodeChangeDifferIntermediateModule/src" />
+		<dirset dir="../ECG_SocketSourceModule/src" />
+		<dirset dir="../ECG_StatisticsTargetModule/src" />
+	</path>
+    
+	
+	<target name="CleanAll Build">
+	
+		<echo message="######## CLEANING BUILD" />
+		
+		<delete dir="${dist.dir}"/>
+		
+	</target>
+		
+
+	<!-- Cleans dirs of ECG_SensorShell component -->
+	<target name="CleanAll SensorShell">
+
+		<echo message="######## CLEANING SENSORSHELL" />
+
+		<ant dir="../ECG_SensorShell" target="cleanall" />
+
+	</target>
+
+	<!-- Cleans dirs of ECG_SensorShell component -->
+	<target name="CleanAll EclipseSensor">
+
+		<echo message="######## CLEANING ECLIPSESENSOR" />
+
+		<ant dir="../ECG_EclipseSensor" target="clean" />
+
+	</target>
+	<!-- Cleans dirs of generally used projects -->
+	<target name="CleanAll General">
+
+		<echo message="######## CLEANING GENERAL PROJECTS" />
+
+		<ant dir="../ECG_Support" target="cleanall" />
+		<ant dir="../ECG_TestHelper" target="cleanall" />
+
+	</target>
+
+	<!-- Calls the ant script of the ECG ServerAndLab component to clean it -->
+	<target name="CleanAll Lab">
+
+		<echo message="######## CLEANING LAB" />
+
+		<ant dir="../ECG_Lab" target="cleanall" />
+
+	</target>
+
+	<!-- Cleans folders of the Modules -->
+	<target name="CleanAll Modules">
+
+		<echo message="######## CLEANING MODULES" />
+
+		<ant dir="../ECG_FileSystemTargetModule" target="cleanall" />
+		<ant dir="../ECG_SocketSourceModule" target="cleanall" />
+		<ant dir="../ECG_HackyStatTargetModule" target="cleanall" />
+		<ant dir="../ECG_HackyStatSourceModule" target="cleanall" />
+		<ant dir="../ECG_FileSystemSourceModule" target="cleanall" />
+		<ant dir="../ECG_MSDTFilterIntermediateModule" target="cleanall" />
+		<ant dir="../ECG_StatisticsTargetModule" target="cleanall" />
+		<ant dir="../ECG_CodechangeDifferIntermediateModule" target="cleanall" />
+		<ant dir="../ECG_ManualAnnotatorSourceModule" target="cleanall" />
+		<!-- <ant dir="../ECG_TestFirstEpisodeRecognizerModule" target="cleanall" /> -->
+
+	</target>
+
+	<!-- Calls the ant script of the Installer to clean its dirs -->
+	<target name="CleanAll Installer">
+
+		<echo message="######## CLEANING INSTALLER" />
+
+		<ant dir="../ECG_Installer" target="cleanall" />
+
+	</target>
+
+	<!-- Cleans all ECG components -->
+	<target name="cleanall" depends="CleanAll Build, CleanAll SensorShell, CleanAll EclipseSensor, CleanAll General, CleanAll Lab, CleanAll Modules, CleanAll Installer" />
+
+
+	<!-- Builds the ant script of the general components to build it -->
+	<target name="Build General">
+
+		<echo message="######## BUILDING GENERAL PROJECTS" />
+
+		<!-- beware order of compilation! -->
+		<ant dir="../ECG_Support" target="deploy" />
+		<ant dir="../ECG_TestHelper" target="deploy" />
+
+	</target>
+
+	<!-- Calls the ant script of the ECG SensorShell component to build it -->
+	<target name="Build SensorShell">
+
+		<echo message="######## BUILDING SENSORSHELL" />
+
+		<ant dir="../ECG_SensorShell" target="deploy" />
+
+	</target>
+
+	<!-- Calls the ant script of the ECG SensorShell component to build it -->
+	<target name="Build EclipseSensor">
+
+		<echo message="######## BUILDING ECLIPSESENSOR" />
+
+		<ant dir="../ECG_EclipseSensor" target="zip.plugin" />
+
+	</target>
+
+
+	<!-- Calls the ant script of the ECG ServerAndLab Module-API to build it -->
+	<target name="Build Lab">
+
+		<echo message="######## BUILDING ECG MODULE-API" />
+
+		<ant dir="../ECG_Lab" target="deploy" />
+
+	</target>
+
+
+	<!-- Calls the ant script of the ECG SocketSourceModule to build it -->
+	<target name="Build Modules">
+
+		<echo message="######## BUILDING MODULES" />
+
+		<ant dir="../ECG_SocketSourceModule" target="deploy" />
+		<ant dir="../ECG_FileSystemTargetModule" target="deploy" />
+		<ant dir="../ECG_HackyStatTargetModule" target="deploy" />
+		<ant dir="../ECG_HackyStatSourceModule" target="deploy" />
+		<ant dir="../ECG_FileSystemSourceModule" target="deploy" />
+		<ant dir="../ECG_MSDTFilterIntermediateModule" target="deploy" />
+		<ant dir="../ECG_StatisticsTargetModule" target="deploy" />
+		<ant dir="../ECG_CodechangeDifferIntermediateModule" target="deploy" />
+		<ant dir="../ECG_ManualAnnotatorSourceModule" target="deploy" />
+		<!-- <ant dir="../ECG_TestFirstEpisodeRecognizerModule" target="deploy" /> -->
+	
+	</target>
+
+	
+	<!-- Calls the ant script of the Installer to build it -->
+	<target name="Build Installer">
+
+		<echo message="######## BUILDING INSTALLER" />
+
+		<ant dir="../ECG_Installer" target="deploy" />
+
+	</target>
+
+
+	<!-- Calls the ant script of the ECG_Lab to assemble the application -->
+	<target name="Assemble Lab">
+
+		<echo message="######## ASSEMBLING ECG SERVERANDLAB" />
+
+		<ant dir="../ECG_Lab" target="Assemble ECGLab" />
+
+	</target>
+
+
+
+	<!-- Builds all ECG components -->
+	<target name="buildall" depends="Build General, Build SensorShell, Build EclipseSensor, Build Lab, Build Modules, Build Installer" />
+
+	
+	<!-- Package release -->
+	<target name="Package release" depends="CleanAll Build, buildall, Assemble Lab, javadoc">
+		
+		<echo message="######## ASSEMBLING ECG RELEASE" />
+
+		<tstamp />
+
+		<mkdir dir="dist" />
+
+		<mkdir dir="dist/plugins" />
+
+		<mkdir dir="dist/user.home" />
+
+		<mkdir dir="dist/user.home/.hackystat" />
+
+		<mkdir dir="dist/ecg" />
+
+		<mkdir dir="dist/lib" />
+
+		<copy todir="dist/user.home/.hackystat">
+
+			<fileset dir="../ECG_SensorShell/" includes="sensor.properties" />
+
+		</copy>
+
+		<copy todir="dist/ecg">
+
+			<fileset dir="../ECG_Lab/dist/application" />
+
+		</copy>
+
+		<copy todir="dist/lib">
+
+			<fileset dir="../ECG_Support/dist/lib" includes="ecg_support.jar"/>
+			<fileset dir="../ECG_TestHelper/dist/lib" includes="ecg_test.jar" />
+			<fileset dir="../ECG_Lab/dist/lib" includes="ecg_moduleapi.jar" />
+
+		</copy>
+
+<!--
+		<mkdir dir="../ECG_EclipseSensor/ecg" />
+
+		<copy todir="../ECG_EclipseSensor/dist/ecg">
+
+			<fileset dir="../ECG_Lab/dist/application" />
+
+		</copy>
+-->
+		
+		<copy todir="${dist.dir}/plugins">
+
+			<fileset dir="../ECG_EclipseSensor/" includes="**/org.electrocodeogram.sensor.eclipse*.zip"/>
+
+		</copy>
+
+	</target>
+
+	<!-- Invokes all ECG ant scripts -->
+	<target name="all" depends="cleanall, Package release" />
+
+
+	<!-- Cleans API doc folder -->
+	<target name="clean javadoc">
+
+		<delete failonerror="no" includeemptydirs="true">
+			<fileset dir="${doc.dir}" includes="**/*" />
+		</delete>
+
+	</target>
+
+
+	<!-- Generate the API documentation -->
+	<target name="javadoc" depends="clean javadoc">
+
+		<mkdir dir="${doc.dir}/images" />
+			
+		<copy todir="${doc.dir}/images">
+		
+			<fileset dir="images" />			
+		</copy>
+		
+		<javadoc packagenames="org.*" destdir="${doc.dir}" access="private" use="true" windowtitle="ElectroCodeoGram API and Developer Documentation">
+
+			<sourcepath refid="sourcepath" />
+
+			<header>
+				<![CDATA[ElectroCodeoGram<br><a target="_new" href="http://www.electrocodeogram.org">www.electrocodeogram.org</a>]]></header>
+
+		<doctitle>
+			<![CDATA[<img src='images/ECG.jpg'><br><br><br>ElectroCodeoGram API and Developer Documentation<br>]]></doctitle>
+
+		<group title="ECG Eclipse Sensor" packages="org.electrocodeogram.sensor.eclipse:org.hackystat.stdext.sensor.eclipse" />
+		<group title="ECG SensorShell" packages="org.electrocodeogram.client:org.hackystat.kernel.shell:org.hackystat.kernel.admin" />
+		<group title="ECG Module API" packages="org.electrocodeogram.module:org.electrocodeogram.module.source:org.electrocodeogram.module.intermediate:org.electrocodeogram.module.target:org.electrocodeogram.module.event" />
+		<group title="ECG ModulePackage" packages="org.electrocodeogram.modulepackage:org.electrocodeogram.modulepackage.classloader:org.electrocodeogram.modulepackage.modulesetup" />			
+		<group title="ECG Event API" packages="org.electrocodeogram.event" />
+		<group title="ECG Lab" packages="org.electrocodeogram.module.classloader:org.electrocodeogram.module.registry:org.electrocodeogram.module.setup:org.electrocodeogram.msdt:org.electrocodeogram.msdt.registry:org.electrocodeogram.system:org.electrocodeogram.ui:org.electrocodeogram.ui.*" />						
+		<group title="ECG SourceModules" packages="org.electrocodeogram.module.source.implementation" />						
+		<group title="ECG IntermediateModules" packages="org.electrocodeogram.module.intermediate.implementation" />						
+		<group title="ECG TargetModules" packages="org.electrocodeogram.module.target.implementation" />						
+		<group title="ECG Helper Packages" packages="org.electrocodeogram.logging:org.electrocodeogram.misc.xml:org.electrocodeogram.installer:org.electrocodeogram.misc.constants" />
+		<group title="ECG Test Packages" packages="org.electrocodeogram.test:org.electrocodeogram.test.*" />
+				
+		</javadoc>
+
+	</target>
+
+
+</project>
+
