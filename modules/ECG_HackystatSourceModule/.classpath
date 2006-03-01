@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry excluding="**/apache/**" kind="src" path="src">
+		<attributes>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
+		<attributes>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/runtime/javax.servlet.jar">
+		<attributes>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="/Mortbey" kind="lib" path="lib/runtime/org.mortbay.jetty.jar">
+		<attributes>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/runtime/org.mortbay.jmx.jar">
+		<attributes>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/runtime/log4j-1.2.12.jar">
+		<attributes>
+		</attributes>
+	</classpathentry>
+	<classpathentry combineaccessrules="false" kind="src" path="/ECG_Lab">
+		<attributes>
+		</attributes>
+	</classpathentry>
+	<classpathentry combineaccessrules="false" kind="src" path="/ECG_Support">
+		<attributes>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/ECG_Lab/lib/hackystat/sensorshell.jar">
+		<attributes>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/ECG_Lab/dist/lib/ecg_moduleapi.jar">
+		<attributes>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/ECG_Support/dist/lib/ecg_support.jar">
+		<attributes>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

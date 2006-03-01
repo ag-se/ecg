@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<module>
+	<id>
+		org.electrocodeogram.module.source.implementation.HackyStatSourceModule
+	</id>
+	<provider-name>
+		Frank Schlesinger (Frank@Schlesinger.com)
+	</provider-name>
+	<version>
+		1.0
+	</version>
+	<name>
+		HackyStat reader
+	</name>
+	<class>
+		org.electrocodeogram.module.source.implementation.HackyStatSourceModule
+	</class>
+	<description>
+		This module reads events from a HackyStat SensorShell.
+	</description>
+	<type>
+		SOURCE
+	</type>
+	<properties>
+		<property>
+			<propertyName>
+				HackyStat Host
+			</propertyName>
+			<propertyType>
+				java.lang.String
+			</propertyType>
+			<propertyValue>
+			</propertyValue>
+		</property>
+		<property>
+			<propertyName>
+				HackyStat Key
+			</propertyName>
+			<propertyType>
+				java.lang.String
+			</propertyType>
+			<propertyValue>
+			</propertyValue>
+		</property>
+	</properties>
+	
+</module>
