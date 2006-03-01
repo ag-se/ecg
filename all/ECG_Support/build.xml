@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- ECG_Support: Buildfile for the Event-API and logger components -->
+
+<project name="ECG_Support" default="deploy" basedir=".">
+
+	<!-- Project directories -->
+	<property name="src.dir" value="src"/>
+
+	<property name="dist.dir" value="dist"/>
+
+	<property name="doc.dir" value="doc"/>
+
+	<property name="build.dir" value="bin"/>
+
+	<property name="lib.dir" value="lib"/>
+	
+	<!-- Classpath setting -->
+	<path id="classpath">
+		<!--
+		<fileset dir="${lib.dir}">
+			<include name="**/*.jar"/>
+		</fileset>
+		-->
+	</path>
+
+
+	<!-- Target to create the build directories prior to a compile target -->
+	<target name="prepare">
+
+		<tstamp />
+		<mkdir dir="${build.dir}"/>
+		<mkdir dir="${doc.dir}"/>
+
+	</target>
+
+	<!-- Build the Event-API. -->
+	<target name="buildEvent" depends="prepare, buildLogging">
+
+		<echo message="Building the Event-API..."/>
+
+		<javac
+			destdir="${build.dir}"
+			srcdir="${src.dir}/org/electrocodeogram/event/"
+			source="1.5"
+			debug="on"
+			deprecation="on">
+
+			<classpath refid="classpath" />
+
+		</javac>
+
+	</target>
+	
+	<!-- Build the Logging-API. -->
+		<target name="buildLogging" depends="prepare">
+
+			<echo message="Building the Logging-API..."/>
+
+			<javac
+				destdir="${build.dir}"
+				srcdir="${src.dir}/org/electrocodeogram/logging/"
+				source="1.5"
+				debug="on"
+				deprecation="on">
+
+				<classpath refid="classpath" />
+
+			</javac>
+
+		</target>
+
+	<!-- Delete class files built during previous builds. Leave directories. -->
+	<target name="clean">
+
+		<delete failonerror="no">
+			<fileset dir="${build.dir}" includes="**/*.class"/>
+		</delete>
+
+	</target>
+
+	<!-- Delete any created directories and their contents. -->
+	<target name="cleanall" depends="clean">
+
+		<delete dir="${build.dir}"/>
+		<delete dir="${dist.dir}"/>
+		<delete dir="${doc.dir}"/>
+
+	</target>
+
+	<!-- Deploy the ecg_support.jar to ./dist -->
+	<target name="deploy" depends="buildEvent, buildLogging, javadoc">
+
+		<echo message="Deploying the event.jar to ./dist/lib/...."/>
+
+		<!-- Create the distribution directories -->
+		<mkdir dir="${dist.dir}"/>
+		<mkdir dir="${dist.dir}/lib"/>
+		<mkdir dir="${dist.dir}/doc"/>
+
+		<!-- Copy the documentation -->
+		<copy todir="${dist.dir}/doc">
+
+			<fileset dir="${doc.dir}"/>
+
+		</copy>
+
+		<!-- Package classes into jar. -->
+		<jar
+				excludes="org.hackystat.*,org.electrocodeogram.test.*"
+				compress="true"
+				duplicate="fail"
+				jarfile="${dist.dir}/lib/ecg_support.jar"
+				basedir="${build.dir}" />
+
+		<!-- Copies lib to EclipseSensor 
+		<copy todir="../ECG_EclipseSensor/">
+				
+			<fileset file="${dist.dir}/lib/ecg_support.jar"/>
+					
+		</copy>
+		-->
+		<!-- Copy the documentation -->
+		<copy todir="${dist.dir}/doc">
+
+			<fileset dir="${doc.dir}"/>
+
+		</copy>
+
+		<!-- Copy the libraries 
+		<copy todir="${dist.dir}/lib">
+
+			<fileset dir="${lib.dir}" includes="**/*.jar" />
+
+		</copy>
+		-->
+		
+		<!-- Copy the JARs to the other projects 
+		<copy todir="../ECG Build/dist/lib/">
+
+				<fileset dir="${build.lib}" includes="ecg_support.jar" />
+
+		</copy>
+		-->
+	</target>
+
+	<!-- Generate the API documentation. -->
+	<target name="javadoc">
+
+		<javadoc
+			packagenames="org.*"
+			sourcepath="${src.dir}"
+			destdir="${doc.dir}">
+
+			<classpath refid="classpath"/>
+
+		</javadoc>
+
+	</target>
+
+	<!-- Completely rebuild project -->
+	<target name="all" depends="cleanall, deploy"/>
+
+</project>
+
