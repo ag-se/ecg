@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Buildfile for the ECG TestHelper component -->
+
+<project name="ECG_TestHelper" default="deploy" basedir=".">
+
+	<!-- Project directories -->
+	<property name="src.dir" value="src"/>
+
+	<property name="dist.dir" value="dist"/>
+
+	<property name="doc.dir" value="doc"/>
+
+	<property name="build.dir" value="bin"/>
+
+	<property name="lib.dir" value="lib"/>
+
+	<!-- Dependend project directories -->
+	<property name="support.dir" value="../ECG_Support"/>
+
+	<!-- Classpath setting -->
+	<path id="classpath">
+
+		<fileset dir="${lib.dir}">
+			<include name="**/*.jar/"/>
+		</fileset>
+		
+		<fileset dir="${support.dir}/dist/lib">
+			<include name="**/*.jar/"/>
+		</fileset>
+
+	</path>
+
+
+	<!-- Target to create the build directories prior to a compile target -->
+	<!-- The start time of the build is marked as well for the log -->
+	<target name="prepare">
+
+		<tstamp />
+		<mkdir dir="${build.dir}"/>
+		<mkdir dir="${doc.dir}"/>
+
+	</target>
+
+	<!-- Build the ECG TestHelper component. -->
+	<target name="build" depends="prepare">
+
+		<echo message="Building the ECG TestHelper component..."/>
+
+		<javac
+			destdir="${build.dir}"
+			srcdir="${src.dir}"
+			source="1.5"
+			debug="on"
+			deprecation="on">
+
+			<classpath refid="classpath" />
+
+		</javac>
+
+	</target>
+
+	<!-- This shall be the default target. -->
+	<target name="all" depends="cleanall, deploy"/>
+
+	<!-- Generate the API documentation. -->
+	<target name="javadoc" depends="build">
+
+		<javadoc
+			packagenames="org.*"
+			sourcepath="${src.dir}"
+			destdir="${doc.dir}">
+
+			<classpath refid="classpath"/>
+
+		</javadoc>
+
+	</target>
+
+	<!-- Delete class files built during previous builds. Leave directories. -->
+	<target name="clean">
+
+		<delete failonerror="no">
+			<fileset dir="${build.dir}" includes="**/*.class"/>
+		</delete>
+
+	</target>
+
+	<!-- Delete any created directories and their contents. -->
+	<target name="cleanall" depends="clean">
+
+		<delete dir="${build.dir}"/>
+		<delete dir="${dist.dir}"/>
+		<delete dir="${doc.dir}"/>
+		
+	</target>
+
+	<!-- Deploy the ECG TestHelper component into ./dist/lib. -->
+	<target name="deploy" depends="build, javadoc">
+
+		<echo message="Deploying ecg_test.jar"/>
+
+		<!-- Create the distribuition directories -->
+		<mkdir dir="${dist.dir}"/>
+		<mkdir dir="${dist.dir}/lib"/>
+		<mkdir dir="${dist.dir}/doc"/>
+
+		<!-- Create the libraries -->
+		<jar
+				compress="true"
+				duplicate="fail"
+				jarfile="${dist.dir}/lib/ecg_test.jar"
+				basedir="${build.dir}"/>
+
+		<!-- Copy the documentation -->
+		<copy todir="${dist.dir}/doc">
+
+			<fileset dir="${doc.dir}"/>
+
+		</copy>
+
+		<!-- Copy the libraries -->
+		<copy todir="${dist.dir}/lib">
+
+			<fileset dir="${lib.dir}" includes=".jar" />
+
+		</copy>
+		
+<!--		
+		<copy todir="../ECG Build/dist/lib">
+
+				<fileset dir="${build.lib}" includes="ecg_test.jar" />
+
+				</copy>
+-->
+		
+		<!-- Copy the JARs to the other projects 
+		<copy todir="../ECG_SensorShell/lib/ecg">
+
+			<fileset dir="${build.lib}" includes="testHelper.jar" />
+
+		</copy>
+
+
+		
+		<copy todir="../ECG_Lab/lib/ecg">
+
+			<fileset dir="${build.lib}" includes="testHelper.jar" />
+
+		</copy>
+
+Copy the JARs to the other projects -->
+
+	</target>
+
+</project>
+
