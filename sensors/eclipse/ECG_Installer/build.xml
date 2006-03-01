@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Buildfile for the ECG Installer -->
+
+<project name="ECG Installer" default="all" basedir=".">
+
+	<!-- Project directories -->
+	<property name="src.dir" value="src"/>
+
+	<property name="dist.dir" value="dist"/>
+
+	<property name="doc.dir" value="doc"/>
+
+	<property name="lib.dir" value="lib"/>
+
+	<property name="build.dir" value="bin"/>
+
+	<!-- Dependend project directories -->
+	<property name="support.dir" value="../ECG_Support"/>
+
+	<property name="lab.dir" value="../ECG_Lab"/>
+
+	<property name="test.dir" value="../ECG_TestHelper"/>
+
+	<!-- Classpath setting -->
+	<path id="classpath">
+		<fileset dir="${lib.dir}">
+			<include name="**/*.jar/"/>
+		</fileset>
+
+		<fileset dir="${test.dir}/dist/lib">
+			<include name="**/*.jar"/>
+		</fileset>
+
+
+
+	</path>
+
+
+	<target name="help">
+		<echo message="Build the ECG Installer"/>
+		<echo message="Usage: ant [ant options] target1 [ target2 | target3 | ... ]"/>
+		<echo message=""/>
+		<echo message="build - Build the Module-APE and ServerAndLab application."/>
+		<echo message="jarEcgLab - build + Package the ServerAndLab application into ECGLab.jar"/>
+		<echo message="jarModuleApi - build + Package the Module-API into moduleapi.jar"/>
+		<echo message="javadoc - Generate the API documentation."/>
+		<echo message="clean - Delete class files built during previous builds. Leave directories."/>
+		<echo message="cleanall - clean + Delete any created directories and their contents."/>
+		<echo message="deployEcgLab - jarEcgLab + Deploy the ECGLab.jar into ./dist/lib/."/>
+		<echo message="deployModuleApi - jarEcgLab + Deploy the moduleapi.jar into ./dist/lib/."/>
+		<echo message="Assemble application - Assemble the ECG ServerAndLab application with modules into ./application/"/>
+	</target>
+
+	<!-- Target to create the build directories prior to a compile target -->
+	<!-- The start time of the build is marked as well for the log -->
+	<target name="prepare">
+
+		<tstamp />
+
+		<mkdir dir="${build.dir}"/>
+		<mkdir dir="${doc.dir}"/>
+
+	</target>
+
+	<!-- Build the ECG Installer. -->
+	<target name="build" depends="prepare">
+
+		<echo message="Building the ECG Installer..."/>
+
+		<javac
+			destdir="${build.dir}"
+			srcdir="${src.dir}"
+			source="1.5"
+			debug="on"
+			deprecation="on">
+
+			<classpath refid="classpath" />
+
+		</javac>
+
+	</target>
+
+
+	<!-- Generate the API documentation. -->
+	<target name="javadoc">
+
+		<javadoc
+			packagenames="org.*"
+			sourcepath="${src.dir}"
+			destdir="${doc.dir}">
+
+			<classpath refid="classpath"/>
+
+		</javadoc>
+
+	</target>
+
+	<!-- Delete class files built during previous builds. Leave directories. -->
+	<target name="clean">
+
+		<delete failonerror="no">
+			<fileset dir="${build.dir}" includes="**/*.class"/>
+		</delete>
+
+	</target>
+
+	<!-- Delete any created directories and their contents. -->
+	<target name="cleanall" depends="clean">
+
+		<delete dir="${build.dir}"/>
+		<delete dir="${dist.dir}"/>
+		<delete dir="${doc.dir}"/>
+		
+	</target>
+
+	<!-- This shall be the default target. -->
+	<target name="all" depends="deploy"/>
+
+	<!-- Deploy the installer.jar into ./dist/lib/. -->
+	<target name="deploy" depends="build">
+
+		<echo message="Deploying installer.jar..."/>
+
+		<!-- Create the distribution directories -->
+		<mkdir dir="${dist.dir}"/>
+		<mkdir dir="${dist.dir}/lib"/>
+		<mkdir dir="${dist.dir}/doc"/>
+
+		<!-- Package the ECG Installer. -->
+		<jar
+				compress="true"
+				duplicate="fail"
+				jarfile="${dist.dir}/lib/installer.jar"
+				basedir="${build.dir}"
+				manifest="manifest.txt"/>		
+		
+		<!-- Copy the documentation -->
+		<copy todir="${dist.dir}/doc">
+
+			<fileset dir="${doc.dir}"/>
+
+		</copy>
+
+	</target>
+	
+</project>
+
