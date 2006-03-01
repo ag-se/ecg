@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Buildfile for the ECG StatisticsTargetModule -->
+
+<project name="ECG_StatisticsTargetModule" default="deploy" basedir=".">
+
+	<!-- Project directories -->
+	<property name="src.dir" value="src"/>
+
+	<property name="dist.dir" value="dist"/>
+
+	<property name="doc.dir" value="doc"/>
+
+	<property name="msdt.dir" value="msdt"/>
+
+	<property name="build.dir" value="bin"/>
+
+	<property name="lib.dir" value="lib"/>
+
+	<!-- Dependend project directories -->
+	<property name="support.dir" value="../ECG_Support"/>
+
+	<property name="lab.dir" value="../ECG_Lab"/>
+
+	<property name="test.dir" value="../ECG_TestHelper"/>
+
+	<!-- Classpath setting -->
+	<path id="classpath">
+
+		<!-- include special jars, if available 
+		<fileset dir="${lib.dir}">
+			<include name="**/*.jar/"/>			
+		</fileset>
+		-->
+		<fileset dir="${support.dir}/dist/lib">
+			<include name="**/ecg_support.jar/"/>			
+		</fileset>
+		<fileset dir="${test.dir}/dist/lib">
+			<include name="**/*.jar/"/>			
+		</fileset>
+		<fileset dir="${lab.dir}/dist/lib">
+			<include name="**/ecg_moduleapi.jar/"/>			
+		</fileset>
+
+	</path>
+
+
+	<!-- Target to create the build directories prior to a compile target -->
+	<target name="prepare" description="create the build directories">
+
+		<tstamp />
+
+		<mkdir dir="${build.dir}"/>
+		<mkdir dir="${doc.dir}"/>
+
+	</target>
+
+	<!-- Build the module. -->
+	<target name="build" depends="prepare" description="compile source files">
+
+		<echo message="Building ${ant.project.name}"/>
+
+		<javac
+			destdir="${build.dir}"
+			srcdir="${src.dir}"
+			source="1.5"
+			debug="on"
+			deprecation="on">
+
+			<classpath refid="classpath" />
+
+		</javac>
+
+	</target>
+
+
+	<!-- Delete class files built during previous builds. Leave directories. -->
+	<target name="clean" description="delete class files">
+
+		<delete failonerror="no">
+			<fileset dir="${build.dir}" includes="**/*.class"/>
+		</delete>
+
+	</target>
+
+	<!-- Delete any created directories and their contents. -->
+	<target name="cleanall" depends="clean" description="delete created directories">
+
+		<delete dir="${dist.dir}"/>
+		<delete dir="${build.dir}"/>
+		<delete dir="${doc.dir}"/>
+
+	</target>
+
+	<!-- Completely rebuild project -->
+	<target name="all" depends="cleanall, deploy"/>
+
+	<!-- Generate the API documentation. -->
+	<target name="javadoc" description="generate javadoc">
+
+		<javadoc
+			packagenames="org.electrocodeogram.*"
+			sourcepath="${src.dir}"
+			destdir="${doc.dir}">
+
+			<classpath refid="classpath"/>
+
+		</javadoc>
+
+	</target>
+
+	<!-- Deploy the module. -->
+	<target name="deploy" depends="build" description="build classes and create deployable directory">
+
+		<echo message="Deploying ${ant.project.name}"/>
+
+		<!-- Create the distribuition directories -->
+		<mkdir dir="${dist.dir}"/>
+		<mkdir dir="${dist.dir}/${ant.project.name}"/>
+		<mkdir dir="${dist.dir}/doc"/>
+
+		<!-- Copy the libraries -->
+		<copy todir="${dist.dir}/${ant.project.name}">
+
+			<fileset dir="${build.dir}" />
+			<fileset dir="${basedir}" file="module.properties.xml" />
+
+		</copy>
+
+		<!-- Copy the MicroSensorDataTypes, if available
+		<copy todir="${dist.dir}/${ant.project.name}/msdt/">
+
+			<fileset dir="${msdt.dir}"/>
+
+		</copy>
+		-->
+		
+		<!-- Copy module into ECG_Lab module directory -->
+		<mkdir dir="${lab.dir}/modules/${ant.project.name}/"/>
+		
+		<copy todir="${lab.dir}/modules/${ant.project.name}/">
+
+			<fileset dir="${dist.dir}/${ant.project.name}/"/>
+
+		</copy>
+	</target>
+
+</project>
+
