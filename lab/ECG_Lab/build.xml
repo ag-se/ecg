@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Buildfile for the Module-API and ECG Lab application -->
+
+<project name="ECG_Lab" default="deploy" basedir=".">
+
+	<!-- Project directories -->
+	<property name="src.dir" value="src"/>
+
+	<property name="dist.dir" value="dist"/>
+
+	<property name="doc.dir" value="doc"/>
+
+	<property name="lib.dir" value="lib"/>
+	
+	<property name="module.dir" value="modules"/>
+
+	<property name="msdt.dir" value="msdt"/>
+
+	<property name="build.dir" value="bin"/>
+
+
+	<!-- Dependend project directories -->
+	<property name="support.dir" value="../ECG_Support"/>
+
+	<property name="test.dir" value="../ECG_TestHelper"/>
+
+
+	<!-- Classpath setting -->
+	<path id="classpath">
+		<fileset dir="${lib.dir}">
+			<include name="**/*.jar/"/>
+		</fileset>
+		
+		<fileset dir="${test.dir}/dist/lib">
+			<include name="**/*.jar"/>
+		</fileset>
+
+		<fileset dir="${support.dir}/dist/lib">
+			<include name="**/*.jar/"/>			
+		</fileset>
+
+	</path>
+
+
+	<!-- Target to create the build directories prior to a compile target -->
+	<!-- The start time of the build is marked as well for the log -->
+	<target name="prepare">
+
+		<tstamp />
+		<mkdir dir="${build.dir}"/>
+		<mkdir dir="${doc.dir}"/>
+
+	</target>
+
+	<!-- Build the Module-API and ECG Lab application. -->
+	<target name="build" depends="prepare">
+
+		<echo message="Building the Module-API and ECG Lab application..."/>
+
+		<javac
+			destdir="${build.dir}"
+			srcdir="${src.dir}"
+			source="1.5"
+			debug="on"
+			deprecation="on">
+
+			<classpath refid="classpath" />
+
+		</javac>
+
+	</target>
+
+	<!-- Delete class files built during previous builds. Leave directories. -->
+	<target name="clean">
+
+		<delete failonerror="no">
+			<fileset dir="${build.dir}" includes="**/*.class"/>
+		</delete>
+
+	</target>
+
+	<!-- Delete any created directories and their contents. -->
+	<target name="cleanall" depends="clean">
+
+		<delete failonerror="no" dir="${build.dir}"/>
+		<delete failonerror="no" dir="${dist.dir}"/>
+		<delete failonerror="no" dir="${doc.dir}"/>
+		
+		<delete failonerror="no">
+			<fileset dir="${lib.dir}/ecg" includes="**/*.jar"/>
+		</delete>
+
+	</target>
+
+	<!-- Delete all modules. -->
+	<target name="cleanmodules">
+
+		<delete dir="${module.dir}"/>
+
+	</target>
+
+	<!-- Deploy the ecg_lab.jar into ./dist/lib/. -->
+	<target name="deployEcgLab" depends="build">
+
+		<echo message="Deploying ecg_lab.jar..."/>
+
+		<!-- Create the distribution directories -->
+		<mkdir dir="${dist.dir}"/>
+		<mkdir dir="${dist.dir}/lib"/>
+		<mkdir dir="${dist.dir}/doc"/>
+
+		<!-- Package the ECG Lab into ecg_lab.jar. -->
+		<jar
+				compress="true"
+				duplicate="fail"
+				jarfile="${dist.dir}/lib/ecg_lab.jar"
+				basedir="${build.dir}"
+				manifest="manifest.txt"/>
+
+		<!-- Copy the documentation -->
+		<copy todir="${dist.dir}/doc">
+
+			<fileset dir="${doc.dir}"/>
+
+		</copy>
+
+	</target>
+
+	<!-- Deploy the Module-API into ./dist/lib/. -->
+	<target name="deployModuleApi" depends="build">
+
+		<echo message="Deploying ecg_moduleapi.jar ..."/>
+
+		<!-- Create the distribuition directories -->
+		<mkdir dir="${dist.dir}"/>
+		<mkdir dir="${dist.dir}/lib"/>
+		<mkdir dir="${dist.dir}/doc"/>
+
+		<!-- Package the Module-API into ecg_moduleapi.jar -->
+		<jar
+					includes="org/electrocodeogram/module/*,
+							org/electrocodeogram/module/intermediate/*,
+							org/electrocodeogram/module/source/*,
+							org/electrocodeogram/module/target/*,
+							org/electrocodeogram/modulepackage/*,
+							org/electrocodeogram/system/IModuleSystem.class*,
+							org/electrocodeogram/system/ModuleSystem.class*,
+							org/electrocodeogram/system/logging/*,
+							org/electrocodeogram/module/event/*,
+							org/electrocodeogram/msdt/*,
+							org/electrocodeogram/event/*,
+							org/electrocodeogram/ui/IGui.class,
+							org/electrocodeogram/misc/xml/*,
+							org/electrocodeogram/misc/constants/UIConstants.class,"
+					compress="true"
+					duplicate="fail"
+					jarfile="${dist.dir}/lib/ecg_moduleapi.jar"
+					basedir="${build.dir}" />
+
+		<!-- Copy the documentation -->
+		<copy todir="${dist.dir}/doc">
+
+			<fileset dir="${doc.dir}"/>
+
+		</copy>
+
+		<!-- Copy the ecg_moduleapi.jar 
+		
+		<copy todir="../ECG Build/dist/lib/">
+
+			<fileset dir="${build.lib}" includes="ecg_moduleapi.jar" />
+
+		</copy>
+		-->
+		
+	</target>
+
+	<!-- Deploys all deployables and used libs -->
+	<target name="deploy" depends="deployEcgLab, deployModuleApi">
+
+		<!-- Copy the libraries -->
+		<copy todir="${dist.dir}/lib">
+
+			<fileset dir="${lib.dir}" />
+			<fileset dir="${support.dir}/dist/lib" />
+<!--			<fileset dir="${test.dir}/dist/lib" />  -->
+
+		</copy>		
+
+		<!-- Copy the documentation -->
+		<copy todir="${dist.dir}/doc">
+
+			<fileset dir="${doc.dir}"/>
+
+		</copy>
+
+	</target>
+	
+	<!-- This shall be the default target. -->
+	<target name="all" depends="cleanall, deploy"/>
+
+	<!-- Generate the API documentation. -->
+	<target name="javadoc">
+
+		<javadoc
+			packagenames="org.*"
+			sourcepath="${src.dir}"
+			destdir="${doc.dir}">
+
+			<classpath refid="classpath"/>
+
+		</javadoc>
+
+	</target>
+
+	<!-- Assemble application -->
+	<target name="Assemble ECGLab" depends="deploy">
+
+		<echo message="Assembling ECG ServerAndLab application"/>
+
+		<delete dir="${dist.dir}/application/"/>
+		<mkdir dir="${dist.dir}/application/"/>
+		<mkdir dir="${dist.dir}/application/modules/"/>
+		<mkdir dir="${dist.dir}/application/msdt/"/>
+		<mkdir dir="${dist.dir}/application/lib/"/>
+
+		<copy todir="${dist.dir}/application/">
+
+			<fileset dir="${dist.dir}/lib/" includes="ecg_lab.jar" />
+
+		</copy>
+	
+		<copy todir="${dist.dir}/application/">
+
+			<fileset dir="." includes="ecg.bat" />
+
+		</copy>
+		
+		<copy todir="${dist.dir}/application/">
+
+			<fileset dir="." includes="ecg.sh" />
+
+		</copy>
+		
+		<copy todir="${dist.dir}/application/modules/">
+
+			<fileset dir="${module.dir}"/>
+
+		</copy>
+
+		<copy todir="${dist.dir}/application/">
+
+			<fileset dir="." includes="socket.setup" />
+
+		</copy>
+
+		
+		<copy todir="${dist.dir}/application/msdt/">
+
+			<fileset dir="${msdt.dir}"/>
+
+		</copy>
+		
+		<copy todir="${dist.dir}/application/lib/">
+
+			<fileset dir="${dist.dir}/lib" excludes="ecg_lab.jar,ecg_test.jar,junit.jar"/>
+
+		</copy>
+		
+	</target>
+</project>
+
