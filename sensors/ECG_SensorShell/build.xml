@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Buildfile for the Event-API and ECG SensorShell component -->
+
+<project name="ECG_SensorShell" default="deploy" basedir=".">
+
+	<!-- Project directories -->
+	<property name="src.dir" value="src"/>
+
+	<property name="dist.dir" value="dist"/>
+
+	<property name="doc.dir" value="doc"/>
+
+	<property name="lib.dir" value="lib"/>
+
+	<property name="build.dir" value="bin"/>
+
+	<!-- Dependend project directories -->
+	<property name="support.dir" value="../ECG_Support"/>
+
+	<property name="lab.dir" value="../ECG_Lab"/>
+
+	<property name="test.dir" value="../ECG_TestHelper"/>
+
+
+	<!-- Classpath setting -->
+	<path id="classpath">
+		<!--
+		<fileset dir="${lib.dir}">
+			<include name="**/*.jar/"/>
+		</fileset>
+		-->
+		<fileset dir="${support.dir}/dist/lib">
+			<include name="**/*.jar/"/>			
+		</fileset>
+		<fileset dir="${test.dir}/dist/lib">
+			<include name="**/*.jar"/>
+		</fileset>
+
+	</path>
+
+
+	<!-- Target to create the build directories prior to a compile target -->
+	<target name="prepare">
+
+		<tstamp />
+
+		<mkdir dir="${build.dir}"/>
+		<mkdir dir="${doc.dir}"/>
+
+	</target>
+
+	<!-- Build the ECG SensorShell component for the sensorshell.jar. -->
+	<target name="build" depends="prepare">
+
+		<echo message="Building ${ant.project.name}"/>
+
+		<javac
+				destdir="${build.dir}"
+				srcdir="${src.dir}:${support.dir}/src"
+				source="1.5"
+				debug="on"
+				deprecation="on">
+
+			<classpath refid="classpath" />
+
+		</javac>
+
+	</target>
+
+	<!-- This shall be the default target. -->
+	<target name="all" depends="cleanall, deploy"/>
+
+	<!-- Generate the API documentation. -->
+	<target name="javadoc">
+
+		<javadoc
+			packagenames="org.*"
+			sourcepath="${src.dir}"
+			destdir="${doc.dir}">
+
+			<classpath refid="classpath"/>
+
+		</javadoc>
+
+	</target>
+
+	<!-- Delete class files built during previous builds. Leave directories. -->
+	<target name="clean">
+
+		<delete failonerror="no">
+			<fileset dir="${build.dir}" includes="**/*.class"/>
+		</delete>
+
+	</target>
+
+	<!-- Delete any created directories and their contents. -->
+	<target name="cleanall" depends="clean">
+
+		<delete dir="${build.dir}"/>
+		<delete dir="${dist.dir}"/>
+		<delete dir="${doc.dir}"/>
+
+		<delete failonerror="no">
+			<fileset dir="${lib.dir}/ecg" includes="**/*.jar"/>
+		</delete>
+		
+	</target>
+
+	<!-- Deploy the sensorshell.jar to ./dist/lib/. -->
+	<target name="deploy" depends="build">
+
+		<echo message="Deploying the sensorshell.jar to ./dist/lib/...."/>
+
+		<!-- Create the distribution directories -->
+		<mkdir dir="${dist.dir}"/>
+		<mkdir dir="${dist.dir}/lib"/>
+		<mkdir dir="${dist.dir}/doc"/>
+
+		<!-- Package the ECG SensorShell component's shell parts into a JAR. -->
+		<jar
+					excludes="org.hackystat.*"
+					compress="true"
+					duplicate="fail"
+					jarfile="${dist.dir}/lib/sensorshell.jar"
+					basedir="${build.dir}"
+					manifest="manifest.txt"/>
+
+		<!-- Copies Lib to EclipseSensor -->
+		<copy todir="../ECG_EclipseSensor/">
+		
+			<fileset file="${dist.dir}/lib/sensorshell.jar"/>
+			
+		</copy>
+		
+		<!-- Copy the documentation -->
+		<copy todir="${dist.dir}/doc">
+
+			<fileset dir="${doc.dir}"/>
+
+		</copy>
+
+	</target>
+
+</project>
+
