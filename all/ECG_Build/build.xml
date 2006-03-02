@@ -70,6 +70,7 @@
 		<echo message="######## CLEANING LAB" />
 
 		<ant dir="../ECG_Lab" target="cleanall" />
+		<ant dir="../ECG_Lab" target="cleanmodules" />
 
 	</target>
 
