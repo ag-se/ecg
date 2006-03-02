@@ -150,7 +150,7 @@
 
 		<echo message="######## BUILDING MODULES" />
 
-		<ant dir="../ECG_SocketSourceModule" target="deploy" />
+	 	<ant dir="../ECG_SocketSourceModule" target="deploy" />
 		<ant dir="../ECG_FileSystemTargetModule" target="deploy" />
 		<ant dir="../ECG_HackyStatTargetModule" target="deploy" />
 		<ant dir="../ECG_HackyStatSourceModule" target="deploy" />
