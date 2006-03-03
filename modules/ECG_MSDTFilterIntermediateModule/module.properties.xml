@@ -23,4 +23,16 @@
 	<type>
 		INTERMEDIATE
 	</type>
+	<properties>
+		<property>
+			<propertyName>
+				Configuration
+			</propertyName>
+			<propertyType>
+				java.lang.String
+			</propertyType>
+			<propertyValue>
+			</propertyValue>
+		</property>
+	</properties>
 </module>

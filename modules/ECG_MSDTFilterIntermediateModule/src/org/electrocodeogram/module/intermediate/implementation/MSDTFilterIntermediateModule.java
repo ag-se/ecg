@@ -18,16 +18,15 @@ import java.util.logging.Logger;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.logging.LogHelper;
-import org.electrocodeogram.modulepackage.ModuleProperty;
 import org.electrocodeogram.module.UIModule;
-import org.electrocodeogram.module.event.MessageEvent;
 import org.electrocodeogram.module.intermediate.IntermediateModule;
+import org.electrocodeogram.modulepackage.ModuleProperty;
+import org.electrocodeogram.modulepackage.ModulePropertyException;
 import org.electrocodeogram.msdt.MicroSensorDataType;
 import org.electrocodeogram.system.ModuleSystem;
 
@@ -44,15 +43,15 @@ public class MSDTFilterIntermediateModule extends IntermediateModule implements 
     private static Logger logger = LogHelper
         .createLogger(MSDTFilterIntermediateModule.class.getName());
 
-    /**
+	/**
+     * Name of the configuration property of the module
+     */
+	private static final String CONF_PROPERTY = "Configuration";
+	
+	/**
      * This is a map of <em>MicroSensorDataTypes</em>, which are filtered.
      */
     private HashMap < MicroSensorDataType, Boolean > msdtFilterMap;
-
-    /**
-     * A reference to the GUi dialog.
-     */
-    //private JDialog dlgFilterConfiguration;
 
     /**
      * This is a map containing the checkboxes from the user dialog.
@@ -68,7 +67,7 @@ public class MSDTFilterIntermediateModule extends IntermediateModule implements 
      * The main panel of the dialog.
      */
     private JPanel pnlMain;
-
+	
     /**
      * This creates the module instance. It is not to be
      * called by developers, instead it is called from the <em>ECG
@@ -100,16 +99,13 @@ public class MSDTFilterIntermediateModule extends IntermediateModule implements 
         logger.entering(this.getClass().getName(),
             "MSDTFilterIntermediateModule", new Object[] {packet});
 
-        if (this.msdtFilterMap.containsKey(packet.getMicroSensorDataType())) {
-            if (this.msdtFilterMap.get(packet.getMicroSensorDataType()).equals(
-                new Boolean(true))) {
+        if (this.msdtFilterMap.get(packet.getMicroSensorDataType()) == Boolean.TRUE) {
 
-                logger.log(Level.FINE, "The event is passing the filter.");
+            logger.log(Level.FINE, "The event is passing the filter.");
 
-                logger.exiting(this.getClass().getName(), "packet");
+            logger.exiting(this.getClass().getName(), "packet");
 
-                return packet;
-            }
+            return packet;
         }
 
         logger.log(Level.FINE, "The event is filtered out.");
@@ -124,19 +120,43 @@ public class MSDTFilterIntermediateModule extends IntermediateModule implements 
      * @see org.electrocodeogram.module.Module#propertyChanged(org.electrocodeogram.modulepackage.ModuleProperty)
      */
     @Override
-    public final void propertyChanged(final ModuleProperty moduleProperty) {
+    public final void propertyChanged(final ModuleProperty moduleProperty)
+    throws ModulePropertyException {
 
         logger.entering(this.getClass().getName(), "propertyChanged",
             new Object[] {moduleProperty});
 
-        if (moduleProperty.getValue().equals("configureFilter")) {
-            configureFilter();
-        }
+        logger.log(Level.INFO, "Request to set the property: "
+                + moduleProperty.getName());
+
+        if (moduleProperty.getName().equals(CONF_PROPERTY)) {
+
+	        logger.log(Level.INFO, "Request to set the property: "
+	                + moduleProperty.getName());
+
+			configureFilter(moduleProperty.getValue());
+			
+		} else {
+	        
+			logger.log(Level.WARNING,
+	            "The module does not support a property with the given name: "
+	                            + moduleProperty.getName());
+	
+	        logger.exiting(this.getClass().getName(), "propertyChanged");
+	
+	        throw new ModulePropertyException(
+	            "The module does not support this property.", this.getName(),
+	            this.getId(), moduleProperty.getName(), moduleProperty
+	                .getValue());
+	
+	    }
 
         logger.exiting(this.getClass().getName(), "propertyChanged");
     }
 
     /**
+     * Updates the list of MSDTs
+     * 
      * @see org.electrocodeogram.module.Module#update()
      */
     @Override
@@ -150,19 +170,6 @@ public class MSDTFilterIntermediateModule extends IntermediateModule implements 
 
     }
 
-//    /**
-//     * Returns the user dialog.
-//     * @return The user dialog
-//     */
-//    final JDialog getDialog() {
-//
-//        logger.entering(this.getClass().getName(), "getDialog");
-//
-//        logger.exiting(this.getClass().getName(), "getDialog",
-//            this.dlgFilterConfiguration);
-//
-//        return this.dlgFilterConfiguration;
-//    }
 
     /**
      * This method fills the {@link #msdtFilterMap}
@@ -177,12 +184,18 @@ public class MSDTFilterIntermediateModule extends IntermediateModule implements 
         MicroSensorDataType[] msdts = ModuleSystem.getInstance()
             .getMicroSensorDataTypes();
 
-        for (MicroSensorDataType msdt : msdts) {
-
-            this.msdtFilterMap.put(msdt, new Boolean(true));
-
+		// First, include all avaiable MSDTs as keys in the HashMap
+		for (MicroSensorDataType msdt : msdts) {
+            this.msdtFilterMap.put(msdt, Boolean.TRUE);
         }
 
+		// Now (re-)set the correct values of the filter configuration
+		try {
+			configureFilter(this.getModuleProperty(CONF_PROPERTY).getValue());
+		} catch (ModulePropertyException e) {
+			logger.log(Level.WARNING, "The filter module is supposed to support the property " +  CONF_PROPERTY);
+		}
+		
         logger.exiting(this.getClass().getName(), "setFilterMap");
     }
 
@@ -193,8 +206,6 @@ public class MSDTFilterIntermediateModule extends IntermediateModule implements 
     public final void initialize() {
 
         logger.entering(this.getClass().getName(), "initialize");
-
-        this.msdtFilterMap = new HashMap < MicroSensorDataType, Boolean >();
 
         setFilterMap();
 
@@ -207,24 +218,27 @@ public class MSDTFilterIntermediateModule extends IntermediateModule implements 
      * This method is used to configure this filter module.
      * It creates and displays a user dialog to set the filter rules.
      */
-    public final void configureFilter() {
+    public final void configureFilter(String filterExpression) {
 
         logger.entering(this.getClass().getName(), "configureFilter");
 
-        if (this.msdtFilterMap.size() == 0) {
-
-            MessageEvent event = new MessageEvent(
-                "There are no MicroSensorDataTypes loaded yet. Please add at least one SourceModule to load the predefined MicroSensorDataTypes.",
-                MessageEvent.MessageType.INFO, getName(), getId());
-
-            getGuiNotifiator().fireMessageNotification(event);
-
-            logger.exiting(this.getClass().getName(), "configureFilter");
-
-            return;
-        }
-
-
+		if (filterExpression != null) {
+			
+			for (MicroSensorDataType msdt : this.msdtFilterMap.keySet()) {
+	
+				// Use regular expression ".*msdt.TYPE.xsd.*" to be found in 
+				// the configuration property
+				if (filterExpression.matches(".*" + msdt.getName() + ".*")) {
+	
+	//				this.msdtFilterMap.put(msdt, Boolean.FALSE);
+	
+				} else {
+	
+	//				this.msdtFilterMap.put(msdt, Boolean.TRUE);
+	
+				}
+	        }
+		}
 
         logger.exiting(this.getClass().getName(), "configureFilter");
     }
@@ -237,17 +251,33 @@ public class MSDTFilterIntermediateModule extends IntermediateModule implements 
 
         logger.entering(this.getClass().getName(), "updateMsdtFilterMap");
 
-        for (MicroSensorDataType msdt : this.chkMsdtSelection.keySet()) {
+        String filterExpression = "";
+		
+		for (MicroSensorDataType msdt : this.chkMsdtSelection.keySet()) {
             JCheckBox chkBox = this.chkMsdtSelection.get(msdt);
 
             this.msdtFilterMap.remove(msdt);
 
             if (chkBox.isSelected()) {
-                this.msdtFilterMap.put(msdt, new Boolean(false));
-            } else {
-                this.msdtFilterMap.put(msdt, new Boolean(true));
-            }
+
+				this.msdtFilterMap.put(msdt, Boolean.FALSE);
+				// Compile new filter property string
+				filterExpression += (filterExpression.length() == 0 ? "" : ",") + msdt.getName();
+
+			} else {
+
+				this.msdtFilterMap.put(msdt, Boolean.TRUE);
+
+			}
         }
+		
+		// set the new value of the filter property
+		try {
+			this.getModuleProperty(CONF_PROPERTY).setValue(filterExpression);
+		} catch (ModulePropertyException e) {
+			logger.log(Level.WARNING, "The filter module is supposed to support the property " +  CONF_PROPERTY);
+		}
+			
 
         logger.exiting(this.getClass().getName(), "updateMsdtFilterMap");
     }
@@ -263,8 +293,8 @@ public class MSDTFilterIntermediateModule extends IntermediateModule implements 
         this.chkMsdtSelection = new HashMap < MicroSensorDataType, JCheckBox >();
 
         for (MicroSensorDataType msdt : this.msdtFilterMap.keySet()) {
-            if (this.msdtFilterMap.get(msdt).equals(new Boolean(true))) {
-                this.chkMsdtSelection.put(msdt, new JCheckBox(msdt.getName(),
+            if (this.msdtFilterMap.get(msdt) == Boolean.TRUE) {
+				this.chkMsdtSelection.put(msdt, new JCheckBox(msdt.getName(),
                     false));
             } else {
                 this.chkMsdtSelection.put(msdt, new JCheckBox(msdt.getName(),
@@ -285,7 +315,7 @@ public class MSDTFilterIntermediateModule extends IntermediateModule implements 
         logger.entering(this.getClass().getName(), "refreshCheckBoxes");
 
         for (MicroSensorDataType msdt : this.msdtFilterMap.keySet()) {
-            if (this.msdtFilterMap.get(msdt).equals(new Boolean(true))) {
+            if (this.msdtFilterMap.get(msdt) == Boolean.TRUE) {
                 this.chkMsdtSelection.get(msdt).setSelected(false);
             } else {
                 this.chkMsdtSelection.get(msdt).setSelected(true);
@@ -380,10 +410,17 @@ public class MSDTFilterIntermediateModule extends IntermediateModule implements 
             public void actionPerformed(@SuppressWarnings("unused")
             final ActionEvent e) {
                 updateMsdtFilterMap();
+				closePanel();
+            }
+        });
 
-                //getDialog().dispose();
-                
+        JButton btnApply = new JButton("Apply");
 
+        btnApply.addActionListener(new ActionListener() {
+
+            public void actionPerformed(@SuppressWarnings("unused")
+            final ActionEvent e) {
+                updateMsdtFilterMap();
             }
         });
 
@@ -393,8 +430,7 @@ public class MSDTFilterIntermediateModule extends IntermediateModule implements 
 
             public void actionPerformed(@SuppressWarnings("unused")
             final ActionEvent e) {
-                //getDialog().dispose();
-
+				closePanel();
             }
         });
 
@@ -432,7 +468,9 @@ public class MSDTFilterIntermediateModule extends IntermediateModule implements 
 
         pnlButtons.add(btnCancel);
 
-        pnlButtons.add(btnOK);
+        pnlButtons.add(btnApply);
+
+		pnlButtons.add(btnOK);
 
         logger.exiting(this.getClass().getName(), "getButtonPanel", pnlButtons);
 
@@ -456,5 +494,14 @@ public class MSDTFilterIntermediateModule extends IntermediateModule implements 
         
         return this.pnlMain;
     }
+	
+	/**
+	 * Closes the Modules Configuration panel frame
+	 */
+	private final void closePanel() {
+
+		this.pnlMain.getRootPane().getParent().setVisible(false);
+		
+	}
 
 }
