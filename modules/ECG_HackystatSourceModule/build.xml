@@ -40,6 +40,7 @@
 		</fileset>
 		<fileset dir="${lab.dir}/dist/lib">
 			<include name="**/ecg_moduleapi.jar/"/>			
+			<include name="**/hackystat/sensorshell.jar/"/>
 		</fileset>
 
 	</path>
