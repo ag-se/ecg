@@ -4,7 +4,9 @@
 	<xs:annotation>
 		<xs:documentation>
 			This XML schema defines the structure of an "Window active episode" 
-			MicroSensorDataType.
+			MicroSensorDataType. It groups two msdt.window.xsd events to represent
+			that this Window (usually the complete IDE application was active 
+			(i.e. has probably been looked at).
 		</xs:documentation>
 	</xs:annotation>
 

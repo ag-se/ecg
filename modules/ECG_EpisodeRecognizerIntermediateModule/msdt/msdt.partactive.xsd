@@ -4,7 +4,8 @@
 	<xs:annotation>
 		<xs:documentation>
 			This XML schema defines the structure of an "Part active episode" 
-			MicroSensorDataType.
+			MicroSensorDataType. It groups two msdt.part.xsd events to represent
+			that this Eclipse Part was active (i.e. has probably been looked at).
 		</xs:documentation>
 	</xs:annotation>
 

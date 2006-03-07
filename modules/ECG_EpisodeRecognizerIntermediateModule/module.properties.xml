@@ -7,7 +7,7 @@
 		FU Berlin
 	</provider-name>
 	<version>
-		0.1
+		1.0
 	</version>
 	<name>
 		Simple episode recognizer
@@ -16,8 +16,13 @@
 		org.electrocodeogram.module.intermediate.implementation.EpisodeRecognizerIntermediateModule
 	</class>
 	<description>
-		This module computes various episodes compiled from the standard mirco-events.
-		It generates msdt.fileactive.xsd events.
+		This module is used as a shell of one configurable EpisodeRecognizer. You can 
+		specify the Recognizer in the property "Recognizer". The module also contains some
+		new MSDTs which actually are episode representations.
+		
+		The properties are:
+		* Recognizer - The name of the class to be found in the ...recognizer package
+		* MinDuration - No Episode shorter than MinDuration (in ms) should be recognized
 	</description>
 	<type>
 		INTERMEDIATE

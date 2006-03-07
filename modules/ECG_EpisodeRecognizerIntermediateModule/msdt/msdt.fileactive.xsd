@@ -4,7 +4,10 @@
 	<xs:annotation>
 		<xs:documentation>
 			This XML schema defines the structure of an "File active episode" 
-			MicroSensorDataType.
+			MicroSensorDataType. It groups two msdt.editor.xsd events to represent
+			that this editor's file was active (i.e. has probably been looked at).
+			The flag "changed" indicates whether the file has been edited while
+			being active.
 		</xs:documentation>
 	</xs:annotation>
 
