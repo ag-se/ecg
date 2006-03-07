@@ -94,7 +94,16 @@ public class MSDTFilterIntermediateModule extends IntermediateModule implements 
      */
     private JPanel pnlMain;
 
+    /**
+     * List of five compiled regular expressions 
+     */
 	private Pattern[] filters = new Pattern[5];
+    
+    /**
+     * List of five MSDTs (in name representation) which correspond to
+     * the filters. See the documentation of the module's properties
+     * in the module.properties.xml
+     */
 	private String[] msdts = new String[5];
 	
     /**
@@ -141,6 +150,7 @@ public class MSDTFilterIntermediateModule extends IntermediateModule implements 
 		String eventTypeName = packet.getMicroSensorDataType().getName();
 		ValidEventPacket result = packet;
 		
+        // for each regex filter, filter the non-regex-compliant
 		if (msdts[0] != null && eventTypeName.equals(msdts[0]))
 			if (!filters[0].matcher(eventString).matches())
 				result = null;
@@ -234,8 +244,13 @@ public class MSDTFilterIntermediateModule extends IntermediateModule implements 
     }
 
 	
+	/**
+     * Parses the expression {MSDTTYPE}={REGEX} filter properties
+     * 
+	 * @param value
+	 * @param index
+	 */
 	private void extractFilterExpression(String value, int index) {
-		// TODO Auto-generated method stub
 		
 		if (value != null && value.length() > 0) {
 			int sep = value.indexOf('=');
