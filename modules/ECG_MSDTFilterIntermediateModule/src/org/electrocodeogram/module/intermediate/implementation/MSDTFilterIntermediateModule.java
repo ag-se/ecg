@@ -14,6 +14,7 @@ import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -44,10 +45,35 @@ public class MSDTFilterIntermediateModule extends IntermediateModule implements 
         .createLogger(MSDTFilterIntermediateModule.class.getName());
 
 	/**
-     * Name of the configuration property of the module
+     * Name of the blocker configuration property of the module
      */
-	private static final String CONF_PROPERTY = "Configuration";
+	private static final String CONF_PROPERTY = "Blocker";
 	
+	/**
+     * Name of the filter1 configuration property of the module
+     */
+	private static final String FILTER1_PROPERTY = "Filter1";
+
+	/**
+     * Name of the filter1 configuration property of the module
+     */
+	private static final String FILTER2_PROPERTY = "Filter2";
+
+	/**
+     * Name of the filter1 configuration property of the module
+     */
+	private static final String FILTER3_PROPERTY = "Filter3";
+
+	/**
+     * Name of the filter1 configuration property of the module
+     */
+	private static final String FILTER4_PROPERTY = "Filter4";
+
+	/**
+     * Name of the filter1 configuration property of the module
+     */
+	private static final String FILTER5_PROPERTY = "Filter5";
+
 	/**
      * This is a map of <em>MicroSensorDataTypes</em>, which are filtered.
      */
@@ -67,6 +93,9 @@ public class MSDTFilterIntermediateModule extends IntermediateModule implements 
      * The main panel of the dialog.
      */
     private JPanel pnlMain;
+
+	private Pattern[] filters = new Pattern[5];
+	private String[] msdts = new String[5];
 	
     /**
      * This creates the module instance. It is not to be
@@ -99,20 +128,43 @@ public class MSDTFilterIntermediateModule extends IntermediateModule implements 
         logger.entering(this.getClass().getName(),
             "MSDTFilterIntermediateModule", new Object[] {packet});
 
-        if (this.msdtFilterMap.get(packet.getMicroSensorDataType()) == Boolean.TRUE) {
+        if (this.msdtFilterMap.get(packet.getMicroSensorDataType()) == Boolean.FALSE) {
 
-            logger.log(Level.FINE, "The event is passing the filter.");
+	        logger.log(Level.FINE, "The event type is filtered.");
 
-            logger.exiting(this.getClass().getName(), "packet");
+            logger.exiting(this.getClass().getName(), null);
 
-            return packet;
+            return null;
         }
+		
+		String eventString = packet.toString();
+		String eventTypeName = packet.getMicroSensorDataType().getName();
+		ValidEventPacket result = packet;
+		
+		if (msdts[0] != null && eventTypeName.equals(msdts[0]))
+			if (!filters[0].matcher(eventString).matches())
+				result = null;
+		if (msdts[1] != null && eventTypeName.equals(msdts[1]))
+			if (!filters[1].matcher(eventString).matches())
+				result = null;
+		if (msdts[2] != null && eventTypeName.equals(msdts[2]))
+			if (!filters[2].matcher(eventString).matches())
+				result = null;
+		if (msdts[3] != null && eventTypeName.equals(msdts[3]))
+			if (!filters[3].matcher(eventString).matches())
+				result = null;
+		if (msdts[4] != null && eventTypeName.equals(msdts[4]))
+			if (!filters[4].matcher(eventString).matches())
+				result = null;
+			
+		if (result != null)			
+			logger.log(Level.FINE, "The event fulfills one of the filters.");
+		else
+			logger.log(Level.FINE, "The event is filtered.");
 
-        logger.log(Level.FINE, "The event is filtered out.");
+		logger.exiting(this.getClass().getName(), null);
 
-        logger.exiting(this.getClass().getName(), null);
-
-        return null;
+        return result;
 
     }
 
@@ -129,13 +181,40 @@ public class MSDTFilterIntermediateModule extends IntermediateModule implements 
         logger.log(Level.INFO, "Request to set the property: "
                 + moduleProperty.getName());
 
+		String value = moduleProperty.getValue();
+		
         if (moduleProperty.getName().equals(CONF_PROPERTY)) {
 
 	        logger.log(Level.INFO, "Request to set the property: "
 	                + moduleProperty.getName());
 
-			configureFilter(moduleProperty.getValue());
+			configureFilter(value);
 			
+        } else if (moduleProperty.getName().equals(FILTER1_PROPERTY)) {
+            logger.log(Level.INFO, "Request to set the property: "
+                                   + moduleProperty.getName());
+			extractFilterExpression(value, 0);
+
+        } else if (moduleProperty.getName().equals(FILTER2_PROPERTY)) {
+            logger.log(Level.INFO, "Request to set the property: "
+                                   + moduleProperty.getName());
+			extractFilterExpression(value, 1);
+
+        } else if (moduleProperty.getName().equals(FILTER3_PROPERTY)) {
+            logger.log(Level.INFO, "Request to set the property: "
+                                   + moduleProperty.getName());
+			extractFilterExpression(value, 2);
+
+        } else if (moduleProperty.getName().equals(FILTER4_PROPERTY)) {
+            logger.log(Level.INFO, "Request to set the property: "
+                                   + moduleProperty.getName());
+			extractFilterExpression(value, 3);
+
+        } else if (moduleProperty.getName().equals(FILTER5_PROPERTY)) {
+            logger.log(Level.INFO, "Request to set the property: "
+                                   + moduleProperty.getName());
+			extractFilterExpression(value, 4);
+
 		} else {
 	        
 			logger.log(Level.WARNING,
@@ -154,7 +233,24 @@ public class MSDTFilterIntermediateModule extends IntermediateModule implements 
         logger.exiting(this.getClass().getName(), "propertyChanged");
     }
 
-    /**
+	
+	private void extractFilterExpression(String value, int index) {
+		// TODO Auto-generated method stub
+		
+		if (value != null && value.length() > 0) {
+			int sep = value.indexOf('=');
+			if (sep > 0) {
+				msdts[index] = new String(value.substring(0, sep));
+				String pattern = value.substring(sep+1);
+				filters[index] = Pattern.compile(pattern);
+				return;
+			}
+		}
+		msdts[index] = null;
+		filters[index] = null;
+	}
+
+	/**
      * Updates the list of MSDTs
      * 
      * @see org.electrocodeogram.module.Module#update()
@@ -230,11 +326,11 @@ public class MSDTFilterIntermediateModule extends IntermediateModule implements 
 				// the configuration property
 				if (filterExpression.matches(".*" + msdt.getName() + ".*")) {
 	
-	//				this.msdtFilterMap.put(msdt, Boolean.FALSE);
+					this.msdtFilterMap.put(msdt, Boolean.FALSE);
 	
 				} else {
 	
-	//				this.msdtFilterMap.put(msdt, Boolean.TRUE);
+					this.msdtFilterMap.put(msdt, Boolean.TRUE);
 	
 				}
 	        }
@@ -497,6 +593,7 @@ public class MSDTFilterIntermediateModule extends IntermediateModule implements 
 	
 	/**
 	 * Closes the Modules Configuration panel frame
+	 * Note: This is probably quite a hack
 	 */
 	private final void closePanel() {
 

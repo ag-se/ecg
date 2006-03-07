@@ -26,7 +26,57 @@
 	<properties>
 		<property>
 			<propertyName>
-				Configuration
+				Blocker
+			</propertyName>
+			<propertyType>
+				java.lang.String
+			</propertyType>
+			<propertyValue>
+			</propertyValue>
+		</property>
+		<property>
+			<propertyName>
+				Filter1
+			</propertyName>
+			<propertyType>
+				java.lang.String
+			</propertyType>
+			<propertyValue>
+			</propertyValue>
+		</property>
+		<property>
+			<propertyName>
+				Filter2
+			</propertyName>
+			<propertyType>
+				java.lang.String
+			</propertyType>
+			<propertyValue>
+			</propertyValue>
+		</property>
+		<property>
+			<propertyName>
+				Filter3
+			</propertyName>
+			<propertyType>
+				java.lang.String
+			</propertyType>
+			<propertyValue>
+			</propertyValue>
+		</property>
+		<property>
+			<propertyName>
+				Filter4
+			</propertyName>
+			<propertyType>
+				java.lang.String
+			</propertyType>
+			<propertyValue>
+			</propertyValue>
+		</property>
+		<property>
+			<propertyName>
+				Filter5
 			</propertyName>
 			<propertyType>
 				java.lang.String
