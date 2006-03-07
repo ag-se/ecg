@@ -111,6 +111,13 @@ public final class Core extends Observable implements ISystem, IModuleSystem,
     private MsdtRegistry mstdRegistry;
 
     /**
+     * GuiKind denotes the kind of Gui for the Lab: GUI is full module
+     * gui, SMALLUI is simple termination possibility, and NOGUI
+     * is batch mode
+     */
+	private enum GuiKind {GUI, SMALLUI, NOGUI}
+	
+	/**
      * The private constructor is only used internally to create the
      * <em>Singleton</em> instance. Here the
      * {@link org.electrocodeogram.module.registry.ModuleRegistry} and
@@ -147,7 +154,7 @@ public final class Core extends Observable implements ISystem, IModuleSystem,
      * @param moduleSetup
      *            The path to the <em>ModuleSetup</em> given as a
      *            command line parameter
-     * @param nogui
+     * @param guiKind
      *            Tells the ECG Lab to either start with or without a
      *            graphical user interface
      * @throws ModuleSetupLoadException
@@ -160,17 +167,17 @@ public final class Core extends Observable implements ISystem, IModuleSystem,
      */
     @SuppressWarnings("boxing")
     private Core(final String moduleDir, final String moduleSetup,
-        final boolean nogui) throws ModuleSetupLoadException,
+        final GuiKind guiKind) throws ModuleSetupLoadException,
         ModuleClassLoaderInitializationException {
 
         this();
 
         logger.entering(this.getClass().getName(), "SystemRoot", new Object[] {
-            moduleDir, moduleSetup, nogui});
+            moduleDir, moduleSetup, guiKind});
 
         Thread console = new Console();
 
-        if (!nogui) {
+        if (guiKind == GuiKind.GUI) {
             logger.log(Level.INFO,
                 "Going to start ECG Lab with user interface.");
 
@@ -180,10 +187,15 @@ public final class Core extends Observable implements ISystem, IModuleSystem,
 
             this.mstdRegistry.addObserver(this.gui);
 
-        } else {
+        } else if (guiKind == GuiKind.NOGUI) {
+			
+            logger.log(Level.INFO,
+            "Going to start ECG Lab without user interface.");			
+		
+		} else {
 
             logger.log(Level.INFO,
-                "Going to start ECG Lab without user interface.");
+                "Going to start ECG Lab with only basic user interface.");
 
             new SmallUI();
 
@@ -437,14 +449,14 @@ public final class Core extends Observable implements ISystem, IModuleSystem,
 
         String logFile = getLogFile(args);
 
-        boolean nogui = isNogui(args);
+        GuiKind guiKind = guiKind(args);
 
         if (help) {
             printHelpMessage();
         }
 
         try {
-            startSystem(moduleDir, moduleSetup, nogui, logLevel, logFile);
+            startSystem(moduleDir, moduleSetup, guiKind, logLevel, logFile);
         } catch (ModuleSetupLoadException e) {
             java.lang.System.err
                 .println("The following error occured while loading the given ModuleSetup: "
@@ -473,7 +485,7 @@ public final class Core extends Observable implements ISystem, IModuleSystem,
      * @param moduleSetup
      *            The path to the <em>ModuleSetup</em> given as a
      *            command line parameter
-     * @param nogui
+     * @param guiKind
      *            Tells the ECG Lab to either start with or without a
      *            graphical user interface
      * @param logLevel
@@ -489,7 +501,7 @@ public final class Core extends Observable implements ISystem, IModuleSystem,
      *             could not be created
      */
     private static void startSystem(final String moduleDir,
-        final String moduleSetup, final boolean nogui, final Level logLevel,
+        final String moduleSetup, final GuiKind guiKind, final Level logLevel,
         final String logFile) throws ModuleSetupLoadException,
         ModuleClassLoaderInitializationException {
 
@@ -507,7 +519,7 @@ public final class Core extends Observable implements ISystem, IModuleSystem,
                                          + logFile);
         }
 
-        new Core(moduleDir, moduleSetup, nogui);
+        new Core(moduleDir, moduleSetup, guiKind);
 
         logger.exiting(Core.class.getName(), "startSystem");
 
@@ -555,31 +567,34 @@ public final class Core extends Observable implements ISystem, IModuleSystem,
 
     /**
      * Parses the command line parameters for the <code>-nogui</code>
-     * parameter.
+     * and <code>-smallui</code> parameter.
      * @param args
      *            The command line parameters
      * @return If <code>-nogui</code> is given it returns
-     *         <code>true</code> otherwise <code>false</code>
+     *         <code>NOGUI</code>, <code>SMALLUI</code> for
+     *         <code>-smallui</code>, otherwise <code>GUI</code>
      */
-    private static boolean isNogui(final String[] args) {
-        logger.entering(Core.class.getName(), "isNogui");
+    private static GuiKind guiKind(final String[] args) {
+        logger.entering(Core.class.getName(), "guiKind");
 
         if (args == null || args.length == 0) {
-            logger.exiting(Core.class.getName(), "isNogui");
-
-            return false;
+            logger.exiting(Core.class.getName(), "guiKind");
+            return GuiKind.GUI;
         }
         for (int i = 0; i < args.length; i++) {
             if (args[i].equals("-nogui")) {
-                logger.exiting(Core.class.getName(), "isNogui");
-
-                return true;
+                logger.exiting(Core.class.getName(), "guiKind");
+                return GuiKind.NOGUI;
+            }
+            if (args[i].equals("-smallui")) {
+                logger.exiting(Core.class.getName(), "guiKind");
+                return GuiKind.SMALLUI;
             }
         }
 
-        logger.exiting(Core.class.getName(), "isNogui");
+        logger.exiting(Core.class.getName(), "guiKind");
 
-        return false;
+        return GuiKind.GUI;
     }
 
     /**
@@ -783,6 +798,9 @@ public final class Core extends Observable implements ISystem, IModuleSystem,
 
         java.lang.System.out
             .println("-nogui\tTells the ECG Lab to start without graphical user interface (for inline server mode).\n");
+
+        java.lang.System.out
+        .println("-smallui\tTells the ECG Lab to start with only a task killer button.\n");
 
         java.lang.System.out.println("-help\tPrints out this list.\n");
 
