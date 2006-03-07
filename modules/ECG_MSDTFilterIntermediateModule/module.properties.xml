@@ -19,6 +19,15 @@
 		This module can be used to filter out events of certain MicroSensorDataTypes.
 		To filter out means here: From all events that this module is receiving, only
 		those are sent, which are not of the selected MicroSensorDataTypes.
+		
+		Use the properties as follows:
+		* Blocker is a String of MSDT names, e.g. "msdt.testrun.xsd, msdt.codechange.xsd, msdt.window.xsd".
+		  It doesn't matter how they are concatenating
+		* Each FilterX is an expression of the kind {MSDTTYPE}={REGEX} where
+		  MSDTTYPE is a type name for which the following expression is evaluated
+		  REGEX is a regular expression (as used in String.matches()). Only events of the MSDTTYPE type 
+		     which confirm to this regex in its toString() representation are passed, i.e. MSDTTYPE-typed
+		     events which doesn't fulfill it are filtered.
 	</description>
 	<type>
 		INTERMEDIATE
