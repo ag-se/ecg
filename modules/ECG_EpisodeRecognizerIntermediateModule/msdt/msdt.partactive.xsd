@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+	<xs:annotation>
+		<xs:documentation>
+			This XML schema defines the structure of an "Part active episode" 
+			MicroSensorDataType.
+		</xs:documentation>
+	</xs:annotation>
+
+	<xs:element name="microActivity">
+		<xs:complexType>
+	    	<xs:sequence>
+				<xs:element name="username" type="xs:token"/>
+				<xs:element name="projectname" type="xs:token"/>
+				<xs:element name="starttime" type="xs:string"/>
+				<xs:element name="duration" type="xs:long"/>
+				<xs:element name="resourcename" type="xs:normalizedString"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

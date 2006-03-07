@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<module>
+	<id>
+		org.electrocodeogram.module.intermediate.implementation.EpisodeRecognizerIntermediateModule
+	</id>
+	<provider-name>
+		FU Berlin
+	</provider-name>
+	<version>
+		0.1
+	</version>
+	<name>
+		Simple episode recognizer
+	</name>
+	<class>
+		org.electrocodeogram.module.intermediate.implementation.EpisodeRecognizerIntermediateModule
+	</class>
+	<description>
+		This module computes various episodes compiled from the standard mirco-events.
+		It generates msdt.fileactive.xsd events.
+	</description>
+	<type>
+		INTERMEDIATE
+	</type>
+	<properties>
+		<property>
+			<propertyName>
+				Recognizer
+			</propertyName>
+			<propertyType>
+				java.lang.String
+			</propertyType>
+			<propertyValue>
+			</propertyValue>
+		</property>
+		<property>
+			<propertyName>
+				MinDuration
+			</propertyName>
+			<propertyType>
+				java.lang.Long
+			</propertyType>
+			<propertyValue>
+			</propertyValue>
+		</property>
+	</properties>
+	<microsensordatatypes>
+		<microsensordatatype>
+			<msdtName>
+				msdt.fileactive.xsd
+			</msdtName>
+			<msdtFile>
+				msdt.fileactive.xsd
+			</msdtFile>
+		</microsensordatatype>
+		<microsensordatatype>
+			<msdtName>
+				msdt.windowactive.xsd
+			</msdtName>
+			<msdtFile>
+				msdt.windowactive.xsd
+			</msdtFile>
+		</microsensordatatype>
+	</microsensordatatypes>
+</module>
