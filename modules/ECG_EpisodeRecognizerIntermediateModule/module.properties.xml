@@ -66,5 +66,13 @@
 				msdt.windowactive.xsd
 			</msdtFile>
 		</microsensordatatype>
+		<microsensordatatype>
+			<msdtName>
+				msdt.partactive.xsd
+			</msdtName>
+			<msdtFile>
+				msdt.partactive.xsd
+			</msdtFile>
+		</microsensordatatype>
 	</microsensordatatypes>
 </module>
