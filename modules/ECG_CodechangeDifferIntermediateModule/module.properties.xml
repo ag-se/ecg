@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <module>
 	<id>
-		org.electrocodeogram.module.intermediate.CodechangeDifferIntermediateModule
+		org.electrocodeogram.module.intermediate.implementation.CodechangeDifferIntermediateModule
 	</id>
 	<provider-name>
 		Frank Schlesinger (Frank@Schlesinger.com)
@@ -13,7 +13,7 @@
 		Codechange Diff-Generator
 	</name>
 	<class>
-		org.electrocodeogram.module.intermediate.CodechangeDifferIntermediateModule
+		org.electrocodeogram.module.intermediate.implementation.CodechangeDifferIntermediateModule
 	</class>
 	<description>
 		This module computes the difference between two msdt.codechange.xsd events.
