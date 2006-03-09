@@ -110,7 +110,7 @@ public class WindowActiveEpisodeRecognizer implements EpisodeRecognizer {
 
 		data += "<projectname>" + projectname + "</projectname>";
 
-		data += "<starttime>" + this.dateFormat.format(begin) + "</starttime>";
+		data += "<endtime>" + this.dateFormat.format(end) + "</endtime>";
 
 		data += "<duration>" + duration + "</duration>";
 
@@ -125,7 +125,7 @@ public class WindowActiveEpisodeRecognizer implements EpisodeRecognizer {
             data};
 
         try {
-            event = new ValidEventPacket(id, end,
+            event = new ValidEventPacket(id, begin,
                 WellFormedEventPacket.HACKYSTAT_ACTIVITY_STRING, Arrays
                     .asList(args));
 

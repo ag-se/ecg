@@ -18,7 +18,7 @@ import org.w3c.dom.Document;
 
 public class PartActiveEpisodeRecognizer implements EpisodeRecognizer {
 
-    private enum PartActiveEpisodeState {START, PARTACTIVE, STOP}
+    private enum PartActiveEpisodeState {START, PARTACTIVE, PARTHOLD, STOP}
 	
 	// Eigentlich ist dies ein kleiner Unterautomat. Die Zustandsmenge oben müsste man verdoppeln!
 	private boolean hasBeenChanged = false;
@@ -29,7 +29,12 @@ public class PartActiveEpisodeRecognizer implements EpisodeRecognizer {
     private static String[] generalParts = new String[] {
             "Hierarchy",
             "Search",
-            "Console"
+            "Console",
+            "Ant",
+            "Outline",
+            "Navigator",
+            "Package Explorer",
+            "Problems"
             };
     
     private PartActiveEpisodeState state;
@@ -61,32 +66,54 @@ public class PartActiveEpisodeRecognizer implements EpisodeRecognizer {
 
 		try {
 
-			if (msdt.equals("msdt.part.xsd")) {
+			if (msdt.equals("msdt.part.xsd") ||
+                msdt.equals("msdt.window.xsd")) {
 
 				Document document = packet.getDocument();
 				Date timestamp = packet.getTimeStamp();
 				
-				String activity = ECGParser.getSingleNodeValue("activity", document);
-				String partname = ECGParser.getSingleNodeValue("partname", document);
-				
-				if (state == PartActiveEpisodeState.START && activity.equals("activated")) {
-					state = PartActiveEpisodeState.PARTACTIVE;
-					activePartName = partname;
-					startDate = timestamp;
-				}
-				else if (state == PartActiveEpisodeState.PARTACTIVE && 
-						activity.equals("deactivated") && 
-						this.isSamePart(partname, activePartName)) {
-					event = generateEpisode(id, minDuration, "msdt.partactive.xsd", 
-							ECGParser.getSingleNodeValue("username", document),
-							ECGParser.getSingleNodeValue("projectname", document),
-							timestamp,
-							startDate,
-							activePartName);
-					activePartName = null;
-					startDate = null;
-					state = PartActiveEpisodeState.STOP;
-				}
+                if (msdt.equals("msdt.part.xsd")) {
+    				String activity = ECGParser.getSingleNodeValue("activity", document);
+    				String partname = ECGParser.getSingleNodeValue("partname", document);
+    				
+    				if (state == PartActiveEpisodeState.START && activity.equals("activated")) {
+    					state = PartActiveEpisodeState.PARTACTIVE;
+    					activePartName = partname;
+    					startDate = timestamp;
+    				}
+    				else if (state == PartActiveEpisodeState.PARTACTIVE && 
+    						activity.equals("deactivated") && 
+    						this.isSamePart(partname, activePartName)) {
+                            event = generateEpisode(id, minDuration, "msdt.partactive.xsd", 
+    							ECGParser.getSingleNodeValue("username", document),
+    							ECGParser.getSingleNodeValue("projectname", document),
+    							timestamp,
+    							startDate,
+    							activePartName);
+    					activePartName = null;
+    					startDate = null;
+    					state = PartActiveEpisodeState.STOP;
+    				}
+                    
+                } else if (msdt.equals("msdt.window.xsd")) {
+    
+                    String activity = ECGParser.getSingleNodeValue("activity", document);
+                    
+                    if (state == PartActiveEpisodeState.PARTACTIVE && activity.equals("deactivated")) {
+                        state = PartActiveEpisodeState.PARTHOLD;
+                        event = generateEpisode(id, minDuration, "msdt.partactive.xsd", 
+                                ECGParser.getSingleNodeValue("username", document),
+                                ECGParser.getSingleNodeValue("projectname", document),
+                                timestamp,
+                                startDate,
+                                activePartName);
+                        startDate = null;
+                    }
+                    else if (state == PartActiveEpisodeState.PARTHOLD && activity.equals("activated")) {
+                        state = PartActiveEpisodeState.PARTACTIVE;
+                        startDate = timestamp; 
+                    }
+                }
 			}
 
 		} catch (NodeException e1) {
@@ -121,21 +148,21 @@ public class PartActiveEpisodeRecognizer implements EpisodeRecognizer {
 		
 		if (duration < minDur)
 			return null;
-		
+/*		
         for (int i = 0; i < generalParts.length; i++) {
             if (partname.startsWith(generalParts[i])) {
                 partname = generalParts[i];
                 break;
             }
         }
-        
+*/        
         String data = "<?xml version=\"1.0\"?><microActivity>";
 		
 		data += "<username>"  + username  + "</username>";
 
 		data += "<projectname>" + projectname + "</projectname>";
 
-		data += "<starttime>" + this.dateFormat.format(begin) + "</starttime>";
+		data += "<endtime>" + this.dateFormat.format(end) + "</endtime>";
 
 		data += "<duration>" + duration + "</duration>";
 
@@ -150,7 +177,7 @@ public class PartActiveEpisodeRecognizer implements EpisodeRecognizer {
             data};
 
         try {
-            event = new ValidEventPacket(id, end,
+            event = new ValidEventPacket(id, begin,
                 WellFormedEventPacket.HACKYSTAT_ACTIVITY_STRING, Arrays
                     .asList(args));
 

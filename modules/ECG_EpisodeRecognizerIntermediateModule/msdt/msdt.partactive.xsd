@@ -14,7 +14,7 @@
 	    	<xs:sequence>
 				<xs:element name="username" type="xs:token"/>
 				<xs:element name="projectname" type="xs:token"/>
-				<xs:element name="starttime" type="xs:string"/>
+				<xs:element name="endtime" type="xs:string"/>
 				<xs:element name="duration" type="xs:long"/>
 				<xs:element name="resourcename" type="xs:normalizedString"/>
 			</xs:sequence>
