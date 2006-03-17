@@ -1,5 +1,9 @@
 /*
  * Class: Gui
+ * Version: 1.1
+ * Date: 17.03.2006
+ * Feature Request #1899
+ * 
  * Version: 1.0
  * Date: 16.10.2005
  * By: Frank@Schlesinger.com
@@ -22,6 +26,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -30,6 +35,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.UIManager;
@@ -38,6 +44,7 @@ import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
 import org.electrocodeogram.event.ValidEventPacket;
+import org.electrocodeogram.event.ValidEventPacket.VALIDATION_LEVEL;
 import org.electrocodeogram.logging.LogHelper;
 import org.electrocodeogram.misc.constants.UIConstants;
 import org.electrocodeogram.module.Module;
@@ -302,11 +309,51 @@ public class Gui extends JFrame implements IGui {
             }
         });
         menuWindow.add(mniShow);
+       
+        JMenu menuEvents = new JMenu("Events");
+        
+        JRadioButtonMenuItem mniInvalid = new JRadioButtonMenuItem("Allow all events");
+        
+        mniInvalid.addActionListener(new ActionListener(){
 
+			public void actionPerformed(ActionEvent arg0) {
+				ValidEventPacket.setValidityLevel(VALIDATION_LEVEL.INVALID);
+				
+			}});
+        
+        JRadioButtonMenuItem mniHackystat = new JRadioButtonMenuItem("Allow all Hackystat events (ECG events included)");
+        
+        mniHackystat.addActionListener(new ActionListener(){
+
+			public void actionPerformed(ActionEvent arg0) {
+				ValidEventPacket.setValidityLevel(VALIDATION_LEVEL.HACKYSTAT);
+				
+			}});
+        
+        JRadioButtonMenuItem mniECG = new JRadioButtonMenuItem("Allow ECG events only");
+        
+        mniECG.addActionListener(new ActionListener(){
+
+			public void actionPerformed(ActionEvent arg0) {
+				ValidEventPacket.setValidityLevel(VALIDATION_LEVEL.ECG);
+				
+			}});
+        
+        ButtonGroup grpBtn = new ButtonGroup();
+        grpBtn.add(mniInvalid);
+        grpBtn.add(mniHackystat);
+        grpBtn.add(mniECG);
+        
+        menuEvents.add(mniInvalid);
+        menuEvents.add(mniHackystat);
+        menuEvents.add(mniECG);
+       
         menuBar.add(menuFile);
         menuBar.add(Gui.this.menuModule);
+        menuBar.add(menuEvents);
         menuBar.add(menuWindow);
 
+        
         this.setJMenuBar(menuBar);
     }
 

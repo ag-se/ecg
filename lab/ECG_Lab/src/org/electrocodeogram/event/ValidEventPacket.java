@@ -221,6 +221,8 @@ public class ValidEventPacket extends WellFormedEventPacket {
             new Object[] {validityLevel});
 
         validationLevel = validityLevel;
+        
+        logger.log(Level.INFO,"The validation level has been set to: " + validityLevel);
 
         logger.exiting(ValidEventPacket.class.getName(), "setValidityLevel");
 
