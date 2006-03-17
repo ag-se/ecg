@@ -227,10 +227,10 @@ public class FileSystemSourceModule extends SourceModule {
         } catch (IOException e) {
 
             logger.log(Level.WARNING,
-                "An error has occured while starting this module.");
+                "The FileReader was unable to open the input file: " + this.inputFile.getAbsolutePath());
 
             throw new SourceModuleException(
-                "An error has occured while starting this module.", this
+            		"The FileReader was unable to open the input file: " + this.inputFile.getAbsolutePath(), this
                     .getName());
         }
 

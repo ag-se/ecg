@@ -1,5 +1,9 @@
 /*
  * Class: FileReaderThread
+ * Version 1.1
+ * Date 17.03.2006
+ * Fixed Bug #6632
+ * 
  * Version: 1.0
  * Date: 16.10.2005
  * By: Frank@Schlesinger.com
@@ -38,6 +42,11 @@ import org.electrocodeogram.module.source.implementation.FileSystemSourceModule.
  */
 public class FileReaderThread extends EventReader {
 
+	/**
+	 * Holds the system dependent representation of a line separator. 
+	 */
+	private static String NEW_LINE_CHAR = System.getProperty("line.separator");
+	
     /**
      * This <em>EventReader</em> makes use of <em>Tokenizers</em>
      * to cut a read line into pieces of event data. Some events like
@@ -172,7 +181,7 @@ public class FileReaderThread extends EventReader {
 
                 codechange = true;
 
-                int beginOfCode = line.indexOf("![CDATA");
+                int beginOfCode = line.indexOf("<![CDATA");
 
                 logger.log(Level.FINE,
                     "Begin of a multiline Codechange event at index: "
@@ -183,7 +192,7 @@ public class FileReaderThread extends EventReader {
                 String nextLine;
 
                 while ((nextLine = this.reader.readLine()) != null && this.run) {
-                    line += nextLine;
+                    line += nextLine + NEW_LINE_CHAR;
 
                     lineNumber++;
 
@@ -212,7 +221,7 @@ public class FileReaderThread extends EventReader {
 
                 code = line.substring(beginOfCode, endOfCode);
 
-                String preCode = line.substring(0, beginOfCode - 1);
+                String preCode = line.substring(0, beginOfCode);
 
                 String postCode = line.substring(endOfCode, line.length());
 
@@ -329,9 +338,9 @@ public class FileReaderThread extends EventReader {
                     return null;
                 }
 
-                String last = argListStringArray[argListStringArray.length - 1];
+                String withCodeReplacement = argListStringArray[argListStringArray.length - 1];
 
-                if (!last.contains(CODE_REPLACEMENT)) {
+                if (!withCodeReplacement.contains(CODE_REPLACEMENT)) {
                     logger.log(Level.WARNING, "Error while reading line "
                                               + lineNumber + ":");
 
@@ -343,7 +352,9 @@ public class FileReaderThread extends EventReader {
                     return null;
                 }
 
-                last = last.replace(CODE_REPLACEMENT, code);
+                String withCode = withCodeReplacement.replace(CODE_REPLACEMENT, code);
+                
+                argListStringArray[argListStringArray.length - 1] = withCode;
             }
 
             // Create a List object from the Array now containing the
