@@ -18,7 +18,7 @@
 				<xs:element name="projectname" type="xs:token"/>
 				<xs:element name="endtime" type="xs:string"/>
 				<xs:element name="duration" type="xs:long"/>
-				<xs:element name="changed" type="xs:boolean"/>
+				<xs:element name="changed" type="xs:int"/>
 				<xs:element name="resourcename" type="xs:normalizedString"/>
 			</xs:sequence>
 		</xs:complexType>
