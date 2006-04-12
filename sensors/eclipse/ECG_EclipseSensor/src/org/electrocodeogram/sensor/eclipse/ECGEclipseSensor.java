@@ -21,21 +21,30 @@ import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
-import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.IDebugEventSetListener;
 import org.eclipse.debug.core.ILaunch;
+import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.model.RuntimeProcess;
 import org.eclipse.jdt.internal.junit.ui.JUnitPlugin;
 import org.eclipse.jdt.junit.ITestRunListener;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentListener;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ShellEvent;
+import org.eclipse.swt.events.ShellListener;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IPartListener;
+import org.eclipse.ui.IPartService;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWindowListener;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
@@ -67,7 +76,7 @@ import org.hackystat.stdext.sensor.eclipse.EclipseSensorShell;
 public final class ECGEclipseSensor {
 
     /**
-     * This is the logger.
+     * This is to log program states.
      */
     private static Logger logger = LogHelper
         .createLogger(ECGEclipseSensor.class.getName());
@@ -116,6 +125,12 @@ public final class ECGEclipseSensor {
      * to.
      */
     private EclipseSensorShell eclipseSensorShell;
+    
+    private ECGPartListener partListener;
+    private ECGShellListener shellListener;
+    private ECGRunDebugListener runDebugListener;
+    private ECGDocumentListener docListener;
+    private ECGTestListener testListener;
 
     /**
      * This is the private contstructor creating the <em>ECG
@@ -176,74 +191,159 @@ public final class ECGEclipseSensor {
 
         logger.log(Level.FINE, "Username is set to" + this.username);
 
-        // add the WindowListener for listening on
-        // window events.
         IWorkbench workbench = PlatformUI.getWorkbench();
 
-        workbench.addWindowListener(new WindowListenerAdapter());
-
+        /*
+        // add the WindowListener for listening on window events.
+        ECGWindowListener windowListener = new ECGWindowListener();
+        workbench.addWindowListener(windowListener);
         logger.log(Level.FINE, "Added WindowListener.");
+        */
+        
+        // add some DisplayListener for listening on shell activation events.
+        workbench.getDisplay().asyncExec(new Runnable() {
+            public void run() {
+                Listener displayListener = new ECGDisplayListener();
+                PlatformUI.getWorkbench().getDisplay().addFilter(SWT.Activate, displayListener);                
+                PlatformUI.getWorkbench().getDisplay().addFilter(SWT.Dispose,displayListener);
+                PlatformUI.getWorkbench().getDisplay().addFilter(SWT.Deactivate, displayListener);
+                // others are SWT.Deiconify, SWT.Close, SWT.Iconify, SWT.FocusIn, SWT.FocusOut, SWT.Hide, SWT.Show
+                // especially interesting are SWT.Selection (includes text selection), SWT.Modify (text being modified) 
+            }
+        });
+
+        logger.log(Level.FINE, "Added some DisplayListeners.");
 
         // add the PartListener for listening on
         // part events.
-        IWorkbenchWindow[] activeWindows = workbench.getWorkbenchWindows();
-
-        IWorkbenchPage activePage = null;
-
-        for (int i = 0; i < activeWindows.length; i++) {
-            activePage = activeWindows[i].getActivePage();
-
-            activePage.addPartListener(new PartAndEditorListenerAdapter());
+        IWorkbenchWindow[] windows = workbench.getWorkbenchWindows();
+        IPartService partService = null;
+        partListener = new ECGPartListener();
+        for (int i = 0; i < windows.length; i++) {
+            partService = windows[i].getPartService();
+            partService.addPartListener(partListener);
         }
 
         logger.log(Level.FINE, "Added PartListener.");
 
-        // add the DocumentListener for listening on
-        // document events.
-        IEditorPart part = activePage.getActiveEditor();
+        // add ShellListener for ShellEvents
+        shellListener = new ECGShellListener();
+        workbench.getDisplay().asyncExec(new Runnable() {
+            public void run() {
+                Shell shell = null;
+                IWorkbenchWindow[] activeWindows = PlatformUI.getWorkbench().getWorkbenchWindows();
+                // There could be (really) more than one Window/Shell at start-up
+                for (int i = 0; i < activeWindows.length; i++) {
+                    shell = activeWindows[i].getShell();
+                    shell.addShellListener(shellListener);
+                }
 
-        if (part instanceof ITextEditor) {
-            processActivity(
-                "msdt.editor.xsd",
-                "<?xml version=\"1.0\"?><microActivity><commonData><username>"
-                                + ECGEclipseSensor.this.username
-                                + "</username><projectname>"
-                                + ECGEclipseSensor.this.projectname
-                                + "</projectname></commonData><editor><activity>opened</activity><editorname>"
-                                + part.getTitle()
-                                + "</editorname></editor></microActivity>");
-
-            this.activeTextEditor = (ITextEditor) part;
-
-            IDocumentProvider provider = this.activeTextEditor
-                .getDocumentProvider();
-
-            IDocument document = provider.getDocument(part.getEditorInput());
-
-            document.addDocumentListener(new DocumentListenerAdapter());
-        }
-
-        logger.log(Level.FINE, "Added DocumentListener.");
-
+            }
+        });
+        logger.log(Level.FINE, "Added ShellListener.");
+        
+        /* TODO: Currently, no resource change events are used. This would be the place, 
+         * where renaming etc. is detected.
         // add the ResourceChangeListener to the workspace for
-        // listening on
-        // resource events.
+        // listening on resource events.
         IWorkspace workspace = ResourcesPlugin.getWorkspace();
-
         workspace.addResourceChangeListener(new ResourceChangeAdapter(),
             IResourceChangeEvent.POST_CHANGE);
+         */
 
-        // add the DebugEventSetListener to listen to run and debug
-        // events.
+        // add the DebugEventSetListener to listen to run and debug events.
         DebugPlugin dp = DebugPlugin.getDefault();
-
-        dp.addDebugEventListener(new DebugEventSetAdapter());
-
+        runDebugListener = new ECGRunDebugListener();
+        dp.addDebugEventListener(runDebugListener);
         logger.log(Level.FINE, "Added DebugEventSetListener.");
 
-        JUnitPlugin.getDefault().addTestRunListener(new TestRunAdapter());
-
+        // add listener for testRun events
+        testListener = new ECGTestListener();        
+        JUnitPlugin.getDefault().addTestRunListener(testListener);
         logger.exiting(this.getClass().getName(), "ECGEclipseSensor");
+        
+        
+        // -------
+        // Send initial events on startup: which parts are open and which are activated
+        
+        for (int i = 0; i < windows.length; i++) {
+            IWorkbenchPage page = windows[i].getActivePage();
+    
+            // send opened event on all views
+            IViewReference[] views = page.getViewReferences();
+            for (int j = 0; j < views.length; j++) {
+                IViewPart view = views[j].getView(false);
+                if (view != null) {
+                    logger.log(ECGLevel.PACKET,
+                        "A partOpened event has been recorded on startup.");
+                    processActivity(
+                        "msdt.part.xsd",
+                        "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+                            + ECGEclipseSensor.this.username
+                            + "</username><projectname>"
+                            + ECGEclipseSensor.this.projectname
+                            + "</projectname></commonData><part><activity>opened</activity><partname>"
+                            + view.getTitle()
+                            + "</partname></part></microActivity>");
+                }
+            }
+            // send opened event on all views
+            IEditorReference[] editors = page.getEditorReferences();
+            for (int j = 0; j < editors.length; j++) {
+                IEditorPart editor = editors[j].getEditor(false);
+                if (editor != null) {
+                    logger.log(ECGLevel.PACKET,
+                        "An editorOpened event has been recorded on startup.");
+                    processActivity(
+                        "msdt.editor.xsd",
+                        "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+                            + ECGEclipseSensor.this.username
+                            + "</username><projectname>"
+                            + ECGEclipseSensor.this.projectname
+                            + "</projectname></commonData><editor><activity>opened</activity><editorname>"
+                            + editor.getTitle()
+                            + "</editorname></editor></microActivity>");
+            
+                    if (editor instanceof ITextEditor) {
+                        ITextEditor textEditor = (ITextEditor) editor;
+                        IDocumentProvider provider = textEditor.getDocumentProvider();
+                        IDocument document = provider.getDocument(textEditor.getEditorInput());
+                        document.addDocumentListener(new ECGDocumentListener());                    
+                        logger.log(Level.FINE, "Added DocumentListener on startup.");
+                    }
+                }
+            }
+            // send event for activated part
+            IWorkbenchPart activePart = page.getActivePart();
+            if (activePart instanceof IEditorPart) {
+                logger.log(ECGLevel.PACKET,
+                    "An editorActivated event has been recorded for startup.");
+                processActivity(
+                    "msdt.editor.xsd",
+                    "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+                        + ECGEclipseSensor.this.username
+                        + "</username><projectname>"
+                        + ECGEclipseSensor.this.projectname
+                        + "</projectname></commonData><editor><activity>activated</activity><editorname>"
+                        + activePart.getTitle()
+                        + "</editorname></editor></microActivity>");
+            }
+            else if (activePart instanceof IViewPart) {
+                logger.log(ECGLevel.PACKET,
+                    "A partActivated event has been recorded for startup.");
+                processActivity(
+                    "msdt.part.xsd",
+                    "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+                        + ECGEclipseSensor.this.username
+                        + "</username><projectname>"
+                        + ECGEclipseSensor.this.projectname
+                        + "</projectname></commonData><part><activity>activated</activity><partname>"
+                        + activePart.getTitle()
+                        + "</partname></part></microActivity>");            
+            }
+
+        }
+        
     }
 
     /**
@@ -327,8 +427,7 @@ public final class ECGEclipseSensor {
             data};
 
         // if Eclipse is shutting down the EclipseSensorShell might be
-        // gone
-        // allready
+        // gone already
         if (this.eclipseSensorShell != null) {
             this.eclipseSensorShell.doCommand(
                 WellFormedEventPacket.HACKYSTAT_ACTIVITY_STRING, Arrays
@@ -342,10 +441,15 @@ public final class ECGEclipseSensor {
         logger.exiting(this.getClass().getName(), "processActivity");
     }
 
+    
+    // -----------------------------------------------------------------------------
+    
+    
     /**
      * This is listening for events of the <em>Eclipse</em> window.
+     * TODO: Not used anymore
      */
-    private class WindowListenerAdapter implements IWindowListener {
+    private class ECGWindowListener implements IWindowListener {
 
         /**
          * @see org.eclipse.ui.IWindowListener#windowActivated(org.eclipse.ui.IWorkbenchWindow)
@@ -460,6 +564,7 @@ public final class ECGEclipseSensor {
 
         /**
          * @see org.eclipse.ui.IWindowListener#windowOpened(org.eclipse.ui.IWorkbenchWindow)
+         * Seems that this event never occurs on the top-level window
          */
         @SuppressWarnings("synthetic-access")
         public void windowOpened(final IWorkbenchWindow window) {
@@ -488,7 +593,7 @@ public final class ECGEclipseSensor {
                                 + ECGEclipseSensor.this.username
                                 + "</username><projectname>"
                                 + ECGEclipseSensor.this.projectname
-                                + "</projectname></commonData><window><activity>deactivated</activity><windowname>"
+                                + "</projectname></commonData><window><activity>opened</activity><windowname>"
                                 + window.getActivePage().getLabel()
                                 + "</windowname></window></microActivity>");
 
@@ -499,8 +604,9 @@ public final class ECGEclipseSensor {
     /**
      * This is listeneing for events on resources like files,
      * directories or projects.
+     * TODO: This is currently not being used 
      */
-    private class ResourceChangeAdapter implements IResourceChangeListener {
+    private class ECGResourceChangeListener implements IResourceChangeListener {
 
         /**
          * @see org.eclipse.core.resources.IResourceChangeListener#resourceChanged(org.eclipse.core.resources.IResourceChangeEvent)
@@ -636,6 +742,7 @@ public final class ECGEclipseSensor {
                             // if its a project change, set the name
                             // of the
                             // project to be the name used.
+                            // TODO: SEEMS TO BE THE ONLY PLACE, WHERE THE PROJECTNAME IS FETCHED
                             if (resource instanceof IProject) {
                                 ECGEclipseSensor.this.projectname = resource
                                     .getName();
@@ -689,7 +796,7 @@ public final class ECGEclipseSensor {
     /**
      * This is listening for run and debug events.
      */
-    private class DebugEventSetAdapter implements IDebugEventSetListener {
+    private class ECGRunDebugListener implements IDebugEventSetListener {
 
         /**
          * A reference to the current programm launch.
@@ -713,6 +820,7 @@ public final class ECGEclipseSensor {
                 return;
             }
 
+            // TODO: What about the others?
             Object source = events[0].getSource();
 
             if (source instanceof RuntimeProcess) {
@@ -720,13 +828,8 @@ public final class ECGEclipseSensor {
 
                 ILaunch launch = rp.getLaunch();
 
-                if (this.currentLaunch == null) {
+                if (this.currentLaunch == null || !this.currentLaunch.equals(launch)) {
                     this.currentLaunch = launch;
-
-                    analyseLaunch(launch);
-                } else if (!this.currentLaunch.equals(launch)) {
-                    this.currentLaunch = launch;
-
                     analyseLaunch(launch);
                 }
             }
@@ -753,7 +856,7 @@ public final class ECGEclipseSensor {
                 return;
             }
 
-            if (launch.getLaunchMode().equals("run")) {
+            if (launch.getLaunchMode().equals(ILaunchManager.RUN_MODE)) {
 
                 logger.log(ECGLevel.PACKET, "A run event has been recorded.");
 
@@ -764,7 +867,7 @@ public final class ECGEclipseSensor {
                                     + "</username><projectname>"
                                     + ECGEclipseSensor.this.projectname
                                     + "</projectname></commonData><run debug=\"false\"></run></microActivity>");
-            } else {
+            } else if (launch.getLaunchMode().equals(ILaunchManager.DEBUG_MODE)) {
                 logger.log(ECGLevel.PACKET, "A debug event has been recorded.");
 
                 processActivity(
@@ -775,6 +878,7 @@ public final class ECGEclipseSensor {
                                     + ECGEclipseSensor.this.projectname
                                     + "</projectname></commonData><run debug=\"true\"></run></microActivity>");
             }
+            // There's "profile" mode as well which is being ignored.
 
             logger.exiting(this.getClass().getName(), "analyseLaunch");
         }
@@ -784,7 +888,7 @@ public final class ECGEclipseSensor {
      * This is listening for events that are affected to GUI parts and
      * editors of <em>Eclipse</em>.
      */
-    private class PartAndEditorListenerAdapter implements IPartListener {
+    private class ECGPartListener implements IPartListener {
 
         /**
          * @see org.eclipse.ui.IPartListener#partActivated(org.eclipse.ui.IWorkbenchPart)
@@ -804,19 +908,24 @@ public final class ECGEclipseSensor {
                 return;
             }
 
-            if (part instanceof ITextEditor) {
+            if (part instanceof IEditorPart) {
+                
+                if (part instanceof ITextEditor) {
 
-                ECGEclipseSensor.this.activeTextEditor = (ITextEditor) part;
+                    ECGEclipseSensor.this.activeTextEditor = (ITextEditor) part;
 
-                IDocumentProvider provider = ECGEclipseSensor.this.activeTextEditor
-                    .getDocumentProvider();
+                    /* Moved to Opened Event
+                    IDocumentProvider provider = ECGEclipseSensor.this.activeTextEditor
+                        .getDocumentProvider();
 
-                IDocument document = provider
-                    .getDocument(ECGEclipseSensor.this.activeTextEditor
-                        .getEditorInput());
+                    IDocument document = provider
+                        .getDocument(ECGEclipseSensor.this.activeTextEditor
+                                .getEditorInput());
 
-                document.addDocumentListener(new DocumentListenerAdapter());
-
+                    document.addDocumentListener(new DocumentListenerAdapter());                    
+                    */
+                }
+                
                 logger.log(ECGLevel.PACKET,
                     "An editorActivated event has been recorded.");
 
@@ -830,7 +939,7 @@ public final class ECGEclipseSensor {
                                     + part.getTitle()
                                     + "</editorname></editor></microActivity>");
 
-            } else {
+            } else if (part instanceof IViewPart) {
                 logger.log(ECGLevel.PACKET,
                     "A partActivated event has been recorded.");
 
@@ -843,7 +952,7 @@ public final class ECGEclipseSensor {
                                     + "</projectname></commonData><part><activity>activated</activity><partname>"
                                     + part.getTitle()
                                     + "</partname></part></microActivity>");
-            }
+            } 
 
             logger.exiting(this.getClass().getName(), "partActivated");
         }
@@ -865,7 +974,7 @@ public final class ECGEclipseSensor {
                 return;
             }
 
-            if (part instanceof ITextEditor) {
+            if (part instanceof IEditorPart) {
 
                 logger.log(ECGLevel.PACKET,
                     "An editorClosed event has been recorded.");
@@ -880,7 +989,7 @@ public final class ECGEclipseSensor {
                                     + part.getTitle()
                                     + "</editorname></editor></microActivity>");
 
-            } else {
+            } else if (part instanceof IViewPart) {
                 logger.log(ECGLevel.PACKET,
                     "A partClosed event has been recorded.");
 
@@ -915,7 +1024,7 @@ public final class ECGEclipseSensor {
                 return;
             }
 
-            if (part instanceof ITextEditor) {
+            if (part instanceof IEditorPart) {
 
                 logger.log(ECGLevel.PACKET,
                     "An editorDeactivated event has been recorded.");
@@ -930,7 +1039,7 @@ public final class ECGEclipseSensor {
                                     + part.getTitle()
                                     + "</editorname></editor></microActivity>");
 
-            } else {
+            } else if (part instanceof IViewPart) {
                 logger.log(ECGLevel.PACKET,
                     "A partDeactivated event has been recorded.");
 
@@ -966,7 +1075,7 @@ public final class ECGEclipseSensor {
                 return;
             }
 
-            if (part instanceof ITextEditor) {
+            if (part instanceof IEditorPart) {
 
                 logger.log(ECGLevel.PACKET,
                     "An editorOpened event has been recorded.");
@@ -981,25 +1090,33 @@ public final class ECGEclipseSensor {
                                     + part.getTitle()
                                     + "</editorname></editor></microActivity>");
 
-                ITextEditor editor = (ITextEditor) part;
+                if (part instanceof ITextEditor) {
 
-                IDocumentProvider provider = editor.getDocumentProvider();
+                    ITextEditor editor = (ITextEditor) part;
 
-                IDocument doc = provider.getDocument(editor.getEditorInput());
+                    IDocumentProvider provider = editor.getDocumentProvider();
 
-                processActivity(
-                    "msdt.codechange.xsd",
-                    "<?xml version=\"1.0\"?><microActivity><commonData><username>"
-                                    + getUsername()
-                                    + "</username><projectname>"
-                                    + getProjectname()
-                                    + "</projectname></commonData><codechange><document><![CDATA["
-                                    + doc.get()
-                                    + "]]></document><documentname>"
-                                    + part.getTitle()
-                                    + "</documentname></codechange></microActivity>");
+                    IDocument document = provider.getDocument(editor.getEditorInput());
 
-            } else {
+                    document.addDocumentListener(new ECGDocumentListener());                    
+
+                    /* TODO: Was initial CC on Opened
+                    processActivity(
+                            "msdt.codechange.xsd",
+                            "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+                                            + getUsername()
+                                            + "</username><projectname>"
+                                            + getProjectname()
+                                            + "</projectname></commonData><codechange><document><![CDATA["
+                                            + doc.get()
+                                            + "]]></document><documentname>"
+                                            + part.getTitle()
+                                            + "</documentname></codechange></microActivity>");
+                    */
+                }
+
+
+            } else if (part instanceof IViewPart) {
                 logger.log(ECGLevel.PACKET,
                     "A partOpened event has been recorded.");
 
@@ -1037,7 +1154,7 @@ public final class ECGEclipseSensor {
      * This is listening for events about changes in the text of open
      * documents.
      */
-    private class DocumentListenerAdapter implements IDocumentListener {
+    private class ECGDocumentListener implements IDocumentListener {
 
         /**
          * This is used to wait a moment after a
@@ -1053,7 +1170,7 @@ public final class ECGEclipseSensor {
          * <code>Timer</code>.
          */
         @SuppressWarnings("synthetic-access")
-        public DocumentListenerAdapter() {
+        public ECGDocumentListener() {
             logger.entering(this.getClass().getName(),
                 "DocumentListenerAdapter");
 
@@ -1097,7 +1214,7 @@ public final class ECGEclipseSensor {
 
             this.timer.cancel();
 
-            this.timer = new Timer();
+            this.timer = new Timer(); // TODO: Is it a good idea to create a  new timer every now and then (= on each key stroke!)?
 
             this.timer.schedule(new CodeChangeTimerTask(event.getDocument(),
                 ECGEclipseSensor.this.activeTextEditor.getTitle()),
@@ -1110,7 +1227,7 @@ public final class ECGEclipseSensor {
     /**
      * This is listening for events about tests and testruns.
      */
-    private class TestRunAdapter implements ITestRunListener {
+    private class ECGTestListener implements ITestRunListener {
 
         /**
          * Stores the number of individual tests in the current
@@ -1393,6 +1510,148 @@ public final class ECGEclipseSensor {
         }
 
     }
+    
+    /**
+     * Listens for events on the windows shell, i.e. Eclipse's main window
+     * Note: No shell opened event exists. It is send on startup explicitely
+     */
+    public class ECGShellListener implements ShellListener {
+
+        /**
+         * @see org.eclipse.swt.events.ShellListener#shellActivated(org.eclipse.swt.events.ShellEvent)
+         */
+        public void shellActivated(ShellEvent e) {
+            logger.entering(this.getClass().getName(), "shellActivated",
+                    new Object[] {e});
+
+                Shell shell = ((Shell)e.widget);
+            
+                if (shell == null) {
+                    logger.log(Level.FINE,
+                        "The Parameter  \"e.widget\" is null. Ignoring event.");
+                    logger.exiting(this.getClass().getName(), "shellActivated");
+                    return;
+                }
+
+                // store Windowname on activation
+                ECGEclipseSensor.this.activeWindowName = shell.getText();
+
+                logger.log(ECGLevel.PACKET,
+                    "A windowActivated event has been recorded.");
+
+                processActivity(
+                    "msdt.window.xsd",
+                    "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+                                    + ECGEclipseSensor.this.username
+                                    + "</username><projectname>"
+                                    + ECGEclipseSensor.this.projectname
+                                    + "</projectname></commonData><window><activity>activated</activity><windowname>"
+                                    + ECGEclipseSensor.this.activeWindowName
+                                    + "</windowname></window></microActivity>");
+
+                logger.exiting(this.getClass().getName(), "shellActivated");
+        }
+
+        /**
+         * @see org.eclipse.swt.events.ShellListener#shellClosed(org.eclipse.swt.events.ShellEvent)
+         */
+        public void shellClosed(ShellEvent e) {
+            logger.entering(this.getClass().getName(), "shellClosed", new Object[] {e});
+
+                Shell shell = ((Shell)e.widget);
+            
+                if (shell == null) {
+                    logger.log(Level.FINE,
+                        "The Parameter  \"e.widget\" is null. Ignoring event.");
+                    logger.exiting(this.getClass().getName(), "shellClosed");
+                    return;
+                }
+
+                logger.log(ECGLevel.PACKET,
+                    "A windowClosed event has been recorded.");
+
+                processActivity(
+                    "msdt.window.xsd",
+                    "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+                                    + ECGEclipseSensor.this.username
+                                    + "</username><projectname>"
+                                    + ECGEclipseSensor.this.projectname
+                                    + "</projectname></commonData><window><activity>closed</activity><windowname>"
+                                    + ECGEclipseSensor.this.activeWindowName
+                                    + "</windowname></window></microActivity>");
+
+                logger.exiting(this.getClass().getName(), "shellClosed");
+        }
+
+        /**
+         * @see org.eclipse.swt.events.ShellListener#shellDeactivated(org.eclipse.swt.events.ShellEvent)
+         */
+        public void shellDeactivated(ShellEvent e) {
+            logger.entering(this.getClass().getName(), "shellDeactivated", new Object[] {e});
+
+            Shell shell = ((Shell)e.widget);
+        
+            if (shell == null) {
+                logger.log(Level.FINE,
+                    "The Parameter  \"e.widget\" is null. Ignoring event.");
+                logger.exiting(this.getClass().getName(), "shellDeactivated");
+                return;
+            }
+
+            logger.log(ECGLevel.PACKET,
+                "A windowDeactivated event has been recorded.");
+
+            processActivity(
+                "msdt.window.xsd",
+                "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+                                + ECGEclipseSensor.this.username
+                                + "</username><projectname>"
+                                + ECGEclipseSensor.this.projectname
+                                + "</projectname></commonData><window><activity>deactivated</activity><windowname>"
+                                + ECGEclipseSensor.this.activeWindowName
+                                + "</windowname></window></microActivity>");
+
+            logger.exiting(this.getClass().getName(), "shellDeactivated");
+        }
+
+        /**
+         * @see org.eclipse.swt.events.ShellListener#shellDeiconified(org.eclipse.swt.events.ShellEvent)
+         */
+        public void shellDeiconified(ShellEvent e) {
+            // not used by ECG
+        }
+
+        /**
+         * @see org.eclipse.swt.events.ShellListener#shellIconified(org.eclipse.swt.events.ShellEvent)
+         */
+        public void shellIconified(ShellEvent e) {
+            // not used by ECG
+        }
+
+    }
+
+    /**
+     * Listens for events on the display.
+     */
+    public class ECGDisplayListener implements Listener {
+
+        /**
+         * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
+         */
+        public void handleEvent(Event event) {
+            if (event == null || event.widget == null)
+                return;
+            if (event.widget.getClass() == org.eclipse.swt.widgets.Shell.class) {
+                Shell shell = (Shell)event.widget;
+                if (shell.getParent() != null) {
+                    // seems to be a dialog below the main window
+                    // System.out.println("DisplayListenerEvent " + event.toString() + "/parent: " + shell.getParent());
+                }
+            }
+        }
+
+    }
+
 
     /**
      * This <em>TimerTask</em> is used in creating
@@ -1470,3 +1729,4 @@ public final class ECGEclipseSensor {
     }
 
 }
+  

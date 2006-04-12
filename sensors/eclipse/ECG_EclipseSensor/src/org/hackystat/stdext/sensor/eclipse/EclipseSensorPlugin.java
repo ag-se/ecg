@@ -62,7 +62,6 @@ public class EclipseSensorPlugin extends AbstractUIPlugin implements IStartup {
      * @param descriptor
      *            Is the plugin descriptor.
      */
-    @SuppressWarnings( {"deprecation", "deprecation"})
     public EclipseSensorPlugin(final IPluginDescriptor descriptor) {
         super(descriptor);
 
@@ -93,7 +92,6 @@ public class EclipseSensorPlugin extends AbstractUIPlugin implements IStartup {
      * <em>IStartup</em> <code>Interface</code> by implementing
      * this method.
      */
-    @SuppressWarnings("deprecation")
     public final void earlyStartup() {
 
         logger.entering(this.getClass().getName(), "earlyStartup");
@@ -179,7 +177,6 @@ public class EclipseSensorPlugin extends AbstractUIPlugin implements IStartup {
      * @param e
      *            Is an <code>Excpetion</code> to log
      */
-    @SuppressWarnings("deprecation")
     public final void log(final Exception e) {
         if (e == null) {
             return;
