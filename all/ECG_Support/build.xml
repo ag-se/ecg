@@ -89,7 +89,7 @@
 	</target>
 
 	<!-- Deploy the ecg_support.jar to ./dist -->
-	<target name="deploy" depends="buildEvent, buildLogging, javadoc">
+	<target name="deploy" depends="buildEvent, buildLogging">
 
 		<echo message="Deploying the event.jar to ./dist/lib/...."/>
 
