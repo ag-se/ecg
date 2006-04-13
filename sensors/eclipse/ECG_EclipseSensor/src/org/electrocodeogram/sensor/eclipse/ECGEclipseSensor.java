@@ -1,14 +1,13 @@
 /*
- * Class: ECGEclipseSensor
- * Version: 1.0
- * Date: 16.10.2005
- * By: Frank@Schlesinger.com
+ * Freie Universität Berlin, 2006
  */
 
 package org.electrocodeogram.sensor.eclipse;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -62,9 +61,9 @@ import org.hackystat.stdext.sensor.eclipse.EclipseSensorPlugin;
 import org.hackystat.stdext.sensor.eclipse.EclipseSensorShell;
 
 /**
- * This is the <em>ECG EclipseSensor</em>. It is a collection of
+ * A collection of
  * <em>EventListeners</em> that are registered at different
- * interesrting pointsi in the Eclipse Plugin-API. These
+ * interesting points in the Eclipse Workbench. These
  * <em>Listeners</em> are recording events. The events are then
  * encoded in <em>MicroActivityEvents</em> and sent to the ECG Lab.
  * The actual sending is done in the
@@ -126,11 +125,35 @@ public final class ECGEclipseSensor {
      */
     private EclipseSensorShell eclipseSensorShell;
     
+    /**
+     * The one and only PartListener, because all Parts are treated similarly 
+     */
     private ECGPartListener partListener;
+    
+    /**
+     * The one and only ShellListener, because all Shells are treated similarly 
+     */
     private ECGShellListener shellListener;
+    
+    /**
+     * The one and only RunDebugListener, because all Launch events are treated similarly 
+     */
     private ECGRunDebugListener runDebugListener;
+    
+    /**
+     * The one and only DocumentListener, because all Text files are treated similarly 
+     */
     private ECGDocumentListener docListener;
+    
+    /**
+     * The one and only TestListener, because all test runs are treated similarly 
+     */
     private ECGTestListener testListener;
+
+    /**
+     * The one and only TestListener, because all test runs are treated similarly 
+     */
+    private ArrayList openDialogs = new ArrayList();
 
     /**
      * This is the private contstructor creating the <em>ECG
@@ -192,7 +215,11 @@ public final class ECGEclipseSensor {
         logger.log(Level.FINE, "Username is set to" + this.username);
 
         IWorkbench workbench = PlatformUI.getWorkbench();
+        IWorkbenchWindow[] windows = workbench.getWorkbenchWindows();
 
+        // ------
+        // Register Listeners
+        
         /*
         // add the WindowListener for listening on window events.
         ECGWindowListener windowListener = new ECGWindowListener();
@@ -211,19 +238,16 @@ public final class ECGEclipseSensor {
                 // especially interesting are SWT.Selection (includes text selection), SWT.Modify (text being modified) 
             }
         });
-
         logger.log(Level.FINE, "Added some DisplayListeners.");
 
         // add the PartListener for listening on
         // part events.
-        IWorkbenchWindow[] windows = workbench.getWorkbenchWindows();
         IPartService partService = null;
         partListener = new ECGPartListener();
         for (int i = 0; i < windows.length; i++) {
             partService = windows[i].getPartService();
             partService.addPartListener(partListener);
         }
-
         logger.log(Level.FINE, "Added PartListener.");
 
         // add ShellListener for ShellEvents
@@ -237,7 +261,6 @@ public final class ECGEclipseSensor {
                     shell = activeWindows[i].getShell();
                     shell.addShellListener(shellListener);
                 }
-
             }
         });
         logger.log(Level.FINE, "Added ShellListener.");
@@ -260,13 +283,26 @@ public final class ECGEclipseSensor {
         // add listener for testRun events
         testListener = new ECGTestListener();        
         JUnitPlugin.getDefault().addTestRunListener(testListener);
-        logger.exiting(this.getClass().getName(), "ECGEclipseSensor");
-        
-        
+        logger.log(Level.FINE, "Added TestListener.");
+
+
         // -------
         // Send initial events on startup: which parts are open and which are activated
-        
         for (int i = 0; i < windows.length; i++) {
+            // send window open first
+            this.activeWindowName = "Eclipse";
+            logger.log(ECGLevel.PACKET,
+                "A windowOpened event has been recorded on startup.");
+            processActivity(
+                "msdt.window.xsd",
+                "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+                    + ECGEclipseSensor.this.username
+                    + "</username><projectname>"
+                    + ECGEclipseSensor.this.projectname
+                    + "</projectname></commonData><window><activity>opened</activity><windowname>"
+                    + this.activeWindowName // TODO: eigentlich getShell().getText();
+                    + "</windowname></window></microActivity>");
+
             IWorkbenchPage page = windows[i].getActivePage();
     
             // send opened event on all views
@@ -287,7 +323,7 @@ public final class ECGEclipseSensor {
                             + "</partname></part></microActivity>");
                 }
             }
-            // send opened event on all views
+            // send opened event on all editors
             IEditorReference[] editors = page.getEditorReferences();
             for (int j = 0; j < editors.length; j++) {
                 IEditorPart editor = editors[j].getEditor(false);
@@ -327,6 +363,8 @@ public final class ECGEclipseSensor {
                         + "</projectname></commonData><editor><activity>activated</activity><editorname>"
                         + activePart.getTitle()
                         + "</editorname></editor></microActivity>");
+                if (activePart instanceof ITextEditor)
+                    ECGEclipseSensor.this.activeTextEditor = (ITextEditor) activePart;
             }
             else if (activePart instanceof IViewPart) {
                 logger.log(ECGLevel.PACKET,
@@ -341,9 +379,10 @@ public final class ECGEclipseSensor {
                         + activePart.getTitle()
                         + "</partname></part></microActivity>");            
             }
-
         }
         
+        logger.exiting(this.getClass().getName(), "ECGEclipseSensor");
+                
     }
 
     /**
@@ -911,19 +950,7 @@ public final class ECGEclipseSensor {
             if (part instanceof IEditorPart) {
                 
                 if (part instanceof ITextEditor) {
-
                     ECGEclipseSensor.this.activeTextEditor = (ITextEditor) part;
-
-                    /* Moved to Opened Event
-                    IDocumentProvider provider = ECGEclipseSensor.this.activeTextEditor
-                        .getDocumentProvider();
-
-                    IDocument document = provider
-                        .getDocument(ECGEclipseSensor.this.activeTextEditor
-                                .getEditorInput());
-
-                    document.addDocumentListener(new DocumentListenerAdapter());                    
-                    */
                 }
                 
                 logger.log(ECGLevel.PACKET,
@@ -932,12 +959,12 @@ public final class ECGEclipseSensor {
                 processActivity(
                     "msdt.editor.xsd",
                     "<?xml version=\"1.0\"?><microActivity><commonData><username>"
-                                    + ECGEclipseSensor.this.username
-                                    + "</username><projectname>"
-                                    + ECGEclipseSensor.this.projectname
-                                    + "</projectname></commonData><editor><activity>activated</activity><editorname>"
-                                    + part.getTitle()
-                                    + "</editorname></editor></microActivity>");
+                        + ECGEclipseSensor.this.username
+                        + "</username><projectname>"
+                        + ECGEclipseSensor.this.projectname
+                        + "</projectname></commonData><editor><activity>activated</activity><editorname>"
+                        + part.getTitle()
+                        + "</editorname></editor></microActivity>");
 
             } else if (part instanceof IViewPart) {
                 logger.log(ECGLevel.PACKET,
@@ -946,12 +973,12 @@ public final class ECGEclipseSensor {
                 processActivity(
                     "msdt.part.xsd",
                     "<?xml version=\"1.0\"?><microActivity><commonData><username>"
-                                    + ECGEclipseSensor.this.username
-                                    + "</username><projectname>"
-                                    + ECGEclipseSensor.this.projectname
-                                    + "</projectname></commonData><part><activity>activated</activity><partname>"
-                                    + part.getTitle()
-                                    + "</partname></part></microActivity>");
+                        + ECGEclipseSensor.this.username
+                        + "</username><projectname>"
+                        + ECGEclipseSensor.this.projectname
+                        + "</projectname></commonData><part><activity>activated</activity><partname>"
+                        + part.getTitle()
+                        + "</partname></part></microActivity>");
             } 
 
             logger.exiting(this.getClass().getName(), "partActivated");
@@ -982,12 +1009,12 @@ public final class ECGEclipseSensor {
                 processActivity(
                     "msdt.editor.xsd",
                     "<?xml version=\"1.0\"?><microActivity><commonData><username>"
-                                    + ECGEclipseSensor.this.username
-                                    + "</username><projectname>"
-                                    + ECGEclipseSensor.this.projectname
-                                    + "</projectname></commonData><editor><activity>closed</activity><editorname>"
-                                    + part.getTitle()
-                                    + "</editorname></editor></microActivity>");
+                        + ECGEclipseSensor.this.username
+                        + "</username><projectname>"
+                        + ECGEclipseSensor.this.projectname
+                        + "</projectname></commonData><editor><activity>closed</activity><editorname>"
+                        + part.getTitle()
+                        + "</editorname></editor></microActivity>");
 
             } else if (part instanceof IViewPart) {
                 logger.log(ECGLevel.PACKET,
@@ -996,12 +1023,12 @@ public final class ECGEclipseSensor {
                 processActivity(
                     "msdt.part.xsd",
                     "<?xml version=\"1.0\"?><microActivity><commonData><username>"
-                                    + ECGEclipseSensor.this.username
-                                    + "</username><projectname>"
-                                    + ECGEclipseSensor.this.projectname
-                                    + "</projectname></commonData><part><activity>closed</activity><partname>"
-                                    + part.getTitle()
-                                    + "</partname></part></microActivity>");
+                        + ECGEclipseSensor.this.username
+                        + "</username><projectname>"
+                        + ECGEclipseSensor.this.projectname
+                        + "</projectname></commonData><part><activity>closed</activity><partname>"
+                        + part.getTitle()
+                        + "</partname></part></microActivity>");
             }
 
             logger.exiting(this.getClass().getName(), "partClosed");
@@ -1032,12 +1059,12 @@ public final class ECGEclipseSensor {
                 processActivity(
                     "msdt.editor.xsd",
                     "<?xml version=\"1.0\"?><microActivity><commonData><username>"
-                                    + ECGEclipseSensor.this.username
-                                    + "</username><projectname>"
-                                    + ECGEclipseSensor.this.projectname
-                                    + "</projectname></commonData><editor><activity>deactivated</activity><editorname>"
-                                    + part.getTitle()
-                                    + "</editorname></editor></microActivity>");
+                        + ECGEclipseSensor.this.username
+                        + "</username><projectname>"
+                        + ECGEclipseSensor.this.projectname
+                        + "</projectname></commonData><editor><activity>deactivated</activity><editorname>"
+                        + part.getTitle()
+                        + "</editorname></editor></microActivity>");
 
             } else if (part instanceof IViewPart) {
                 logger.log(ECGLevel.PACKET,
@@ -1046,12 +1073,12 @@ public final class ECGEclipseSensor {
                 processActivity(
                     "msdt.part.xsd",
                     "<?xml version=\"1.0\"?><microActivity><commonData><username>"
-                                    + ECGEclipseSensor.this.username
-                                    + "</username><projectname>"
-                                    + ECGEclipseSensor.this.projectname
-                                    + "</projectname></commonData><part><activity>deactivated</activity><partname>"
-                                    + part.getTitle()
-                                    + "</partname></part></microActivity>");
+                        + ECGEclipseSensor.this.username
+                        + "</username><projectname>"
+                        + ECGEclipseSensor.this.projectname
+                        + "</projectname></commonData><part><activity>deactivated</activity><partname>"
+                        + part.getTitle()
+                        + "</partname></part></microActivity>");
             }
 
             logger.exiting(this.getClass().getName(), "partDeactivated");
@@ -1083,36 +1110,19 @@ public final class ECGEclipseSensor {
                 processActivity(
                     "msdt.editor.xsd",
                     "<?xml version=\"1.0\"?><microActivity><commonData><username>"
-                                    + ECGEclipseSensor.this.username
-                                    + "</username><projectname>"
-                                    + ECGEclipseSensor.this.projectname
-                                    + "</projectname></commonData><editor><activity>opened</activity><editorname>"
-                                    + part.getTitle()
-                                    + "</editorname></editor></microActivity>");
+                        + ECGEclipseSensor.this.username
+                        + "</username><projectname>"
+                        + ECGEclipseSensor.this.projectname
+                        + "</projectname></commonData><editor><activity>opened</activity><editorname>"
+                        + part.getTitle()
+                        + "</editorname></editor></microActivity>");
 
                 if (part instanceof ITextEditor) {
-
+                    // register document listener on opened Editors
                     ITextEditor editor = (ITextEditor) part;
-
                     IDocumentProvider provider = editor.getDocumentProvider();
-
                     IDocument document = provider.getDocument(editor.getEditorInput());
-
                     document.addDocumentListener(new ECGDocumentListener());                    
-
-                    /* TODO: Was initial CC on Opened
-                    processActivity(
-                            "msdt.codechange.xsd",
-                            "<?xml version=\"1.0\"?><microActivity><commonData><username>"
-                                            + getUsername()
-                                            + "</username><projectname>"
-                                            + getProjectname()
-                                            + "</projectname></commonData><codechange><document><![CDATA["
-                                            + doc.get()
-                                            + "]]></document><documentname>"
-                                            + part.getTitle()
-                                            + "</documentname></codechange></microActivity>");
-                    */
                 }
 
 
@@ -1123,12 +1133,12 @@ public final class ECGEclipseSensor {
                 processActivity(
                     "msdt.part.xsd",
                     "<?xml version=\"1.0\"?><microActivity><commonData><username>"
-                                    + ECGEclipseSensor.this.username
-                                    + "</username><projectname>"
-                                    + ECGEclipseSensor.this.projectname
-                                    + "</projectname></commonData><part><activity>opened</activity><partname>"
-                                    + part.getTitle()
-                                    + "</partname></part></microActivity>");
+                        + ECGEclipseSensor.this.username
+                        + "</username><projectname>"
+                        + ECGEclipseSensor.this.projectname
+                        + "</projectname></commonData><part><activity>opened</activity><partname>"
+                        + part.getTitle()
+                        + "</partname></part></microActivity>");
 
             }
 
@@ -1639,15 +1649,103 @@ public final class ECGEclipseSensor {
          * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
          */
         public void handleEvent(Event event) {
-            if (event == null || event.widget == null)
-                return;
+            logger.entering(this.getClass().getName(), "handleEvent", new Object[] {event});
+
+            if (event == null || event.widget == null) {
+                // could happen, don't know why
+                logger.exiting(this.getClass().getName(), "handleEvent");
+                return;                
+            }
             if (event.widget.getClass() == org.eclipse.swt.widgets.Shell.class) {
                 Shell shell = (Shell)event.widget;
-                if (shell.getParent() != null) {
-                    // seems to be a dialog below the main window
-                    // System.out.println("DisplayListenerEvent " + event.toString() + "/parent: " + shell.getParent());
+                // is it a dialog below the main window or another dialog
+                if (shell.getParent() == null) {
+                    // seems to be main window which is handeled by ShellListener
+                    logger.exiting(this.getClass().getName(), "handleEvent");
+                    return;
+                }
+                if (event.type == SWT.Activate) {
+                    // in case of Activate, it may be opened the first time. Check if shell is known
+                    Shell foundOpenedShell = null;
+                    for (Iterator it = openDialogs.iterator(); it.hasNext() && foundOpenedShell == null; ) {
+                        Shell s = (Shell)it.next();
+                        if (s.equals(shell))
+                            foundOpenedShell = s;
+                    }
+                    if (foundOpenedShell == null) {
+                        // new shell, send opened event
+                        openDialogs.add(shell);
+                        // send window open as well
+                        logger.log(ECGLevel.PACKET,
+                            "A dialogOpened event has been recorded.");
+                        processActivity(
+                            "msdt.dialog.xsd",
+                            "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+                                + ECGEclipseSensor.this.username
+                                + "</username><projectname>"
+                                + ECGEclipseSensor.this.projectname
+                                + "</projectname></commonData><dialog><activity>opened</activity><dialogname>"
+                                + shell.getText()
+                                + "</dialogname></dialog></microActivity>");
+                    }
+                    // finally send activate event
+                    logger.log(ECGLevel.PACKET,
+                        "A dialogActivated event has been recorded.");
+                    processActivity(
+                        "msdt.dialog.xsd",
+                        "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+                            + ECGEclipseSensor.this.username
+                            + "</username><projectname>"
+                            + ECGEclipseSensor.this.projectname
+                            + "</projectname></commonData><dialog><activity>activated</activity><dialogname>"
+                            + shell.getText()
+                            + "</dialogname></dialog></microActivity>");
+                }
+                else if (event.type == SWT.Deactivate) {
+                    logger.log(ECGLevel.PACKET,
+                        "A dialogDeactivated event has been recorded.");
+                    processActivity(
+                        "msdt.dialog.xsd",
+                        "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+                            + ECGEclipseSensor.this.username
+                            + "</username><projectname>"
+                            + ECGEclipseSensor.this.projectname
+                            + "</projectname></commonData><dialog><activity>deactivated</activity><dialogname>"
+                            + shell.getText()
+                            + "</dialogname></dialog></microActivity>");
+                }
+                else if (event.type == SWT.Dispose) {
+                    // in case of Dispose, remove dialog from opened dialogs
+                    if (openDialogs.remove(shell)) {
+                        // if known opened dialog send deactivate first
+                        logger.log(ECGLevel.PACKET,
+                            "A dialogDeactivated event has been recorded.");
+                        processActivity(
+                            "msdt.dialog.xsd",
+                            "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+                                + ECGEclipseSensor.this.username
+                                + "</username><projectname>"
+                                + ECGEclipseSensor.this.projectname
+                                + "</projectname></commonData><dialog><activity>deactivated</activity><dialogname>"
+                                + shell.getText()
+                                + "</dialogname></dialog></microActivity>");
+                        // ...and closed afterwards
+                        logger.log(ECGLevel.PACKET,
+                            "A dialogClosed event has been recorded.");
+                        processActivity(
+                            "msdt.dialog.xsd",
+                            "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+                                + ECGEclipseSensor.this.username
+                                + "</username><projectname>"
+                                + ECGEclipseSensor.this.projectname
+                                + "</projectname></commonData><dialog><activity>closed</activity><dialogname>"
+                                + shell.getText()
+                                + "</dialogname></dialog></microActivity>");
+                    }
                 }
             }
+
+            logger.exiting(this.getClass().getName(), "handleEvent");
         }
 
     }
