@@ -15,12 +15,14 @@
 		<dirset dir="../ECG_TestHelper/src" />
 		<dirset dir="../ECG_Support/src" />
 		<dirset dir="../ECG_EclipseSensor/src" />
+		<dirset dir="../ECG_Installer/src" />
 		<dirset dir="../ECG_FileSystemSourceModule/src" />
 		<dirset dir="../ECG_FileSystemTargetModule/src" />
 		<dirset dir="../ECG_HackyStatTargetModule/src" />
 		<dirset dir="../ECG_HackyStatSourceModule/src" />
-		<dirset dir="../ECG_Installer/src" />
 		<dirset dir="../ECG_ManualAnnotatorSourceModule/src" />
+		<dirset dir="../ECG_EpisodeRecognizerIntermediateModule/src" />
+		<dirset dir="../ECG_CSVFileTargetModule/src" />
 		<dirset dir="../ECG_MSDTFilterIntermediateModule/src" />
 		<dirset dir="../ECG_CodeChangeDifferIntermediateModule/src" />
 		<dirset dir="../ECG_SocketSourceModule/src" />
@@ -88,6 +90,8 @@
 		<ant dir="../ECG_StatisticsTargetModule" target="cleanall" />
 		<ant dir="../ECG_CodechangeDifferIntermediateModule" target="cleanall" />
 		<ant dir="../ECG_ManualAnnotatorSourceModule" target="cleanall" />
+		<ant dir="../ECG_EpisodeRecognizerIntermediateModule" target="cleanall" />
+		<ant dir="../ECG_CSVFileTargetModule" target="cleanall" />
 		<!-- <ant dir="../ECG_TestFirstEpisodeRecognizerModule" target="cleanall" /> -->
 
 	</target>
@@ -159,6 +163,8 @@
 		<ant dir="../ECG_StatisticsTargetModule" target="deploy" />
 		<ant dir="../ECG_CodechangeDifferIntermediateModule" target="deploy" />
 		<ant dir="../ECG_ManualAnnotatorSourceModule" target="deploy" />
+		<ant dir="../ECG_EpisodeRecognizerIntermediateModule" target="deploy" />
+		<ant dir="../ECG_CSVFileTargetModule" target="deploy" />
 		<!-- <ant dir="../ECG_TestFirstEpisodeRecognizerModule" target="deploy" /> -->
 	
 	</target>
@@ -190,7 +196,7 @@
 
 	
 	<!-- Package release -->
-	<target name="Package release" depends="CleanAll Build, buildall, Assemble Lab, javadoc">
+	<target name="Package release" depends="CleanAll Build, buildall, Assemble Lab">
 		
 		<echo message="######## ASSEMBLING ECG RELEASE" />
 
