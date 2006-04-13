@@ -96,7 +96,7 @@
 	</target>
 
 	<!-- Deploy the ECG TestHelper component into ./dist/lib. -->
-	<target name="deploy" depends="build, javadoc">
+	<target name="deploy" depends="build">
 
 		<echo message="Deploying ecg_test.jar"/>
 
