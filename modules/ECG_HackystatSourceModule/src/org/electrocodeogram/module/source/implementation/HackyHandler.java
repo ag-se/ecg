@@ -255,7 +255,7 @@ public class HackyHandler extends AbstractHttpHandler {
             
             argList.add(0,"add");
             
-            WellFormedEventPacket event = new WellFormedEventPacket(0, timestamp, sdtName, argList);
+            WellFormedEventPacket event = new WellFormedEventPacket(timestamp, sdtName, argList);
                         
             logger.log(ECGLevel.INFO,event.toString());
             
