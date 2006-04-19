@@ -346,6 +346,19 @@ public final class ECGEclipseSensor {
                         IDocument document = provider.getDocument(textEditor.getEditorInput());
                         document.addDocumentListener(new ECGDocumentListener());                    
                         logger.log(Level.FINE, "Added DocumentListener on startup.");
+                        // send codestatus event on open
+                        processActivity(
+                            "msdt.codestatus.xsd",
+                            "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+                                + getUsername()
+                                + "</username><projectname>"
+                                + getProjectname()
+                                + "</projectname></commonData><codestatus><document><![CDATA["
+                                + document.get()
+                                + "]]></document><documentname>"
+                                + editor.getTitle()
+                                + "</documentname></codestatus></microActivity>");
+                        logger.log(Level.FINE, "Send CodeStatus event on startup.");
                     }
                 }
             }
@@ -1122,7 +1135,19 @@ public final class ECGEclipseSensor {
                     ITextEditor editor = (ITextEditor) part;
                     IDocumentProvider provider = editor.getDocumentProvider();
                     IDocument document = provider.getDocument(editor.getEditorInput());
-                    document.addDocumentListener(new ECGDocumentListener());                    
+                    document.addDocumentListener(new ECGDocumentListener());
+                    // send codestatus event on open
+                    processActivity(
+                        "msdt.codestatus.xsd",
+                        "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+                            + getUsername()
+                            + "</username><projectname>"
+                            + getProjectname()
+                            + "</projectname></commonData><codestatus><document><![CDATA["
+                            + document.get()
+                            + "]]></document><documentname>"
+                            + editor.getTitle()
+                            + "</documentname></codestatus></microActivity>");                    
                 }
 
 
@@ -1807,19 +1832,17 @@ public final class ECGEclipseSensor {
             logger
                 .log(ECGLevel.PACKET, "A codechange event has been recorded.");
 
-            sensor
-                .processActivity(
-                    "msdt.codechange.xsd",
-                    "<?xml version=\"1.0\"?><microActivity><commonData><username>"
-                                    + sensor.getUsername()
-                                    + "</username><projectname>"
-                                    + sensor.getProjectname()
-                                    + "</projectname></commonData><codechange><document><![CDATA["
-                                    + this.doc.get()
-                                    + "]]></document><documentname>"
-                                    + this.name
-                                    + "</documentname></codechange></microActivity>");
-
+            sensor.processActivity(
+                "msdt.codechange.xsd",
+                "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+                    + sensor.getUsername()
+                    + "</username><projectname>"
+                    + sensor.getProjectname()
+                    + "</projectname></commonData><codechange><document><![CDATA["
+                    + this.doc.get()
+                    + "]]></document><documentname>"
+                    + this.name
+                    + "</documentname></codechange></microActivity>");
 
             logger.exiting(this.getClass().getName(), "run");
 
