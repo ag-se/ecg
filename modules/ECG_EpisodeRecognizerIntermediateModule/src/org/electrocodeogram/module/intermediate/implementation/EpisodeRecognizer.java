@@ -57,12 +57,10 @@ public interface EpisodeRecognizer {
      * a final state.
      * 
      * @param packet an event packet just like in class IntermediateModule
-     * @param id the Id of the calling EpisodeRecognizerIntermediateModule 
-     * instance. It's useful for logging or exception purposes for example
      * @param minDuration minimal duration of an emitted episode, in ms 
      * @return a new episode-like event, if one has been detected, null
      *         otherwise
      */
-    ValidEventPacket analyse(ValidEventPacket packet, int id, long minDuration);
+    ValidEventPacket analyse(ValidEventPacket packet, long minDuration);
 
 }

@@ -96,7 +96,7 @@ public class WindowActiveEpisodeRecognizer implements EpisodeRecognizer {
     /* (non-Javadoc)
      * @see org.electrocodeogram.module.intermediate.implementation.EpisodeRecognizer#analyse(org.electrocodeogram.event.ValidEventPacket, int, long)
      */
-    public ValidEventPacket analyse(ValidEventPacket packet, int id, long minDuration) {
+    public ValidEventPacket analyse(ValidEventPacket packet, long minDuration) {
 
 		ValidEventPacket event = null;
 
@@ -139,7 +139,7 @@ public class WindowActiveEpisodeRecognizer implements EpisodeRecognizer {
                     if (activeWindow == null) {
                         activeWindow = windowname;
                     }
-					event = generateEpisode(id, "msdt.windowactive.xsd", minDuration,
+					event = generateEpisode("msdt.windowactive.xsd", minDuration,
 							ECGParser.getSingleNodeValue("username", document),
 							ECGParser.getSingleNodeValue("projectname", document),
 							timestamp,
@@ -181,7 +181,7 @@ public class WindowActiveEpisodeRecognizer implements EpisodeRecognizer {
 	 * @param filename
 	 * @return
 	 */
-	private ValidEventPacket generateEpisode(int id, String msdt, long minDur,
+	private ValidEventPacket generateEpisode(String msdt, long minDur,
 			String username, String projectname, Date end, 
 			Date begin, String filename) {
 
@@ -212,7 +212,7 @@ public class WindowActiveEpisodeRecognizer implements EpisodeRecognizer {
             data};
 
         try {
-            event = new ValidEventPacket(id, begin,
+            event = new ValidEventPacket(begin,
                 WellFormedEventPacket.HACKYSTAT_ACTIVITY_STRING, Arrays
                     .asList(args));
 

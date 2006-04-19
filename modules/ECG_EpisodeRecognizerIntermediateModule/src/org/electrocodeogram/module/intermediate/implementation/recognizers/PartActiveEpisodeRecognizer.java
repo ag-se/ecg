@@ -114,7 +114,7 @@ public class PartActiveEpisodeRecognizer implements EpisodeRecognizer {
     /* (non-Javadoc)
      * @see org.electrocodeogram.module.intermediate.implementation.EpisodeRecognizer#analyse(org.electrocodeogram.event.ValidEventPacket, int, long)
      */
-    public ValidEventPacket analyse(ValidEventPacket packet, int id, long minDuration) {
+    public ValidEventPacket analyse(ValidEventPacket packet, long minDuration) {
 
 		ValidEventPacket event = null;
 
@@ -143,7 +143,7 @@ public class PartActiveEpisodeRecognizer implements EpisodeRecognizer {
         						activity.equals("deactivated") && 
         						this.isSamePart(partname, activePartName)) {
                             // normal deactivate of this view
-                            event = generateEpisode(id, minDuration, "msdt.partactive.xsd", 
+                            event = generateEpisode(minDuration, "msdt.partactive.xsd", 
     							ECGParser.getSingleNodeValue("username", document),
     							ECGParser.getSingleNodeValue("projectname", document),
     							timestamp,
@@ -157,7 +157,7 @@ public class PartActiveEpisodeRecognizer implements EpisodeRecognizer {
                                 (activity.equals("activated") || activity.equals("opened")) && 
                                 !this.isSamePart(partname, activePartName)) {
                             // activation of another view = more reliable to tell that this one is deactivated
-                            event = generateEpisode(id, minDuration, "msdt.partactive.xsd", 
+                            event = generateEpisode(minDuration, "msdt.partactive.xsd", 
                                 ECGParser.getSingleNodeValue("username", document),
                                 ECGParser.getSingleNodeValue("projectname", document),
                                 timestamp,
@@ -183,7 +183,7 @@ public class PartActiveEpisodeRecognizer implements EpisodeRecognizer {
                     if (state == PartActiveEpisodeState.PARTACTIVE &&
                             (activity.equals("activated") || activity.equals("opened"))) {
                         // activation of editor means deactivation of this part
-                        event = generateEpisode(id, minDuration, "msdt.partactive.xsd", 
+                        event = generateEpisode(minDuration, "msdt.partactive.xsd", 
                                 ECGParser.getSingleNodeValue("username", document),
                                 ECGParser.getSingleNodeValue("projectname", document),
                                 timestamp,
@@ -200,7 +200,7 @@ public class PartActiveEpisodeRecognizer implements EpisodeRecognizer {
                     
                     if (state == PartActiveEpisodeState.PARTACTIVE && activity.equals("deactivated")) {
                         state = PartActiveEpisodeState.PARTHOLD;
-                        event = generateEpisode(id, minDuration, "msdt.partactive.xsd", 
+                        event = generateEpisode(minDuration, "msdt.partactive.xsd", 
                                 ECGParser.getSingleNodeValue("username", document),
                                 ECGParser.getSingleNodeValue("projectname", document),
                                 timestamp,
@@ -259,7 +259,7 @@ public class PartActiveEpisodeRecognizer implements EpisodeRecognizer {
 	 * @param partname
 	 * @return
 	 */
-	private ValidEventPacket generateEpisode(int id, long minDur, String msdt, 
+	private ValidEventPacket generateEpisode(long minDur, String msdt, 
 				String username, String projectname, Date end, 
 				Date begin, String partname) {
 
@@ -297,7 +297,7 @@ public class PartActiveEpisodeRecognizer implements EpisodeRecognizer {
             data};
 
         try {
-            event = new ValidEventPacket(id, begin,
+            event = new ValidEventPacket(begin,
                 WellFormedEventPacket.HACKYSTAT_ACTIVITY_STRING, Arrays
                     .asList(args));
 

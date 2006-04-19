@@ -100,7 +100,7 @@ public class EpisodeRecognizerManager {
 			EpisodeRecognizer recognizer = i.next();
 			
 			// Do it for active recognizers!
-			recognizerEvent = recognizer.analyse(packet, this.module.getId(), this.module.getMinDuration());
+			recognizerEvent = recognizer.analyse(packet, this.module.getMinDuration());
 			
 			if (event != null && recognizerEvent != null) {
 		        logger.log(Level.WARNING, "double episode in EpisodeRecognizer (used!) at time " + recognizerEvent.getTimeStamp());
@@ -118,10 +118,7 @@ public class EpisodeRecognizerManager {
 		}
 
 		// Do it for the free recognizer
-		recognizerEvent = freeRecognizer.analyse(
-                packet, 
-                this.module.getId(), 
-                this.module.getMinDuration());
+		recognizerEvent = freeRecognizer.analyse(packet, this.module.getMinDuration());
 
         // Look for existing recognizer with equal state. If, forget the free
         // one. "equal" depends on type of recognizer. It should be true if both
