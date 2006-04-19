@@ -1,0 +1,210 @@
+<?xml version="1.0"?>
+<modulesetup>
+	<module id="6" active="true">
+		<name>
+			WindowActive episode recognizer
+		</name>
+		<fromClassId>
+			org.electrocodeogram.module.intermediate.implementation.EpisodeRecognizerIntermediateModule
+		</fromClassId>
+		<connectedTo>
+			<id>5</id>
+		</connectedTo>
+		<properties>
+			<property>
+				<name>Recognizer</name>
+				<value>
+					WindowActiveEpisodeRecognizer
+				</value>
+				<type>java.lang.String</type>
+			</property>
+		</properties>
+	</module>
+
+	<module id="3" active="true">
+		<name>
+			File Reader
+		</name>
+		<fromClassId>
+			org.electrocodeogram.module.source.implementation.FileSystemSourceModule
+		</fromClassId>
+		<connectedTo>
+			<id>8</id>
+		</connectedTo>
+		<properties>
+			<property>
+				<name>Input File</name>
+				<value>testeventlogs/viewsevents.log</value>
+				<type>java.io.File</type>
+			</property>
+			<property>
+				<name>Enable Burst Mode</name>
+				<value>true</value>
+				<type>java.lang.Boolean</type>
+			</property>
+		</properties>
+	</module>
+
+	<module id="8" active="true">
+		<name>
+			MicroActivity Filter1
+		</name>
+		<fromClassId>
+			org.electrocodeogram.module.intermediate.implementation.MSDTFilterIntermediateModule
+		</fromClassId>
+		<connectedTo>
+			<id>6</id>
+		</connectedTo>
+		<properties>
+			<property>
+				<name>Blocker</name>
+				<value>
+					msdt.testrun.xsd,
+					msdt.resource.xsd,
+					msdt.test.xsd,
+				</value>
+				<type>java.lang.String</type>
+			</property>
+		</properties>
+	</module>
+
+	<module id="5" active="true">
+		<name>
+			FileActive episode recognizer
+		</name>
+		<fromClassId>
+			org.electrocodeogram.module.intermediate.implementation.EpisodeRecognizerIntermediateModule
+		</fromClassId>
+		<connectedTo>
+			<id>7</id>
+		</connectedTo>
+		<properties>
+			<property>
+				<name>Recognizer</name>
+				<value>
+					FileActiveEpisodeRecognizer
+				</value>
+				<type>java.lang.String</type>
+			</property>
+			<property>
+				<name>MinDuration</name>
+				<value>
+					0
+				</value>
+				<type>java.lang.Long</type>
+			</property>
+		</properties>
+	</module>
+
+	<module id="7" active="true">
+		<name>
+			PartActive episode recognizer
+		</name>
+		<fromClassId>
+			org.electrocodeogram.module.intermediate.implementation.EpisodeRecognizerIntermediateModule
+		</fromClassId>
+		<connectedTo>
+			<id>4</id>
+		</connectedTo>
+		<properties>
+			<property>
+				<name>Recognizer</name>
+				<value>
+					PartActiveEpisodeRecognizer
+				</value>
+				<type>java.lang.String</type>
+			</property>
+			<property>
+				<name>MinDuration</name>
+				<value>
+					0
+				</value>
+				<type>java.lang.Long</type>
+			</property>
+		</properties>
+	</module>
+
+	<module id="4" active="true">
+		<name>
+			MicroActivity Filter2
+		</name>
+		<fromClassId>
+			org.electrocodeogram.module.intermediate.implementation.MSDTFilterIntermediateModule
+		</fromClassId>
+		<connectedTo>
+			<id>2</id>
+			<id>1</id>
+		</connectedTo>
+		<properties>
+			<property>
+				<name>Blocker</name>
+				<value>
+					msdt.testrun.xsd,
+					msdt.codechange.xsd,
+					msdt.window.xsd,
+					msdt.resource.xsd,
+					msdt.test.xsd,
+					msdt.editor.xsd
+					msdt.part.xsd
+				</value>
+				<type>java.lang.String</type>
+			</property>
+<!--
+			<property>
+				<name>Filter1</name>
+				<value>msdt.partactive.xsd=.*>Hierarchy.*</value>
+				<type>java.lang.String</type>
+			</property>		
+-->
+		</properties>
+	</module>
+
+	<module id="1" active="true">
+		<name>
+		AdHoc Statistics
+		</name>
+		<fromClassId>
+		org.electrocodeogram.module.target.implementation.StatisticsTargetModule
+		</fromClassId>
+		<connectedTo>
+		</connectedTo>
+		<properties>
+		</properties>
+	</module>
+
+	<module id="2" active="true">
+		<name>
+			CSV File Writer
+		</name>
+		<fromClassId>
+			org.electrocodeogram.module.target.implementation.CSVFileTargetModule
+		</fromClassId>
+		<connectedTo>
+		</connectedTo>
+		<properties>
+			<property>
+				<name>
+					Output File
+				</name>
+				<value>
+					events.out
+				</value>
+				<type>
+					java.io.File
+				</type>
+			</property>
+			<property>
+				<name>
+					Columns
+				</name>
+				<value>
+					type,timestamp,endtime,resourcename,duration,changed
+				</value>
+				<type>
+					java.lang.String
+				</type>
+			</property>
+		</properties>
+	</module>
+
+</modulesetup>

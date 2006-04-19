@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<modulesetup>
+<module id="2" active="true">
+<name>
+AdHoc Statistics
+</name>
+<fromClassId>
+org.electrocodeogram.module.target.implementation.StatisticsTargetModule
+</fromClassId>
+<connectedTo>
+</connectedTo>
+<properties>
+</properties>
+</module>
+<module id="1" active="true">
+<name>
+Socket Server And Reader
+</name>
+<fromClassId>
+org.electrocodeogram.module.source.implementation.SocketSourceModule
+</fromClassId>
+<connectedTo>
+<id>
+2
+</id>
+</connectedTo>
+<properties>
+<property>
+<name>
+port
+</name>
+<value>
+22222
+</value>
+<type>
+java.lang.Integer
+</type>
+</property>
+</properties>
+</module>
+</modulesetup>
