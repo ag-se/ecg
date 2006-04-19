@@ -107,13 +107,13 @@ public class WellFormedEventPacket extends EventPacket {
      *             If the given parameters are not conforming to the
      *             syntactical rules
      */
-    public WellFormedEventPacket(final int id, final Date timeStamp,
+    public WellFormedEventPacket(final Date timeStamp,
         final String sensorDataType, final List argList)
         throws IllegalEventParameterException {
-        super(id, timeStamp, sensorDataType, argList);
+        super(timeStamp, sensorDataType, argList);
 
         logger.entering(this.getClass().getName(), "WellFormedEventPacket",
-            new Object[] {new Integer(id), timeStamp, sensorDataType, argList});
+            new Object[] {timeStamp, sensorDataType, argList});
 
         validate();
 

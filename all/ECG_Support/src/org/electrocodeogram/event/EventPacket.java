@@ -40,25 +40,19 @@ public class EventPacket implements Serializable {
         .getName());
 
     /**
-     * The unique int id of the module that processed this event at
-     * last.
+     * The timestamp telling when the event was recorded.
      */
-    private int sourceId = -1;
-
-    /**
-     * The timestamp telling when thew event was recorded.
-     */
-    private Date myTimeStamp;
+    private Date timeStamp;
 
     /**
      * The <em>Hackystat SensorDataType</em> of the event.
      */
-    private String mySensorDataType;
+    private String sensorDataType;
 
     /**
      * The stringlist containing the evtn's data.
      */
-    private List myArgList;
+    private List argList;
 
     /**
      * This creates a new <em>EventPacket</em>.
@@ -72,19 +66,19 @@ public class EventPacket implements Serializable {
      * @param argList
      *            The stringlist containing the evtn's data
      */
-    public EventPacket(final int id, final Date timeStamp,
+    public EventPacket(final Date timeStamp,
         final String sensorDataType, final List argList) {
 
         logger.entering(this.getClass().getName(), "EventPacket", new Object[] {
-            new Integer(id), timeStamp, sensorDataType, argList});
+            timeStamp, sensorDataType, argList});
 
-        this.sourceId = id;
+//        this.sourceId = id;
 
-        this.myTimeStamp = timeStamp;
+        this.timeStamp = timeStamp;
 
-        this.mySensorDataType = sensorDataType;
+        this.sensorDataType = sensorDataType;
 
-        this.myArgList = argList;
+        this.argList = argList;
 
         logger.exiting(this.getClass().getName(), "EventPacket");
 
@@ -94,7 +88,6 @@ public class EventPacket implements Serializable {
      * This method returns the id that identifies module, which was
      * processing this event at last.
      * @return The id of the last processing module
-     */
     public final int getSourceId() {
         logger.entering(this.getClass().getName(), "getSourceId");
 
@@ -102,6 +95,7 @@ public class EventPacket implements Serializable {
 
         return this.sourceId;
     }
+     */
 
     /**
      * This method returns the timestamp of the event.
@@ -110,12 +104,12 @@ public class EventPacket implements Serializable {
     public final Date getTimeStamp() {
         logger.entering(this.getClass().getName(), "getTimeStamp");
 
-        if (this.myTimeStamp != null) {
+        if (this.timeStamp != null) {
 
             logger.exiting(this.getClass().getName(), "getTimeStamp", new Date(
-                this.myTimeStamp.getTime()));
+                this.timeStamp.getTime()));
 
-            return new Date(this.myTimeStamp.getTime());
+            return new Date(this.timeStamp.getTime());
         }
 
         logger.exiting(this.getClass().getName(), "getTimeStamp", null);
@@ -132,9 +126,9 @@ public class EventPacket implements Serializable {
         logger.entering(this.getClass().getName(), "getSensorDataType");
 
         logger.exiting(this.getClass().getName(), "getSensorDataType",
-            this.mySensorDataType);
+            this.sensorDataType);
 
-        return this.mySensorDataType;
+        return this.sensorDataType;
     }
 
     /**
@@ -144,9 +138,9 @@ public class EventPacket implements Serializable {
     public final List getArgList() {
         logger.entering(this.getClass().getName(), "getArglist");
 
-        logger.exiting(this.getClass().getName(), "getArglist", this.myArgList);
+        logger.exiting(this.getClass().getName(), "getArglist", this.argList);
 
-        return this.myArgList;
+        return this.argList;
     }
 
     /**
