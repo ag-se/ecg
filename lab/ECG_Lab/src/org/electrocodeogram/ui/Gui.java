@@ -58,6 +58,7 @@ import org.electrocodeogram.module.registry.ModuleSetupStoreException;
 import org.electrocodeogram.modulepackage.ModuleDescriptor;
 import org.electrocodeogram.modulepackage.ModuleType;
 import org.electrocodeogram.ui.event.EventWindow;
+import org.electrocodeogram.ui.event.ProcessedEventPacket;
 import org.electrocodeogram.ui.modules.ModuleGraph;
 
 /**
@@ -473,9 +474,9 @@ public class Gui extends JFrame implements IGui {
                 this.splitPane.resetToPreferredSizes();
 
             }
-        } else if (arg instanceof ValidEventPacket) {
+        } else if (arg instanceof ProcessedEventPacket) {
 
-            ValidEventPacket event = (ValidEventPacket) arg;
+            ProcessedEventPacket event = (ProcessedEventPacket) arg;
 
             if (this.eventWindoMap
                 .containsKey(new Integer(event.getSourceId()))) {

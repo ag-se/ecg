@@ -181,7 +181,7 @@ public abstract class SourceModule extends Module {
         ValidEventPacket validEventPacket = null;
 
         try {
-            validEventPacket = new ValidEventPacket(this.getId(), eventPacket
+            validEventPacket = new ValidEventPacket(eventPacket
                 .getTimeStamp(), eventPacket.getSensorDataType(), eventPacket
                 .getArgList());
 

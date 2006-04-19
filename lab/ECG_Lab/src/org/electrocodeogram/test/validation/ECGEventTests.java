@@ -762,7 +762,7 @@ public class ECGEventTests extends TestCase {
 
         ValidEventPacket.setValidityLevel(VALIDATION_LEVEL.ECG);
 
-        new ValidEventPacket(event.getSourceId(), event.getTimeStamp(), event
+        new ValidEventPacket(event.getTimeStamp(), event
             .getSensorDataType(), event.getArgList());
     }
 

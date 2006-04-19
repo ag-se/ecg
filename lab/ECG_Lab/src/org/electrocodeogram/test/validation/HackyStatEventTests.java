@@ -258,7 +258,7 @@ public class HackyStatEventTests extends TestCase {
 
         ValidEventPacket.setValidityLevel(VALIDATION_LEVEL.HACKYSTAT);
 
-        new ValidEventPacket(event.getSourceId(), event.getTimeStamp(), event
+        new ValidEventPacket(event.getTimeStamp(), event
             .getSensorDataType(), event.getArgList());
     }
 }

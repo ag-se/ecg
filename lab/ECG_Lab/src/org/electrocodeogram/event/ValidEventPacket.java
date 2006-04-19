@@ -110,31 +110,6 @@ public class ValidEventPacket extends WellFormedEventPacket {
     private static VALIDATION_LEVEL validationLevel = DEFAULT_VALIDITY_LEVEL;
 
     /**
-     * Every module is handling <code>ValidEventPackets</code> twice. It receives
-     * them and creates a new one that is then sent to other
-     * modules. The DELIVERY_STATE as told by
-     * {@link ValidEventPacket#getDeliveryState()} says if the event
-     * is the received one or if it is the sent one. This is actually
-     * only used in the GUI to toggle which events to display.
-     */
-    public enum DELIVERY_STATE {
-        /**
-         * The event was sent by a module.
-         */
-        SENT,
-
-        /**
-         * The event was received by a module.
-         */
-        RECEIVED;
-    }
-
-    /**
-     * THe <em>DELIVERY_STATE</em> of this event.
-     */
-    private DELIVERY_STATE deliveryState = null;
-
-    /**
      * If the event is an <em>ECG</em> event, it is containing the
      * <em>MicroActivtiyEvent</em> as a XML document, which is an
      * instance of a
@@ -163,14 +138,13 @@ public class ValidEventPacket extends WellFormedEventPacket {
      *             If the parameters are invalid according to the
      *             current <em>VALIDATION_LEVEL</em>
      */
-    public ValidEventPacket(final int sourceId, final Date timeStamp,
+    public ValidEventPacket(final Date timeStamp,
         final String sensorDataType, final List argList)
         throws IllegalEventParameterException {
-        super(sourceId, timeStamp, sensorDataType, argList);
+        super(timeStamp, sensorDataType, argList);
 
         logger.entering(this.getClass().getName(), "ValidEventPacket",
-            new Object[] {new Integer(sourceId), timeStamp, sensorDataType,
-                argList});
+            new Object[] {timeStamp, sensorDataType, argList});
 
         validate();
 
@@ -248,13 +222,13 @@ public class ValidEventPacket extends WellFormedEventPacket {
         }
 
         if (validationLevel == VALIDATION_LEVEL.HACKYSTAT) {
-            new WellFormedEventPacket(this.getSourceId(), this.getTimeStamp(),
+            new WellFormedEventPacket(this.getTimeStamp(),
                 this.getSensorDataType(), this.getArgList());
 
             hackyStatValidate();
         } else if (validationLevel == VALIDATION_LEVEL.ECG) {
 
-            new WellFormedEventPacket(this.getSourceId(), this.getTimeStamp(),
+            new WellFormedEventPacket(this.getTimeStamp(),
                 this.getSensorDataType(), this.getArgList());
 
             hackyStatValidate();
@@ -496,7 +470,6 @@ public class ValidEventPacket extends WellFormedEventPacket {
     /**
      * This returns the delivery state of the event.
      * @return the delivery state of this event
-     */
     public final DELIVERY_STATE getDeliveryState() {
         logger.entering(this.getClass().getName(), "getDeliveryState");
 
@@ -505,13 +478,12 @@ public class ValidEventPacket extends WellFormedEventPacket {
 
         return this.deliveryState;
     }
+     */
 
     /**
      * This sets the delivery state of the event.
      * @param state
      *            Is the delivery state
-     */
-
     public final void setDeliveryState(final DELIVERY_STATE state) {
         logger.entering(this.getClass().getName(), "setDeliveryState",
             new Object[] {state});
@@ -528,6 +500,7 @@ public class ValidEventPacket extends WellFormedEventPacket {
 
         logger.exiting(this.getClass().getName(), "setDeliveryState");
     }
+     */
 
     /**
      * This returns the XML document of the event, if it is a

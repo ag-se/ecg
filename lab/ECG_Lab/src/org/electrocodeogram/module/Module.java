@@ -17,7 +17,6 @@ import java.util.logging.Logger;
 
 import org.electrocodeogram.event.IllegalEventParameterException;
 import org.electrocodeogram.event.ValidEventPacket;
-import org.electrocodeogram.event.ValidEventPacket.DELIVERY_STATE;
 import org.electrocodeogram.logging.LogHelper;
 import org.electrocodeogram.logging.LogHelper.ECGLevel;
 import org.electrocodeogram.module.event.MessageEvent;
@@ -38,6 +37,7 @@ import org.electrocodeogram.msdt.MsdtProvider;
 import org.electrocodeogram.msdt.registry.MicroSensorDataTypeRegistrationException;
 import org.electrocodeogram.system.ISystem;
 import org.electrocodeogram.system.ModuleSystem;
+import org.electrocodeogram.ui.event.ProcessedEventPacket;
 
 /**
  * This abstract class represents an <em>ElectroCodeoGram Module</em>.
@@ -1244,34 +1244,21 @@ public abstract class Module implements MsdtProvider {
             if (this.myModule.isActive() && (eventPacket != null)) {
                 setChanged();
 
-                try {
-                    ValidEventPacket packet = new ValidEventPacket(
-                        this.myModule.getId(), eventPacket.getTimeStamp(),
-                        eventPacket.getSensorDataType(), eventPacket
-                            .getArgList());
+                ProcessedEventPacket packet = new ProcessedEventPacket(
+                	this.myModule.moduleId,
+                    eventPacket,
+                    ProcessedEventPacket.DELIVERY_STATE.SENT);
 
-                    packet.setDeliveryState(DELIVERY_STATE.SENT);
+                eventSenderLogger.log(Level.INFO,
+                    "An event is about to be send by thie module: "
+                                    + this.myModule.getName());
 
-                    eventSenderLogger.log(Level.INFO,
-                        "An event is about to be send by thie module: "
-                                        + this.myModule.getName());
+                eventSenderLogger.log(ECGLevel.PACKET, packet.toString());
 
-                    eventSenderLogger.log(ECGLevel.PACKET, packet.toString());
+                this.myModule.getSystemNotificator().fireEventNotification(
+                    packet);
 
-                    this.myModule.getSystemNotificator().fireEventNotification(
-                        packet);
-
-                    notifyObservers(packet);
-
-                } catch (IllegalEventParameterException e) {
-
-                    clearChanged();
-
-                    eventSenderLogger.log(Level.WARNING,
-                        "An exception occured while sending an event by the module: "
-                                        + this.myModule.getName());
-
-                }
+                notifyObservers(packet);
 
                 clearChanged();
             }
@@ -1349,40 +1336,35 @@ public abstract class Module implements MsdtProvider {
             }
 
             if ((object instanceof EventSender)
-                && data instanceof ValidEventPacket) {
-                try {
-                    ValidEventPacket receivedPacketForProcessing = (ValidEventPacket) data;
+                && data instanceof ProcessedEventPacket) {
 
-                    receivedPacketForProcessing
-                        .setDeliveryState(DELIVERY_STATE.RECEIVED);
+            	ProcessedEventPacket processedEventPacket = (ProcessedEventPacket) data;
 
-                    ValidEventPacket receivedPacketForSystem = new ValidEventPacket(
-                        this.myModule.getId(), receivedPacketForProcessing
-                            .getTimeStamp(), receivedPacketForProcessing
-                            .getSensorDataType(), receivedPacketForProcessing
-                            .getArgList());
-
-                    receivedPacketForSystem
-                        .setDeliveryState(DELIVERY_STATE.RECEIVED);
+            	if (processedEventPacket.getEventPacket() instanceof ValidEventPacket) {
+                	
+            		ValidEventPacket validEventPacket = (ValidEventPacket)processedEventPacket.getEventPacket();	
 
                     eventReceiverLogger.log(Level.INFO,
-                        "An event has benn recieved by the module: "
-                                        + this.myModule.getName());
-
+                            "An event has been recieved by the module: "
+                                            + this.myModule.getName());
                     eventReceiverLogger.log(ECGLevel.PACKET,
-                        receivedPacketForProcessing.toString());
+                        validEventPacket.toString());
+
+                	processedEventPacket.setDeliveryState(
+                			ProcessedEventPacket.DELIVERY_STATE.RECEIVED);
 
                     this.myModule.getSystemNotificator().fireEventNotification(
-                        receivedPacketForSystem);
+                        processedEventPacket);
 
                     this.myModule
-                        .receiveEventPacket(receivedPacketForProcessing);
-                } catch (IllegalEventParameterException e) {
+                        .receiveEventPacket(validEventPacket);
+            	}
+            	else {
                     eventReceiverLogger.log(Level.WARNING,
-                        "An Eception occured while receiving an event in module: "
-                                        + this.myModule.getName());
-
-                }
+                            "An event has been recieved by the Module " + this.myModule.getName() 
+                            + " which is not ValidEventPacket: " 
+                            + processedEventPacket.toString());
+            	}
 
             }
 
@@ -1498,7 +1480,7 @@ public abstract class Module implements MsdtProvider {
          * @param packet
          *            Is the last sent event packet.
          */
-        public void fireEventNotification(final ValidEventPacket packet) {
+        public void fireEventNotification(final ProcessedEventPacket packet) {
             systemNotificatorlogger.entering(this.getClass().getName(),
                 "fireEventNotification", new Object[] {packet});
 

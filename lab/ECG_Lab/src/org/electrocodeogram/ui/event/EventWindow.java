@@ -31,7 +31,6 @@ import javax.swing.event.ChangeListener;
 
 import org.electrocodeogram.misc.constants.UIConstants;
 import org.electrocodeogram.event.ValidEventPacket;
-import org.electrocodeogram.event.ValidEventPacket.DELIVERY_STATE;
 import org.electrocodeogram.misc.constants.StringConstants;
 import org.electrocodeogram.module.registry.ModuleInstanceNotFoundException;
 
@@ -64,7 +63,7 @@ public class EventWindow extends JFrame {
      * This toggles which events are to be shown. Only those sent by
      * the according module, or only those received.
      */
-    private DELIVERY_STATE deliveryState;
+    private ProcessedEventPacket.DELIVERY_STATE deliveryState;
 
     /**
      * Used to automatically scroll the scollpane as new events are
@@ -118,7 +117,7 @@ public class EventWindow extends JFrame {
             @SuppressWarnings("synthetic-access")
             public void actionPerformed(@SuppressWarnings("unused")
             final ActionEvent e) {
-                EventWindow.this.deliveryState = DELIVERY_STATE.SENT;
+                EventWindow.this.deliveryState = ProcessedEventPacket.DELIVERY_STATE.SENT;
 
                 try {
                     EventWindow.this.titledBorder = new TitledBorder(
@@ -149,7 +148,7 @@ public class EventWindow extends JFrame {
             @SuppressWarnings("synthetic-access")
             public void actionPerformed(@SuppressWarnings("unused")
             final ActionEvent e) {
-                EventWindow.this.deliveryState = DELIVERY_STATE.RECEIVED;
+                EventWindow.this.deliveryState = ProcessedEventPacket.DELIVERY_STATE.RECEIVED;
 
                 try {
                     EventWindow.this.titledBorder = new TitledBorder(
@@ -232,7 +231,7 @@ public class EventWindow extends JFrame {
 
         this.getContentPane().add(this.pnlMessages);
 
-        this.deliveryState = DELIVERY_STATE.SENT;
+        this.deliveryState = ProcessedEventPacket.DELIVERY_STATE.SENT;
 
     }
 
@@ -257,17 +256,17 @@ public class EventWindow extends JFrame {
      * @param event
      *            Is thenew event that is to be displayed
      */
-    public final void appendEvent(final ValidEventPacket event) {
+    public final void appendEvent(final ProcessedEventPacket event) {
         if (event.getDeliveryState() != null) {
             if (event.getDeliveryState().equals(this.deliveryState)) {
-                this.textArea.append(event.getTimeStamp().toString() + ","
-                                     + event.getSensorDataType());
+                this.textArea.append(event.getEventPacket().getTimeStamp().toString() + ","
+                                     + event.getEventPacket().getSensorDataType());
 
-                List argList = event.getArgList();
+                List argList = event.getEventPacket().getArgList();
 
                 if (argList != null) {
 
-                    Object[] args = event.getArgList().toArray();
+                    Object[] args = event.getEventPacket().getArgList().toArray();
 
                     int count = args.length;
 
