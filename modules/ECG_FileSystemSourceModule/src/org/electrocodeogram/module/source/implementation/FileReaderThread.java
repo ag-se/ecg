@@ -361,11 +361,10 @@ public class FileReaderThread extends EventReader {
             // argList String entries.
             List argList = Arrays.asList(argListStringArray);
 
-            // Try to create a ValidEventPacket object from the line's
-            // data.
+            // Try to create an EventPacket object from the line's data.
 
             try {
-                eventPacket = new WellFormedEventPacket(0, timeStamp,
+                eventPacket = new WellFormedEventPacket(timeStamp,
                     sensorDataTypeString, argList);
             } catch (IllegalEventParameterException e) {
 
