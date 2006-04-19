@@ -224,7 +224,7 @@ public class SocketServerThread extends EventReader {
 
             logger.log(Level.FINE, "The object is a WellFormedeventPacket.");
 
-            WellFormedEventPacket readPacket = new WellFormedEventPacket(0,
+            WellFormedEventPacket readPacket = new WellFormedEventPacket(
                 this.packet.getTimeStamp(), this.packet.getSensorDataType(),
                 this.packet.getArgList());
 
