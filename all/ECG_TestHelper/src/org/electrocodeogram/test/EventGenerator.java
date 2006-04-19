@@ -241,7 +241,7 @@ public class EventGenerator {
         final int argListLength, final int argListEntrySize)
         throws NoTestDataException {
         EventPacket eventPacket = null;
-        eventPacket = new EventPacket(0, createDate(wellformedDate),
+        eventPacket = new EventPacket(createDate(wellformedDate),
             createCommandName(wellformedCommandName, linenumber),
             createDeterministicArgList(argListNotNull, argListOfString,
                 argListLength, argListEntrySize));
@@ -282,7 +282,7 @@ public class EventGenerator {
         final int argListEntrySize) throws IllegalEventParameterException,
         NoTestDataException {
         WellFormedEventPacket eventPacket = null;
-        eventPacket = new WellFormedEventPacket(0, createDate(wellformedDate),
+        eventPacket = new WellFormedEventPacket(createDate(wellformedDate),
             createCommandName(wellformedCommandName, linenumber),
             createDeterministicArgList(argListNotNull, argListOfString,
                 argListLength, argListEntrySize));
@@ -307,7 +307,7 @@ public class EventGenerator {
     public final WellFormedEventPacket createPayloadEventPacket(final int size)
         throws IllegalEventParameterException, NoTestDataException {
         WellFormedEventPacket eventPacket = null;
-        eventPacket = new WellFormedEventPacket(0, createDate(true),
+        eventPacket = new WellFormedEventPacket(createDate(true),
             createCommandName(true, 0), createNonDeterministicArgList(10,
                 size / 10));
 
@@ -348,7 +348,7 @@ public class EventGenerator {
                     this.randomStrings[line]};
 
                 try {
-                    eventPacket = new WellFormedEventPacket(0,
+                    eventPacket = new WellFormedEventPacket(
                         createDate(true), "Activity", Arrays.asList(args));
                 } catch (IllegalEventParameterException e) {
                     e.printStackTrace();
@@ -362,7 +362,7 @@ public class EventGenerator {
                     this.randomStrings[line], this.randomStrings[line]};
 
                 try {
-                    eventPacket = new WellFormedEventPacket(0,
+                    eventPacket = new WellFormedEventPacket(
                         createDate(true), "BuffTrans", Arrays.asList(args));
                 } catch (IllegalEventParameterException e) {
                     e.printStackTrace();
@@ -377,7 +377,7 @@ public class EventGenerator {
                     this.randomStrings[line]};
 
                 try {
-                    eventPacket = new WellFormedEventPacket(0,
+                    eventPacket = new WellFormedEventPacket(
                         createDate(true), "Build", Arrays.asList(args));
                 } catch (IllegalEventParameterException e) {
                     e.printStackTrace();
@@ -392,7 +392,7 @@ public class EventGenerator {
                     this.randomStrings[line], this.randomStrings[line]};
 
                 try {
-                    eventPacket = new WellFormedEventPacket(0,
+                    eventPacket = new WellFormedEventPacket(
                         createDate(true), "CLI", Arrays.asList(args));
                 } catch (IllegalEventParameterException e) {
                     e.printStackTrace();
@@ -409,7 +409,7 @@ public class EventGenerator {
                     this.randomStrings[line]};
 
                 try {
-                    eventPacket = new WellFormedEventPacket(0,
+                    eventPacket = new WellFormedEventPacket(
                         createDate(true), "Commit", Arrays.asList(args));
                 } catch (IllegalEventParameterException e) {
                     e.printStackTrace();
@@ -424,7 +424,7 @@ public class EventGenerator {
                     "foo.bar.Bar", "cbo=1,loc=2", "1049798488530"};
 
                 try {
-                    eventPacket = new WellFormedEventPacket(0,
+                    eventPacket = new WellFormedEventPacket(
                         createDate(true), "FileMetric", Arrays.asList(args));
                 } catch (IllegalEventParameterException e) {
                     e.printStackTrace();
@@ -439,7 +439,7 @@ public class EventGenerator {
                     this.randomStrings[line], this.randomStrings[line]};
 
                 try {
-                    eventPacket = new WellFormedEventPacket(0,
+                    eventPacket = new WellFormedEventPacket(
                         createDate(true), "UnitTest", Arrays.asList(args));
                 } catch (IllegalEventParameterException e) {
                     e.printStackTrace();
@@ -484,7 +484,7 @@ public class EventGenerator {
                 args = new String[] {"add", "msdt.testrun.xsd", activity};
 
                 try {
-                    eventPacket = new WellFormedEventPacket(0,
+                    eventPacket = new WellFormedEventPacket(
                         createDate(true), "Activity", Arrays.asList(args));
                 } catch (IllegalEventParameterException e) {
                     e.printStackTrace();
@@ -507,7 +507,7 @@ public class EventGenerator {
                 args = new String[] {"add", "msdt.testrun.xsd", activity};
 
                 try {
-                    eventPacket = new WellFormedEventPacket(0,
+                    eventPacket = new WellFormedEventPacket(
                         createDate(true), "Activity", Arrays.asList(args));
                 } catch (IllegalEventParameterException e) {
                     e.printStackTrace();
@@ -530,7 +530,7 @@ public class EventGenerator {
                 args = new String[] {"add", "msdt.testrun.xsd", activity};
 
                 try {
-                    eventPacket = new WellFormedEventPacket(0,
+                    eventPacket = new WellFormedEventPacket(
                         createDate(true), "Activity", Arrays.asList(args));
                 } catch (IllegalEventParameterException e) {
                     e.printStackTrace();
@@ -550,7 +550,7 @@ public class EventGenerator {
                 args = new String[] {"add", "msdt.testrun.xsd", activity};
 
                 try {
-                    eventPacket = new WellFormedEventPacket(0,
+                    eventPacket = new WellFormedEventPacket(
                         createDate(true), "Activity", Arrays.asList(args));
                 } catch (IllegalEventParameterException e) {
                     e.printStackTrace();
@@ -570,7 +570,7 @@ public class EventGenerator {
                 args = new String[] {"add", "msdt.testrun.xsd", activity};
 
                 try {
-                    eventPacket = new WellFormedEventPacket(0,
+                    eventPacket = new WellFormedEventPacket(
                         createDate(true), "Activity", Arrays.asList(args));
                 } catch (IllegalEventParameterException e) {
                     e.printStackTrace();
@@ -593,7 +593,7 @@ public class EventGenerator {
                 args = new String[] {"add", "msdt.test.xsd", activity};
 
                 try {
-                    eventPacket = new WellFormedEventPacket(0,
+                    eventPacket = new WellFormedEventPacket(
                         createDate(true), "Activity", Arrays.asList(args));
                 } catch (IllegalEventParameterException e) {
                     e.printStackTrace();
@@ -616,7 +616,7 @@ public class EventGenerator {
                 args = new String[] {"add", "msdt.test.xsd", activity};
 
                 try {
-                    eventPacket = new WellFormedEventPacket(0,
+                    eventPacket = new WellFormedEventPacket(
                         createDate(true), "Activity", Arrays.asList(args));
                 } catch (IllegalEventParameterException e) {
                     e.printStackTrace();
@@ -639,7 +639,7 @@ public class EventGenerator {
                 args = new String[] {"add", "msdt.test.xsd", activity};
 
                 try {
-                    eventPacket = new WellFormedEventPacket(0,
+                    eventPacket = new WellFormedEventPacket(
                         createDate(true), "Activity", Arrays.asList(args));
                 } catch (IllegalEventParameterException e) {
                     e.printStackTrace();
@@ -664,7 +664,7 @@ public class EventGenerator {
                 args = new String[] {"add", "msdt.test.xsd", activity};
 
                 try {
-                    eventPacket = new WellFormedEventPacket(0,
+                    eventPacket = new WellFormedEventPacket(
                         createDate(true), "Activity", Arrays.asList(args));
                 } catch (IllegalEventParameterException e) {
                     e.printStackTrace();
@@ -687,7 +687,7 @@ public class EventGenerator {
                 args = new String[] {"add", "msdt.test.xsd", activity};
 
                 try {
-                    eventPacket = new WellFormedEventPacket(0,
+                    eventPacket = new WellFormedEventPacket(
                         createDate(true), "Activity", Arrays.asList(args));
                 } catch (IllegalEventParameterException e) {
                     e.printStackTrace();
@@ -702,7 +702,7 @@ public class EventGenerator {
                 args = new String[] {"add", "msdt.resource.xsd", activity};
 
                 try {
-                    eventPacket = new WellFormedEventPacket(0,
+                    eventPacket = new WellFormedEventPacket(
                         createDate(true), "Activity", Arrays.asList(args));
                 } catch (IllegalEventParameterException e) {
                     e.printStackTrace();
@@ -717,7 +717,7 @@ public class EventGenerator {
                 args = new String[] {"add", "msdt.resource.xsd", activity};
 
                 try {
-                    eventPacket = new WellFormedEventPacket(0,
+                    eventPacket = new WellFormedEventPacket(
                         createDate(true), "Activity", Arrays.asList(args));
                 } catch (IllegalEventParameterException e) {
                     e.printStackTrace();
@@ -732,7 +732,7 @@ public class EventGenerator {
                 args = new String[] {"add", "msdt.resource.xsd", activity};
 
                 try {
-                    eventPacket = new WellFormedEventPacket(0,
+                    eventPacket = new WellFormedEventPacket(
                         createDate(true), "Activity", Arrays.asList(args));
                 } catch (IllegalEventParameterException e) {
                     e.printStackTrace();
@@ -747,7 +747,7 @@ public class EventGenerator {
                 args = new String[] {"add", "msdt.resource.xsd", activity};
 
                 try {
-                    eventPacket = new WellFormedEventPacket(0,
+                    eventPacket = new WellFormedEventPacket(
                         createDate(true), "Activity", Arrays.asList(args));
                 } catch (IllegalEventParameterException e) {
                     e.printStackTrace();
@@ -762,7 +762,7 @@ public class EventGenerator {
                 args = new String[] {"add", "msdt.codechange.xsd", activity};
 
                 try {
-                    eventPacket = new WellFormedEventPacket(0,
+                    eventPacket = new WellFormedEventPacket(
                         createDate(true), "Activity", Arrays.asList(args));
                 } catch (IllegalEventParameterException e) {
                     e.printStackTrace();
@@ -777,7 +777,7 @@ public class EventGenerator {
                 args = new String[] {"add", "msdt.editor.xsd", activity};
 
                 try {
-                    eventPacket = new WellFormedEventPacket(0,
+                    eventPacket = new WellFormedEventPacket(
                         createDate(true), "Activity", Arrays.asList(args));
                 } catch (IllegalEventParameterException e) {
                     e.printStackTrace();
@@ -792,7 +792,7 @@ public class EventGenerator {
                 args = new String[] {"add", "msdt.editor.xsd", activity};
 
                 try {
-                    eventPacket = new WellFormedEventPacket(0,
+                    eventPacket = new WellFormedEventPacket(
                         createDate(true), "Activity", Arrays.asList(args));
                 } catch (IllegalEventParameterException e) {
                     e.printStackTrace();
@@ -806,7 +806,7 @@ public class EventGenerator {
                 args = new String[] {"add", "msdt.editor.xsd", activity};
 
                 try {
-                    eventPacket = new WellFormedEventPacket(0,
+                    eventPacket = new WellFormedEventPacket(
                         createDate(true), "Activity", Arrays.asList(args));
                 } catch (IllegalEventParameterException e) {
                     e.printStackTrace();
@@ -821,7 +821,7 @@ public class EventGenerator {
                 args = new String[] {"add", "msdt.editor.xsd", activity};
 
                 try {
-                    eventPacket = new WellFormedEventPacket(0,
+                    eventPacket = new WellFormedEventPacket(
                         createDate(true), "Activity", Arrays.asList(args));
                 } catch (IllegalEventParameterException e) {
                     e.printStackTrace();
@@ -836,7 +836,7 @@ public class EventGenerator {
                 args = new String[] {"add", "msdt.editor.xsd", activity};
 
                 try {
-                    eventPacket = new WellFormedEventPacket(0,
+                    eventPacket = new WellFormedEventPacket(
                         createDate(true), "Activity", Arrays.asList(args));
                 } catch (IllegalEventParameterException e) {
                     e.printStackTrace();
@@ -851,7 +851,7 @@ public class EventGenerator {
                 args = new String[] {"add", "msdt.part.xsd", activity};
 
                 try {
-                    eventPacket = new WellFormedEventPacket(0,
+                    eventPacket = new WellFormedEventPacket(
                         createDate(true), "Activity", Arrays.asList(args));
                 } catch (IllegalEventParameterException e) {
                     e.printStackTrace();
@@ -866,7 +866,7 @@ public class EventGenerator {
                 args = new String[] {"add", "msdt.part.xsd", activity};
 
                 try {
-                    eventPacket = new WellFormedEventPacket(0,
+                    eventPacket = new WellFormedEventPacket(
                         createDate(true), "Activity", Arrays.asList(args));
                 } catch (IllegalEventParameterException e) {
                     e.printStackTrace();
@@ -880,7 +880,7 @@ public class EventGenerator {
                 args = new String[] {"add", "msdt.part.xsd", activity};
 
                 try {
-                    eventPacket = new WellFormedEventPacket(0,
+                    eventPacket = new WellFormedEventPacket(
                         createDate(true), "Activity", Arrays.asList(args));
                 } catch (IllegalEventParameterException e) {
                     e.printStackTrace();
@@ -895,7 +895,7 @@ public class EventGenerator {
                 args = new String[] {"add", "msdt.part.xsd", activity};
 
                 try {
-                    eventPacket = new WellFormedEventPacket(0,
+                    eventPacket = new WellFormedEventPacket(
                         createDate(true), "Activity", Arrays.asList(args));
                 } catch (IllegalEventParameterException e) {
                     e.printStackTrace();
@@ -910,7 +910,7 @@ public class EventGenerator {
                 args = new String[] {"add", "msdt.part.xsd", activity};
 
                 try {
-                    eventPacket = new WellFormedEventPacket(0,
+                    eventPacket = new WellFormedEventPacket(
                         createDate(true), "Activity", Arrays.asList(args));
                 } catch (IllegalEventParameterException e) {
                     e.printStackTrace();
@@ -925,7 +925,7 @@ public class EventGenerator {
                 args = new String[] {"add", "msdt.rundebug.xsd", activity};
 
                 try {
-                    eventPacket = new WellFormedEventPacket(0,
+                    eventPacket = new WellFormedEventPacket(
                         createDate(true), "Activity", Arrays.asList(args));
                 } catch (IllegalEventParameterException e) {
                     e.printStackTrace();
@@ -940,7 +940,7 @@ public class EventGenerator {
                 args = new String[] {"add", "msdt.rundebug.xsd", activity};
 
                 try {
-                    eventPacket = new WellFormedEventPacket(0,
+                    eventPacket = new WellFormedEventPacket(
                         createDate(true), "Activity", Arrays.asList(args));
                 } catch (IllegalEventParameterException e) {
                     e.printStackTrace();
@@ -955,7 +955,7 @@ public class EventGenerator {
                 args = new String[] {"add", "msdt.rundebug.xsd", activity};
 
                 try {
-                    eventPacket = new WellFormedEventPacket(0,
+                    eventPacket = new WellFormedEventPacket(
                         createDate(true), "Activity", Arrays.asList(args));
                 } catch (IllegalEventParameterException e) {
                     e.printStackTrace();
@@ -970,7 +970,7 @@ public class EventGenerator {
                 args = new String[] {"add", "msdt.window.xsd", activity};
 
                 try {
-                    eventPacket = new WellFormedEventPacket(0,
+                    eventPacket = new WellFormedEventPacket(
                         createDate(true), "Activity", Arrays.asList(args));
                 } catch (IllegalEventParameterException e) {
                     e.printStackTrace();
@@ -985,7 +985,7 @@ public class EventGenerator {
                 args = new String[] {"add", "msdt.window.xsd", activity};
 
                 try {
-                    eventPacket = new WellFormedEventPacket(0,
+                    eventPacket = new WellFormedEventPacket(
                         createDate(true), "Activity", Arrays.asList(args));
                 } catch (IllegalEventParameterException e) {
                     e.printStackTrace();
@@ -999,7 +999,7 @@ public class EventGenerator {
                 args = new String[] {"add", "msdt.window.xsd", activity};
 
                 try {
-                    eventPacket = new WellFormedEventPacket(0,
+                    eventPacket = new WellFormedEventPacket(
                         createDate(true), "Activity", Arrays.asList(args));
                 } catch (IllegalEventParameterException e) {
                     e.printStackTrace();
@@ -1014,7 +1014,7 @@ public class EventGenerator {
                 args = new String[] {"add", "msdt.window.xsd", activity};
 
                 try {
-                    eventPacket = new WellFormedEventPacket(0,
+                    eventPacket = new WellFormedEventPacket(
                         createDate(true), "Activity", Arrays.asList(args));
                 } catch (IllegalEventParameterException e) {
                     e.printStackTrace();
@@ -1029,7 +1029,7 @@ public class EventGenerator {
                 args = new String[] {"add", "msdt.window.xsd", activity};
 
                 try {
-                    eventPacket = new WellFormedEventPacket(0,
+                    eventPacket = new WellFormedEventPacket(
                         createDate(true), "Activity", Arrays.asList(args));
                 } catch (IllegalEventParameterException e) {
                     e.printStackTrace();
