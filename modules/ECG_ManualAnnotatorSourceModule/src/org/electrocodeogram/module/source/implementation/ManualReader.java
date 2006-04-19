@@ -195,7 +195,7 @@ public class ManualReader extends EventReader {
 
                 try {
                     WellFormedEventPacket packet = new WellFormedEventPacket(
-                        this.reader.getSourceModule().getId(), new Date(),
+                        new Date(),
                         "Activity", Arrays.asList(args));
 
                     this.reader.eventBuffer.add(packet);
