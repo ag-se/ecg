@@ -148,7 +148,7 @@ public class CodechangeDifferIntermediateModule extends IntermediateModule {
                 data};
 
             try {
-                event = new ValidEventPacket(this.getId(), timestamp,
+                event = new ValidEventPacket(timestamp,
                     WellFormedEventPacket.HACKYSTAT_ACTIVITY_STRING, Arrays
                         .asList(args));
 
