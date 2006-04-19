@@ -541,8 +541,7 @@ public class SensorShell {
         WellFormedEventPacket packet;
 
         try {
-            packet = new WellFormedEventPacket(0, timeStamp, sensorDataType,
-                argList);
+            packet = new WellFormedEventPacket(timeStamp, sensorDataType, argList);
         } catch (IllegalEventParameterException e) {
             logger.log(Level.FINE,
                 "An error occured while getting an event from the sensor.");
