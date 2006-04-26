@@ -1,0 +1,32 @@
+#created on: 21.04.2006
+package focustracker
+
+#list any import classes here.
+import de.fu_berlin.inf.focustracker.rating.event.*
+
+// expander rule-lang.dsl
+
+
+#declare any global variables here
+
+
+
+
+rule "Your First Rule"
+	
+	when
+//		There is a Person with name of "{name}"
+		event : ElementVisibiltyEvent( )
+	then 
+				
+		
+end
+
+rule "Your Second Rule"
+	#include attributes such as "salience" here...
+	when
+		#conditions
+	then 
+		#actions
+		
+end

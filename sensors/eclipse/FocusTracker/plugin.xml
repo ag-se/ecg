@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            name="Focus Tracker"
+            id="FocusTracker">
+      </category>
+      <view
+            category="FocusTracker"
+            class="de.fu_berlin.inf.focustracker.views.LoggingView"
+            icon="icons/sample.gif"
+            id="de.fu_berlin.inf.focustracker.views.LoggingView"
+            name="LoggingView"/>
+      <view
+            category="FocusTracker"
+            class="de.fu_berlin.inf.focustracker.views.FocussedElementsView"
+            icon="icons/sample.gif"
+            id="de.fu_berlin.inf.focustracker.views.FocussedElementsView"
+            name="FocussedElements"/>
+      <view
+            category="FocusTracker"
+            class="de.fu_berlin.inf.focustracker.views.logging.ChartView"
+            icon="icons/monitor.gif"
+            id="de.fu_berlin.inf.focustracker.views.logging.ChartView"
+            name="ChartView"/>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="org.eclipse.ui.resourcePerspective">
+         <view
+               ratio="0.5"
+               relative="org.eclipse.ui.views.TaskList"
+               relationship="right"
+               id="org.focustracker.views.FocusTrackerView">
+         </view>
+      </perspectiveExtension>
+   </extension>
+   <extension
+         name="FocusTracker Startup"
+         point="org.eclipse.ui.startup">
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="de.fu_berlin.inf.focustracker.report.ReportEditorPart"
+            default="false"
+            icon="icons/monitor.gif"
+            id="de.fu_berlin.inf.focustracker.report.ReportEditorPart"
+            name="Report"/>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <item
+            commandId="FocusTracker.item1"
+            id="FocusTracker.item1"
+            menuId="FocusTracker.menu1"/>
+      <menu
+            id="FocusTracker.menu1"
+            label="FocusTracker"/>
+   </extension>
+   <extension
+         point="org.eclipse.ui.decorators">
+      <decorator
+            class="de.fu_berlin.inf.focustracker.ui.FocusTrackerDecorator"
+            id="de.fu_berlin.inf.focustracker.ui.FocusTrackerDecorator"
+            label="FocusTracker Decorator"
+            lightweight="true"
+            state="true">
+         <description/>
+         <enablement>
+            <objectClass name="java.lang.Object"/>
+         </enablement>
+      </decorator>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="de.fu_berlin.inf.focustracker.ui.preferences.FocusTrackerPreferencePage"
+            id="de.fu_berlin.inf.focustracker.ui.preferences.SamplePreferencePage"
+            name="FocusTracker Preferences"/>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer class="de.fu_berlin.inf.focustracker.ui.preferences.PreferenceInitializer"/>
+   </extension>
+
+</plugin>

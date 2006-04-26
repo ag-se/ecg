@@ -1,0 +1,37 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: FocusTracker Plug-in
+Bundle-SymbolicName: de.fu_berlin.inf.focustracker;singleton:=true
+Bundle-Version: 0.2.2
+Bundle-Activator: de.fu_berlin.inf.focustracker.FocusTrackerPlugin
+Bundle-Localization: plugin
+Require-Bundle: 
+ org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.jdt,
+ org.eclipse.jdt.core,
+ org.eclipse.jdt.debug,
+ org.eclipse.jdt.launching,
+ org.eclipse.jdt.source,
+ org.eclipse.jdt.ui,
+ org.eclipse.ui.editors,
+ org.eclipse.ui.ide,
+ org.eclipse.ui.workbench.texteditor,
+ org.eclipse.ui.views,
+ org.eclipse.jface.text,
+ org.eclipse.ui.console,
+ org.eclipse.ui.intro,
+ org.junit
+Eclipse-LazyStart: true
+Bundle-ClassPath: focustracker.jar,
+ lib/drools/antlr-2.7.6rc1.jar,
+ lib/drools/commons-jci-patched.jar,
+ lib/drools/commons-logging-1.0.4.jar,
+ lib/drools/drools-base-2.5-final.jar,
+ lib/drools/drools-core-2.5-final.jar,
+ lib/drools/drools-io-2.5-final.jar,
+ lib/drools/drools-java-2.5-final.jar,
+ lib/drools/drools-smf-2.5-final.jar,
+ lib/jfreechart/jcommon-1.0.0.jar,
+ lib/jfreechart/jfreechart-1.0.1.jar
+Bundle-Vendor: Fu-Berlin
