@@ -11,7 +11,7 @@ import de.fu_berlin.inf.focustracker.interaction.Action;
 import de.fu_berlin.inf.focustracker.interaction.JavaInteraction;
 import de.fu_berlin.inf.focustracker.interaction.Origin;
 
-public class PackageExplorerExpansionMonitor implements IFocusTrackerMonitor, ITreeViewerListener {
+public class PackageExplorerExpansionMonitor extends AbstractFocusTrackerMonitor implements ITreeViewerListener {
 
 	private PackageExplorerPart part;
 

@@ -50,12 +50,13 @@ import de.fu_berlin.inf.focustracker.rating.event.ElementFoldingEvent;
 import de.fu_berlin.inf.focustracker.rating.event.ElementRegion;
 import de.fu_berlin.inf.focustracker.rating.event.ElementVisibiltyEvent;
 import de.fu_berlin.inf.focustracker.repository.InteractionRepository;
+import de.fu_berlin.inf.focustracker.util.Units;
 
-public class JavaEditorMonitor implements /* ISelectionChangedListener, */
-		IViewportListener, ITextListener, IFocusTrackerMonitor, MouseMoveListener {
+public class JavaEditorMonitor extends AbstractFocusTrackerMonitor implements 
+		IViewportListener, ITextListener, MouseMoveListener {
 
-	private static final long CODECHANGE_INTERVAL = 2000;
-	private static final long SCROLLING_INTERVAL = 1000;
+	private static final long CODECHANGE_INTERVAL = 2 * Units.SECOND;
+	private static final long SCROLLING_INTERVAL = Units.SECOND;
 
 	JavaEditor editor;
 
@@ -220,7 +221,7 @@ System.err.println(elementsInEditor.get(true));
 					for (IJavaElement child : elementsInEditor.get(visible)) {
 						
 						boolean wasVisibleBefore = visibleElements.contains(child);
-						double lastSeverity = InteractionRepository.getInstance().getLastScore(child);
+						double lastSeverity = InteractionRepository.getInstance().getRating(child);
 						Action action = null;
 						
 						ElementRegion elementRegion = RegionHelper.getElementRegion(editor, child);
@@ -360,7 +361,7 @@ System.err.println(elementsInEditor.get(true));
 			} else if (aPart instanceof ClassFileEditor) {
 				origin = Origin.JAVA_CLASSFILE_EDITOR;
 			}
-			
+
 		} else {
 			throw new IllegalArgumentException("Wrong type of part : "
 					+ aPart.getClass());
@@ -415,6 +416,43 @@ System.err.println(elementsInEditor.get(true));
 		return null;
 	}
 	
+	@Override
+	public void partDeactivated() {
+		System.err.println("partDeactivated");
+		partClosed();
+	}
+	
+	@Override
+	public void partClosed() {
+		
+		System.err.println("partClosed");
+		
+		IJavaElement element = JavaUI.getEditorInputJavaElement(editor.getEditorInput());
+		if (element instanceof IParent) {
+			IParent compilationUnit = (IParent) element;
+			List<IJavaElement> allChildren = getAllChildren(compilationUnit);
+			List<JavaInteraction> interacList = new ArrayList<JavaInteraction>();
+			for (IJavaElement child : allChildren) {
+				if(InteractionRepository.getInstance().getRating(child) > 0d) {
+					JavaInteraction interaction = new JavaInteraction(Action.VISIBILITY_LOST, child, 0d, new Date(), null, origin);
+					interacList.add(interaction);
+				}
+			}
+			EventDispatcher.getInstance().notifyInteractionObserved(interacList);
+		}
+		
+//		List<JavaInteraction> interacList = new ArrayList<JavaInteraction>();
+//		for (IJavaElement javaElement : visibleElements) {
+////			ElementVisibiltyEvent visibiltyEvent = new ElementVisibiltyEvent(
+////					Action.VISIBILITY_LOST, javaElement, false, false, elementRegion, numberOfElementsVisible, null);
+//			JavaInteraction interaction = new JavaInteraction(
+//					Action.VISIBILITY_LOST, javaElement, 0d, 
+//					new Date(), null, origin);
+//			interacList.add(interaction);
+//			
+//		}
+//		EventDispatcher.getInstance().notifyInteractionObserved(interacList);
+	}
 	
 }
 
@@ -514,4 +552,5 @@ class FoldingListener implements IAnnotationModelListener,
 		// but IAnnotationModelListener must be implemented, too
 	}
 
+	
 }

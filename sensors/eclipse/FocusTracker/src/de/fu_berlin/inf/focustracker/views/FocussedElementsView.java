@@ -7,6 +7,7 @@ import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.swt.widgets.Composite;
 
 import de.fu_berlin.inf.focustracker.EventDispatcher;
+import de.fu_berlin.inf.focustracker.jobs.RefreshViewsJob;
 import de.fu_berlin.inf.focustracker.repository.Element;
 import de.fu_berlin.inf.focustracker.repository.InteractionRepository;
 
@@ -14,6 +15,7 @@ import de.fu_berlin.inf.focustracker.repository.InteractionRepository;
 public class FocussedElementsView extends BeanView {
 
 	public static final String ID = "de.fu_berlin.inf.focustracker.views.FocussedElementsView";
+	private RefreshViewsJob refreshJob;
 
 	@Override
 	public Class getClazz() {
@@ -23,7 +25,7 @@ public class FocussedElementsView extends BeanView {
 	@Override
 	public void createPartControl(Composite aParent) {
 		super.createPartControl(aParent);
-//		refreshJob = new RefreshViewsJob(this);
+		refreshJob = new RefreshViewsJob(this);
 		getViewer().setSorter(
 				new ViewerSorter() {
 					Comparator<Element> comparator = new Comparator<Element>() {
@@ -53,7 +55,8 @@ public class FocussedElementsView extends BeanView {
 	@Override
 	public Object[] getObjects() {
 //		return InteractionRepository.getInstance().getJavaElements();
-		return InteractionRepository.getInstance().getElements().values().toArray();
+//		return InteractionRepository.getInstance().getElements().values().toArray();
+		return InteractionRepository.getInstance().getElementsWithRating().toArray();
 	}
 	
 	protected void makeActions() {
@@ -62,7 +65,7 @@ public class FocussedElementsView extends BeanView {
 	
 	@Override
 	public void dispose() {
-//		refreshJob.cancel();
+		refreshJob.cancel();
 		super.dispose();
 	}
 	

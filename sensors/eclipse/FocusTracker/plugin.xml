@@ -20,12 +20,6 @@
             icon="icons/sample.gif"
             id="de.fu_berlin.inf.focustracker.views.FocussedElementsView"
             name="FocussedElements"/>
-      <view
-            category="FocusTracker"
-            class="de.fu_berlin.inf.focustracker.views.logging.ChartView"
-            icon="icons/monitor.gif"
-            id="de.fu_berlin.inf.focustracker.views.logging.ChartView"
-            name="ChartView"/>
    </extension>
    <extension
          point="org.eclipse.ui.perspectiveExtensions">

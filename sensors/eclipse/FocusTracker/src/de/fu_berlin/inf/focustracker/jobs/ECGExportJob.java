@@ -10,10 +10,11 @@ import org.eclipse.core.runtime.jobs.Job;
 import de.fu_berlin.inf.focustracker.FocusTrackerPlugin;
 import de.fu_berlin.inf.focustracker.repository.ECGExporter;
 import de.fu_berlin.inf.focustracker.ui.preferences.PreferenceConstants;
+import de.fu_berlin.inf.focustracker.util.Units;
 
 public class ECGExportJob extends Job implements IPropertyChangeListener {
 
-	private static long delay = 1000 * FocusTrackerPlugin.getDefault().getPluginPreferences().getInt(PreferenceConstants.P_ECG_EXPORT_INTERVAL);
+	private static long delay = Units.SECOND * FocusTrackerPlugin.getDefault().getPluginPreferences().getInt(PreferenceConstants.P_ECG_EXPORT_INTERVAL);
 	private static ECGExporter ecgExporter = new ECGExporter();
 	
 	public ECGExportJob() {
@@ -37,7 +38,7 @@ public class ECGExportJob extends Job implements IPropertyChangeListener {
 
 	public void propertyChange(PropertyChangeEvent aEvent) {
 		if(PreferenceConstants.P_ECG_EXPORT_INTERVAL.equals(aEvent.getProperty())) {
-			delay = 1000 * getExportInterval();
+			delay = Units.SECOND * getExportInterval();
 			schedule(delay);
 		}
 	}

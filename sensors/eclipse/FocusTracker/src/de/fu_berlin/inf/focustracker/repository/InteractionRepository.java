@@ -9,10 +9,13 @@ import org.eclipse.jdt.core.IJavaElement;
 
 import de.fu_berlin.inf.focustracker.interaction.Interaction;
 import de.fu_berlin.inf.focustracker.interaction.JavaInteraction;
+import de.fu_berlin.inf.focustracker.util.Units;
 
 
 public class InteractionRepository {
 
+	private static final long INACTIVITY_OFFSET = 10 * Units.SECOND;
+	
 	private static InteractionRepository instance;
 //	private HashMap<IJavaElement, List<JavaInteraction>> elements = new HashMap<IJavaElement, List<JavaInteraction>>();
 	private HashMap<IJavaElement, Element> elements = new HashMap<IJavaElement, Element>();
@@ -50,6 +53,7 @@ public class InteractionRepository {
 		Interaction lastInteraction = getLastInteraction(aJavaInteraction.getJavaElement());
 		aJavaInteraction.setLastInteraction(lastInteraction);
 		element.getInteractions().add(aJavaInteraction);
+		element.setRating(aJavaInteraction.getSeverity());
 //		lastVisitedJavaElement = aJavaInteraction.getJavaElement();
 //		javaElements.get(aJavaInteraction.getJavaElement())
 //		element.addInteraction(aJavaInteraction);
@@ -65,15 +69,24 @@ public class InteractionRepository {
 	}
 	
 	
-	public double getLastScore(IJavaElement aJavaElement) {
+	public double getRating(IJavaElement aJavaElement) {
 		Element element = elements.get(aJavaElement);
 		if(element != null) {
-			return element.getLastInteraction().getSeverity();
+			return element.getRating();
 		}
 		// not rated, yet
 		return 0.0d;
 	}
 	
+//	public double getLastScore(IJavaElement aJavaElement) {
+//		Element element = elements.get(aJavaElement);
+//		if(element != null) {
+//			return element.getLastInteraction().getSeverity();
+//		}
+//		// not rated, yet
+//		return 0.0d;
+//	}
+//	
 	public JavaInteraction getLastInteraction(IJavaElement aJavaElement) {
 		Element element = elements.get(aJavaElement);
 		if(element != null) {
@@ -89,7 +102,7 @@ public class InteractionRepository {
 	public IJavaElement[] getRatedJavaElements() {
 		List<IJavaElement> ratedElements = new ArrayList<IJavaElement>();
 		for (IJavaElement element : elements.keySet()) {
-			if(getLastScore(element) > 0d) {
+			if(getRating(element) > 0d) {
 				ratedElements.add(element);
 			}
 		}
@@ -103,6 +116,17 @@ public class InteractionRepository {
 		return elements;
 	}
 
+	public List<Element> getElementsWithRating() {
+		
+		List<Element> elementsWithRating = new ArrayList<Element>();
+		for (Element element : elements.values()) {
+			if(element.getRating() > 0d) {
+				elementsWithRating.add(element);
+			}
+		}
+		return elementsWithRating;
+	}
+	
 	public List<Interaction> getAllInteractions() {
 		return allInteractions;
 	}
@@ -138,8 +162,36 @@ public class InteractionRepository {
 					removed++;
 				}
 			}
+			// remove element, if it seems to be unimportant
+			if(element.getInteractions().size() == 0 && element.getRating() < 0.01d) {
+				elements.remove(element);
+			}
 		}
 		return removed;
 	}
+	
+	
+	public void calculateInactivities() {
+		for (Element element : elements.values()) {
+			calculateInactivity(element);			
+		}
+	}
+	
+	/**
+	 * after a specified offset time, the rating of an element should decrease 
+	 * @param aElement
+	 */
+	public void calculateInactivity(Element aElement) {
+		if(aElement.getRating() == 0d || aElement.getLastInteraction() == null) {
+			return;
+		}
+		long currentTime = System.currentTimeMillis();
+		long start = aElement.getLastInteraction().getDate().getTime() + INACTIVITY_OFFSET;
+		if(start < currentTime) {
+//			System.err.println("decreasing : " + (((currentTime - start) / Units.SECOND) * 0.005));
+			aElement.setRating(aElement.getLastInteraction().getSeverity() - ((currentTime - start) / Units.SECOND) * 0.005); 
+		}
+		
+	}	
 	
 }

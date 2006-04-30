@@ -41,22 +41,28 @@ public class PartMonitor implements IPartListener {
 	}
 	
 	public void partActivated(IWorkbenchPart aPart) {
-//		System.err.println("partActivated: " + aPart);
+		IFocusTrackerMonitor monitor = monitorInstances.get(aPart);
+		if(monitorInstances.get(aPart) != null) {
+			monitor.partActivated();
+		}
 	}
 
 	public void partBroughtToTop(IWorkbenchPart aPart) {
 	}
 
 	public void partDeactivated(IWorkbenchPart aPart) {
-//		System.err.println("partDeactivated: " + aPart);
+		IFocusTrackerMonitor monitor = monitorInstances.get(aPart);
+		if(monitorInstances.get(aPart) != null) {
+			monitor.partDeactivated();
+		}
 	}
 	
 	public void partClosed(IWorkbenchPart aPart) {
 		IFocusTrackerMonitor monitor = monitorInstances.get(aPart);
 		if(monitorInstances.get(aPart) == null) {
-//			System.err.println("no listener instances for : " + aPart);
 			return;
 		}
+		monitor.partClosed();
 		monitor.deregisterFromPart();
 		monitorInstances.remove(aPart);
 		System.err.println("partmonitor removed from : " + aPart);

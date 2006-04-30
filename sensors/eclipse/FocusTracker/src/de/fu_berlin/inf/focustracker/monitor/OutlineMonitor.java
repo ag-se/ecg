@@ -16,7 +16,7 @@ import de.fu_berlin.inf.focustracker.interaction.JavaInteraction;
 import de.fu_berlin.inf.focustracker.interaction.Origin;
 
 
-public class OutlineMonitor implements ISelectionChangedListener, IFocusTrackerMonitor {
+public class OutlineMonitor extends AbstractFocusTrackerMonitor implements ISelectionChangedListener{
 
 	JavaEditor editor;
 	private ContentOutline part;

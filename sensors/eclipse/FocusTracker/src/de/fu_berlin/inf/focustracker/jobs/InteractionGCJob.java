@@ -6,11 +6,12 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
 import de.fu_berlin.inf.focustracker.repository.InteractionRepository;
+import de.fu_berlin.inf.focustracker.util.Units;
 
 public class InteractionGCJob extends Job {
 
-	public static long DELAY = 5000;
-	private static long DELETE_OLDER_THAN = 1000 * 60;
+	public static long DELAY = 5 * Units.SECOND;
+	private static long DELETE_OLDER_THAN = 5 * Units.MINUTE;
 	private static InteractionRepository interactionRepository = InteractionRepository.getInstance();
 	
 	public InteractionGCJob() {
@@ -20,7 +21,7 @@ public class InteractionGCJob extends Job {
 	@Override
 	protected IStatus run(IProgressMonitor aMonitor) {
 		
-		System.err.println("running: " + getName());
+//		System.err.println("running: " + getName());
 		int removed = interactionRepository.removeInteractions(System.currentTimeMillis() - DELETE_OLDER_THAN);
 		if(removed > 0) {
 			System.err.println("Removed " + removed + " interactions!");

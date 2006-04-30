@@ -1,6 +1,8 @@
 package de.fu_berlin.inf.focustracker.repository;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
@@ -25,6 +27,7 @@ public class ECGExporter implements IPropertyChangeListener {
             this.username = "n.a.";
         }
         minProbabilityForApperance = getMinProbabilityForApperance();
+        minProbabilityForDisapperance = getMinProbabilityForDisapperance();
         interactionRepository = InteractionRepository.getInstance();
         currentlyExportedElements = new HashSet<IJavaElement>();
 	}
@@ -40,9 +43,9 @@ public class ECGExporter implements IPropertyChangeListener {
 			+ aJavaElement.getElementName()
 			+ "</element><focus>" 
 			+ aIsInFocus
-			+ "</focus><rating>"
-			+ aRating
-			+ "</rating></focustracker></microActivity>";
+			+ "</focus>" 
+			+ (aIsInFocus ? "<rating>" + aRating + "</rating>" : "") // add rating only if element is in focus
+			+ "</focustracker></microActivity>";
 		
 		System.err.println(data);
 		
@@ -54,19 +57,29 @@ public class ECGExporter implements IPropertyChangeListener {
 	public void exportCurrentInteractions() {
 
 		System.err.println("ECG Export: -----------------------");
+		List<Element> focussedElementsToExport = new ArrayList<Element>();
 		for (Element element : interactionRepository.getElements().values()) {
-			if(element.getRating() >= minProbabilityForApperance) {
+			if(element.getRating() >= minProbabilityForApperance || (element.getRating() > minProbabilityForDisapperance && currentlyExportedElements.contains(element.getJavaElement())) ) {
 				// notify the ecg, that this element has (gained) focus
 				currentlyExportedElements.add(element.getJavaElement());
-				export(element.getJavaElement(), element.getRating(), true);
-			} else if(element.getRating() <= minProbabilityForDisapperance && currentlyExportedElements.contains(element.getJavaElement())) {
+				focussedElementsToExport.add(element);
+			} else if(element.getRating() < minProbabilityForDisapperance && currentlyExportedElements.contains(element.getJavaElement())) {
 				// notify the ecg, that this element isn't focussed anymore
 				currentlyExportedElements.remove(element.getJavaElement());
 				export(element.getJavaElement(), element.getRating(), false);
 			}
 		}
 		
+		for (Element element : focussedElementsToExport) {
+			export(element.getJavaElement(), normalizeRating(element.getRating(), focussedElementsToExport.size()), true);
+		}
+		
 	}
+
+	private double normalizeRating(double aRating, int aNumberOfElements) {
+		return aRating / aNumberOfElements;
+	}
+
 
 	public void propertyChange(PropertyChangeEvent aEvent) {
 		if(PreferenceConstants.P_ECG_EXPORT_MIN_PROBABILITY_FOR_APPEARANCE.equals(aEvent.getProperty())) {

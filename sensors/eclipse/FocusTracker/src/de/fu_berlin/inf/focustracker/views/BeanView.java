@@ -38,6 +38,7 @@ import de.fu_berlin.inf.focustracker.interaction.Interaction;
 import de.fu_berlin.inf.focustracker.interaction.InteractionListener;
 import de.fu_berlin.inf.focustracker.repository.InteractionRepository;
 import de.fu_berlin.inf.focustracker.resources.FocusTrackerResources;
+import de.fu_berlin.inf.focustracker.util.Units;
 
 
 
@@ -61,7 +62,7 @@ import de.fu_berlin.inf.focustracker.resources.FocusTrackerResources;
 
 public abstract class BeanView extends ViewPart implements InteractionListener {
 
-	private static final long REFRESH_INTERVAL = 1000;
+	private static final long REFRESH_INTERVAL = Units.SECOND;
 	protected TableViewer viewer;
 	private Action clearAction;
 	private Action restoreAction;
@@ -184,7 +185,7 @@ public abstract class BeanView extends ViewPart implements InteractionListener {
 					
 					Formatter formatter = new Formatter();
 					prefix = "(" + 
-					formatter.format("%1.2f", InteractionRepository.getInstance().getLastScore((IJavaElement)object)).toString()
+					formatter.format("%1.2f", InteractionRepository.getInstance().getRating((IJavaElement)object)).toString()
 					+ ") ";
 				}
 				return prefix + String.valueOf(propertyDescriptors[index].getReadMethod().invoke(obj, new Object[0]));
@@ -342,7 +343,9 @@ public abstract class BeanView extends ViewPart implements InteractionListener {
 		
 		PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
 			public void run() {
-				viewer.refresh(aUpdateLabels);
+				if(!isDisposed()) {
+					viewer.refresh(aUpdateLabels);
+				}
 			}
 		});		
 		if(startFromFilter != null && startFromFilter.startFrom != -1) {

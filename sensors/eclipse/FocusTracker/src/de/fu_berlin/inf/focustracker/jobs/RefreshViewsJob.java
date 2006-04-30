@@ -7,12 +7,13 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.TableItem;
 
+import de.fu_berlin.inf.focustracker.util.Units;
 import de.fu_berlin.inf.focustracker.views.BeanView;
 
 
 public class RefreshViewsJob extends Job {
 
-	private static int DELAY = 2000;
+	private static long DELAY = 2 * Units.SECOND;
 	private BeanView beanView;
 	
 	public RefreshViewsJob(BeanView aBeanView) {

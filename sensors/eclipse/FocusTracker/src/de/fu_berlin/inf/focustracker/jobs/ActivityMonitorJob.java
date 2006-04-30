@@ -6,14 +6,14 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
 import de.fu_berlin.inf.focustracker.EventDispatcher;
+import de.fu_berlin.inf.focustracker.repository.InteractionRepository;
+import de.fu_berlin.inf.focustracker.util.Units;
 
 
 public class ActivityMonitorJob extends Job {
 
-	public static final long INACTIVITY_DELAY = 5000;
-	private static final int DELAY = 1000;
-//	private static final int DELAY_NOP = 5000;
-//	private static final int DELAY_LOSING_FOCUS = 5000;
+	public static final long INACTIVITY_DELAY = 5 * Units.SECOND;
+	private static final long DELAY = Units.SECOND;
 	
 	private long inactivityDetectedTimestamp = 0;
 	private boolean currentlyInactive = false;
@@ -68,8 +68,12 @@ public class ActivityMonitorJob extends Job {
 				currentlyInactive = false;
 		}
 		
+		InteractionRepository.getInstance().calculateInactivities();
+		
 		schedule(DELAY);
 		return Status.OK_STATUS;
 	}
 
+
+	
 }

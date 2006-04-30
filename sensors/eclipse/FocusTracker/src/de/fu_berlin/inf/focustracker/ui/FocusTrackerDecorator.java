@@ -38,7 +38,7 @@ public class FocusTrackerDecorator implements ILightweightLabelDecorator, Intera
 
 	public void decorate(Object element, IDecoration decoration) {
 		if(element instanceof IJavaElement) {
-			double lastScore = InteractionRepository.getInstance().getLastScore((IJavaElement)element);
+			double lastScore = InteractionRepository.getInstance().getRating((IJavaElement)element);
 			if(lastScore > 0.5d) {
 //				decoration.setForegroundColor(COLOR_0);
 				decoration.setFont(BOLD);

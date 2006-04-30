@@ -8,4 +8,9 @@ public interface IFocusTrackerMonitor {
 
 	void registerPart(IWorkbenchPart aPart);
 
+	void partClosed();
+	
+	void partActivated();
+	
+	void partDeactivated();
 }
