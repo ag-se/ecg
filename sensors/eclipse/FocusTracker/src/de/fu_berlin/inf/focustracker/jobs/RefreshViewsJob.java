@@ -6,9 +6,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.TableItem;
-import org.eclipse.ui.PlatformUI;
 
-import de.fu_berlin.inf.focustracker.ui.FocusTrackerDecorator;
 import de.fu_berlin.inf.focustracker.views.BeanView;
 
 

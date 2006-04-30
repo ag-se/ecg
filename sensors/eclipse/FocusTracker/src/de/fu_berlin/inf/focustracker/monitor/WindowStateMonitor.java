@@ -11,7 +11,7 @@ import de.fu_berlin.inf.focustracker.interaction.Origin;
 import de.fu_berlin.inf.focustracker.interaction.SystemInteraction;
 
 
-public class WindowMonitor implements IWindowListener {
+public class WindowStateMonitor implements IWindowListener {
 
 	public void windowActivated(IWorkbenchWindow aWindow) {
 		SystemInteraction interaction = new SystemInteraction(Action.WINDOW_ACTIVED, 0f, new Date(), null, Origin.WINDOW_SYSTEM);

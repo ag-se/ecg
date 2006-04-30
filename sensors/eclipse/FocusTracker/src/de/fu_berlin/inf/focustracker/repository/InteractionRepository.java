@@ -2,11 +2,10 @@ package de.fu_berlin.inf.focustracker.repository;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.jdt.core.IJavaElement;
-import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.internal.corext.util.JavaModelUtil;
 
 import de.fu_berlin.inf.focustracker.interaction.Interaction;
 import de.fu_berlin.inf.focustracker.interaction.JavaInteraction;
@@ -126,4 +125,21 @@ public class InteractionRepository {
 		return list;
 	}
 
+	public int removeInteractions(long aOlderThan) {
+		
+		int removed = 0;
+		for (Element element : elements.values()) {
+			
+			for (Iterator iter = element.getInteractions().iterator(); iter.hasNext();) {
+				Interaction interaction = (Interaction) iter.next();
+				// if the interaction is older than the given argument, remove it
+				if(interaction.getDate().getTime() < aOlderThan) {
+					iter.remove();
+					removed++;
+				}
+			}
+		}
+		return removed;
+	}
+	
 }

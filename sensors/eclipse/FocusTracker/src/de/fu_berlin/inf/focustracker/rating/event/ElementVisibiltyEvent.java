@@ -13,6 +13,7 @@ public class ElementVisibiltyEvent implements EventHolder {
 	private boolean collapsed;
 	private ElementRegion elementRegion;
 	private JavaInteraction lastInteraction;
+	private int numberOfElementsVisible;
 	
 	public ElementVisibiltyEvent(
 			Action aAction,
@@ -20,6 +21,7 @@ public class ElementVisibiltyEvent implements EventHolder {
 			boolean aVisible,
 			boolean aCollapsed,
 			ElementRegion aElementRegion, 
+			int aNumberOfElementsVisible, 
 			JavaInteraction aLastInteraction) {
 		
 		action = aAction;
@@ -27,6 +29,7 @@ public class ElementVisibiltyEvent implements EventHolder {
 		visible = aVisible;
 		collapsed = aCollapsed;
 		elementRegion = aElementRegion;
+		numberOfElementsVisible = aNumberOfElementsVisible;
 		lastInteraction = aLastInteraction;
 		
 	}
@@ -76,6 +79,14 @@ public class ElementVisibiltyEvent implements EventHolder {
 
 	public void setElementRegion(ElementRegion aElementRegion) {
 		elementRegion = aElementRegion;
+	}
+
+	public int getNumberOfElementsVisible() {
+		return numberOfElementsVisible;
+	}
+
+	public void setNumberOfElementsVisible(int aNumberOfElementsVisible) {
+		numberOfElementsVisible = aNumberOfElementsVisible;
 	}
 	
 	

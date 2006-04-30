@@ -3,18 +3,21 @@ package de.fu_berlin.inf.focustracker.monitor;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import org.eclipse.jdt.core.IClassFile;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.IParent;
 import org.eclipse.jdt.core.ISourceReference;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.internal.core.CompilationUnit;
 import org.eclipse.jdt.internal.corext.util.JavaModelUtil;
-import org.eclipse.jdt.internal.ui.actions.SelectionConverter;
 import org.eclipse.jdt.internal.ui.javaeditor.ClassFileEditor;
 import org.eclipse.jdt.internal.ui.javaeditor.CompilationUnitEditor;
 import org.eclipse.jdt.internal.ui.javaeditor.EditorUtility;
@@ -23,7 +26,6 @@ import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextListener;
-import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.IViewportListener;
 import org.eclipse.jface.text.TextEvent;
 import org.eclipse.jface.text.source.Annotation;
@@ -35,7 +37,6 @@ import org.eclipse.jface.text.source.projection.ProjectionAnnotation;
 import org.eclipse.jface.text.source.projection.ProjectionAnnotationModel;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseMoveListener;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchPart;
 
@@ -44,7 +45,6 @@ import de.fu_berlin.inf.focustracker.interaction.Action;
 import de.fu_berlin.inf.focustracker.interaction.JavaInteraction;
 import de.fu_berlin.inf.focustracker.interaction.Origin;
 import de.fu_berlin.inf.focustracker.monitor.helper.RegionHelper;
-import de.fu_berlin.inf.focustracker.monitor.listener.KeyAndMouseListener;
 import de.fu_berlin.inf.focustracker.rating.RatingException;
 import de.fu_berlin.inf.focustracker.rating.event.ElementFoldingEvent;
 import de.fu_berlin.inf.focustracker.rating.event.ElementRegion;
@@ -178,7 +178,11 @@ public class JavaEditorMonitor implements /* ISelectionChangedListener, */
 	private void handleViewportChanged(int aVerticalOffset) {
 //		System.err.println(" handle -------------------------------- viewportChanged : " + aVerticalOffset);
 		try {
-
+			// editor could have been closed meanwhile
+			if(editor == null || editor.getViewer() == null) {
+				return;
+			}
+			
 			int topOffset = editor.getViewer().getDocument()
 					.getLineInformation(editor.getViewer().getTopIndex())
 					.getOffset();
@@ -187,55 +191,73 @@ public class JavaEditorMonitor implements /* ISelectionChangedListener, */
 			int bottomOffset = lineInformation.getOffset()
 					+ lineInformation.getLength();
 
+			Map<Boolean, List<IJavaElement>> elementsInEditor = new HashMap<Boolean, List<IJavaElement>>();
+			elementsInEditor.put(true, new ArrayList<IJavaElement>());
+			elementsInEditor.put(false, new ArrayList<IJavaElement>());
+			
 			// iterate through all java elements, to determine their status of visibility
-			IJavaElement element = JavaUI.getEditorInputJavaElement(editor
-					.getEditorInput());
-//			if (element instanceof ICompilationUnit) {
+//			int numberOfElementsVisible = 0;
+			IJavaElement element = JavaUI.getEditorInputJavaElement(editor.getEditorInput());
 			if (element instanceof IParent) {
 				IParent compilationUnit = (IParent) element;
 				List<IJavaElement> allChildren = getAllChildren(compilationUnit);
 				List<JavaInteraction> interacList = new ArrayList<JavaInteraction>();
 				for (IJavaElement child : allChildren) {
-					ISourceReference ref = (ISourceReference) child;
-					// is this element visible?
-					boolean visible = ref.getSourceRange().getOffset()
-							+ ref.getSourceRange().getLength() >= topOffset
-							&& ref.getSourceRange().getOffset() <= bottomOffset;
-					boolean wasVisibleBefore = visibleElements.contains(child);
-					double lastSeverity = InteractionRepository.getInstance().getLastScore(child);
-					Action action = null;
-					
-					ElementRegion elementRegion = RegionHelper.getElementRegion(editor, child);
-					ElementVisibiltyEvent visibiltyEvent = new ElementVisibiltyEvent(
-							action, element, visible, foldingListener.isCollapsed(element), elementRegion, null);
-					
-					if (visible && !wasVisibleBefore) {
-						visibleElements.add(child);
-						action = Action.VISIBILITY_GAINED;
-					} else if (!visible && wasVisibleBefore) {
-						visibleElements.remove(child);
-						action = Action.VISIBILITY_LOST;
-					} else if (visible && wasVisibleBefore && (lastSeverity != EventDispatcher.getInstance()
-							.getRating().rateEvent(visibiltyEvent))) {
-						action = Action.VISIBILITY_CHANGED;
-					} else if (!visible) {
-
-					} else {
-
-					}
-					
-					if (action != null) {
-						//						ElementRegion elementRegion = RegionHelper.getElementRegion(editor, child);
-//						ElementVisibiltyEvent visibiltyEvent = new ElementVisibiltyEvent(
-//								action, element, visible, foldingListener.isCollapsed(element), elementRegion, null);
-						JavaInteraction interaction = new JavaInteraction(
-								action, child, EventDispatcher.getInstance()
-										.getRating().rateEvent(visibiltyEvent),
-								new Date(), null, origin);
-						interacList.add(interaction);
+					// ignore imports and class, since the opened class is always visible 
+					if (child instanceof IMember && !(child.getParent() instanceof CompilationUnit)) {
+						ISourceReference ref = (ISourceReference) child;
+						// is this element visible?
+						boolean visible = ref.getSourceRange().getOffset()
+								+ ref.getSourceRange().getLength() >= topOffset
+								&& ref.getSourceRange().getOffset() <= bottomOffset;
+						elementsInEditor.get(visible).add(child);
+						}
+				}
+				int numberOfElementsVisible = elementsInEditor.get(true).size();
+System.err.println("#elementsVisible: " + numberOfElementsVisible);
+System.err.println(elementsInEditor.get(true));
+				for (Boolean visible : elementsInEditor.keySet()) {
+					for (IJavaElement child : elementsInEditor.get(visible)) {
+						
+						boolean wasVisibleBefore = visibleElements.contains(child);
+						double lastSeverity = InteractionRepository.getInstance().getLastScore(child);
+						Action action = null;
+						
+						ElementRegion elementRegion = RegionHelper.getElementRegion(editor, child);
+						ElementVisibiltyEvent visibiltyEvent = new ElementVisibiltyEvent(
+								action, element, visible, foldingListener.isCollapsed(element), elementRegion, numberOfElementsVisible, null);
+						
+						if (visible && !wasVisibleBefore) {
+							visibleElements.add(child);
+							action = Action.VISIBILITY_GAINED;
+						} else if (!visible && wasVisibleBefore) {
+							visibleElements.remove(child);
+							action = Action.VISIBILITY_LOST;
+						} else if (visible && wasVisibleBefore && (lastSeverity != EventDispatcher.getInstance()
+								.getRating().rateEvent(visibiltyEvent))) {
+							action = Action.VISIBILITY_CHANGED;
+						} else if (!visible) {
+	
+						} else {
+	
+						}
+						visibiltyEvent.setAction(action);
+						
+						if (action != null) {
+							//						ElementRegion elementRegion = RegionHelper.getElementRegion(editor, child);
+	//						ElementVisibiltyEvent visibiltyEvent = new ElementVisibiltyEvent(
+	//								action, element, visible, foldingListener.isCollapsed(element), elementRegion, null);
+							
+							JavaInteraction interaction = new JavaInteraction(
+									action, child, EventDispatcher.getInstance()
+											.getRating().rateEvent(visibiltyEvent),
+									new Date(), null, origin);
+							interacList.add(interaction);
+						}
 					}
 
 				}
+				
 				EventDispatcher.getInstance().notifyInteractionObserved(interacList);
 			}
 
@@ -284,15 +306,17 @@ public class JavaEditorMonitor implements /* ISelectionChangedListener, */
 		
 		@Override
 		public void run() {
-			ICompilationUnit unit= 
-				 (ICompilationUnit)EditorUtility.getEditorInputJavaElement(editor, false);
-			
-			try {
-//				System.err.println("tc offset: " + textChangedOffset + " - " + unit.getElementAt(textChangedOffset));
-				JavaInteraction interaction = new JavaInteraction(Action.TEXT_CHANGED, unit.getElementAt(textChangedOffset), 1d, origin);
-				EventDispatcher.getInstance().notifyInteractionObserved(interaction);
-			} catch (JavaModelException e) {
-				e.printStackTrace();
+			// editor could have been closed in the meanwhile
+			if(editor != null) {
+				ICompilationUnit unit= 
+					 (ICompilationUnit)EditorUtility.getEditorInputJavaElement(editor, false);
+				try {
+	//				System.err.println("tc offset: " + textChangedOffset + " - " + unit.getElementAt(textChangedOffset));
+					JavaInteraction interaction = new JavaInteraction(Action.TEXT_CHANGED, unit.getElementAt(textChangedOffset), 1d, origin);
+					EventDispatcher.getInstance().notifyInteractionObserved(interaction);
+				} catch (JavaModelException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 		
@@ -348,15 +372,28 @@ public class JavaEditorMonitor implements /* ISelectionChangedListener, */
 	}
 
 	public void mouseMove(MouseEvent aE) {
-		Point point = new Point(aE.x, aE.y);
-		int offset = editor.getViewer().getTextWidget().getOffsetAtLocation(point);
-		try {
-//			System.err.println("mouseMove: " + point + " - " + offset + " element: " + getElementAtOffset(offset).getElementName());
-			System.err.println("mouseMove: " + getElementAtOffset(offset).getElementName());
-		} catch (JavaModelException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		Point point = new Point(aE.x, aE.y);
+////		Rectangle rect = layout.getLineBounds(layout.getLineIndex(offsetInLine));
+//
+//		int lineIndex = editor.getViewer().getTextWidget().getLineIndex(point.y);
+//		editor.get
+//		
+//		
+////		Rectangle rect = editor.getViewer().getTextWidget(). // getTextBounds(). getBounds(); // layout.getLineIndex(offsetInLine));
+////		if (!rect.contains(point)) {
+////			System.err.println("PPPPPPPPPPPPPPPPPP");
+////		}
+//		
+//		int offset = editor.getViewer().getTextWidget().getOffsetAtLocation(point);
+//		try {
+////			System.err.println("mouseMove: " + point + " - " + offset + " element: " + getElementAtOffset(offset).getElementName());
+//			System.err.println("mouseMove: " + getElementAtOffset(offset).getElementName());
+//		} catch (Throwable e) {
+//			// is thrown if the mousemove event occured outside of java element, do nothing in this case
+////		} catch (JavaModelException e) {
+////			// TODO Auto-generated catch block
+////			e.printStackTrace();
+//		}
 	}
 
 	public IJavaElement getElementAtOffset(int aOffset) throws JavaModelException {

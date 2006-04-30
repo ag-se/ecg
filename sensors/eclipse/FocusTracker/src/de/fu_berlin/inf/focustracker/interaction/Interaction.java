@@ -1,7 +1,5 @@
 package de.fu_berlin.inf.focustracker.interaction;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public abstract class Interaction {

@@ -7,7 +7,6 @@ import org.eclipse.jdt.internal.ui.javaeditor.JavaEditor;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.views.contentoutline.ContentOutline;
 
@@ -22,36 +21,8 @@ public class OutlineMonitor implements ISelectionChangedListener, IFocusTrackerM
 	JavaEditor editor;
 	private ContentOutline part;
 	protected StructuredSelection currentSelection = null;
-	private Tree tree;
+//	private Tree tree;
 	
-//	public JavaEditorMonitor() {
-//		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-//		// update editors that are already opened
-//		if (PlatformUI.getWorkbench().getActiveWorkbenchWindow() != null) {
-//			if (page != null) {
-//				IEditorReference[] references = page.getEditorReferences();
-//				for (int i = 0; i < references.length; i++) {
-//					IEditorPart part = references[i].getEditor(false);
-//					if (part != null && part instanceof JavaEditor) {
-//						System.err.println("JavaEditor found !");
-//						JavaEditor editor = (JavaEditor) part;
-//						editor.getSelectionProvider().addSelectionChangedListener(this);
-//						System.err.println("docProvider: " + ((CompilationUnitDocumentProvider)editor.getDocumentProvider()));
-//						editor.getViewer().addViewportListener(this);
-//						editor.getViewer().addTextListener(this);
-//						
-////						editor.getSite().getWorkbenchWindow(). getShell().addMouseMoveListener(this);
-//						
-////						editor.getDocumentProvider().
-////						editorTracker.registerEditor(editor);
-////						ActiveFoldingListener.resetProjection(editor);
-//						
-//					}
-//				}
-//			}
-//		}		
-//	}
-
 	public synchronized void selectionChanged(SelectionChangedEvent aEvent) {
 
 		try {
@@ -82,23 +53,6 @@ public class OutlineMonitor implements ISelectionChangedListener, IFocusTrackerM
 		
 	}
 
-//	private List<IJavaElement> findNeighbours(IJavaElement aJavaElement) throws JavaModelException {
-//		List<IJavaElement> elements = Arrays.asList(((JavaElement)aJavaElement.getParent()).getChildren());
-//		List<IJavaElement> neighbours = new ArrayList<IJavaElement>();
-//		
-//		int elementIndex = elements.indexOf(aJavaElement);  
-//		if(elementIndex > 0) {
-//			neighbours.add(elements.get(elementIndex - 1));
-//		}
-//		if(elementIndex < elements.size() - 1) {
-//			neighbours.add(elements.get(elementIndex + 1));
-//		}
-////		System.err.println("neighbours of: " + aJavaElement + " - " + neighbours.toString());
-////		new Exception().printStackTrace();
-//		return neighbours;
-//		
-//	}
-	
 	public void deregisterFromPart() {
 		part.removeSelectionChangedListener(this);
 	}
@@ -107,11 +61,10 @@ public class OutlineMonitor implements ISelectionChangedListener, IFocusTrackerM
 		if (aPart instanceof ContentOutline) {
 			part = (ContentOutline)aPart;
 			part.addSelectionChangedListener(this);
-			System.err.println(part.getCurrentPage().getControl());
-			if(part.getCurrentPage().getControl() instanceof Tree) {
-				tree = (Tree)part.getCurrentPage().getControl();
-//				System.err.println(tree.getParent());
-			}
+//			System.err.println(part.getCurrentPage().getControl());
+//			if(part.getCurrentPage().getControl() instanceof Tree) {
+//				tree = (Tree)part.getCurrentPage().getControl();
+//			}
 //			part.getCurrentPage().getControl().addMouseMoveListener(new KeyAndMouseListener());
 		} else {
 			throw new IllegalArgumentException("Wrong type of part : " + aPart.getClass());

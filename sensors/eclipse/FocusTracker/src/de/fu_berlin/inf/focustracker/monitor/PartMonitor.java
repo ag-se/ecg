@@ -10,8 +10,6 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 
-import de.fu_berlin.inf.focustracker.monitor.listener.KeyAndMouseListener;
-
 
 public class PartMonitor implements IPartListener {
 
@@ -83,7 +81,7 @@ public class PartMonitor implements IPartListener {
 			IFocusTrackerMonitor monitor = registeredMonitorClasses.get(aPart.getClass()).newInstance();
 			monitorInstances.put(aPart, monitor);
 			monitor.registerPart(aPart);
-			System.err.println("instance created for : " + aPart);
+			System.err.println("partmonitor instance created for : " + aPart);
 		} catch (InstantiationException e) {
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {

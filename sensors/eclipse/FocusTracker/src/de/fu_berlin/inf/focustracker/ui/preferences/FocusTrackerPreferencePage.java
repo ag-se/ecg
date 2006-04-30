@@ -1,8 +1,10 @@
 package de.fu_berlin.inf.focustracker.ui.preferences;
 
-import org.eclipse.jface.preference.*;
-import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.eclipse.jface.preference.FieldEditorPreferencePage;
+import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPreferencePage;
+
 import de.fu_berlin.inf.focustracker.FocusTrackerPlugin;
 
 /**
@@ -26,7 +28,7 @@ public class FocusTrackerPreferencePage
 	public FocusTrackerPreferencePage() {
 		super(GRID);
 		setPreferenceStore(FocusTrackerPlugin.getDefault().getPreferenceStore());
-		setDescription("A demonstration of a preference page implementation");
+		setDescription("FocusTracker Preferences");
 	}
 	
 	/**
@@ -36,26 +38,12 @@ public class FocusTrackerPreferencePage
 	 * restore itself.
 	 */
 	public void createFieldEditors() {
-		addField(new DirectoryFieldEditor(PreferenceConstants.P_PATH, 
-				"&Directory preference:", getFieldEditorParent()));
-		addField(
-			new BooleanFieldEditor(
-				PreferenceConstants.P_BOOLEAN,
-				"&An example of a boolean preference",
-				getFieldEditorParent()));
-
-		addField(new RadioGroupFieldEditor(
-				PreferenceConstants.P_CHOICE,
-			"An example of a multiple-choice preference",
-			1,
-			new String[][] { { "&Choice 1", "choice1" }, {
-				"C&hoice 2", "choice2" }
-		}, getFieldEditorParent()));
-		addField(
-			new StringFieldEditor(PreferenceConstants.P_STRING, "A &text preference:", getFieldEditorParent()));
+		addField(new IntegerFieldEditor(PreferenceConstants.P_ECG_EXPORT_INTERVAL, "ECG Export &Interval in seconds", getFieldEditorParent()));
+		addField(new ProbabilityFieldEditor(PreferenceConstants.P_ECG_EXPORT_MIN_PROBABILITY_FOR_APPEARANCE, "ECG Export mininum &probability where elements should be considered as visible", getFieldEditorParent()));
+		addField(new ProbabilityFieldEditor(PreferenceConstants.P_ECG_EXPORT_MIN_PROBABILITY_FOR_DISAPPEARANCE, "ECG Export &probability where already exported elements should be considered as invisible", getFieldEditorParent()));
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
 	 */
 	public void init(IWorkbench workbench) {

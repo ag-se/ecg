@@ -22,14 +22,14 @@ import de.fu_berlin.inf.focustracker.interaction.InteractionListener;
 import de.fu_berlin.inf.focustracker.interaction.JavaInteraction;
 import de.fu_berlin.inf.focustracker.jobs.ActivityMonitorJob;
 import de.fu_berlin.inf.focustracker.jobs.ECGExportJob;
+import de.fu_berlin.inf.focustracker.jobs.InteractionGCJob;
 import de.fu_berlin.inf.focustracker.monitor.JavaEditorMonitor;
 import de.fu_berlin.inf.focustracker.monitor.OutlineMonitor;
 import de.fu_berlin.inf.focustracker.monitor.PackageExplorerExpansionMonitor;
 import de.fu_berlin.inf.focustracker.monitor.PartMonitor;
 import de.fu_berlin.inf.focustracker.monitor.SelectionMonitor;
-import de.fu_berlin.inf.focustracker.monitor.SystemMonitor;
-import de.fu_berlin.inf.focustracker.monitor.WindowMonitor;
-import de.fu_berlin.inf.focustracker.monitor.listener.KeyAndMouseListener;
+import de.fu_berlin.inf.focustracker.monitor.SystemActivityMonitor;
+import de.fu_berlin.inf.focustracker.monitor.WindowStateMonitor;
 import de.fu_berlin.inf.focustracker.rating.Rating;
 import de.fu_berlin.inf.focustracker.repository.InteractionRepository;
 
@@ -42,9 +42,11 @@ public class EventDispatcher {
 	private InteractionRepository interactionRepository;
 	private Rating rating;
 	private PartMonitor partMonitor;
-	private SystemMonitor systemMonitor;
+	private SystemActivityMonitor systemMonitor;
 	private ActivityMonitorJob activityMonitorJob;
 	private ECGExportJob ecgExportJob;
+	private WindowStateMonitor windowStateMonitor;
+	private InteractionGCJob interactionGCJob;
 	
 	private EventDispatcher() {
 		try {
@@ -84,23 +86,22 @@ public class EventDispatcher {
 			}
 		}
 		
-		PlatformUI.getWorkbench().addWindowListener(new WindowMonitor());
-		systemMonitor = new SystemMonitor();
+		windowStateMonitor = new WindowStateMonitor();
+		PlatformUI.getWorkbench().addWindowListener(windowStateMonitor);
+		systemMonitor = new SystemActivityMonitor();
 		Display.getDefault().addFilter(SWT.MouseMove, systemMonitor);
 		Display.getDefault().addFilter(SWT.KeyDown, systemMonitor);
 		
 		
-//		PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell().addKeyListener(new KeyAndMouseListener());
-//		PlatformUI.getWorkbench().getDisplay().addListener(SWT.MouseMove, new TypedListener(this));
-//		PlatformUI.getWorkbench().getDisplay().addListener(SWT.KeyDown, new KeyAndMouseListener());
-
 		// jobs :
 		activityMonitorJob = new ActivityMonitorJob();
-		activityMonitorJob.schedule();
-		
 		ecgExportJob = new ECGExportJob();
-		ecgExportJob.schedule();
 		
+		activityMonitorJob.schedule(ActivityMonitorJob.INACTIVITY_DELAY);
+		ecgExportJob.schedule(ECGExportJob.getExportInterval());
+		
+		interactionGCJob = new InteractionGCJob();
+		interactionGCJob.schedule(InteractionGCJob.DELAY);
 		
 		service.addPostSelectionListener(new SelectionMonitor());
 
@@ -156,7 +157,7 @@ public class EventDispatcher {
 		return partMonitor;
 	}
 
-	public SystemMonitor getSystemMonitor() {
+	public SystemActivityMonitor getSystemMonitor() {
 		return systemMonitor;
 	}
 	
@@ -165,6 +166,7 @@ public class EventDispatcher {
 		// TODO deregister all jobs and listeners
 		activityMonitorJob.cancel();
 		ecgExportJob.cancel();
+		interactionGCJob.cancel();
 	}
 	
 }

@@ -4,10 +4,8 @@ import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 
-import de.fu_berlin.inf.focustracker.beaninfo.JavaInteractionBeanInfo;
-import de.fu_berlin.inf.focustracker.interaction.JavaInteraction;
-
 import junit.framework.TestCase;
+import de.fu_berlin.inf.focustracker.interaction.JavaInteraction;
 
 
 public class TestBeanInfoRetrieval extends TestCase {

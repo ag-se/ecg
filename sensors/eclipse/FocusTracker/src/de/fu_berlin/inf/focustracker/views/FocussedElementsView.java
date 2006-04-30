@@ -26,7 +26,7 @@ public class FocussedElementsView extends BeanView {
 //		refreshJob = new RefreshViewsJob(this);
 		getViewer().setSorter(
 				new ViewerSorter() {
-					Comparator comparator = new Comparator<Element>() {
+					Comparator<Element> comparator = new Comparator<Element>() {
 						public int compare(Element aO1, Element aO2) {
 							if (aO1 != null && aO2 != null) {
 								if (aO1.getRating() >= aO2.getRating()) {
@@ -42,7 +42,7 @@ public class FocussedElementsView extends BeanView {
 					
 					@Override
 					public int compare(Viewer viewer, Object e1, Object e2) {
-						return comparator.compare(e1, e2);
+						return comparator.compare((Element)e1, (Element)e2);
 					}
 				}
 			);

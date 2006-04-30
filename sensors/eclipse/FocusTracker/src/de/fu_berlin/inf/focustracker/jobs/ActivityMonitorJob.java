@@ -10,10 +10,10 @@ import de.fu_berlin.inf.focustracker.EventDispatcher;
 
 public class ActivityMonitorJob extends Job {
 
-	private static final long INACTIVITY_DELAY = 5000;
+	public static final long INACTIVITY_DELAY = 5000;
 	private static final int DELAY = 1000;
-	private static final int DELAY_NOP = 5000;
-	private static final int DELAY_LOSING_FOCUS = 5000;
+//	private static final int DELAY_NOP = 5000;
+//	private static final int DELAY_LOSING_FOCUS = 5000;
 	
 	private long inactivityDetectedTimestamp = 0;
 	private boolean currentlyInactive = false;
@@ -28,7 +28,7 @@ public class ActivityMonitorJob extends Job {
 	protected IStatus run(IProgressMonitor aMonitor) {
 		
 //		System.out.println("checking for a timeout... ");
-		long currentTime = System.currentTimeMillis();
+//		long currentTime = System.currentTimeMillis();
 //		if(poiList.size() > 0 &&  
 //				poiList.get(poiList.size()-1).getTimeStamp().getTime() < (currentTime - NOP_DELAY) &&
 //				(lastTimeOut == null || lastTimeOut.getNumberOfElements() != poiList.size()) 

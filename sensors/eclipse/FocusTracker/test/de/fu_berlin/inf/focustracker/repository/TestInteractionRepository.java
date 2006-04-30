@@ -8,7 +8,6 @@ import org.eclipse.jdt.internal.core.ResolvedSourceField;
 import de.fu_berlin.inf.focustracker.interaction.Action;
 import de.fu_berlin.inf.focustracker.interaction.JavaInteraction;
 import de.fu_berlin.inf.focustracker.interaction.Origin;
-import de.fu_berlin.inf.focustracker.repository.InteractionRepository;
 
 public class TestInteractionRepository extends TestCase {
 

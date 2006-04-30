@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.focustracker.rating.event;
 
-import de.fu_berlin.inf.focustracker.rating.event.ElementRegion;
 import junit.framework.TestCase;
 
 public class TestElementRegion extends TestCase {

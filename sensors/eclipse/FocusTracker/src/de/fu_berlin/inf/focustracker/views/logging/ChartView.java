@@ -30,7 +30,6 @@ import de.fu_berlin.inf.focustracker.EventDispatcher;
 import de.fu_berlin.inf.focustracker.interaction.Interaction;
 import de.fu_berlin.inf.focustracker.interaction.InteractionListener;
 import de.fu_berlin.inf.focustracker.interaction.JavaInteraction;
-import de.fu_berlin.inf.focustracker.repository.InteractionRepository;
 import de.fu_berlin.inf.focustracker.resources.FocusTrackerResources;
 
 

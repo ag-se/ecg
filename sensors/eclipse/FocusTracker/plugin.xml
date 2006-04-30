@@ -44,15 +44,6 @@
          point="org.eclipse.ui.startup">
    </extension>
    <extension
-         point="org.eclipse.ui.editors">
-      <editor
-            class="de.fu_berlin.inf.focustracker.report.ReportEditorPart"
-            default="false"
-            icon="icons/monitor.gif"
-            id="de.fu_berlin.inf.focustracker.report.ReportEditorPart"
-            name="Report"/>
-   </extension>
-   <extension
          point="org.eclipse.ui.menus">
       <item
             commandId="FocusTracker.item1"
@@ -80,8 +71,8 @@
          point="org.eclipse.ui.preferencePages">
       <page
             class="de.fu_berlin.inf.focustracker.ui.preferences.FocusTrackerPreferencePage"
-            id="de.fu_berlin.inf.focustracker.ui.preferences.SamplePreferencePage"
-            name="FocusTracker Preferences"/>
+            id="de.fu_berlin.inf.focustracker.ui.preferences.FocusTrackerPreferencePage"
+            name="FocusTracker"/>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">

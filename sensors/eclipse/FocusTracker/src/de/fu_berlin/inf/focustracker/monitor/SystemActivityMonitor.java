@@ -3,7 +3,7 @@ package de.fu_berlin.inf.focustracker.monitor;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
-public class SystemMonitor implements Listener {
+public class SystemActivityMonitor implements Listener {
 
 	
 	private long lastActivityTimestamp = 0;

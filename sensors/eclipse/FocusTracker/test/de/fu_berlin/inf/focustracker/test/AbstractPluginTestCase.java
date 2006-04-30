@@ -4,6 +4,7 @@ import junit.framework.TestCase;
 
 import org.eclipse.jdt.internal.ui.JavaPlugin;
 
+import de.fu_berlin.inf.focustracker.EventDispatcher;
 import de.fu_berlin.inf.focustracker.FocusTrackerPlugin;
 
 public abstract class AbstractPluginTestCase extends TestCase {
@@ -13,6 +14,7 @@ public abstract class AbstractPluginTestCase extends TestCase {
 		super.setUp();
 		assertNotNull(JavaPlugin.getDefault());
 		assertNotNull(FocusTrackerPlugin.getDefault());
+		assertNotNull(EventDispatcher.getInstance());
 	}
 	
 }

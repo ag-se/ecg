@@ -71,11 +71,11 @@
         	if(event.isVisible()) {
 				double percentageVisible = event.getElementRegion().getPercentageVisible();
 	        	if(percentageVisible >= 0.9d) {
-	        		p = 1d;
+	        		p = 0.25d;
 	        	} else if (percentageVisible >= 0.5d) {
-	        			p = 0.75d;
+	        			p = 0.2d;
 	        	} else {
-	        			p = 0.25d;
+	        			p = 0.1d;
 	        	}
         	}
             drools.assertObject(new Double(p));
