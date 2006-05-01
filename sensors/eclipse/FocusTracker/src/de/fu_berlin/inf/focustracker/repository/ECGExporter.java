@@ -8,6 +8,7 @@ import java.util.Set;
 import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.core.runtime.Preferences.PropertyChangeEvent;
 import org.eclipse.jdt.core.IJavaElement;
+import org.electrocodeogram.sensor.eclipse.ECGEclipseSensor;
 
 import de.fu_berlin.inf.focustracker.FocusTrackerPlugin;
 import de.fu_berlin.inf.focustracker.interaction.JavaElementToStringBuilder;
@@ -53,9 +54,9 @@ public class ECGExporter implements IPropertyChangeListener {
 		
 		System.err.println(data);
 		
-//		ECGEclipseSensor.getInstance().processActivity(
-//        "msdt.focustracker.xsd",
-//        data);
+		ECGEclipseSensor.getInstance().processActivity(
+				"msdt.focustracker.xsd",
+				data);
 	}
 	
 	public void exportSystemInteraction(SystemInteraction aSystemInteraction) {
@@ -72,9 +73,10 @@ public class ECGExporter implements IPropertyChangeListener {
 		
 		System.err.println(data);
 		aSystemInteraction.setExported(true);
-//		ECGEclipseSensor.getInstance().processActivity(
-//        "msdt.focustracker.xsd",
-//        data);
+		
+		ECGEclipseSensor.getInstance().processActivity(
+				"msdt.focustracker.xsd",
+				data);
 	}
 	
 	
