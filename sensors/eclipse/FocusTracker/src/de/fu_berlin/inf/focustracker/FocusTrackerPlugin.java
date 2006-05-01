@@ -12,6 +12,8 @@ import org.osgi.framework.BundleContext;
  */
 public class FocusTrackerPlugin extends AbstractUIPlugin implements IStartup {
 
+	public static final String ID = "de.fu_berlin.inf.focustracker";
+	
 	//The shared instance.
 	private static FocusTrackerPlugin plugin;
 	

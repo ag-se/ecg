@@ -5,9 +5,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.drools.IntegrationException;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.internal.ui.javaeditor.ClassFileEditor;
 import org.eclipse.jdt.internal.ui.javaeditor.CompilationUnitEditor;
 import org.eclipse.jdt.internal.ui.packageview.PackageExplorerPart;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.ISelectionService;
@@ -19,7 +22,6 @@ import org.xml.sax.SAXException;
 
 import de.fu_berlin.inf.focustracker.interaction.Interaction;
 import de.fu_berlin.inf.focustracker.interaction.InteractionListener;
-import de.fu_berlin.inf.focustracker.interaction.JavaInteraction;
 import de.fu_berlin.inf.focustracker.jobs.ActivityMonitorJob;
 import de.fu_berlin.inf.focustracker.jobs.ECGExportJob;
 import de.fu_berlin.inf.focustracker.jobs.InteractionGCJob;
@@ -66,6 +68,7 @@ public class EventDispatcher {
 	private void init() throws IntegrationException, SAXException, IOException {
 		
 		boolean partMonitorAdded = false;
+		int numberOfRetries = 5;
 		
 		// monitors : 
 		partMonitor = new PartMonitor();
@@ -85,9 +88,18 @@ public class EventDispatcher {
 			}
 		}
 		
+		// this is ugly, but sometimes the listeners won't be added
 		if(!partMonitorAdded) {
 			System.err.println("partmonitor not yet added, trying again");
 			init();
+			if(numberOfRetries == 0) {
+				String message = "Unable to register listeners! Please restart the plugin.";
+				ErrorDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), 
+						"Unable to start.",
+						message,
+						new Status(IStatus.ERROR, FocusTrackerPlugin.ID, 0, message, new Exception())); 
+			}
+			numberOfRetries--;
 		}
 		
 		interactionRepository = InteractionRepository.getInstance();

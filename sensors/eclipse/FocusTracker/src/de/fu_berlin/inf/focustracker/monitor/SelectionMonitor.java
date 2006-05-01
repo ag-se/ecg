@@ -10,7 +10,6 @@ import org.eclipse.jdt.internal.ui.actions.SelectionConverter;
 import org.eclipse.jdt.internal.ui.javaeditor.JavaEditor;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.ITextSelection;
-import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.ui.ISelectionListener;
@@ -47,7 +46,7 @@ public class SelectionMonitor implements ISelectionListener {
 	//			JavaInteraction interaction = new JavaInteraction(Action.SELECTED, javaElement, EventDispatcher.getInstance().getRating().rateEvent(editorSelectionEvent), new Date(), null, Origin.JAVAEDITOR);
 	//			EventDispatcher.getInstance().notifyInteractionObserved(interaction);
 	//
-				System.err.println("console: " + ((TextSelection)aSelection).getText());
+//				System.err.println("console: " + ((TextSelection)aSelection).getText());
 			}
 			
 			if(aSelection instanceof StructuredSelection) {
@@ -61,11 +60,11 @@ public class SelectionMonitor implements ISelectionListener {
 					EventDispatcher.getInstance().notifyInteractionObserved(javaInteraction);
 					oldSelection = javaElement;
 					
-					System.err.println(javaElement.getElementName() + " in " + javaElement.getPath());
+//					System.err.println(javaElement.getElementName() + " in " + javaElement.getPath());
 					
 				}				
 			} else {
-				System.err.println("selectionChanged in " + aPart + " selection: " + aSelection);
+//				System.err.println("selectionChanged in " + aPart + " selection: " + aSelection);
 			}
 		}
 		
