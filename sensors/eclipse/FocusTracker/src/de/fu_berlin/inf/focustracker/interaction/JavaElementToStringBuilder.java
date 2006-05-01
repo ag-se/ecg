@@ -17,10 +17,6 @@ public class JavaElementToStringBuilder {
 		try {
 			if (aJavaElement instanceof SourceMethod) {
 				SourceMethod method = (SourceMethod) aJavaElement;
-	//			ret += method.get 
-//				ret.append(method.getElementName())
-				
-				
 				ret.append(method.getElementName());
 				ret.append("(");
 				addParameters(ret, method.getParameterTypes());

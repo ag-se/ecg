@@ -65,9 +65,7 @@ public class EventDispatcher {
 	
 	private void init() throws IntegrationException, SAXException, IOException {
 		
-		interactionRepository = InteractionRepository.getInstance();
-		rating = new Rating();
-		ISelectionService service = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getSelectionService();
+		boolean partMonitorAdded = false;
 		
 		// monitors : 
 		partMonitor = new PartMonitor();
@@ -82,9 +80,19 @@ public class EventDispatcher {
 		for (IWorkbenchWindow window : windows) {
 			for (IWorkbenchPage page : window.getPages()) {
 				page.addPartListener(partMonitor);
+				partMonitorAdded = true;
 				System.err.println("partmonitor added to " + page );
 			}
 		}
+		
+		if(!partMonitorAdded) {
+			System.err.println("partmonitor not yet added, trying again");
+			init();
+		}
+		
+		interactionRepository = InteractionRepository.getInstance();
+		rating = new Rating();
+		ISelectionService service = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getSelectionService();
 		
 		windowStateMonitor = new WindowStateMonitor();
 		PlatformUI.getWorkbench().addWindowListener(windowStateMonitor);
@@ -97,7 +105,7 @@ public class EventDispatcher {
 		activityMonitorJob = new ActivityMonitorJob();
 		ecgExportJob = new ECGExportJob();
 		
-		activityMonitorJob.schedule(ActivityMonitorJob.INACTIVITY_DELAY);
+		activityMonitorJob.schedule(ActivityMonitorJob.getInactivityDetectionTimeout());
 		ecgExportJob.schedule(ECGExportJob.getExportInterval());
 		
 		interactionGCJob = new InteractionGCJob();
@@ -135,9 +143,10 @@ public class EventDispatcher {
 
 	public void notifyInteractionObserved(List<? extends Interaction> aInteractions) {
 		for (Interaction interaction : aInteractions) {
-			if(interaction instanceof JavaInteraction) {
-				interactionRepository.add((JavaInteraction)interaction);
-			}
+//			if(interaction instanceof JavaInteraction) {
+//				interactionRepository.add((JavaInteraction)interaction);
+//			}
+			interactionRepository.add(interaction);
 		}
 		notifyInteractionListeners(aInteractions);
 	}

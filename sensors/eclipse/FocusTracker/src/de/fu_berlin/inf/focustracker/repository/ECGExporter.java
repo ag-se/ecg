@@ -10,6 +10,8 @@ import org.eclipse.core.runtime.Preferences.PropertyChangeEvent;
 import org.eclipse.jdt.core.IJavaElement;
 
 import de.fu_berlin.inf.focustracker.FocusTrackerPlugin;
+import de.fu_berlin.inf.focustracker.interaction.JavaElementToStringBuilder;
+import de.fu_berlin.inf.focustracker.interaction.SystemInteraction;
 import de.fu_berlin.inf.focustracker.ui.preferences.PreferenceConstants;
 
 public class ECGExporter implements IPropertyChangeListener {
@@ -30,6 +32,8 @@ public class ECGExporter implements IPropertyChangeListener {
         minProbabilityForDisapperance = getMinProbabilityForDisapperance();
         interactionRepository = InteractionRepository.getInstance();
         currentlyExportedElements = new HashSet<IJavaElement>();
+		// listen to changes of the preferences
+		FocusTrackerPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(this);
 	}
 	
 	
@@ -40,7 +44,7 @@ public class ECGExporter implements IPropertyChangeListener {
 			+ "</username><projectname>"
 			+ aJavaElement.getJavaProject().getProject().getName()		            
 			+ "</projectname></commonData><focustracker><element>" 
-			+ aJavaElement.getElementName()
+			+ JavaElementToStringBuilder.toString(aJavaElement)
 			+ "</element><focus>" 
 			+ aIsInFocus
 			+ "</focus>" 
@@ -54,9 +58,30 @@ public class ECGExporter implements IPropertyChangeListener {
 //        data);
 	}
 	
+	public void exportSystemInteraction(SystemInteraction aSystemInteraction) {
+		
+		String data = "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+			+ this.username
+			+ "</username></commonData><focustracker><system><origin>" 
+			+ aSystemInteraction.getOrigin()
+			+ "</origin><action>" 
+			+ aSystemInteraction.getAction()
+			+ "</action><timestamp>"
+			+ aSystemInteraction.getDate().getTime()
+			+ "</timestamp></system></focustracker></microActivity>";
+		
+		System.err.println(data);
+		aSystemInteraction.setExported(true);
+//		ECGEclipseSensor.getInstance().processActivity(
+//        "msdt.focustracker.xsd",
+//        data);
+	}
+	
+	
+	
 	public void exportCurrentInteractions() {
 
-		System.err.println("ECG Export: -----------------------");
+		// export java interactions :
 		List<Element> focussedElementsToExport = new ArrayList<Element>();
 		for (Element element : interactionRepository.getElements().values()) {
 			if(element.getRating() >= minProbabilityForApperance || (element.getRating() > minProbabilityForDisapperance && currentlyExportedElements.contains(element.getJavaElement())) ) {
@@ -73,6 +98,14 @@ public class ECGExporter implements IPropertyChangeListener {
 		for (Element element : focussedElementsToExport) {
 			export(element.getJavaElement(), normalizeRating(element.getRating(), focussedElementsToExport.size()), true);
 		}
+		
+		// export system interactions 
+		
+		for (SystemInteraction interaction : interactionRepository.getSystemInteractions()) {
+			if(!interaction.isExported()) {
+				exportSystemInteraction(interaction);
+			}
+		} 
 		
 	}
 

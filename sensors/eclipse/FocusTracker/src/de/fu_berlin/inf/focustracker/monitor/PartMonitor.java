@@ -3,6 +3,7 @@ package de.fu_berlin.inf.focustracker.monitor;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IViewReference;
@@ -16,6 +17,7 @@ public class PartMonitor implements IPartListener {
 	private Map<Class<? extends IWorkbenchPart>, Class<? extends IFocusTrackerMonitor>> registeredMonitorClasses = new HashMap<Class<? extends IWorkbenchPart>, Class<? extends IFocusTrackerMonitor>>(); 
 	private Map<IWorkbenchPart, IFocusTrackerMonitor> monitorInstances = new HashMap<IWorkbenchPart, IFocusTrackerMonitor>(); 
 
+	private IEditorPart activatedEditor = null; 
 	
 	public void registerMonitor(Class<? extends IFocusTrackerMonitor> aMonitorClass, Class<? extends IWorkbenchPart> aPart) {
 		
@@ -30,8 +32,11 @@ public class PartMonitor implements IPartListener {
 //		List<IWorkbenchPart> alreadyOpenedParts = new ArrayList<IWorkbenchPart>();
 		for (IWorkbenchPage page : pages) {
 			for (IEditorReference ref : page.getEditorReferences()) {
-				IWorkbenchPart part = ref.getEditor(false);
-				createMonitorInstance(part);
+				IEditorPart part = ref.getEditor(false);
+				if(part != null && part != activatedEditor) {
+					createMonitorInstance(part);
+					activatedEditor = part;
+				}
 			}
 			for (IViewReference ref : page.getViewReferences()) {
 				IWorkbenchPart part = ref.getView(false);
@@ -41,6 +46,15 @@ public class PartMonitor implements IPartListener {
 	}
 	
 	public void partActivated(IWorkbenchPart aPart) {
+//		System.err.println("part activated");
+		// only one editor instance can be visible at one time
+		if(aPart instanceof IEditorPart) {
+			if(activatedEditor != null && activatedEditor != aPart) {
+//				System.err.println("----#### sending closed to : " + activatedEditor.getTitle() + " opened " + aPart.getTitle());
+				monitorInstances.get(activatedEditor).partClosed();
+			}
+			activatedEditor = (IEditorPart)aPart;
+		}
 		IFocusTrackerMonitor monitor = monitorInstances.get(aPart);
 		if(monitorInstances.get(aPart) != null) {
 			monitor.partActivated();
@@ -48,13 +62,15 @@ public class PartMonitor implements IPartListener {
 	}
 
 	public void partBroughtToTop(IWorkbenchPart aPart) {
+//		System.err.println("partBroughtToTop " + aPart);
+//		partActivated(aPart);
 	}
 
 	public void partDeactivated(IWorkbenchPart aPart) {
-		IFocusTrackerMonitor monitor = monitorInstances.get(aPart);
-		if(monitorInstances.get(aPart) != null) {
-			monitor.partDeactivated();
-		}
+//		IFocusTrackerMonitor monitor = monitorInstances.get(aPart);
+//		if(monitorInstances.get(aPart) != null) {
+//			monitor.partDeactivated();
+//		}
 	}
 	
 	public void partClosed(IWorkbenchPart aPart) {

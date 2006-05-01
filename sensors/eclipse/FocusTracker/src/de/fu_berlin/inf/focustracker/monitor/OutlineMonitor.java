@@ -26,7 +26,7 @@ public class OutlineMonitor extends AbstractFocusTrackerMonitor implements ISele
 	public synchronized void selectionChanged(SelectionChangedEvent aEvent) {
 
 		try {
-			System.err.println("outline: " + aEvent.getSource());
+//			System.err.println("outline: " + aEvent.getSource());
 //			IJavaElement selectedElement = null;
 			if (aEvent.getSelection() instanceof StructuredSelection) {
 				StructuredSelection structuredSelection = (StructuredSelection) aEvent.getSelection();
@@ -40,7 +40,7 @@ public class OutlineMonitor extends AbstractFocusTrackerMonitor implements ISele
 				Object selectedObject = structuredSelection.getFirstElement();
 				if (selectedObject instanceof IJavaElement) {
 					// rate selection
-					JavaInteraction interaction = new JavaInteraction(Action.SELECTION_CHANGED, (IJavaElement)selectedObject, 1f, new Date(), null, Origin.OUTLINE);
+					JavaInteraction interaction = new JavaInteraction(Action.SELECTION_CHANGED, (IJavaElement)selectedObject, 0.5d, new Date(), null, Origin.OUTLINE);
 					EventDispatcher.getInstance().notifyInteractionObserved(interaction);
 				}
 			}

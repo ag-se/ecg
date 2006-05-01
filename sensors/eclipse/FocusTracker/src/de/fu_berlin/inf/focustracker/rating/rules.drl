@@ -69,13 +69,17 @@
 
         	double p = 0d;
         	if(event.isVisible()) {
-				double percentageVisible = event.getElementRegion().getPercentageVisible();
-	        	if(percentageVisible >= 0.9d) {
-	        		p = 0.25d;
-	        	} else if (percentageVisible >= 0.5d) {
-	        			p = 0.2d;
-	        	} else {
-	        			p = 0.1d;
+        		if(event.getElementRegion().isFillingCompleteView() || event.getNumberOfElementsVisible() == 1) {
+					p = 1d;        		
+        		} else {
+					double percentageVisible = event.getElementRegion().getPercentageVisible();
+		        	if(percentageVisible >= 0.9d) {
+		        		p = 0.25d;
+		        	} else if (percentageVisible >= 0.5d) {
+		        			p = 0.2d;
+		        	} else {
+		        			p = 0.1d;
+		        	}
 	        	}
         	}
             drools.assertObject(new Double(p));
@@ -90,9 +94,9 @@
         <java:condition>true</java:condition>
         <java:consequence><![CDATA[
 
-        	double p = 0d;
+        	double p = 0.1d;
         	if(event.getAction() == de.fu_berlin.inf.focustracker.interaction.Action.FOLDING_EXPANDED) {
-        		p = 1d;
+        		p = 0.5d;
         	}
             drools.assertObject(new Double(p));
             

@@ -13,8 +13,8 @@ public enum Origin {
 		CONSOLE, 
 		OUTLINE, 
 		WINDOW_SYSTEM, 
-		MONITOR_ACTIVIY, 
-		PACKAGE_EXPLORER;
+		PACKAGE_EXPLORER,
+		ACTIVITY_MANAGER;
 		
 		public static Origin getOrigin(IWorkbenchPart aPart) {
 			if (aPart instanceof ContentOutline) {

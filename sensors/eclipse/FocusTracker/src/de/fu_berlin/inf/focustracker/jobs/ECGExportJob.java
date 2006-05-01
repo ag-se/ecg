@@ -14,11 +14,12 @@ import de.fu_berlin.inf.focustracker.util.Units;
 
 public class ECGExportJob extends Job implements IPropertyChangeListener {
 
-	private static long delay = Units.SECOND * FocusTrackerPlugin.getDefault().getPluginPreferences().getInt(PreferenceConstants.P_ECG_EXPORT_INTERVAL);
+	private static long delay = getExportInterval();
 	private static ECGExporter ecgExporter = new ECGExporter();
 	
 	public ECGExportJob() {
 		super("ECG Export");
+		// listen to changes of the preferences
 		FocusTrackerPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(this);
 	}
 
@@ -26,7 +27,6 @@ public class ECGExportJob extends Job implements IPropertyChangeListener {
 	protected IStatus run(IProgressMonitor aMonitor) {
 		
 		try {
-			System.err.println("running: " + getName());
 			ecgExporter.exportCurrentInteractions();
 			schedule(delay);
 			return Status.OK_STATUS;
@@ -38,13 +38,14 @@ public class ECGExportJob extends Job implements IPropertyChangeListener {
 
 	public void propertyChange(PropertyChangeEvent aEvent) {
 		if(PreferenceConstants.P_ECG_EXPORT_INTERVAL.equals(aEvent.getProperty())) {
-			delay = Units.SECOND * getExportInterval();
+			delay = getExportInterval();
+			this.cancel();
 			schedule(delay);
 		}
 	}
 
 	public static long getExportInterval() {
-		return FocusTrackerPlugin.getDefault().getPluginPreferences().getInt(PreferenceConstants.P_ECG_EXPORT_INTERVAL);
+		return Units.SECOND * FocusTrackerPlugin.getDefault().getPluginPreferences().getInt(PreferenceConstants.P_ECG_EXPORT_INTERVAL);
 	}
 	
 }

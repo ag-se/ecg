@@ -4,6 +4,8 @@ import java.util.Date;
 
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.internal.core.CompilationUnit;
+import org.eclipse.jdt.internal.core.SourceType;
 import org.eclipse.jdt.internal.ui.actions.SelectionConverter;
 import org.eclipse.jdt.internal.ui.javaeditor.JavaEditor;
 import org.eclipse.jface.text.BadLocationException;
@@ -76,6 +78,11 @@ public class SelectionMonitor implements ISelectionListener {
 		try {
 			IJavaElement javaElement = SelectionConverter.resolveEnclosingElement(editor, (ITextSelection)aSelection);
 
+			// ignore main classes, since they are handled in a different way!
+			if(javaElement instanceof SourceType && javaElement.getParent() instanceof CompilationUnit) {
+				return;
+			}
+			
 			// rate neighbours
 //			List<IJavaElement> neighbours = findNeighbours(javaElement);
 //			for (IJavaElement neighbourElement : neighbours) {

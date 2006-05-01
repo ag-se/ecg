@@ -5,6 +5,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 
 public class ProbabilityFieldEditor extends StringFieldEditor{
+	
     private double minValidValue = 0;
 
     private double maxValidValue = 1.0d;
@@ -12,13 +13,13 @@ public class ProbabilityFieldEditor extends StringFieldEditor{
     private static final int DEFAULT_TEXT_LIMIT = 10;
 
     /**
-     * Creates a new integer field editor 
+     * Creates a new probability field editor 
      */
     protected ProbabilityFieldEditor() {
     }
 
     /**
-     * Creates an integer field editor.
+     * Creates an probability field editor.
      * 
      * @param name the name of the preference this field editor works on
      * @param labelText the label text of the field editor
@@ -29,7 +30,7 @@ public class ProbabilityFieldEditor extends StringFieldEditor{
     }
 
     /**
-     * Creates an integer field editor.
+     * Creates an probability field editor.
      * 
      * @param name the name of the preference this field editor works on
      * @param labelText the label text of the field editor
@@ -46,19 +47,7 @@ public class ProbabilityFieldEditor extends StringFieldEditor{
     }
 
     /**
-     * Sets the range of valid values for this field.
-     * 
-     * @param min the minimum allowed value (inclusive)
-     * @param max the maximum allowed value (inclusive)
-     */
-    public void setValidRange(int min, int max) {
-        minValidValue = min;
-        maxValidValue = max;
-    }
-
-    /* (non-Javadoc)
-     * Method declared on StringFieldEditor.
-     * Checks whether the entered String is a valid integer or not.
+     * @see org.eclipse.jface.preference.StringFieldEditor#checkState()
      */
     protected boolean checkState() {
 
@@ -86,8 +75,8 @@ public class ProbabilityFieldEditor extends StringFieldEditor{
         return false;
     }
 
-    /* (non-Javadoc)
-     * Method declared on FieldEditor.
+    /**
+     * @see org.eclipse.jface.preference.StringFieldEditor#doLoad()
      */
     protected void doLoad() {
         Text text = getTextControl();
@@ -98,8 +87,8 @@ public class ProbabilityFieldEditor extends StringFieldEditor{
 
     }
 
-    /* (non-Javadoc)
-     * Method declared on FieldEditor.
+    /**
+     * @see org.eclipse.jface.preference.StringFieldEditor#doLoadDefault()
      */
     protected void doLoadDefault() {
         Text text = getTextControl();
@@ -110,8 +99,8 @@ public class ProbabilityFieldEditor extends StringFieldEditor{
         valueChanged();
     }
 
-    /* (non-Javadoc)
-     * Method declared on FieldEditor.
+    /**
+     * @see org.eclipse.jface.preference.StringFieldEditor#doStore()
      */
     protected void doStore() {
         Text text = getTextControl();

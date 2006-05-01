@@ -10,7 +10,6 @@ public class SystemActivityMonitor implements Listener {
 	
 	public void handleEvent(Event aEvent) {
 		
-//		System.err.println(aEvent.data + " - " + aEvent.x + " - " + aEvent.y);
 		lastActivityTimestamp = System.currentTimeMillis();
 	}
 

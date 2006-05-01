@@ -29,6 +29,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
@@ -69,8 +70,8 @@ public abstract class BeanView extends ViewPart implements InteractionListener {
 	private Action deleteAction;
 	private Action pinAction;
 	
-	private Table table = null;
-	private JavaElementImageProvider imageProvider = new JavaElementImageProvider();
+	protected Table table = null;
+	protected JavaElementImageProvider imageProvider = new JavaElementImageProvider();
 	private boolean disposed;
 	private StartWithOffsetFilter startFromFilter;
 	private boolean pinnedOutput; 
@@ -363,10 +364,15 @@ public abstract class BeanView extends ViewPart implements InteractionListener {
 				Display.getDefault().asyncExec(new Runnable() {
 					public void run() {
 						refresh(isLabelUpdate());
+						if(!isPinnedOutput()) {
+							TableItem[] tableItems = getViewer().getTable().getItems();
+							if(tableItems.length>0) {
+								getViewer().getTable().showItem(tableItems[tableItems.length-1]);
+							}
+						}
 					}
 				});
 			}
-			
 		}, REFRESH_INTERVAL);
 		
 	}

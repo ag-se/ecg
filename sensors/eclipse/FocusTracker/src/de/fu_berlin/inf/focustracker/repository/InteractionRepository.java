@@ -9,6 +9,7 @@ import org.eclipse.jdt.core.IJavaElement;
 
 import de.fu_berlin.inf.focustracker.interaction.Interaction;
 import de.fu_berlin.inf.focustracker.interaction.JavaInteraction;
+import de.fu_berlin.inf.focustracker.interaction.SystemInteraction;
 import de.fu_berlin.inf.focustracker.util.Units;
 
 
@@ -19,6 +20,7 @@ public class InteractionRepository {
 	private static InteractionRepository instance;
 //	private HashMap<IJavaElement, List<JavaInteraction>> elements = new HashMap<IJavaElement, List<JavaInteraction>>();
 	private HashMap<IJavaElement, Element> elements = new HashMap<IJavaElement, Element>();
+	private List<SystemInteraction> systemInteractions = new ArrayList<SystemInteraction>();
 	private List<Interaction> allInteractions = new ArrayList<Interaction>();
 	private IJavaElement lastVisitedJavaElement;
 //	private HashSet<Element> javaElements = new HashSet<Element>();
@@ -33,22 +35,21 @@ public class InteractionRepository {
 	}
 	
 	
-	public boolean add(Interaction aInteraction) {
+	public void add(Interaction aInteraction) {
 		allInteractions.add(aInteraction);
 		if (aInteraction instanceof JavaInteraction) {
-			return add((JavaInteraction)aInteraction);
-		} else {
-			return false;
+			add((JavaInteraction)aInteraction);
+		} else if(aInteraction instanceof SystemInteraction) {
+			systemInteractions.add((SystemInteraction)aInteraction);
 		}
 	}
 	
-	private boolean add(JavaInteraction aJavaInteraction) {
-		boolean createdNewElement = false;
+	private void add(JavaInteraction aJavaInteraction) {
+//		boolean createdNewElement = false;
 		Element element = elements.get(aJavaInteraction.getJavaElement());
 		if(element == null) {
 			element = new Element(aJavaInteraction.getJavaElement(), aJavaInteraction.getSeverity());
 			elements.put(aJavaInteraction.getJavaElement(), element);
-			createdNewElement = true;
 		}
 		Interaction lastInteraction = getLastInteraction(aJavaInteraction.getJavaElement());
 		aJavaInteraction.setLastInteraction(lastInteraction);
@@ -65,7 +66,6 @@ public class InteractionRepository {
 //		} else {
 //			System.err.println("type is null: " + aJavaInteraction.getJavaElement());
 //		}
-		return createdNewElement;
 	}
 	
 	
@@ -167,6 +167,15 @@ public class InteractionRepository {
 				elements.remove(element);
 			}
 		}
+		
+		for (Iterator<SystemInteraction> iter = systemInteractions.iterator(); iter.hasNext();) {
+			SystemInteraction interaction = iter.next();
+			if(interaction.getDate().getTime() < aOlderThan && interaction.isExported()) {
+				iter.remove();
+				removed++;
+			}
+		}
+		
 		return removed;
 	}
 	
@@ -192,6 +201,10 @@ public class InteractionRepository {
 			aElement.setRating(aElement.getLastInteraction().getSeverity() - ((currentTime - start) / Units.SECOND) * 0.005); 
 		}
 		
+	}
+
+	public List<SystemInteraction> getSystemInteractions() {
+		return systemInteractions;
 	}	
 	
 }

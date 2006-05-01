@@ -28,7 +28,7 @@ public class SeverityHelper {
 		return /*aSeverity +*/ 0.2f;
 	}
 	
-	private static double adjustSeverity(double aSeverity) {
+	public static double adjustSeverity(double aSeverity) {
 		if (aSeverity < 0f) {
 			return 0d;
 		} else if (aSeverity > 1f) {
