@@ -5,13 +5,7 @@
 		<xs:documentation>
 			This XML schema defines the structure of the "Resource" MicroSensorDataType.
 			The instance documents, the XML documents using this schema, are actual
-			"Resource" MicroActivities.
-		</xs:documentation>
-	</xs:annotation>
-
-	<xs:annotation>
-		<xs:documentation>
-			This includes the data fields that are common to all MicroSensorDataTypes.
+			"Resource" MicroActivities. Resources are mainly files
 		</xs:documentation>
 	</xs:annotation>
 
@@ -36,6 +30,9 @@
   									
    										<xs:enumeration value="added"/>
 	 	   								<xs:enumeration value="removed"/>
+	 	   								<xs:enumeration value="deleted"/>
+	 	   								<xs:enumeration value="moved"/>
+	 	   								<xs:enumeration value="renamed"/>
 	 	   								<xs:enumeration value="changed"/>
    										<xs:enumeration value="opened"/>
    										<xs:enumeration value="closed"/>
@@ -45,8 +42,8 @@
 								</xs:simpleType>
 							</xs:element>
 							
-							<xs:element name="resourcename" type="xs:token"/>
-							<xs:element name="resourcetype" type="xs:token"/>
+							<xs:element name="resourcename" type="xs:string"/>
+							<xs:element name="resourcetype" type="xs:string" minOccurs="0"/>
 						</xs:sequence>
 					</xs:complexType>			
 				</xs:element>
