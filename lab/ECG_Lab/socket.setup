@@ -2,10 +2,10 @@
 <modulesetup>
 <module id="2" active="true">
 <name>
-AdHoc Statistics
+File Writer
 </name>
 <fromClassId>
-org.electrocodeogram.module.target.implementation.StatisticsTargetModule
+org.electrocodeogram.module.target.implementation.FileSystemTargetModule
 </fromClassId>
 <connectedTo>
 </connectedTo>
