@@ -12,7 +12,8 @@
 	<xs:complexType name="commonDataType">
 	    	<xs:sequence>
 			<xs:element name="username" type="xs:token"/>
-			<xs:element name="projectname" type="xs:token"/>
+			<xs:element name="projectname" type="xs:token" minOccurs="0"/>
+			<xs:element name="id" type="xs:token" minOccurs="0"/>
 		</xs:sequence>
 	</xs:complexType>
 </xs:schema>
