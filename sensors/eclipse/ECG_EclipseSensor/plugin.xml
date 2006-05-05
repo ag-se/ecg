@@ -2,8 +2,8 @@
 <?eclipse version="3.0"?>
 <plugin
    id="org.electrocodeogram.sensor.eclipse"
-   name="ElectroCodeoGram Eclipse Sensor (Extending HackyStat Sensor)"
-   version="1.0"
+   name="ElectroCodeoGram Eclipse Sensor"
+   version="1.1"
    provider-name="FU Berlin"
    class="org.hackystat.stdext.sensor.eclipse.EclipseSensorPlugin">
 
