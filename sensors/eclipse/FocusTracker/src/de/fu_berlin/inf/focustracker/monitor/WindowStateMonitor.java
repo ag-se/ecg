@@ -20,7 +20,8 @@ public class WindowStateMonitor implements IWindowListener {
 	Map<Element, Double> deactivatedElements = new HashMap<Element, Double>(); 
 	
 	public void windowActivated(IWorkbenchWindow aWindow) {
-		SystemInteraction interaction = new SystemInteraction(Action.MAIN_WINDOW_ACTIVED, 1d, new Date(), null, Origin.WINDOW_SYSTEM);
+		System.err.println("activated : " +  aWindow.getClass());
+		SystemInteraction interaction = new SystemInteraction(Action.MAIN_WINDOW_ACTIVATED, 1d, new Date(), null, Origin.WINDOW_SYSTEM);
 		EventDispatcher.getInstance().notifyInteractionObserved(interaction);
 		// TODO: interaction!!!
 //		System.err.println("Main window activated");

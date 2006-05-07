@@ -28,6 +28,7 @@ import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextListener;
+import org.eclipse.jface.text.ITextViewerExtension5;
 import org.eclipse.jface.text.IViewportListener;
 import org.eclipse.jface.text.TextEvent;
 import org.eclipse.jface.text.source.Annotation;
@@ -35,8 +36,12 @@ import org.eclipse.jface.text.source.AnnotationModelEvent;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.text.source.IAnnotationModelListener;
 import org.eclipse.jface.text.source.IAnnotationModelListenerExtension;
+import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.projection.ProjectionAnnotation;
 import org.eclipse.jface.text.source.projection.ProjectionAnnotationModel;
+import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.graphics.Point;
@@ -60,9 +65,9 @@ import de.fu_berlin.inf.focustracker.ui.preferences.PreferenceConstants;
 import de.fu_berlin.inf.focustracker.util.Units;
 
 public class JavaEditorMonitor extends AbstractFocusTrackerMonitor implements 
-		IViewportListener, ITextListener, MouseMoveListener, IPropertyChangeListener {
+		IViewportListener, ITextListener, MouseMoveListener, IPropertyChangeListener, KeyListener {
 
-	private static final long CODECHANGE_INTERVAL = 2 * Units.SECOND;
+	private static final long CODECHANGE_INTERVAL = Units.SECOND / 2;
 	private static final long SCROLLING_INTERVAL = Units.SECOND;
 	private static final long DELAY_BETWEEN_MOUSE_OVER_DETECTION = 1 * Units.SECOND;
 
@@ -77,6 +82,10 @@ public class JavaEditorMonitor extends AbstractFocusTrackerMonitor implements
 	private IJavaElement input;
 	private MouseMoveHolder lastMouseMove = null;
 	private boolean mouseMoveListenerEnabled = isMouseMoveListenerEnabled();
+	private StyledText textWidget;
+//	private int textWidgetCaretOffset = 0;
+	private ICompilationUnit compilationUnit;
+	
 	
 	public JavaEditorMonitor() {
 
@@ -323,11 +332,9 @@ public class JavaEditorMonitor extends AbstractFocusTrackerMonitor implements
 		public void run() {
 			// editor could have been closed in the meanwhile
 			if(editor != null) {
-				ICompilationUnit unit= 
-					 (ICompilationUnit)EditorUtility.getEditorInputJavaElement(editor, false);
 				try {
 	//				System.err.println("tc offset: " + textChangedOffset + " - " + unit.getElementAt(textChangedOffset));
-					JavaInteraction interaction = new JavaInteraction(Action.TEXT_CHANGED, unit.getElementAt(textChangedOffset), 1d, origin);
+					JavaInteraction interaction = new JavaInteraction(Action.TEXT_CHANGED, compilationUnit.getElementAt(textChangedOffset), 1d, origin);
 					EventDispatcher.getInstance().notifyInteractionObserved(interaction);
 				} catch (JavaModelException e) {
 					e.printStackTrace();
@@ -352,7 +359,16 @@ public class JavaEditorMonitor extends AbstractFocusTrackerMonitor implements
 //			editor.getSelectionProvider().addSelectionChangedListener(this);
 			editor.getViewer().addViewportListener(this);
 			editor.getViewer().addTextListener(this);
-
+			textWidget = editor.getViewer().getTextWidget();
+			textWidget.addKeyListener(this);
+			
+			if (aPart instanceof CompilationUnitEditor) {
+				origin = Origin.JAVAEDITOR;
+			} else if (aPart instanceof ClassFileEditor) {
+				origin = Origin.JAVA_CLASSFILE_EDITOR;
+			}
+			compilationUnit = (ICompilationUnit)EditorUtility.getEditorInputJavaElement(editor, false);
+			
 			// check folding
 			projectionAnnotationModel = (ProjectionAnnotationModel) editor.getAdapter(ProjectionAnnotationModel.class);
 			foldingListener = new FoldingListener(origin);
@@ -362,11 +378,6 @@ public class JavaEditorMonitor extends AbstractFocusTrackerMonitor implements
 			editor.getViewer().getTextWidget().addMouseMoveListener(this);
 			input = EditorUtility.getEditorInputJavaElement(editor, true); 
 			 
-			if (aPart instanceof CompilationUnitEditor) {
-				origin = Origin.JAVAEDITOR;
-			} else if (aPart instanceof ClassFileEditor) {
-				origin = Origin.JAVA_CLASSFILE_EDITOR;
-			}
 			FocusTrackerPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(this);
 
 		} else {
@@ -513,6 +524,32 @@ public class JavaEditorMonitor extends AbstractFocusTrackerMonitor implements
 
 	}
 
+	// KeyListener, used to listen for cursor moves! 
+	public void keyPressed(KeyEvent aE) {
+		// do nothing
+	}
+
+	public void keyReleased(KeyEvent aE) {
+//		try {
+//			IJavaElement element = compilationUnit.getElementAt(widgetOffset2ModelOffset(editor.getViewer(), textWidget.getCaretOffset()));
+//			JavaInteraction interaction = new JavaInteraction(Action.CURSOR_MOVED, element, 1d, origin);
+//			EventDispatcher.getInstance().notifyInteractionObserved(interaction);
+//		} catch (JavaModelException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+	}
+
+	
+	protected final static int widgetOffset2ModelOffset(ISourceViewer viewer, int widgetOffset) {
+		if (viewer instanceof ITextViewerExtension5) {
+			ITextViewerExtension5 extension= (ITextViewerExtension5) viewer;
+			return extension.widgetOffset2ModelOffset(widgetOffset);
+		}
+		return widgetOffset + viewer.getVisibleRegion().getOffset();
+	}
+	
+	
 }
 
 class FoldingListener implements IAnnotationModelListener,

@@ -33,7 +33,5 @@ Bundle-ClassPath: focustracker.jar,
  lib/drools/drools-core-2.5-final.jar,
  lib/drools/drools-io-2.5-final.jar,
  lib/drools/drools-java-2.5-final.jar,
- lib/drools/drools-smf-2.5-final.jar,
- lib/jfreechart/jcommon-1.0.0.jar,
- lib/jfreechart/jfreechart-1.0.1.jar
+ lib/drools/drools-smf-2.5-final.jar
 Bundle-Vendor: Fu-Berlin

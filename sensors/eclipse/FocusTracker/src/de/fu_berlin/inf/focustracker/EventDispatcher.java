@@ -49,6 +49,10 @@ public class EventDispatcher {
 	private ECGExportJob ecgExportJob;
 	private WindowStateMonitor windowStateMonitor;
 	private InteractionGCJob interactionGCJob;
+
+	// debug variable
+	private int numberOfRetries = 5;
+
 	
 	private EventDispatcher() {
 		try {
@@ -68,7 +72,6 @@ public class EventDispatcher {
 	private void init() throws IntegrationException, SAXException, IOException {
 		
 		boolean partMonitorAdded = false;
-		int numberOfRetries = 5;
 		
 		// monitors : 
 		partMonitor = new PartMonitor();
@@ -91,15 +94,22 @@ public class EventDispatcher {
 		// this is ugly, but sometimes the listeners won't be added
 		if(!partMonitorAdded) {
 			System.err.println("partmonitor not yet added, trying again");
-			init();
+			numberOfRetries--;
 			if(numberOfRetries == 0) {
 				String message = "Unable to register listeners! Please restart the plugin.";
 				ErrorDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), 
 						"Unable to start.",
 						message,
-						new Status(IStatus.ERROR, FocusTrackerPlugin.ID, 0, message, new Exception())); 
+						new Status(IStatus.ERROR, FocusTrackerPlugin.ID, 0, message, new Exception()));
+				try {
+					FocusTrackerPlugin.getDefault().stop(null);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			} else {
+				init();
 			}
-			numberOfRetries--;
 		}
 		
 		interactionRepository = InteractionRepository.getInstance();
@@ -108,6 +118,7 @@ public class EventDispatcher {
 		
 		windowStateMonitor = new WindowStateMonitor();
 		PlatformUI.getWorkbench().addWindowListener(windowStateMonitor);
+//		PlatformUI.getWorkbench().getDisplay().getActiveShell().  addWindowListener(windowStateMonitor);
 		systemMonitor = new SystemActivityMonitor();
 		Display.getDefault().addFilter(SWT.MouseMove, systemMonitor);
 		Display.getDefault().addFilter(SWT.KeyDown, systemMonitor);

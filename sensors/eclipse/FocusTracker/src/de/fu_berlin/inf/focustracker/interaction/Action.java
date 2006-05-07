@@ -1,7 +1,7 @@
 package de.fu_berlin.inf.focustracker.interaction;
 
 public enum Action {
-	MAIN_WINDOW_ACTIVED, 
+	MAIN_WINDOW_ACTIVATED, 
 	MAIN_WINDOW_DEACTIVATED, 
 	SELECTED, 
 	SELECTION_CHANGED, 
@@ -19,7 +19,8 @@ public enum Action {
 	TEXT_CHANGED, 
 	MOUSE_OVER, 
 	USER_INACTIVE, 
-	USER_ACTIVE,
+	USER_ACTIVE, 
+	CURSOR_MOVED,
 	
 	;
 }
