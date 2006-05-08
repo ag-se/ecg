@@ -1,16 +1,22 @@
 package de.fu_berlin.inf.focustracker;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
+import org.eclipse.core.runtime.Preferences.PropertyChangeEvent;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IStartup;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
+import de.fu_berlin.inf.focustracker.ui.FocusTrackerDecorator;
+import de.fu_berlin.inf.focustracker.ui.preferences.PreferenceConstants;
+
 
 /**
  * The main plugin class to be used in the desktop.
  */
-public class FocusTrackerPlugin extends AbstractUIPlugin implements IStartup {
+public class FocusTrackerPlugin extends AbstractUIPlugin implements IStartup, IPropertyChangeListener {
 
 	public static final String ID = "de.fu_berlin.inf.focustracker";
 	
@@ -22,6 +28,7 @@ public class FocusTrackerPlugin extends AbstractUIPlugin implements IStartup {
 	 */
 	public FocusTrackerPlugin() {
 		plugin = this;
+		// listen to changes of the preferences
 	}
 	
 	/**
@@ -33,10 +40,10 @@ public class FocusTrackerPlugin extends AbstractUIPlugin implements IStartup {
 			PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
 				public void run() {
 					EventDispatcher.getInstance();
+					FocusTrackerPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(FocusTrackerPlugin.this);
 				}
 			});
 		}
-//		System.err.println("earlyStartup finished!");
 	}	
 	
 	/**
@@ -44,7 +51,7 @@ public class FocusTrackerPlugin extends AbstractUIPlugin implements IStartup {
 	 */
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
-//		EventDispatcher.getInstance();
+		FocusTrackerPlugin.getDefault().getWorkbench().getDecoratorManager().setEnabled(FocusTrackerDecorator.ID, FocusTrackerDecorator.isDecoratorActivated());		
 	}
 
 	/**
@@ -76,4 +83,18 @@ public class FocusTrackerPlugin extends AbstractUIPlugin implements IStartup {
 	public static ImageDescriptor getImageDescriptor(String path) {
 		return AbstractUIPlugin.imageDescriptorFromPlugin("FocusTracker", path);
 	}
+	
+	public void propertyChange(PropertyChangeEvent aEvent) {
+		if(PreferenceConstants.P_DECORATOR_ACTIVATED.equals(aEvent.getProperty())) {
+			try {
+				FocusTrackerPlugin.getDefault().getWorkbench().getDecoratorManager().setEnabled(ID, FocusTrackerDecorator.isDecoratorActivated());
+			} catch (CoreException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} 
+				//LightweightDecoratorManager.
+		}
+	}
+	
+	
 }

@@ -1,12 +1,14 @@
 package de.fu_berlin.inf.focustracker.interaction;
 
+import org.eclipse.jdt.core.IClassFile;
+import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.jdt.internal.core.CompilationUnit;
 import org.eclipse.jdt.internal.core.SourceField;
 import org.eclipse.jdt.internal.core.SourceMethod;
 
-public class JavaElementToStringBuilder {
+public class JavaElementHelper {
 
 	public static String toString(IJavaElement aJavaElement) {
 		
@@ -33,6 +35,19 @@ public class JavaElementToStringBuilder {
 		ret.append("\"");
 		return ret.toString();
 	}
+	
+	public static IJavaElement getCompilationUnit(IJavaElement aJavaElement) {
+		if(aJavaElement instanceof ICompilationUnit || aJavaElement == null) {
+			return aJavaElement;
+		}
+		IJavaElement parent = null;
+		for (parent = aJavaElement.getParent(); !(parent instanceof ICompilationUnit) && !(parent instanceof IClassFile) && parent != null; parent = parent.getParent());
+		
+		return parent;
+	}
+	
+	
+	
 	
 	private static String getPackage(IJavaElement aJavaElement) {
 		

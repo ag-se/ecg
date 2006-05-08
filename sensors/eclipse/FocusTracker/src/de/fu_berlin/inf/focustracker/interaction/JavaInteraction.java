@@ -32,7 +32,7 @@ public class JavaInteraction extends Interaction {
 //	public String getJavaElementFormatted() {
 ////		return javaElement.getPath() + "#" + javaElement.getPrimaryElement().toString().substring(0, javaElement.getPrimaryElement().toString().indexOf('['));
 ////		return javaElement.getPath() + "#" + javaElement.getPrimaryElement().toString();
-//		return JavaElementToStringBuilder.toString(javaElement);
+//		return JavaElementHelper.toString(javaElement);
 //	}
 	
 }

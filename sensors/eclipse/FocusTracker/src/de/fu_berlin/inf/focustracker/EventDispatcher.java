@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.drools.IntegrationException;
+import org.eclipse.core.internal.resources.Workspace;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.internal.ui.javaeditor.ClassFileEditor;
@@ -26,6 +28,7 @@ import de.fu_berlin.inf.focustracker.jobs.ActivityMonitorJob;
 import de.fu_berlin.inf.focustracker.jobs.ECGExportJob;
 import de.fu_berlin.inf.focustracker.jobs.InteractionGCJob;
 import de.fu_berlin.inf.focustracker.monitor.JavaEditorMonitor;
+import de.fu_berlin.inf.focustracker.monitor.ProjectLifecycleMonitor;
 import de.fu_berlin.inf.focustracker.monitor.OutlineMonitor;
 import de.fu_berlin.inf.focustracker.monitor.PackageExplorerExpansionMonitor;
 import de.fu_berlin.inf.focustracker.monitor.PartMonitor;
@@ -40,6 +43,7 @@ public class EventDispatcher {
 
 	private static EventDispatcher instance;
 	private static List<InteractionListener> listeners = new ArrayList<InteractionListener>();
+	private static boolean started;
 	
 	private InteractionRepository interactionRepository;
 	private Rating rating;
@@ -52,11 +56,13 @@ public class EventDispatcher {
 
 	// debug variable
 	private int numberOfRetries = 5;
+	private ProjectLifecycleMonitor lifecycleMonitor;
 
 	
 	private EventDispatcher() {
 		try {
 			init();
+			started = true;
 		} catch (IntegrationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -72,6 +78,9 @@ public class EventDispatcher {
 	private void init() throws IntegrationException, SAXException, IOException {
 		
 		boolean partMonitorAdded = false;
+		
+		interactionRepository = InteractionRepository.getInstance();
+		rating = new Rating();
 		
 		// monitors : 
 		partMonitor = new PartMonitor();
@@ -112,13 +121,14 @@ public class EventDispatcher {
 			}
 		}
 		
-		interactionRepository = InteractionRepository.getInstance();
-		rating = new Rating();
 		ISelectionService service = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getSelectionService();
 		
-		windowStateMonitor = new WindowStateMonitor();
-		PlatformUI.getWorkbench().addWindowListener(windowStateMonitor);
-//		PlatformUI.getWorkbench().getDisplay().getActiveShell().  addWindowListener(windowStateMonitor);
+//		windowStateMonitor = new WindowStateMonitor();
+//		PlatformUI.getWorkbench().addWindowListener(windowStateMonitor);
+		
+		lifecycleMonitor = new ProjectLifecycleMonitor();
+		((Workspace)ResourcesPlugin.getWorkspace()).addLifecycleListener(lifecycleMonitor);
+		
 		systemMonitor = new SystemActivityMonitor();
 		Display.getDefault().addFilter(SWT.MouseMove, systemMonitor);
 		Display.getDefault().addFilter(SWT.KeyDown, systemMonitor);
@@ -135,7 +145,6 @@ public class EventDispatcher {
 		interactionGCJob.schedule(InteractionGCJob.DELAY);
 		
 		service.addPostSelectionListener(new SelectionMonitor());
-
 	}
 	
 	public static EventDispatcher getInstance() {
@@ -199,6 +208,11 @@ public class EventDispatcher {
 		activityMonitorJob.cancel();
 		ecgExportJob.cancel();
 		interactionGCJob.cancel();
+		lifecycleMonitor = null;
+	}
+
+	public static boolean isStarted() {
+		return started;
 	}
 	
 }

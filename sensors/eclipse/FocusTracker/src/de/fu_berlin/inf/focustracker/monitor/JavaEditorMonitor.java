@@ -84,7 +84,7 @@ public class JavaEditorMonitor extends AbstractFocusTrackerMonitor implements
 	private boolean mouseMoveListenerEnabled = isMouseMoveListenerEnabled();
 	private StyledText textWidget;
 //	private int textWidgetCaretOffset = 0;
-	private ICompilationUnit compilationUnit;
+	private IJavaElement compilationUnit;
 	
 	
 	public JavaEditorMonitor() {
@@ -221,8 +221,8 @@ public class JavaEditorMonitor extends AbstractFocusTrackerMonitor implements
 				List<IJavaElement> allChildren = getAllChildren(compilationUnit);
 				List<JavaInteraction> interacList = new ArrayList<JavaInteraction>();
 				for (IJavaElement child : allChildren) {
-					// ignore imports and class, since the opened class is always visible 
-					if (child instanceof IMember && !(child.getParent() instanceof CompilationUnit)) {
+					// ignore imports and class, since the opened class is always visible
+					if (!ignoreElement(child)) {
 						ISourceReference ref = (ISourceReference) child;
 						// is this element visible?
 						boolean visible = ref.getSourceRange().getOffset()
@@ -248,14 +248,12 @@ public class JavaEditorMonitor extends AbstractFocusTrackerMonitor implements
 						if (visible && !wasVisibleBefore) {
 							visibleElements.add(child);
 							action = Action.VISIBILITY_GAINED;
-						} else if (!visible && wasVisibleBefore) {
+						} else if (!visible && lastSeverity > 0d /* && wasVisibleBefore*/) {
 							visibleElements.remove(child);
 							action = Action.VISIBILITY_LOST;
 						} else if (visible && wasVisibleBefore && (lastSeverity != EventDispatcher.getInstance()
 								.getRating().rateEvent(visibiltyEvent))) {
 							action = Action.VISIBILITY_CHANGED;
-						} else if (!visible) {
-	
 						} else {
 	
 						}
@@ -334,8 +332,16 @@ public class JavaEditorMonitor extends AbstractFocusTrackerMonitor implements
 			if(editor != null) {
 				try {
 	//				System.err.println("tc offset: " + textChangedOffset + " - " + unit.getElementAt(textChangedOffset));
-					JavaInteraction interaction = new JavaInteraction(Action.TEXT_CHANGED, compilationUnit.getElementAt(textChangedOffset), 1d, origin);
-					EventDispatcher.getInstance().notifyInteractionObserved(interaction);
+					IJavaElement javaElement;
+					if(origin == Origin.JAVAEDITOR) {
+						javaElement = ((ICompilationUnit)compilationUnit).getElementAt(textChangedOffset);
+					} else {
+						javaElement = ((IClassFile)compilationUnit).getElementAt(textChangedOffset);
+					}
+					if(!JavaEditorMonitor.ignoreElement(javaElement)) {
+						JavaInteraction interaction = new JavaInteraction(Action.TEXT_CHANGED, javaElement, 1d, origin);
+						EventDispatcher.getInstance().notifyInteractionObserved(interaction);
+					}
 				} catch (JavaModelException e) {
 					e.printStackTrace();
 				}
@@ -364,11 +370,21 @@ public class JavaEditorMonitor extends AbstractFocusTrackerMonitor implements
 			
 			if (aPart instanceof CompilationUnitEditor) {
 				origin = Origin.JAVAEDITOR;
+				compilationUnit = (ICompilationUnit)EditorUtility.getEditorInputJavaElement(editor, false);
 			} else if (aPart instanceof ClassFileEditor) {
 				origin = Origin.JAVA_CLASSFILE_EDITOR;
+				compilationUnit = (IClassFile)EditorUtility.getEditorInputJavaElement(editor, false);
 			}
-			compilationUnit = (ICompilationUnit)EditorUtility.getEditorInputJavaElement(editor, false);
-			
+//			compilationUnit = (ICompilationUnit)EditorUtility.getEditorInputJavaElement(editor, false);
+
+			// create a class opened event
+//			EventDispatcher.getInstance().notifyInteractionObserved(
+//					new JavaInteraction(Action.CLASS_OPENED, compilationUnit, 1d, Origin.JAVAEDITOR)
+//					);
+			InteractionRepository.getInstance().add(
+					new JavaInteraction(Action.CLASS_OPENED, compilationUnit, 1d, Origin.JAVAEDITOR)
+			);
+
 			// check folding
 			projectionAnnotationModel = (ProjectionAnnotationModel) editor.getAdapter(ProjectionAnnotationModel.class);
 			foldingListener = new FoldingListener(origin);
@@ -409,13 +425,14 @@ public class JavaEditorMonitor extends AbstractFocusTrackerMonitor implements
 //		}
 		
 		int offset = editor.getViewer().getTextWidget().getOffsetAtLocation(point);
+		offset = widgetOffset2ModelOffset(editor.getViewer(), offset);
 		try {
 //			System.err.println("mouseMove: " + point + " - " + offset + " element: " + getElementAtOffset(offset).getElementName());
 //			System.err.println("mouseMove: " + getElementAtOffset(offset).getElementName());
 			long eventReceivedTs = System.currentTimeMillis();
 			IJavaElement javaElement = getElementAtOffset(offset);
 
-//			System.err.println( "######################## " + lastMouseMove);
+			System.err.println( "######################## " + javaElement);
 			if(lastMouseMove == null || lastMouseMove.getJavaElement() != javaElement) {
 				lastMouseMove = new MouseMoveHolder(javaElement, eventReceivedTs);
 				return;
@@ -433,8 +450,10 @@ public class JavaEditorMonitor extends AbstractFocusTrackerMonitor implements
 //					 (element.getLastInteraction().getAction() == Action.MOUSE_OVER && 
 //							 element.getLastInteraction().getDate().getTime() < eventReceivedTs - DELAY_BETWEEN_MOUSE_OVER_DETECTION))
 					) {
-				EventDispatcher.getInstance().notifyInteractionObserved(
-						new JavaInteraction(Action.MOUSE_OVER, element.getJavaElement(), SeverityHelper.adjustSeverity(element.getRating() + 0.1d), origin));
+				if (!ignoreElement(javaElement)) {
+					EventDispatcher.getInstance().notifyInteractionObserved(
+							new JavaInteraction(Action.MOUSE_OVER, element.getJavaElement(), SeverityHelper.adjustSeverity(element.getRating() + 0.1d), origin));
+				}
 				lastMouseMove.setEventReceivedTs(eventReceivedTs);
 			}
 		} catch (Throwable e) {
@@ -449,13 +468,13 @@ public class JavaEditorMonitor extends AbstractFocusTrackerMonitor implements
 		if (input instanceof ICompilationUnit) {
 			ICompilationUnit cunit= (ICompilationUnit) input;
 			JavaModelUtil.reconcile(cunit);
-			IJavaElement ref= cunit.getElementAt(aOffset);
+			IJavaElement ref = cunit.getElementAt(aOffset);
 			if (ref == null)
 				return input;
 			else
 				return ref;
 		} else if (input instanceof IClassFile) {
-			IJavaElement ref= ((IClassFile)input).getElementAt(aOffset);
+			IJavaElement ref = ((IClassFile)input).getElementAt(aOffset);
 			if (ref == null)
 				return input;
 			else
@@ -468,6 +487,12 @@ public class JavaEditorMonitor extends AbstractFocusTrackerMonitor implements
 	public void partDeactivated() {
 //		System.err.println("partDeactivated");
 //		partClosed();
+	}
+	
+	
+	@Override
+	public void partActivated() {
+		System.err.println("partActivated : " + editor.getTitle());
 	}
 	
 	@Override
@@ -488,6 +513,12 @@ public class JavaEditorMonitor extends AbstractFocusTrackerMonitor implements
 			}
 			EventDispatcher.getInstance().notifyInteractionObserved(interacList);
 		}
+		// create a class closed event
+		EventDispatcher.getInstance().notifyInteractionObserved(
+				new JavaInteraction(Action.CLASS_CLOSED, compilationUnit, 0d, Origin.JAVAEDITOR)
+				);
+		
+		
 	}
 
 	private boolean isMouseMoveListenerEnabled() {
@@ -547,6 +578,15 @@ public class JavaEditorMonitor extends AbstractFocusTrackerMonitor implements
 			return extension.widgetOffset2ModelOffset(widgetOffset);
 		}
 		return widgetOffset + viewer.getVisibleRegion().getOffset();
+	}
+	
+	
+	public static boolean ignoreElement(IJavaElement aJavaElement) {
+		return !(
+				aJavaElement instanceof IMember 
+				&& !(aJavaElement.getParent() instanceof CompilationUnit)
+				);
+
 	}
 	
 	

@@ -4,8 +4,6 @@ import java.util.Date;
 
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.internal.core.CompilationUnit;
-import org.eclipse.jdt.internal.core.SourceType;
 import org.eclipse.jdt.internal.ui.actions.SelectionConverter;
 import org.eclipse.jdt.internal.ui.javaeditor.JavaEditor;
 import org.eclipse.jface.text.BadLocationException;
@@ -18,6 +16,7 @@ import org.eclipse.ui.internal.console.ConsoleView;
 
 import de.fu_berlin.inf.focustracker.EventDispatcher;
 import de.fu_berlin.inf.focustracker.interaction.Action;
+import de.fu_berlin.inf.focustracker.interaction.JavaElementHelper;
 import de.fu_berlin.inf.focustracker.interaction.JavaInteraction;
 import de.fu_berlin.inf.focustracker.interaction.Origin;
 import de.fu_berlin.inf.focustracker.monitor.helper.RegionHelper;
@@ -54,7 +53,7 @@ public class SelectionMonitor implements ISelectionListener {
 				Object selectedObject = structuredSelection.getFirstElement();
 				if (selectedObject == null)
 					return;
-				if (selectedObject instanceof IJavaElement) {
+				if (selectedObject instanceof IJavaElement && !JavaEditorMonitor.ignoreElement((IJavaElement) selectedObject)) {
 					IJavaElement javaElement = (IJavaElement) selectedObject;
 					JavaInteraction javaInteraction = new JavaInteraction(getAction(javaElement), javaElement, 1d, Origin.getOrigin(aPart));
 					EventDispatcher.getInstance().notifyInteractionObserved(javaInteraction);
@@ -78,7 +77,14 @@ public class SelectionMonitor implements ISelectionListener {
 			IJavaElement javaElement = SelectionConverter.resolveEnclosingElement(editor, (ITextSelection)aSelection);
 
 			// ignore main classes, since they are handled in a different way!
-			if(javaElement instanceof SourceType && javaElement.getParent() instanceof CompilationUnit) {
+			if(JavaEditorMonitor.ignoreElement(javaElement)) {
+				IJavaElement parent = JavaElementHelper.getCompilationUnit(javaElement); 
+				if (parent != null) {
+					JavaInteraction interaction = new JavaInteraction(Action.SELECTED, parent, 1d, Origin.SYSTEM);
+					EventDispatcher.getInstance().notifyInteractionObserved(
+							interaction
+							);
+				}
 				return;
 			}
 			

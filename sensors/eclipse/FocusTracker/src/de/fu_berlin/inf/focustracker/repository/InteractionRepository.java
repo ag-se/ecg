@@ -5,10 +5,21 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IPackageDeclaration;
+import org.eclipse.jdt.core.IPackageFragment;
+import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.dom.PackageDeclaration;
+import org.eclipse.jdt.internal.core.PackageFragment;
+import org.eclipse.jdt.internal.core.SourceType;
 
+import de.fu_berlin.inf.focustracker.EventDispatcher;
+import de.fu_berlin.inf.focustracker.interaction.Action;
 import de.fu_berlin.inf.focustracker.interaction.Interaction;
+import de.fu_berlin.inf.focustracker.interaction.JavaElementHelper;
 import de.fu_berlin.inf.focustracker.interaction.JavaInteraction;
+import de.fu_berlin.inf.focustracker.interaction.Origin;
 import de.fu_berlin.inf.focustracker.interaction.SystemInteraction;
 import de.fu_berlin.inf.focustracker.util.Units;
 
@@ -55,6 +66,39 @@ public class InteractionRepository {
 		aJavaInteraction.setLastInteraction(lastInteraction);
 		element.getInteractions().add(aJavaInteraction);
 		element.setRating(aJavaInteraction.getSeverity());
+		
+//		System.err.println(" ... " + element.getJavaElement().getElementName() + " - " + element.getJavaElement().getClass());
+		try {
+			if(element.getJavaElement() instanceof ICompilationUnit) {
+				JavaInteraction interaction = new JavaInteraction(Action.SELECTED, ((ICompilationUnit)element.getJavaElement()).getPackageDeclarations()[0], 1d, Origin.SYSTEM);
+				if(EventDispatcher.isStarted()) {
+					EventDispatcher.getInstance().notifyInteractionObserved(
+							interaction
+							);
+				} else {
+					add(interaction);
+				}
+			} else if(!(element.getJavaElement() instanceof IPackageDeclaration) && !(element.getJavaElement() instanceof PackageFragment)){
+				IJavaElement parent = JavaElementHelper.getCompilationUnit(element.getJavaElement()); 
+				if (parent != null) {
+					JavaInteraction interaction = new JavaInteraction(Action.SELECTED, parent, 1d, Origin.SYSTEM);
+					EventDispatcher.getInstance().notifyInteractionObserved(
+							interaction
+							);
+				}
+				
+			}
+		} catch (Throwable e) {
+			e.printStackTrace();
+			
+//		} catch (JavaModelException e) {
+//			// TODO fix me
+//			e.printStackTrace();
+		}
+		
+		recalculateRatings(element);
+		
+		
 //		lastVisitedJavaElement = aJavaInteraction.getJavaElement();
 //		javaElements.get(aJavaInteraction.getJavaElement())
 //		element.addInteraction(aJavaInteraction);
@@ -69,6 +113,32 @@ public class InteractionRepository {
 	}
 	
 	
+	@SuppressWarnings("unchecked")
+	private void recalculateRatings(Element aElement) {
+		
+		if (aElement.getRating() < 1d) {
+			return;
+		} else if (aElement.getJavaElement() instanceof ICompilationUnit)  {
+			for (Element element : getElementsForClass(aElement.getJavaElement().getClass())) {
+				if(element != aElement) {
+					element.setRating(0d);
+				}
+			}
+		} else if (aElement.getJavaElement() instanceof IPackageDeclaration || aElement.getJavaElement() instanceof IPackageFragment) {
+			for (Element element : getElementsForClass(new Class[] {IPackageDeclaration.class, IPackageFragment.class})) {
+				if(element != aElement) {
+					element.setRating(0d);
+				}
+			}
+		} else {
+			for (Element element : getElementsWithRating()) {
+				if (element != aElement && !(element.getJavaElement() instanceof ICompilationUnit || element.getJavaElement() instanceof IPackageDeclaration)) {
+					element.setRating(0d);
+				}
+			}
+		}
+	}
+
 	public double getRating(IJavaElement aJavaElement) {
 		Element element = elements.get(aJavaElement);
 		if(element != null) {
@@ -126,6 +196,25 @@ public class InteractionRepository {
 		}
 		return elementsWithRating;
 	}
+	
+	public List<Element> getElementsForClass(Class<? extends IJavaElement>...aClasses) {
+		
+		List<Element> elementsForClass = new ArrayList<Element>();
+		for (Element element : elements.values()) {
+			 if (element.getRating() > 0d) {
+				for (Class clazz : aClasses) {
+//					if(element.getJavaElement().getClass().isAssignableFrom(clazz)) {
+					if(clazz.isAssignableFrom(element.getJavaElement().getClass())) {
+						elementsForClass.add(element);
+						break;
+					}
+				}
+			}
+		}
+		return elementsForClass;
+	}
+	
+	
 	
 	public List<Interaction> getAllInteractions() {
 		return allInteractions;
@@ -197,8 +286,11 @@ public class InteractionRepository {
 		long currentTime = System.currentTimeMillis();
 		long start = aElement.getLastInteraction().getDate().getTime() + INACTIVITY_OFFSET;
 		if(start < currentTime) {
-//			System.err.println("decreasing : " + (((currentTime - start) / Units.SECOND) * 0.005));
-			aElement.setRating(aElement.getLastInteraction().getSeverity() - ((currentTime - start) / Units.SECOND) * 0.005); 
+			double decValue = aElement.getLastInteraction().getSeverity() - ((currentTime - start) / Units.SECOND) * 0.005;
+			if(decValue < 0d) {
+				decValue = 0d;
+			}
+			aElement.setRating(decValue);
 		}
 		
 	}

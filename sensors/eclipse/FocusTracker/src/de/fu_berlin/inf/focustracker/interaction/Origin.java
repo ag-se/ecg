@@ -14,7 +14,9 @@ public enum Origin {
 		OUTLINE, 
 		WINDOW_SYSTEM, 
 		PACKAGE_EXPLORER,
-		ACTIVITY_MANAGER;
+		ACTIVITY_MANAGER, 
+		WORKSPACE, 
+		SYSTEM;
 		
 		public static Origin getOrigin(IWorkbenchPart aPart) {
 			if (aPart instanceof ContentOutline) {

@@ -23,7 +23,10 @@
         <parameter identifier="event">
             <class>de.fu_berlin.inf.focustracker.rating.event.EditorSelectionEvent</class>
         </parameter>
-        <java:condition>event.getAction() == de.fu_berlin.inf.focustracker.interaction.Action.SELECTED</java:condition>
+        <java:condition>
+        	event.getAction() == de.fu_berlin.inf.focustracker.interaction.Action.SELECTED
+        	|| event.getAction() == de.fu_berlin.inf.focustracker.interaction.Action.SELECTION_SAME_ELEMENT 
+        </java:condition>
         <java:consequence><![CDATA[
 
 			double p = 0d;
@@ -31,10 +34,10 @@
 				p = 1d;
 			} else {
 				double percentageVisible = event.getElementRegion().getPercentageVisible();
-	        	if(percentageVisible >= 0.9d) {
+	        	if(percentageVisible >= 0.5d) {
 	        		p = 1d;
-	        	} else if (percentageVisible >= 0.5d) {
-	        			p = 0.75d;
+	        	} else if (percentageVisible >= 0.25d) {
+	        			p = 0.50d;
 	        	} else {
 	        			p = 0.25d;
 	        	}
@@ -44,6 +47,7 @@
         ]]></java:consequence>
     </rule>
     
+<!--    
     <rule name="JavaEditor Selected Same Element">
         <parameter identifier="event">
             <class>de.fu_berlin.inf.focustracker.rating.event.EditorSelectionEvent</class>
@@ -59,6 +63,7 @@
             
         ]]></java:consequence>
     </rule>
+-->    
     
     <rule name="JavaEditor Visibility Changed">
         <parameter identifier="event">
@@ -69,7 +74,9 @@
 
         	double p = 0d;
         	if(event.isVisible()) {
-        		if(event.getElementRegion().isFillingCompleteView() || event.getNumberOfElementsVisible() == 1) {
+        		if(event.getElementRegion().isFillingCompleteView() 
+        			|| event.getNumberOfElementsVisible() == 1 
+        			|| (event.getLastInteraction() != null && event.getLastInteraction().getSeverity() == 1)) {
 					p = 1d;        		
         		} else {
 					double percentageVisible = event.getElementRegion().getPercentageVisible();

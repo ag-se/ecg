@@ -20,7 +20,7 @@ import org.eclipse.ui.PlatformUI;
 
 import de.fu_berlin.inf.focustracker.EventDispatcher;
 import de.fu_berlin.inf.focustracker.interaction.Interaction;
-import de.fu_berlin.inf.focustracker.interaction.JavaElementToStringBuilder;
+import de.fu_berlin.inf.focustracker.interaction.JavaElementHelper;
 import de.fu_berlin.inf.focustracker.interaction.JavaInteraction;
 import de.fu_berlin.inf.focustracker.repository.InteractionRepository;
 
@@ -108,7 +108,7 @@ public class LoggingView extends BeanView {
 					return interaction.getAction().toString();
 				case 3:
 					if(interaction instanceof JavaInteraction) {
-						return JavaElementToStringBuilder.toString(((JavaInteraction)interaction).getJavaElement());
+						return JavaElementHelper.toString(((JavaInteraction)interaction).getJavaElement());
 					} else {
 						return "";
 					}

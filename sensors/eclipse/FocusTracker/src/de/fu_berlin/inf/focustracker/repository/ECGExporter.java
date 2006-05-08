@@ -11,7 +11,7 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.electrocodeogram.sensor.eclipse.ECGEclipseSensor;
 
 import de.fu_berlin.inf.focustracker.FocusTrackerPlugin;
-import de.fu_berlin.inf.focustracker.interaction.JavaElementToStringBuilder;
+import de.fu_berlin.inf.focustracker.interaction.JavaElementHelper;
 import de.fu_berlin.inf.focustracker.interaction.SystemInteraction;
 import de.fu_berlin.inf.focustracker.ui.preferences.PreferenceConstants;
 
@@ -45,7 +45,7 @@ public class ECGExporter implements IPropertyChangeListener {
 			+ "</username><projectname>"
 			+ aJavaElement.getJavaProject().getProject().getName()		            
 			+ "</projectname></commonData><focustracker><element>" 
-			+ JavaElementToStringBuilder.toString(aJavaElement)
+			+ JavaElementHelper.toString(aJavaElement)
 			+ "</element><focus>" 
 			+ aIsInFocus
 			+ "</focus>" 
