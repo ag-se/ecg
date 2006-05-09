@@ -185,15 +185,18 @@ public abstract class SourceModule extends Module {
                 .getTimeStamp(), eventPacket.getSensorDataType(), eventPacket
                 .getArgList());
 
-            logger.log(Level.INFO,
+            logger.log(ECGLevel.PACKET,
                 "An event has been appended to the SourceModule: "
                                 + this.getName());
 
             logger.log(ECGLevel.PACKET, validEventPacket.toString());
         } catch (IllegalEventParameterException e) {
-            logger.log(Level.WARNING,
-                "An Exception occured while appending an event to the SourceModule: "
-                                + this.getName());
+            logger.log(ECGLevel.PACKET,
+                "An Exception occured while appending an event '" 
+            		+ eventPacket.getSensorDataType() 
+            		+ eventPacket.getArgList() 
+            		+ "' to the SourceModule '"
+                    + this.getName() + "'");
         }
 
         if (validEventPacket != null) {
