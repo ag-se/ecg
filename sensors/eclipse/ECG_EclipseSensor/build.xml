@@ -168,7 +168,7 @@
 			<fileset dir="${build.result.folder}" includes="sensor.eclipse.jar"			/>
 		</copy>
 		<copy todir="${destination.temp.folder}/org.electrocodeogram.sensor.eclipse_1.1.0" failonerror="true" overwrite="false">
-			<fileset dir="${basedir}" includes="plugin.xml,sensor.eclipse.jar,lib/hackystat/,sensorshell.jar"			/>
+			<fileset dir="${basedir}" includes="plugin.xml,sensor.eclipse.jar,lib/hackystat/,sensorshell.jar,ecg/"			/>
 		</copy>
 	</target>
 
