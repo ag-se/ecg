@@ -6,7 +6,7 @@
       provider-name="FU Berlin">
    <install-handler library="installer.jar" handler="org.electrocodeogram.installer.Installer"/>
 
-   <description url="http://www.inf.fu-berlin.de/inst/ag-se/research/ecg/">
+   <description url="http://www.inf.fu-berlin.de/ecg/update/">
       This feature provides a plugin that acts as a sensor inside Eclipse
 programming process events. It is part of the ElectroCodeoGram
 framework for &quot;micro-process&quot; recording and analysis. The &quot;micro-process&quot;
@@ -59,7 +59,7 @@ PRIOR TO USE OF THIS CONTENT.
    </license>
 
    <url>
-      <update label="ElectroCodeoGram Update Site" url="http://www.inf.fu-berlin.de/inst/ag-se/research/ecg/"/>
+      <update label="ElectroCodeoGram Update Site" url="http://www.inf.fu-berlin.de/ecg/update"/>
    </url>
 
    <requires>
@@ -86,7 +86,7 @@ PRIOR TO USE OF THIS CONTENT.
          id="org.electrocodeogram.sensor.eclipse"
          download-size="0"
          install-size="0"
-         version="1.1.0"/>
+         version="1.0.2"/>
 
    <data
          id="../sensor.properties"
