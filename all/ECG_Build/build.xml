@@ -102,7 +102,7 @@
 		<echo message="######## CLEANING INSTALLER" />
 
 		<ant dir="../ECG_Installer" target="cleanall" />
-
+		
 	</target>
 
 	<!-- Cleans all ECG components -->
@@ -127,6 +127,8 @@
 
 		<ant dir="../ECG_SensorShell" target="deploy" />
 
+		<copy todir="../ECG_UpdateSite/features" file="../ECG_SensorShell/sensor.properties"/>
+
 	</target>
 
 	<!-- Calls the ant script of the ECG SensorShell component to build it -->
@@ -134,7 +136,7 @@
 
 		<echo message="######## BUILDING ECLIPSESENSOR" />
 
-		<ant dir="../ECG_EclipseSensor" target="zip.plugin" />
+		<ant dir="../ECG_EclipseSensor" target="build.update.jar" />
 
 	</target>
 
@@ -177,6 +179,12 @@
 
 		<ant dir="../ECG_Installer" target="deploy" />
 
+		<copy todir="../ECG_EclipseFeature">
+
+			<fileset dir="../ECG_Installer/dist/lib/" />
+
+		</copy>
+
 	</target>
 
 
@@ -187,16 +195,20 @@
 
 		<ant dir="../ECG_Lab" target="Assemble ECGLab" />
 
+		<copy todir="../ECG_EclipseSensor/ecg">
+			<fileset dir="../ECG_Lab/dist/application/" />
+		</copy>
+		
 	</target>
 
 
 
 	<!-- Builds all ECG components -->
-	<target name="buildall" depends="Build General, Build SensorShell, Build EclipseSensor, Build Lab, Build Modules, Build Installer" />
+	<target name="buildall" depends="Build General, Build SensorShell, Build Lab, Build Modules, Build EclipseSensor, Build Installer" />
 
 	
 	<!-- Package release -->
-	<target name="Package release" depends="CleanAll Build, buildall, Assemble Lab">
+	<target name="Package release" depends="buildall, Assemble Lab">
 		
 		<echo message="######## ASSEMBLING ECG RELEASE" />
 
@@ -215,39 +227,21 @@
 		<mkdir dir="dist/lib" />
 
 		<copy todir="dist/user.home/.hackystat">
-
 			<fileset dir="../ECG_SensorShell/" includes="sensor.properties" />
-
 		</copy>
 
 		<copy todir="dist/ecg">
-
 			<fileset dir="../ECG_Lab/dist/application" />
-
 		</copy>
 
 		<copy todir="dist/lib">
-
 			<fileset dir="../ECG_Support/dist/lib" includes="ecg_support.jar"/>
 			<fileset dir="../ECG_TestHelper/dist/lib" includes="ecg_test.jar" />
 			<fileset dir="../ECG_Lab/dist/lib" includes="ecg_moduleapi.jar" />
-
 		</copy>
-
-<!--
-		<mkdir dir="../ECG_EclipseSensor/ecg" />
-
-		<copy todir="../ECG_EclipseSensor/dist/ecg">
-
-			<fileset dir="../ECG_Lab/dist/application" />
-
-		</copy>
--->
 		
 		<copy todir="${dist.dir}/plugins">
-
-			<fileset dir="../ECG_EclipseSensor/" includes="**/org.electrocodeogram.sensor.eclipse*.zip"/>
-
+			<fileset dir="../ECG_EclipseSensor/" includes="**/org.electrocodeogram.sensor.eclipse*.jar"/>
 		</copy>
 
 	</target>
@@ -255,6 +249,15 @@
 	<!-- Invokes all ECG ant scripts -->
 	<target name="all" depends="cleanall, Package release" />
 
+
+	<target name="Make Release Zip" depends="Package release">
+
+		<delete failonerror="no" file="dist/ElectroCodeoGram_vX.Y.Z.zip"/>
+
+		<zip destfile="dist/ElectroCodeoGram_vX.Y.Z.zip" 
+		 	 basedir="dist" filesonly="false" update="false"/>
+
+	</target>
 
 	<!-- Cleans API doc folder -->
 	<target name="clean javadoc">
