@@ -158,7 +158,7 @@ public class FileActiveEpisodeRecognizer implements EpisodeRecognizer {
     							editorname.equals(activeFileName)) {
     						event = generateEpisode(minDuration, "msdt.fileactive.xsd", 
     								ECGParser.getSingleNodeValue("username", document),
-    								ECGParser.getSingleNodeValue("projectname", document),
+    								ECGParser.getSingleNodeValueIfAvailable("projectname", document),
     								timestamp,
     								startDate,
     								changeCount,
@@ -181,7 +181,7 @@ public class FileActiveEpisodeRecognizer implements EpisodeRecognizer {
                             // Another editor has been activated => this one will be deactivated 
                             event = generateEpisode(minDuration, "msdt.fileactive.xsd", 
                                     ECGParser.getSingleNodeValue("username", document),
-                                    ECGParser.getSingleNodeValue("projectname", document),
+                                    ECGParser.getSingleNodeValueIfAvailable("projectname", document),
                                     timestamp,
                                     startDate,
                                     changeCount,
@@ -200,7 +200,7 @@ public class FileActiveEpisodeRecognizer implements EpisodeRecognizer {
     						state = FileActiveEpisodeState.FILEHOLD;
     						event = generateEpisode(minDuration, "msdt.fileactive.xsd", 
     								ECGParser.getSingleNodeValue("username", document),
-    								ECGParser.getSingleNodeValue("projectname", document),
+    								ECGParser.getSingleNodeValueIfAvailable("projectname", document),
     								timestamp,
     								startDate,
                                     changeCount,
@@ -222,7 +222,7 @@ public class FileActiveEpisodeRecognizer implements EpisodeRecognizer {
                         // Another part has been activated => this one will be deactivated 
                         event = generateEpisode(minDuration, "msdt.fileactive.xsd", 
                                 ECGParser.getSingleNodeValue("username", document),
-                                ECGParser.getSingleNodeValue("projectname", document),
+                                ECGParser.getSingleNodeValueIfAvailable("projectname", document),
                                 timestamp,
                                 startDate,
                                 changeCount,
@@ -241,15 +241,11 @@ public class FileActiveEpisodeRecognizer implements EpisodeRecognizer {
                         state = FileActiveEpisodeState.FILEACTIVE;
                         activeFileName = documentname;
                         startDate = timestamp;
-                        changeCount = 0;
+                        changeCount = 1;
                     }
                     else if (state != FileActiveEpisodeState.START && activeFileName.equals(documentname)) {
-                        if (lastChangeDate == null || !lastChangeDate.equals(timestamp)) {
-                            // for some reason, code change event are snt more than once at 
-                            // exactly the same time. Don't count these.
-                            lastChangeDate = timestamp;
-                            changeCount++;
-                        }
+                        lastChangeDate = timestamp;
+                        changeCount++;
                     }
 
 				}

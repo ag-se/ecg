@@ -106,6 +106,7 @@ public class WindowActiveEpisodeRecognizer implements EpisodeRecognizer {
 
 			if (msdt.equals("msdt.window.xsd") ||
                 msdt.equals("msdt.part.xsd") ||
+                msdt.equals("msdt.dialog.xsd") ||
                 msdt.equals("msdt.editor.xsd")) {
 
 				Document document = packet.getDocument();
@@ -113,8 +114,11 @@ public class WindowActiveEpisodeRecognizer implements EpisodeRecognizer {
 
 				String activity = ECGParser.getSingleNodeValue("activity", document);
 				String windowname = "";
-                if (msdt.equals("msdt.window.xsd"))
+
+				if (msdt.equals("msdt.window.xsd"))
                     windowname = ECGParser.getSingleNodeValue("windowname", document);
+                if (msdt.equals("msdt.dialog.xsd"))
+                    windowname = ECGParser.getSingleNodeValue("dialogname", document);
 				
 				if (state == WindowActiveEpisodeState.START && 
                     (activity.equals("activated") || activity.equals("opened"))) {
@@ -141,7 +145,7 @@ public class WindowActiveEpisodeRecognizer implements EpisodeRecognizer {
                     }
 					event = generateEpisode("msdt.windowactive.xsd", minDuration,
 							ECGParser.getSingleNodeValue("username", document),
-							ECGParser.getSingleNodeValue("projectname", document),
+							ECGParser.getSingleNodeValueIfAvailable("projectname", document),
 							timestamp,
 							startDate,
 							activeWindow);

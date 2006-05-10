@@ -145,7 +145,7 @@ public class PartActiveEpisodeRecognizer implements EpisodeRecognizer {
                             // normal deactivate of this view
                             event = generateEpisode(minDuration, "msdt.partactive.xsd", 
     							ECGParser.getSingleNodeValue("username", document),
-    							ECGParser.getSingleNodeValue("projectname", document),
+    							ECGParser.getSingleNodeValueIfAvailable("projectname", document),
     							timestamp,
     							startDate,
     							activePartName);
@@ -159,7 +159,7 @@ public class PartActiveEpisodeRecognizer implements EpisodeRecognizer {
                             // activation of another view = more reliable to tell that this one is deactivated
                             event = generateEpisode(minDuration, "msdt.partactive.xsd", 
                                 ECGParser.getSingleNodeValue("username", document),
-                                ECGParser.getSingleNodeValue("projectname", document),
+                                ECGParser.getSingleNodeValueIfAvailable("projectname", document),
                                 timestamp,
                                 startDate,
                                 activePartName);
@@ -185,7 +185,7 @@ public class PartActiveEpisodeRecognizer implements EpisodeRecognizer {
                         // activation of editor means deactivation of this part
                         event = generateEpisode(minDuration, "msdt.partactive.xsd", 
                                 ECGParser.getSingleNodeValue("username", document),
-                                ECGParser.getSingleNodeValue("projectname", document),
+                                ECGParser.getSingleNodeValueIfAvailable("projectname", document),
                                 timestamp,
                                 startDate,
                                 activePartName);
@@ -202,7 +202,7 @@ public class PartActiveEpisodeRecognizer implements EpisodeRecognizer {
                         state = PartActiveEpisodeState.PARTHOLD;
                         event = generateEpisode(minDuration, "msdt.partactive.xsd", 
                                 ECGParser.getSingleNodeValue("username", document),
-                                ECGParser.getSingleNodeValue("projectname", document),
+                                ECGParser.getSingleNodeValueIfAvailable("projectname", document),
                                 timestamp,
                                 startDate,
                                 activePartName);
