@@ -34,7 +34,7 @@
 		<properties>
 			<property>
 				<name>Input File</name>
-				<value>testeventlogs/viewsevents.log</value>
+				<value>testeventlogs/Acm3_060509.log</value>
 				<type>java.io.File</type>
 			</property>
 			<property>
@@ -141,11 +141,13 @@
 				<value>
 					msdt.testrun.xsd,
 					msdt.codechange.xsd,
+					msdt.codestatus.xsd,
 					msdt.window.xsd,
 					msdt.resource.xsd,
 					msdt.test.xsd,
 					msdt.editor.xsd
 					msdt.part.xsd
+					msdt.dialog.xsd
 				</value>
 				<type>java.lang.String</type>
 			</property>
