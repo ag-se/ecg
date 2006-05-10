@@ -176,8 +176,8 @@ public class FileReaderThread extends EventReader {
                 return null;
             }
 
-            if (line.contains("<codechange>")
-                && !line.contains("</codechange>")) {
+            if ((line.contains("<codechange>") || line.contains("<codestatus>")) 
+                && !(line.contains("</codechange>") || line.contains("</codestatus>"))) {
 
                 codechange = true;
 
@@ -196,7 +196,7 @@ public class FileReaderThread extends EventReader {
 
                     lineNumber++;
 
-                    if (nextLine.contains("</codechange>")) {
+                    if (nextLine.contains("</codechange>") || nextLine.contains("</codestatus>")) {
 
                         endOfCode = line.lastIndexOf("</document>");
 
