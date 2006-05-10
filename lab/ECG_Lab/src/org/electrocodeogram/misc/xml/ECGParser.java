@@ -877,7 +877,18 @@ public final class ECGParser {
         return getNodeValue(node);
     }
 
-    /**
+    public static String getSingleNodeValueIfAvailable(final String nodeName, 
+    		final Document document) {
+		String value = "";
+		try {
+			value = getSingleNodeValue(nodeName, document);
+		} catch (NodeException e) {
+			// ignore, value remains ""
+		}
+		return value;
+	}
+
+	/**
      * Returns the <em>MicroSensorDataTypes</em> form the given XML
      * <code>Document</code>, wich is expected to be a parsed
      * "module.properties.xml" file. This method uses
