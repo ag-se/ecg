@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <description url="http://www.inf.fu-berlin.de/inst/ag-se/research/ecg/">
+   <description url="http://www.inf.fu-berlin.de/ecg/update">
       This is the ElectroCodeoGram project homepage and the update site for the ECG Eclipse sensor.
    </description>
    <feature url="features/org.electrocodeogram.sensor.eclipse_1.1.0.jar" id="org.electrocodeogram.sensor.eclipse" version="1.1.0">
