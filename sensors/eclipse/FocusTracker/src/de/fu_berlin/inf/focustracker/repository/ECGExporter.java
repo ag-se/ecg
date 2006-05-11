@@ -1,8 +1,11 @@
 package de.fu_berlin.inf.focustracker.repository;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
@@ -22,6 +25,7 @@ public class ECGExporter implements IPropertyChangeListener {
 	private double minProbabilityForDisapperance;
 	private InteractionRepository interactionRepository;
 	private Set<IJavaElement> currentlyExportedElements;
+	private DecimalFormat decimalFormat = new DecimalFormat("0.00", new DecimalFormatSymbols(Locale.US)); 
 	
 	public ECGExporter() {
         this.username = System.getenv("username");
@@ -49,10 +53,10 @@ public class ECGExporter implements IPropertyChangeListener {
 			+ "</element><focus>" 
 			+ aIsInFocus
 			+ "</focus>" 
-			+ (aIsInFocus ? "<rating>" + aRating + "</rating>" : "") // add rating only if element is in focus
+			+ (aIsInFocus ? "<rating>" + decimalFormat.format(aRating) + "</rating>" : "") // add rating only if element is in focus
 			+ "</focustracker></microActivity>";
 		
-		System.err.println(data);
+//		System.err.println(data);
 		
 		ECGEclipseSensor.getInstance().processActivity(
 				"msdt.focustracker.xsd",
@@ -63,19 +67,19 @@ public class ECGExporter implements IPropertyChangeListener {
 		
 		String data = "<?xml version=\"1.0\"?><microActivity><commonData><username>"
 			+ this.username
-			+ "</username></commonData><focustracker><system><origin>" 
+			+ "</username></commonData><focustrackerSystem><system><origin>" 
 			+ aSystemInteraction.getOrigin()
 			+ "</origin><action>" 
 			+ aSystemInteraction.getAction()
 			+ "</action><timestamp>"
 			+ aSystemInteraction.getDate().getTime()
-			+ "</timestamp></system></focustracker></microActivity>";
+			+ "</timestamp></system></focustrackerSystem></microActivity>";
 		
-		System.err.println(data);
+//		System.err.println(data);
 		aSystemInteraction.setExported(true);
 		
 		ECGEclipseSensor.getInstance().processActivity(
-				"msdt.focustracker.xsd",
+				"msdt.focustrackersystem.xsd",
 				data);
 	}
 	
@@ -112,7 +116,8 @@ public class ECGExporter implements IPropertyChangeListener {
 	}
 
 	private double normalizeRating(double aRating, int aNumberOfElements) {
-		return aRating / aNumberOfElements;
+//		return aRating / aNumberOfElements;
+		return aRating;
 	}
 
 
