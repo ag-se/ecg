@@ -1113,7 +1113,15 @@ public final class ECGEclipseSensor {
             if (part instanceof IEditorPart) {
                 
                 if (part instanceof ITextEditor) {
-                    ECGEclipseSensor.this.activeTextEditor = (ITextEditor) part;
+                    ITextEditor textEditor  = (ITextEditor) part;
+                    // register document listener on opened Editors. Should have been done at partOpened
+                    // but in case of a new document instance for this editor, get sure to be registered.
+                    // Adding the same listener twice causes no harm. 
+                    IDocumentProvider provider = textEditor.getDocumentProvider();
+                    IDocument document = provider.getDocument(textEditor.getEditorInput());
+                    document.addDocumentListener(ECGEclipseSensor.this.docListener);
+                    // set current active TextEditor
+                    ECGEclipseSensor.this.activeTextEditor = textEditor;
                 }
                 
                 logger.log(ECGLevel.PACKET,
@@ -1308,7 +1316,7 @@ public final class ECGEclipseSensor {
 //                    provider.addElementStateListener(elementStateListener);
                     // register document listener on opened Editors
                     IDocument document = provider.getDocument(textEditor.getEditorInput());
-                    document.addDocumentListener(docListener);
+                    document.addDocumentListener(ECGEclipseSensor.this.docListener);
                     
                     logger.log(ECGLevel.PACKET, "A code status event has been recorded.");                    
                     processActivity(
@@ -1321,7 +1329,7 @@ public final class ECGEclipseSensor {
 	                        + part.hashCode()
 	                        + "</id></commonData><codestatus><document><![CDATA["
                             + document.get()
-                            + "]]></document><documentname>"
+                            + "]" + "]" + "></document><documentname>"
                             + getFilenameFromLocation(textEditor.getTitleToolTip())
                             + "</documentname></codestatus></microActivity>");                    
                 }
@@ -2322,7 +2330,7 @@ public final class ECGEclipseSensor {
 
             logger
                 .log(ECGLevel.PACKET, "A codechange event has been recorded.");
-
+ 
             sensor.processActivity(
                 "msdt.codechange.xsd",
                 "<?xml version=\"1.0\"?><microActivity><commonData><username>"
@@ -2333,7 +2341,7 @@ public final class ECGEclipseSensor {
                     + textEditor.hashCode()
                     + "</id></commonData><codechange><document><![CDATA["
                     + this.doc.get()
-                    + "]]></document><documentname>"
+                    + "]" + "]" + "></document><documentname>"
                     + sensor.getFilenameFromLocation(textEditor.getTitleToolTip())
                     + "</documentname></codechange></microActivity>");
 
