@@ -19,20 +19,20 @@
 		<xs:complexType>
 	    	<xs:sequence>
 				<xs:element name="commonData" type="commonDataType"/>
-				<xs:element name="focustrackerSystem">
-			    	<xs:sequence>
-						<xs:complexType>
+				<xs:element name="focustracker">
+					<xs:complexType>
+						<xs:sequence>
 							<xs:element name="system">
-								<xs:complexType>
-									<xs:sequence>
-										<xs:element name="origin"/>
-										<xs:element name="action"/>
-										<xs:element name="timestamp"/>
-									</xs:sequence>
-								</xs:complexType>			
+							 <xs:complexType>
+							  <xs:sequence>
+							   <xs:element name="origin"/>
+							   <xs:element name="action"/>
+							   <xs:element name="timestamp"/>
+							  </xs:sequence>
+							 </xs:complexType>
 							</xs:element>
-						</xs:complexType>			
-					</xs:sequence>
+						</xs:sequence>
+					</xs:complexType>			
 				</xs:element>
 			</xs:sequence>
 		</xs:complexType>
