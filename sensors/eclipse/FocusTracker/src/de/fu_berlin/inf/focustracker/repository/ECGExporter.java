@@ -67,13 +67,13 @@ public class ECGExporter implements IPropertyChangeListener {
 		
 		String data = "<?xml version=\"1.0\"?><microActivity><commonData><username>"
 			+ this.username
-			+ "</username></commonData><focustrackerSystem><system><origin>" 
+			+ "</username></commonData><focustracker><system><origin>" 
 			+ aSystemInteraction.getOrigin()
 			+ "</origin><action>" 
 			+ aSystemInteraction.getAction()
 			+ "</action><timestamp>"
 			+ aSystemInteraction.getDate().getTime()
-			+ "</timestamp></system></focustrackerSystem></microActivity>";
+			+ "</timestamp></system></focustracker></microActivity>";
 		
 //		System.err.println(data);
 		aSystemInteraction.setExported(true);
