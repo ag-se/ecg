@@ -28,7 +28,6 @@ public class FocusTrackerPlugin extends AbstractUIPlugin implements IStartup, IP
 	 */
 	public FocusTrackerPlugin() {
 		plugin = this;
-		// listen to changes of the preferences
 	}
 	
 	/**
@@ -40,6 +39,7 @@ public class FocusTrackerPlugin extends AbstractUIPlugin implements IStartup, IP
 			PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
 				public void run() {
 					EventDispatcher.getInstance();
+					// listen to changes of the preferences
 					FocusTrackerPlugin.getDefault().getPluginPreferences().addPropertyChangeListener(FocusTrackerPlugin.this);
 				}
 			});

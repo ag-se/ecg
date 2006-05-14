@@ -108,7 +108,6 @@ public class ECGExporter implements IPropertyChangeListener {
 		}
 		
 		// export system interactions 
-		
 		for (SystemInteraction interaction : interactionRepository.getSystemInteractions()) {
 			if(!interaction.isExported()) {
 				exportSystemInteraction(interaction);
