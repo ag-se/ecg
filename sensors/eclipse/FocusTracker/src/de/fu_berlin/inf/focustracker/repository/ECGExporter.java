@@ -50,7 +50,9 @@ public class ECGExporter implements IPropertyChangeListener {
 			+ aJavaElement.getJavaProject().getProject().getName()		            
 			+ "</projectname></commonData><focustracker><element>" 
 			+ JavaElementHelper.toString(aJavaElement)
-			+ "</element><focus>" 
+			+ "</element><elementType>" 
+			+ aJavaElement.getClass().getName()
+			+ "</elementType><focus>" 
 			+ aIsInFocus
 			+ "</focus>" 
 			+ (aIsInFocus ? "<rating>" + decimalFormat.format(aRating) + "</rating>" : "") // add rating only if element is in focus

@@ -3,6 +3,7 @@ package de.fu_berlin.inf.focustracker.interaction;
 import org.eclipse.jdt.core.IClassFile;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IPackageDeclaration;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.jdt.internal.core.CompilationUnit;
 import org.eclipse.jdt.internal.core.SourceField;
@@ -13,8 +14,8 @@ public class JavaElementHelper {
 	public static String toString(IJavaElement aJavaElement) {
 		
 		StringBuffer ret = new StringBuffer();
-		
-		ret.append(getPackage(aJavaElement));
+		JavaElementInformation elementInfo = getPackage(aJavaElement);
+		ret.append(elementInfo.getPackageName() + "." + elementInfo.getFileName());
 		ret.append("#");
 		try {
 			if (aJavaElement instanceof SourceMethod) {
@@ -26,6 +27,11 @@ public class JavaElementHelper {
 			} else if (aJavaElement instanceof SourceField){
 				SourceField field = (SourceField) aJavaElement;
 				ret.append(field.getElementName());
+			} else if (aJavaElement instanceof CompilationUnit) {
+				// remove #
+				ret.deleteCharAt(ret.length()-1);
+			} else if (aJavaElement instanceof IPackageDeclaration) {
+				ret = new StringBuffer(elementInfo.getPackageName());
 			}
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -49,15 +55,27 @@ public class JavaElementHelper {
 	
 	
 	
-	private static String getPackage(IJavaElement aJavaElement) {
+	private static JavaElementInformation getPackage(IJavaElement aJavaElement) {
 		
 		if(aJavaElement == null) {
-			return "unkown package";
+			return new JavaElementInformation();
 		}
 
 		if (aJavaElement instanceof CompilationUnit) {
 			CompilationUnit unit = (CompilationUnit) aJavaElement;
-			return new String(unit.getPackageName()[0]) + "." + unit.getElementName();
+//			return new String(unit.getPackageName()[0]) + "." + unit.getElementName();
+			StringBuffer sb = new StringBuffer();
+			for (int i = 0; i < unit.getPackageName().length; i++) {
+				sb.append(unit.getPackageName()[i]);
+				if(i<unit.getPackageName().length-1) {
+					sb.append('.');
+				}
+			}
+//			for (char[] chars : unit.getPackageName()) {
+//				sb.append(chars);
+//				sb.append('.');
+//			}
+			return new JavaElementInformation(sb.toString(), unit.getElementName());
 		}
 		return getPackage(aJavaElement.getParent());
 	}
@@ -74,4 +92,21 @@ public class JavaElementHelper {
 		}
 	}
 	
+}
+class JavaElementInformation {
+	
+	private String packageName = "unknown";
+	private String fileName = "unknown";
+
+	public JavaElementInformation() {}
+	public JavaElementInformation(String aPackageName, String aFileName) {
+		packageName = aPackageName;
+		fileName = aFileName;
+	}
+	public String getFileName() {
+		return fileName;
+	}
+	public String getPackageName() {
+		return packageName;
+	}
 }

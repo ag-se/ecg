@@ -9,10 +9,7 @@ import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IPackageDeclaration;
 import org.eclipse.jdt.core.IPackageFragment;
-import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.dom.PackageDeclaration;
 import org.eclipse.jdt.internal.core.PackageFragment;
-import org.eclipse.jdt.internal.core.SourceType;
 
 import de.fu_berlin.inf.focustracker.EventDispatcher;
 import de.fu_berlin.inf.focustracker.interaction.Action;
@@ -67,7 +64,7 @@ public class InteractionRepository {
 		element.getInteractions().add(aJavaInteraction);
 		element.setRating(aJavaInteraction.getSeverity());
 		
-//		System.err.println(" ... " + element.getJavaElement().getElementName() + " - " + element.getJavaElement().getClass());
+		System.err.println(aJavaInteraction.getJavaElement().getClass().getName() + " ... " + JavaElementHelper.toString(aJavaInteraction.getJavaElement()));
 		try {
 			if(element.getJavaElement() instanceof ICompilationUnit) {
 				JavaInteraction interaction = new JavaInteraction(Action.SELECTED, ((ICompilationUnit)element.getJavaElement()).getPackageDeclarations()[0], 1d, Origin.SYSTEM);
