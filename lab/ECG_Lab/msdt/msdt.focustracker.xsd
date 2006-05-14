@@ -23,7 +23,8 @@
 					<xs:complexType>
 						<xs:sequence>
 							<xs:element name="element"/>
-							<xs:element name="focus"/>
+							<xs:element name="elementType"/>
+							<xs:element name="focus" type="xs:boolean"/>
 							<xs:element name="rating" type="xs:double" minOccurs="0"/>
 						</xs:sequence>
 					</xs:complexType>			
