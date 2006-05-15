@@ -5,7 +5,6 @@ package de.fu_berlin.inf.focustracker.ui.preferences;
  */
 public class PreferenceConstants {
 
-	public static final String P_DECORATOR_ACTIVATED = "decoratorActivated";
 	public static final String P_ENABLE_JAVA_EDITOR_MOUSE_MOVE_LISTENER = "enableJavaEditorMouseMoveListener";
 	public static final String P_USER_INACTIVITY_DETECTION_TIMEOUT = "userInactivityDetectionTimeout";
 	

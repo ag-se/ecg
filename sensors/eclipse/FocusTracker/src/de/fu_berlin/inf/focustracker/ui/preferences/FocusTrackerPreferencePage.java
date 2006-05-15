@@ -3,8 +3,12 @@ package de.fu_berlin.inf.focustracker.ui.preferences;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IntegerFieldEditor;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.eclipse.ui.dialogs.PreferenceLinkArea;
+import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 
 import de.fu_berlin.inf.focustracker.FocusTrackerPlugin;
 
@@ -44,8 +48,11 @@ public class FocusTrackerPreferencePage
 		addField(new ProbabilityFieldEditor(PreferenceConstants.P_ECG_EXPORT_MIN_PROBABILITY_FOR_DISAPPEARANCE, "ECG Export &probability where already exported elements should be considered as invisible", getFieldEditorParent()));
 
 		addField(new IntegerFieldEditor(PreferenceConstants.P_USER_INACTIVITY_DETECTION_TIMEOUT, "Inactivity detection timeout (in seconds)", getFieldEditorParent()));
-		addField(new BooleanFieldEditor(PreferenceConstants.P_DECORATOR_ACTIVATED, "Decorator active", getFieldEditorParent()));
 		addField(new BooleanFieldEditor(PreferenceConstants.P_ENABLE_JAVA_EDITOR_MOUSE_MOVE_LISTENER, "Enable the JavaEditor MouseMoveListener (experimental)", getFieldEditorParent()));
+		
+		// link...
+		createPreferenceLink((IWorkbenchPreferenceContainer) getContainer(), getFieldEditorParent(), "org.eclipse.ui.preferencePages.Decorators", "See <a>''{0}''</a> to enable or disable decorations."); // 
+        
 	}
 
 	/**
@@ -53,5 +60,11 @@ public class FocusTrackerPreferencePage
 	 */
 	public void init(IWorkbench workbench) {
 	}
+	
+	public static PreferenceLinkArea createPreferenceLink(IWorkbenchPreferenceContainer container, Composite parent, String pageId, String text) {
+        final PreferenceLinkArea area = new PreferenceLinkArea(parent, SWT.NONE, pageId, text, container, null);
+        return area;
+	}
+	
 	
 }

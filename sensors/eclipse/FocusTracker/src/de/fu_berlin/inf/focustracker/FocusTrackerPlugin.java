@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.focustracker;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
 import org.eclipse.core.runtime.Preferences.PropertyChangeEvent;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -8,9 +7,6 @@ import org.eclipse.ui.IStartup;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
-
-import de.fu_berlin.inf.focustracker.ui.FocusTrackerDecorator;
-import de.fu_berlin.inf.focustracker.ui.preferences.PreferenceConstants;
 
 
 /**
@@ -51,7 +47,7 @@ public class FocusTrackerPlugin extends AbstractUIPlugin implements IStartup, IP
 	 */
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
-		FocusTrackerPlugin.getDefault().getWorkbench().getDecoratorManager().setEnabled(FocusTrackerDecorator.ID, FocusTrackerDecorator.isDecoratorActivated());		
+//		FocusTrackerPlugin.getDefault().getWorkbench().getDecoratorManager().setEnabled(FocusTrackerDecorator.ID, FocusTrackerDecorator.isDecoratorActivated());		
 	}
 
 	/**
@@ -85,15 +81,15 @@ public class FocusTrackerPlugin extends AbstractUIPlugin implements IStartup, IP
 	}
 	
 	public void propertyChange(PropertyChangeEvent aEvent) {
-		if(PreferenceConstants.P_DECORATOR_ACTIVATED.equals(aEvent.getProperty())) {
-			try {
-				FocusTrackerPlugin.getDefault().getWorkbench().getDecoratorManager().setEnabled(ID, FocusTrackerDecorator.isDecoratorActivated());
-			} catch (CoreException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} 
-				//LightweightDecoratorManager.
-		}
+//		if(PreferenceConstants.P_DECORATOR_ACTIVATED.equals(aEvent.getProperty())) {
+//			try {
+//				FocusTrackerPlugin.getDefault().getWorkbench().getDecoratorManager().setEnabled(ID, FocusTrackerDecorator.isDecoratorActivated());
+//			} catch (CoreException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			} 
+//				//LightweightDecoratorManager.
+//		}
 	}
 	
 	

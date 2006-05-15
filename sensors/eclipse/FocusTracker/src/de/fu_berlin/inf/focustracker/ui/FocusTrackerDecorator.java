@@ -15,11 +15,9 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 
 import de.fu_berlin.inf.focustracker.EventDispatcher;
-import de.fu_berlin.inf.focustracker.FocusTrackerPlugin;
 import de.fu_berlin.inf.focustracker.interaction.Interaction;
 import de.fu_berlin.inf.focustracker.interaction.InteractionListener;
 import de.fu_berlin.inf.focustracker.repository.InteractionRepository;
-import de.fu_berlin.inf.focustracker.ui.preferences.PreferenceConstants;
 
 public class FocusTrackerDecorator implements ILightweightLabelDecorator, InteractionListener {
 
@@ -44,6 +42,9 @@ public class FocusTrackerDecorator implements ILightweightLabelDecorator, Intera
 	public void decorate(Object element, IDecoration decoration) {
 		if(element instanceof IJavaElement) {
 			double lastScore = InteractionRepository.getInstance().getRating((IJavaElement)element);
+			if(lastScore == 0) {
+				return;
+			}
 			if(lastScore > 0.5d) {
 				decoration.setFont(BOLD);
 			}
@@ -57,7 +58,6 @@ public class FocusTrackerDecorator implements ILightweightLabelDecorator, Intera
 
 	public void dispose() {
 		EventDispatcher.getInstance().removeListener(this);
-		System.err.println("dec disposed!");
 	}
 
 	public boolean isLabelProperty(Object element, String property) {
@@ -80,9 +80,9 @@ public class FocusTrackerDecorator implements ILightweightLabelDecorator, Intera
 		refresh();
 	}
 	
-	public static boolean isDecoratorActivated() {
-		return FocusTrackerPlugin.getDefault().getPluginPreferences().getBoolean(PreferenceConstants.P_DECORATOR_ACTIVATED);
-	}
+//	public static boolean isDecoratorActivated() {
+//		return FocusTrackerPlugin.getDefault().getPluginPreferences().getBoolean(PreferenceConstants.P_DECORATOR_ACTIVATED);
+//	}
 	
 	
 }

@@ -64,7 +64,7 @@ public class InteractionRepository {
 		element.getInteractions().add(aJavaInteraction);
 		element.setRating(aJavaInteraction.getSeverity());
 		
-		System.err.println(aJavaInteraction.getJavaElement().getClass().getName() + " ... " + JavaElementHelper.toString(aJavaInteraction.getJavaElement()));
+//		System.err.println(aJavaInteraction.getJavaElement().getClass().getName() + " ... " + JavaElementHelper.toString(aJavaInteraction.getJavaElement()));
 		try {
 			if(element.getJavaElement() instanceof ICompilationUnit) {
 				JavaInteraction interaction = new JavaInteraction(Action.SELECTED, ((ICompilationUnit)element.getJavaElement()).getPackageDeclarations()[0], 1d, Origin.SYSTEM);

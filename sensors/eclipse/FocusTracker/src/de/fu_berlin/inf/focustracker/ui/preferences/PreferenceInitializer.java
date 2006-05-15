@@ -16,7 +16,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 	public void initializeDefaultPreferences() {
 		IPreferenceStore store = FocusTrackerPlugin.getDefault()
 				.getPreferenceStore();
-		store.setDefault(PreferenceConstants.P_DECORATOR_ACTIVATED, true);
 		store.setDefault(PreferenceConstants.P_ENABLE_JAVA_EDITOR_MOUSE_MOVE_LISTENER, false);
 		store.setDefault(PreferenceConstants.P_USER_INACTIVITY_DETECTION_TIMEOUT, 60);
 		

@@ -423,16 +423,21 @@ public class JavaEditorMonitor extends AbstractFocusTrackerMonitor implements
 //		if (!rect.contains(point)) {
 //			System.err.println("PPPPPPPPPPPPPPPPPP");
 //		}
-		
-		int offset = editor.getViewer().getTextWidget().getOffsetAtLocation(point);
-		offset = widgetOffset2ModelOffset(editor.getViewer(), offset);
+		int offset = -1;
+		try {
+			offset = editor.getViewer().getTextWidget().getOffsetAtLocation(point);
+			offset = widgetOffset2ModelOffset(editor.getViewer(), offset);
+		} catch (IllegalArgumentException e) {
+			// do nothing, location is outside of any elements!
+			return;
+		}
 		try {
 //			System.err.println("mouseMove: " + point + " - " + offset + " element: " + getElementAtOffset(offset).getElementName());
 //			System.err.println("mouseMove: " + getElementAtOffset(offset).getElementName());
 			long eventReceivedTs = System.currentTimeMillis();
 			IJavaElement javaElement = getElementAtOffset(offset);
 
-			System.err.println( "######################## " + javaElement);
+//			System.err.println( "######################## " + javaElement);
 			if(lastMouseMove == null || lastMouseMove.getJavaElement() != javaElement) {
 				lastMouseMove = new MouseMoveHolder(javaElement, eventReceivedTs);
 				return;

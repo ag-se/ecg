@@ -15,25 +15,32 @@ public class ProjectLifecycleMonitor implements ILifecycleListener{
 
 	public void handleEvent(LifecycleEvent aEvent) throws CoreException {
 		
-		IProject project;
+		
 		switch (aEvent.kind) {
 		case LifecycleEvent.PRE_PROJECT_OPEN:
 			// project opened
-			project = (IProject)aEvent.resource;
-			System.err.println("project about to be opened: " + project.getName());
+//			IProject project = (IProject)aEvent.resource;
+//			System.err.println("project about to be opened: " + project.getName());
 			EventDispatcher.getInstance().notifyInteractionObserved(
-					new JavaInteraction(Action.PROJECT_OPENED, JavaCore.create(project), 1d, Origin.WORKSPACE)
+					new JavaInteraction(Action.PROJECT_OPENED, JavaCore.create((IProject)aEvent.resource), 1d, Origin.WORKSPACE)
 					);
 			break;
 
 		case LifecycleEvent.PRE_PROJECT_CLOSE:
 		case LifecycleEvent.PRE_PROJECT_DELETE:
 			// project closed or deleted
-			project = (IProject)aEvent.resource;
-			System.err.println("project about to be closed/deleted: " + project.getName());
-			EventDispatcher.getInstance().notifyInteractionObserved(
-					new JavaInteraction(Action.PROJECT_CLOSED, JavaCore.create(project), 0d, Origin.WORKSPACE)
-					);
+//			System.err.println("project about to be closed/deleted: " + project.getName());
+			try {
+				EventDispatcher.getInstance().notifyInteractionObserved(
+						new JavaInteraction(Action.PROJECT_CLOSED,
+								// TODO: find a better way to handle JavaProjects on close, because JavaCore could already be disposed
+								JavaCore.create((IProject)aEvent.resource), 
+	//							JavaModelManager.getJavaModelManager().getJavaModel().getJavaProject((IProject)aEvent.resource), 
+								0d, Origin.WORKSPACE)
+						);
+			} catch (NoClassDefFoundError e) {
+				// JavaCore Plugin already disposed!
+			}
 			break;
 			
 		default:
