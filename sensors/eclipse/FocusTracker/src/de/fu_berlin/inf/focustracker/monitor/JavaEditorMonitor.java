@@ -67,7 +67,7 @@ import de.fu_berlin.inf.focustracker.util.Units;
 public class JavaEditorMonitor extends AbstractFocusTrackerMonitor implements 
 		IViewportListener, ITextListener, MouseMoveListener, IPropertyChangeListener, KeyListener {
 
-	private static final long CODECHANGE_INTERVAL = Units.SECOND / 2;
+	private static final long CODECHANGE_INTERVAL = Units.SECOND;
 	private static final long SCROLLING_INTERVAL = Units.SECOND;
 	private static final long DELAY_BETWEEN_MOUSE_OVER_DETECTION = 1 * Units.SECOND;
 
@@ -304,13 +304,14 @@ public class JavaEditorMonitor extends AbstractFocusTrackerMonitor implements
 		return allChildren;
 	}
 
-	public void textChanged(TextEvent aEvent) {
+	public synchronized void textChanged(TextEvent aEvent) {
 		
 //		System.err.println("textChanged: " + aEvent.getDocumentEvent().getText() + " - " + aEvent.getDocumentEvent().getText().length());
 //		if(aEvent.getReplacedText() == null || aEvent.getReplacedText().length() == 0) {
 //			// no text was changed, eg a cursor key could have been pressed
 //			return;
 //		}
+//		System.err.println("tc " + System.currentTimeMillis());
 		
 		// this code is heavyly inspired by the ECGEclipseSensor...
 		delayedTextChangedTimer.cancel();
@@ -324,28 +325,38 @@ public class JavaEditorMonitor extends AbstractFocusTrackerMonitor implements
 		private int textChangedOffset;
 		protected DelayedTimerTask(int aTextChangedOffset) {
 			textChangedOffset = aTextChangedOffset;
+//			System.err.println("creating new timertask " + System.currentTimeMillis());
+
 		}
 		
 		@Override
-		public void run() {
-			// editor could have been closed in the meanwhile
-			if(editor != null) {
-				try {
-	//				System.err.println("tc offset: " + textChangedOffset + " - " + unit.getElementAt(textChangedOffset));
-					IJavaElement javaElement;
-					if(origin == Origin.JAVAEDITOR) {
-						javaElement = ((ICompilationUnit)compilationUnit).getElementAt(textChangedOffset);
-					} else {
-						javaElement = ((IClassFile)compilationUnit).getElementAt(textChangedOffset);
+		public synchronized void run() {
+			synchronized (delayedTextChangedTimer) {
+//				System.err.println("starting timertask " + System.currentTimeMillis());
+				// editor could have been closed in the meanwhile
+				if(editor != null) {
+					try {
+		//				System.err.println("tc offset: " + textChangedOffset + " - " + unit.getElementAt(textChangedOffset));
+						IJavaElement javaElement;
+						if(origin == Origin.JAVAEDITOR) {
+							javaElement = ((ICompilationUnit)compilationUnit).getElementAt(textChangedOffset);
+						} else {
+							javaElement = ((IClassFile)compilationUnit).getElementAt(textChangedOffset);
+						}
+//						System.err.println("timertask " + System.currentTimeMillis() + " - " + javaElement.getElementName());
+						if(!JavaEditorMonitor.ignoreElement(javaElement)) {
+//							System.err.println("sending ia " + System.currentTimeMillis());
+							JavaInteraction interaction = new JavaInteraction(Action.TEXT_CHANGED, javaElement, 1d, origin);
+							EventDispatcher.getInstance().notifyInteractionObserved(interaction);
+//							System.err.println("ia sent " + System.currentTimeMillis());
+						}
+					} catch (JavaModelException e) {
+						e.printStackTrace();
 					}
-					if(!JavaEditorMonitor.ignoreElement(javaElement)) {
-						JavaInteraction interaction = new JavaInteraction(Action.TEXT_CHANGED, javaElement, 1d, origin);
-						EventDispatcher.getInstance().notifyInteractionObserved(interaction);
-					}
-				} catch (JavaModelException e) {
-					e.printStackTrace();
 				}
+//		System.err.println("finished timertask " + System.currentTimeMillis());
 			}
+
 		}
 		
 	}

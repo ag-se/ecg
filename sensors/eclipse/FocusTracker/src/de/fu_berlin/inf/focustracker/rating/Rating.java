@@ -44,7 +44,10 @@ public class Rating {
 			
 		} catch (FactException e) {
 			throw new RatingException("Exception occured during rateEvent()", e);
+//		} finally {
+//			System.err.println("leaving rating: ");
 		}
+
 		
 	}
 

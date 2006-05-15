@@ -80,7 +80,7 @@ public class EventDispatcher {
 		boolean partMonitorAdded = false;
 		
 		interactionRepository = InteractionRepository.getInstance();
-		rating = new Rating();
+//		rating = new Rating();
 		
 		// monitors : 
 		partMonitor = new PartMonitor();
@@ -191,6 +191,20 @@ public class EventDispatcher {
 	}
 
 	public Rating getRating() {
+		if(rating == null) {
+			try {
+				rating = new Rating();
+			} catch (IntegrationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (SAXException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		return rating;
 	}
 

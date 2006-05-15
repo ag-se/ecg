@@ -54,37 +54,42 @@ public class InteractionRepository {
 	
 	private void add(JavaInteraction aJavaInteraction) {
 //		boolean createdNewElement = false;
-		Element element = elements.get(aJavaInteraction.getJavaElement());
-		if(element == null) {
-			element = new Element(aJavaInteraction.getJavaElement(), aJavaInteraction.getSeverity());
-			elements.put(aJavaInteraction.getJavaElement(), element);
-		}
-		Interaction lastInteraction = getLastInteraction(aJavaInteraction.getJavaElement());
-		aJavaInteraction.setLastInteraction(lastInteraction);
-		element.getInteractions().add(aJavaInteraction);
-		element.setRating(aJavaInteraction.getSeverity());
-		
+		Element element = null;
+		synchronized(elements) {
+			element = elements.get(aJavaInteraction.getJavaElement());
+			if(element == null) {
+				element = new Element(aJavaInteraction.getJavaElement(), aJavaInteraction.getSeverity());
+				elements.put(aJavaInteraction.getJavaElement(), element);
+			}
+			Interaction lastInteraction = getLastInteraction(aJavaInteraction.getJavaElement());
+			aJavaInteraction.setLastInteraction(lastInteraction);
+			element.getInteractions().add(aJavaInteraction);
+			element.setRating(aJavaInteraction.getSeverity());
+			recalculateRatings(element);
+		}		
 //		System.err.println(aJavaInteraction.getJavaElement().getClass().getName() + " ... " + JavaElementHelper.toString(aJavaInteraction.getJavaElement()));
+		JavaInteraction interaction = null;
 		try {
 			if(element.getJavaElement() instanceof ICompilationUnit) {
-				JavaInteraction interaction = new JavaInteraction(Action.SELECTED, ((ICompilationUnit)element.getJavaElement()).getPackageDeclarations()[0], 1d, Origin.SYSTEM);
-				if(EventDispatcher.isStarted()) {
+				interaction = new JavaInteraction(Action.SELECTED, ((ICompilationUnit)element.getJavaElement()).getPackageDeclarations()[0], 1d, Origin.SYSTEM);
+			} else if(!(element.getJavaElement() instanceof IPackageDeclaration) && !(element.getJavaElement() instanceof PackageFragment)){
+				IJavaElement parent = JavaElementHelper.getCompilationUnit(element.getJavaElement()); 
+				if (parent != null) {
+					interaction = new JavaInteraction(Action.SELECTED, parent, 1d, Origin.SYSTEM);
+				}
+				
+			}
+			
+			if(interaction != null) {
+				if( EventDispatcher.isStarted()) {
 					EventDispatcher.getInstance().notifyInteractionObserved(
 							interaction
 							);
 				} else {
 					add(interaction);
 				}
-			} else if(!(element.getJavaElement() instanceof IPackageDeclaration) && !(element.getJavaElement() instanceof PackageFragment)){
-				IJavaElement parent = JavaElementHelper.getCompilationUnit(element.getJavaElement()); 
-				if (parent != null) {
-					JavaInteraction interaction = new JavaInteraction(Action.SELECTED, parent, 1d, Origin.SYSTEM);
-					EventDispatcher.getInstance().notifyInteractionObserved(
-							interaction
-							);
-				}
-				
 			}
+			
 		} catch (Throwable e) {
 			e.printStackTrace();
 			
@@ -93,7 +98,6 @@ public class InteractionRepository {
 //			e.printStackTrace();
 		}
 		
-		recalculateRatings(element);
 		
 		
 //		lastVisitedJavaElement = aJavaInteraction.getJavaElement();
