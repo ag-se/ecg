@@ -78,7 +78,7 @@ import org.hackystat.stdext.sensor.eclipse.EclipseSensorShell;
 
 /**
  * A collection of
- * <em>EventListeners</em> that are registered at different
+ * <em>EventListeners</em> that are registered at different 
  * interesting points in the Eclipse Workbench. These
  * <em>Listeners</em> are recording events. The events are then
  * encoded in <em>MicroActivityEvents</em> and sent to the ECG Lab.
@@ -1777,7 +1777,7 @@ public final class ECGEclipseSensor {
                     + "</username><id>"
                     + shell.hashCode()
                     + "</id></commonData><window><activity>closed</activity><windowname>"
-                    + shell.getText()
+                    + (!shell.isDisposed() ? shell.getText() : "Eclipse")
                     + "</windowname></window></microActivity>");
 
             logger.exiting(this.getClass().getName(), "shellClosed");
@@ -2170,7 +2170,7 @@ public final class ECGEclipseSensor {
                 "msdt.resource.xsd",
                 "<?xml version=\"1.0\"?><microActivity><commonData><username>"
                     + ECGEclipseSensor.this.username
-                    + "</username><projectname>"
+                    + "</username><projectname>" 
                     + getProjectnameFromLocation(buffer.getLocation().toString())
                     + "</projectname><id>"
                     + buffer.hashCode()
