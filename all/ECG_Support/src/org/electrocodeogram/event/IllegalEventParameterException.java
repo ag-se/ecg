@@ -32,12 +32,12 @@ public class IllegalEventParameterException extends Exception {
      * Creates the exception.
      * @param message The message
      */
-    public IllegalEventParameterException(final String message) {
+    public IllegalEventParameterException(final EventPacket event, 
+    		final Level logLevel, final String message) {
         super(message);
 
-        logger
-            .log(Level.WARNING, "An IllegalEventParameterException occured.");
-
-        logger.log(Level.WARNING, this.getMessage());
+        logger.log(logLevel, "An IllegalEventParameterException occured.");
+        logger.log(logLevel, "  in event " + event.toString());
+        logger.log(logLevel, "  because: " + this.getMessage());
     }
 }
