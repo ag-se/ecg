@@ -950,7 +950,10 @@ public final class ECGEclipseSensor {
                 return false;
             }
 
-            if (process.getAttribute(IProcess.ATTR_PROCESS_TYPE).toLowerCase().endsWith("antprocess")) {
+            if (process != null 
+            		&& process.getAttribute(IProcess.ATTR_PROCESS_TYPE) != null
+            		&& process.getAttribute(IProcess.ATTR_PROCESS_TYPE)
+            			.toLowerCase().endsWith("antprocess")) {
 
                 String cmdLine = process.getAttribute(IProcess.ATTR_CMDLINE);
             	
