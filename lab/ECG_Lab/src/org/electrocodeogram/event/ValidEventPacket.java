@@ -196,7 +196,7 @@ public class ValidEventPacket extends WellFormedEventPacket {
 
         validationLevel = validityLevel;
         
-        logger.log(Level.INFO,"The validation level has been set to: " + validityLevel);
+        logger.log(Level.INFO, "The validation level has been set to: " + validityLevel);
 
         logger.exiting(ValidEventPacket.class.getName(), "setValidityLevel");
 
@@ -260,16 +260,10 @@ public class ValidEventPacket extends WellFormedEventPacket {
 
         if (!this.getSensorDataType().equals(
             WellFormedEventPacket.HACKYSTAT_ACTIVITY_STRING)) {
-            logger.log(Level.FINE,
-                "The event is not valid in repspect to validity level: "
-                                + VALIDATION_LEVEL.ECG);
-
-            logger.log(Level.FINE,
-                "The event is not a HackyStat ActivityEvent.");
-
             logger.exiting(this.getClass().getName(), "ecgValidate");
 
             throw new IllegalEventParameterException(
+            	this, Level.FINE,
                 "The event is not a HackyStat ActivityEvent.");
 
         }
@@ -279,16 +273,10 @@ public class ValidEventPacket extends WellFormedEventPacket {
         String microActivityType = (String) argList.get(1);
 
         if (microActivityType == null || microActivityType.equals("")) {
-            logger.log(Level.FINE,
-                "The event is not valid in repspect to validity level: "
-                                + VALIDATION_LEVEL.ECG);
-
-            logger.log(Level.FINE,
-                "The event does not have a MicroSensorDataType.");
-
             logger.exiting(this.getClass().getName(), "ecgValidate");
 
             throw new IllegalEventParameterException(
+            	this, Level.FINE,
                 "The event does not have a MicroSensorDataType.");
 
         }
@@ -297,17 +285,11 @@ public class ValidEventPacket extends WellFormedEventPacket {
 
         if (microActivityString == null || microActivityString.equals("")) {
 
-            logger.log(Level.FINE,
-                "The event is not valid in repspect to validity level: "
-                                + VALIDATION_LEVEL.ECG);
-
-            logger.log(Level.FINE,
-                "The event does not have a MicroSensorDataType.");
-
             logger.exiting(this.getClass().getName(), "ecgValidate");
 
             throw new IllegalEventParameterException(
-                "The event does not have a MicroSensorDataType.");
+            	this, Level.FINE,
+                "The event does not have a parameter string.");
 
         }
 
@@ -316,17 +298,10 @@ public class ValidEventPacket extends WellFormedEventPacket {
 
         if (microSensorDataTypes == null || microSensorDataTypes.length == 0) {
 
-            logger.log(Level.FINE,
-                "The event is not valid in repspect to validity level: "
-                                + VALIDATION_LEVEL.ECG);
-
-            logger
-                .log(Level.FINE,
-                    "There are currently no MicroSensorDataTypes registered in the ECG.");
-
             logger.exiting(this.getClass().getName(), "ecgValidate");
 
             throw new IllegalEventParameterException(
+            	this, Level.WARNING,
                 "There are currently no MicroSensorDataTypes registered in the ECG.");
 
         }
@@ -350,17 +325,15 @@ public class ValidEventPacket extends WellFormedEventPacket {
         }
 
         if (defFile == null) {
-            logger.log(Level.FINE,
-                "The event is not valid in respect to validity level: "
-                                + validationLevel);
 
-            logger.log(Level.FINE,
+        	logger.log(Level.FINE,
                 "The MicroSensorDataType of the event is unknown.");
 
             logger.exiting(this.getClass().getName(), "ecgValidate");
 
             throw new IllegalEventParameterException(
-                "The MicroSensorDataType of the event is unknown.");
+            	this, (microActivityType.startsWith("msdt") ? Level.WARNING : Level.FINE),
+            	"The MicroSensorDataType of the event is unknown.");
 
         }
 
@@ -375,26 +348,16 @@ public class ValidEventPacket extends WellFormedEventPacket {
 
             logger.exiting(this.getClass().getName(), "ecgValidate");
         } catch (SAXException e) {
-            logger.log(Level.FINE,
-                "The event is not valid in repspect to validity level: "
-                                + validationLevel);
 
-            logger
-                .log(Level.FINE,
-                    "The event is not valid in respect to his MicroSensorDataType.");
-
-            throw new IllegalEventParameterException("The event is not valid in respect to this MicroSensorDataType.\n" + e.getMessage());
+            throw new IllegalEventParameterException(
+                	this, Level.WARNING,
+            		"The event is not valid in respect to the MicroSensorDataType: " + e.getMessage());
 
         } catch (IOException e) {
-            logger.log(Level.FINE,
-                "The event is not valid in repspect to validity level: "
-                                + validationLevel);
 
-            logger
-                .log(Level.FINE,
-                    "The event is not valid in respect to his MicroSensorDataType.");
-
-            throw new IllegalEventParameterException("The event is not valid in respect to this MicroSensorDataType.\n" + e.getMessage());
+            throw new IllegalEventParameterException(
+                	this, Level.WARNING,
+            		"The event is not valid in respect to this MicroSensorDataType.\n" + e.getMessage());
         }
     }
 
@@ -421,15 +384,13 @@ public class ValidEventPacket extends WellFormedEventPacket {
                 entryList.add(str);
             } else {
                 logger.log(Level.FINE,
-                    "The event is not valid in repspect to validity level: "
+                    "The event is not valid even in repspect to validity level: "
                                     + VALIDATION_LEVEL.HACKYSTAT);
-
-                logger.log(Level.FINE,
-                    "The argList contains non-String elements.");
 
                 logger.exiting(this.getClass().getName(), "hackyStatValidate");
 
                 throw new IllegalEventParameterException(
+                	this, Level.WARNING,
                     "The argList contains non-String elements.");
             }
 
@@ -441,14 +402,14 @@ public class ValidEventPacket extends WellFormedEventPacket {
 
         } catch (SensorDataTypeException e) {
             logger.log(Level.FINE,
-                "The event is not valid in respect to validity level: "
+                "The event is not valid even in respect to validity level: "
                                 + VALIDATION_LEVEL.HACKYSTAT);
-
-            logger.log(Level.FINE, e.getMessage());
 
             logger.exiting(this.getClass().getName(), "hackyStatValidate");
 
-            throw new IllegalEventParameterException(e.getMessage());
+            throw new IllegalEventParameterException(
+                	this, Level.FINE,
+            		e.getMessage());
         }
     }
 
