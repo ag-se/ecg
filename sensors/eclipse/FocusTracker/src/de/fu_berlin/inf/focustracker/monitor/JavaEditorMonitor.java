@@ -399,8 +399,9 @@ public class JavaEditorMonitor extends AbstractFocusTrackerMonitor implements
 			// check folding
 			projectionAnnotationModel = (ProjectionAnnotationModel) editor.getAdapter(ProjectionAnnotationModel.class);
 			foldingListener = new FoldingListener(origin);
-			projectionAnnotationModel
-					.addAnnotationModelListener(foldingListener);
+			if(projectionAnnotationModel != null) {
+				projectionAnnotationModel.addAnnotationModelListener(foldingListener);
+			}
 
 			editor.getViewer().getTextWidget().addMouseMoveListener(this);
 			input = EditorUtility.getEditorInputJavaElement(editor, true); 

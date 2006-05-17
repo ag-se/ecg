@@ -2,14 +2,12 @@ package de.fu_berlin.inf.focustracker.ui;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.IDecoration;
-import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ILightweightLabelDecorator;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.LabelProviderChangedEvent;
@@ -20,7 +18,6 @@ import org.eclipse.ui.PlatformUI;
 import de.fu_berlin.inf.focustracker.EventDispatcher;
 import de.fu_berlin.inf.focustracker.interaction.Interaction;
 import de.fu_berlin.inf.focustracker.interaction.InteractionListener;
-import de.fu_berlin.inf.focustracker.interaction.JavaInteraction;
 import de.fu_berlin.inf.focustracker.repository.InteractionRepository;
 
 public class FocusTrackerDecorator extends LabelProvider implements ILightweightLabelDecorator, InteractionListener {
@@ -93,7 +90,8 @@ public class FocusTrackerDecorator extends LabelProvider implements ILightweight
 //			}
 //		}
 //		postLabelEvent(new LabelProviderChangedEvent(FocusTrackerDecorator.this, elements.toArray()));
-		postLabelEvent(new LabelProviderChangedEvent(FocusTrackerDecorator.this));
+		postLabelEvent(new LabelProviderChangedEvent(FocusTrackerDecorator.this, InteractionRepository.getInstance().getElements().keySet().toArray()));
+//		postLabelEvent(new LabelProviderChangedEvent(FocusTrackerDecorator.this));
 		
 	}
 	

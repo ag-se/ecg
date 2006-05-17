@@ -51,7 +51,9 @@ public class PartMonitor implements IPartListener {
 		if(aPart instanceof IEditorPart) {
 			if(activatedEditor != null && activatedEditor != aPart) {
 //				System.err.println("----#### sending closed to : " + activatedEditor.getTitle() + " opened " + aPart.getTitle());
-				monitorInstances.get(activatedEditor).partClosed();
+				if (monitorInstances.get(activatedEditor) != null) {
+					monitorInstances.get(activatedEditor).partClosed();
+				}
 			}
 			activatedEditor = (IEditorPart)aPart;
 		}
