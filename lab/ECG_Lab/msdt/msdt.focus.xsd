@@ -19,12 +19,13 @@
 		<xs:complexType>
 	    	<xs:sequence>
 				<xs:element name="commonData" type="commonDataType"/>
-				<xs:element name="focustracker">
+				<xs:element name="focus">
 					<xs:complexType>
 						<xs:sequence>
-							<xs:element name="element"/>
-							<xs:element name="elementType"/>
-							<xs:element name="focus" type="xs:boolean"/>
+							<xs:element name="resourcename" type="xs:token"/>
+							<xs:element name="element" type="xs:token"/>
+							<xs:element name="elementtype" type="xs:token"/>
+							<xs:element name="hasfocus" type="xs:boolean"/>
 							<xs:element name="rating" type="xs:double" minOccurs="0"/>
 						</xs:sequence>
 					</xs:complexType>			
