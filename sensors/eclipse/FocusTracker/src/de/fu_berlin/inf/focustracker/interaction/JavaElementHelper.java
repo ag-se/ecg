@@ -11,6 +11,18 @@ import org.eclipse.jdt.internal.core.SourceMethod;
 
 public class JavaElementHelper {
 
+	
+	public static JavaElementResourceAndName getRepresentation(IJavaElement aJavaElement) {
+		JavaElementInformation elementInfo = getPackage(aJavaElement);
+		String path = aJavaElement.getPath().toString();
+		// remove the project name
+		System.err.println("path1: " + path + " projectname: " + aJavaElement.getJavaProject().getProject().getName());
+		path = path.replaceFirst("/" + aJavaElement.getJavaProject().getProject().getName(), "");
+		System.err.println("path2: " + path);
+		
+		return new JavaElementResourceAndName(path, getNameForElement(aJavaElement, elementInfo));
+	}
+	
 	public static String toString(IJavaElement aJavaElement) {
 		
 		StringBuffer ret = new StringBuffer();
@@ -18,27 +30,34 @@ public class JavaElementHelper {
 		ret.append(elementInfo.getPackageName() + "." + elementInfo.getFileName());
 		ret.append("#");
 		try {
-			if (aJavaElement instanceof SourceMethod) {
-				SourceMethod method = (SourceMethod) aJavaElement;
-				ret.append(method.getElementName());
-				ret.append("(");
-				addParameters(ret, method.getParameterTypes());
-				ret.append(")");
-			} else if (aJavaElement instanceof SourceField){
-				SourceField field = (SourceField) aJavaElement;
-				ret.append(field.getElementName());
-			} else if (aJavaElement instanceof CompilationUnit) {
-				// remove #
-				ret.deleteCharAt(ret.length()-1);
-			} else if (aJavaElement instanceof IPackageDeclaration) {
-				ret = new StringBuffer(elementInfo.getPackageName());
-			}
+			ret.append(getNameForElement(aJavaElement, elementInfo));
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
 		ret.append(" in \"");
 		ret.append(aJavaElement.getPath());
 		ret.append("\"");
+		System.err.println(ret.toString());
+		return ret.toString();
+	}
+	
+	private static String getNameForElement(IJavaElement aJavaElement, JavaElementInformation aElementInfo) {
+		StringBuffer ret = new StringBuffer();
+		if (aJavaElement instanceof SourceMethod) {
+			SourceMethod method = (SourceMethod) aJavaElement;
+			ret.append(method.getElementName());
+			ret.append("(");
+			addParameters(ret, method.getParameterTypes());
+			ret.append(")");
+		} else if (aJavaElement instanceof SourceField){
+			SourceField field = (SourceField) aJavaElement;
+			ret.append(field.getElementName());
+		} else if (aJavaElement instanceof CompilationUnit) {
+			// remove #
+//			ret.deleteCharAt(ret.length()-1);
+		} else if (aJavaElement instanceof IPackageDeclaration) {
+			ret = new StringBuffer(aElementInfo.getPackageName());
+		}
 		return ret.toString();
 	}
 	
@@ -110,3 +129,4 @@ class JavaElementInformation {
 		return packageName;
 	}
 }
+

@@ -15,6 +15,7 @@ import org.electrocodeogram.sensor.eclipse.ECGEclipseSensor;
 
 import de.fu_berlin.inf.focustracker.FocusTrackerPlugin;
 import de.fu_berlin.inf.focustracker.interaction.JavaElementHelper;
+import de.fu_berlin.inf.focustracker.interaction.JavaElementResourceAndName;
 import de.fu_berlin.inf.focustracker.interaction.SystemInteraction;
 import de.fu_berlin.inf.focustracker.ui.preferences.PreferenceConstants;
 
@@ -43,25 +44,29 @@ public class ECGExporter implements IPropertyChangeListener {
 	
 	
 	public void export(IJavaElement aJavaElement, double aRating, boolean aIsInFocus) {
+		JavaElementResourceAndName resAndName = JavaElementHelper.getRepresentation(aJavaElement);
 		
 		String data = "<?xml version=\"1.0\"?><microActivity><commonData><username>"
 			+ this.username
 			+ "</username><projectname>"
 			+ aJavaElement.getJavaProject().getProject().getName()		            
-			+ "</projectname></commonData><focustracker><element>" 
-			+ JavaElementHelper.toString(aJavaElement)
-			+ "</element><elementType>" 
+			+ "</projectname></commonData><focus><resourcename>" 
+//			+ JavaElementHelper.toString(aJavaElement)
+			+ resAndName.getResource()
+			+ "</resourcename><element>"
+			+ resAndName.getName()
+			+ "</element><elementtype>" 
 			+ aJavaElement.getClass().getName()
-			+ "</elementType><focus>" 
+			+ "</elementtype><hasfocus>" 
 			+ aIsInFocus
-			+ "</focus>" 
+			+ "</hasfocus>" 
 			+ (aIsInFocus ? "<rating>" + decimalFormat.format(aRating) + "</rating>" : "") // add rating only if element is in focus
-			+ "</focustracker></microActivity>";
+			+ "</focus></microActivity>";
 		
 //		System.err.println(data);
 		
 		ECGEclipseSensor.getInstance().processActivity(
-				"msdt.focustracker.xsd",
+				"msdt.focus.xsd",
 				data);
 	}
 	
@@ -69,19 +74,15 @@ public class ECGExporter implements IPropertyChangeListener {
 		
 		String data = "<?xml version=\"1.0\"?><microActivity><commonData><username>"
 			+ this.username
-			+ "</username></commonData><focustracker><system><origin>" 
-			+ aSystemInteraction.getOrigin()
-			+ "</origin><action>" 
+			+ "</username></commonData><user><activity>" 
 			+ aSystemInteraction.getAction()
-			+ "</action><timestamp>"
-			+ aSystemInteraction.getDate().getTime()
-			+ "</timestamp></system></focustracker></microActivity>";
+			+ "</activity></user></microActivity>";
 		
 //		System.err.println(data);
 		aSystemInteraction.setExported(true);
 		
 		ECGEclipseSensor.getInstance().processActivity(
-				"msdt.focustrackersystem.xsd",
+				"msdt.user.xsd",
 				data);
 	}
 	
