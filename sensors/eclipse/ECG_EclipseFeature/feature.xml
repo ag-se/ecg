@@ -2,23 +2,16 @@
 <feature
       id="org.electrocodeogram.sensor.eclipse"
       label="ElectroCodeoGram EclipseSensor with ECG Lab"
-      version="1.1.0"
+      version="1.1.1"
       provider-name="FU Berlin">
    <install-handler library="installer.jar" handler="org.electrocodeogram.installer.Installer"/>
 
-   <description url="http://www.inf.fu-berlin.de/ecg/update/">
+   <description url="http://projects.mi.fu-berlin.de/w/bin/view/SE/ElectroCodeoGram">
       This feature provides a plugin that acts as a sensor inside Eclipse
-programming process events. It is part of the ElectroCodeoGram
-framework for &quot;micro-process&quot; recording and analysis. The &quot;micro-process&quot;
-is the sequence of very fine steps a programmer takes while working.
-Analysis of the &quot;micor-process&quot; is falling into the domain of
-empirical software engineering, with the goal to make software
-processes better and to minimize defect rates.
-The sensor plugin collects &quot;micro-process&quot; events like the opening
-of a file, the running or building of an application and even
-textual changes in active documents. The events are then sent
-to the ElectroCodeoGram&apos;s ECG Lab process, where they can be
-analysed and stored into file system files for instance.
+programming process events. The sensor plugin collects &quot;micro-process&quot;
+events like the opening of a file, the running or building of
+an application, or textual changes in documents. The events are
+sent to the ElectroCodeoGram&apos;s ECG Lab.
 The ECG Lab comes along with this feature and the sensor plugin
 is configured to initiate the communication with the ECG Lab
 on its own.
@@ -30,11 +23,11 @@ on its own.
 
    <license>
       ElectroCodeoGram Software User Agreement
+
 9th May 2006
 
 ElectroCodeoGram (ECG) is licensed under the GNU General Public
 License (GPL). See http://www.gnu.org/licenses/gpl.html.
-
 Applicable Licenses: The ElectroCodeoGram sensor plugin for Eclipse
 and the ECG Labare built upon a number of other open source or
 free technologies and products.  Here is a list of those products
@@ -86,7 +79,7 @@ PRIOR TO USE OF THIS CONTENT.
          id="org.electrocodeogram.sensor.eclipse"
          download-size="0"
          install-size="0"
-         version="1.0.2"/>
+         version="1.1.1"/>
 
    <data
          id="../sensor.properties"
