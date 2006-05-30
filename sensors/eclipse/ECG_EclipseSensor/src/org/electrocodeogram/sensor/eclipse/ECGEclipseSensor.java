@@ -5,10 +5,11 @@
 package org.electrocodeogram.sensor.eclipse;
 
 import java.io.File;
-import java.util.ArrayList; 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ResourceBundle;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
@@ -39,14 +40,21 @@ import org.eclipse.debug.core.model.RuntimeProcess;
 import org.eclipse.jdt.internal.junit.ui.JUnitPlugin;
 import org.eclipse.jdt.junit.ITestRunListener;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.text.Assert;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentListener;
+import org.eclipse.jface.text.ITextOperationTarget;
+import org.eclipse.jface.text.TextSelection;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.dnd.Clipboard;
+import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.events.ShellListener;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
@@ -63,11 +71,20 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartConstants;
+import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.actions.ActionFactory;
+import org.eclipse.ui.texteditor.IAbstractTextEditorHelpContextIds;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.IElementStateListener;
 import org.eclipse.ui.texteditor.ITextEditor;
+import org.eclipse.ui.texteditor.ITextEditorActionConstants;
+import org.eclipse.ui.texteditor.ITextEditorActionDefinitionIds;
+import org.eclipse.ui.texteditor.IWorkbenchActionDefinitionIds;
+import org.eclipse.ui.texteditor.ResourceAction;
+import org.eclipse.ui.texteditor.TextEditorAction;
+import org.eclipse.ui.texteditor.TextOperationAction;
 import org.electrocodeogram.event.WellFormedEventPacket;
 import org.electrocodeogram.logging.LogHelper;
 import org.electrocodeogram.logging.LogHelper.ECGLevel;
@@ -195,20 +212,13 @@ public final class ECGEclipseSensor {
         logger.log(Level.FINE, "Got HackyStat EclipseSensorShell.");
 
         /*
-         * The next lines are needed for the InlineServer mode. In
+         * The next line is needed for the InlineServer mode. In
          * that case the ECG SensorShell needs to now where the ECG
          * Lab application is stored locally. The ECG Lab is stored in
          * a PlugIns subdirectory called "ecg" per default. So we get
          * the PlugIn directory name itself and are adding the "ecg"
          * subdirectory.
          */
-        // String id =
-        // EclipseSensorPlugin.getInstance().getDescriptor()
-        // .getUniqueIdentifier();
-        //
-        // String version =
-        // EclipseSensorPlugin.getInstance().getDescriptor()
-        // .getVersionIdentifier().toString();
         String[] path = {EclipseSensorPlugin.getInstance().getSensorPath()
                          + File.separator + "ecg"};
 
@@ -1301,17 +1311,24 @@ public final class ECGEclipseSensor {
                 
                 if (part instanceof ITextEditor) {
                     final ITextEditor textEditor = (ITextEditor) part;
-                    // TODO The next lines are only for exploration
-//                    PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
-//                        public void run() {
-//                            IAction copyActionHandler = new ECGCopyActionHandler();
-//                            copyActionHandler.setActionDefinitionId(textEditor.getAction(ActionFactory.COPY.getId()).getActionDefinitionId());
-//                            copyActionHandler.setId(textEditor.getAction(ActionFactory.COPY.getId()).getId());
-//                            textEditor.getEditorSite().getActionBars().setGlobalActionHandler(
-//                            		ActionFactory.COPY.getId(), copyActionHandler);
-//                            textEditor.getEditorSite().getActionBars().updateActionBars();
-//                        }
-//                    });
+                    // Register new CCP actions on this editor
+                    PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
+                        public void run() {
+                        	Action action= new ECGTextOperationAction(ResourceBundle.getBundle("org.eclipse.ui.texteditor.ConstructedEditorMessages"), "Editor.Cut.", textEditor, ITextOperationTarget.CUT); //$NON-NLS-1$
+                    		textEditor.getEditorSite().getActionBars().setGlobalActionHandler(ActionFactory.CUT.getId(), action);
+                    		textEditor.setAction(ITextEditorActionConstants.CUT, action);
+                    		
+                    		action= new ECGTextOperationAction(ResourceBundle.getBundle("org.eclipse.ui.texteditor.ConstructedEditorMessages"), "Editor.Copy.", textEditor, ITextOperationTarget.COPY); //$NON-NLS-1$
+                    		textEditor.getEditorSite().getActionBars().setGlobalActionHandler(ActionFactory.COPY.getId(), action);
+                    		textEditor.setAction(ITextEditorActionConstants.COPY, action);
+                    		
+                    		action= new ECGTextOperationAction(ResourceBundle.getBundle("org.eclipse.ui.texteditor.ConstructedEditorMessages"), "Editor.Paste.", textEditor, ITextOperationTarget.PASTE); //$NON-NLS-1$
+                    		textEditor.getEditorSite().getActionBars().setGlobalActionHandler(ActionFactory.PASTE.getId(), action);
+                    		textEditor.setAction(ITextEditorActionConstants.PASTE, action);                        	
+
+                            textEditor.getEditorSite().getActionBars().updateActionBars();
+                        }
+                    });
                     // TODO The next line is only for exploration (dirty bit flagged)
 //                    textEditor.addPropertyListener(new ECGPropertyListener());
                     IDocumentProvider provider = textEditor.getDocumentProvider();
@@ -2208,23 +2225,7 @@ public final class ECGEclipseSensor {
 	
 
 	/**
-	 * TODO: Experimental Copy Listener
-	 */
-    private class ECGCopyActionHandler extends Action {
-
-		/* (non-Javadoc)
-		 * @see org.eclipse.jface.action.Action#run()
-		 */
-		@Override
-		public void run() {
-			// TODO Auto-generated method stub
-			logger.log(ECGLevel.INFO, "CopyActionHandler executed"); 
-		}
-		
-	}
-
-	/**
-	 * TODO: Experimental Copy, etc. listener
+	 * TODO: Experimental Copy, etc. listener. Commands are key bindings only
 	 */
     private class ECGCommandExecutionListener implements IExecutionListener {
 
@@ -2353,5 +2354,161 @@ public final class ECGEclipseSensor {
         }
     }
 
+    /**
+     * Actions for Copy/Cut/Paste events. This action is registered on COPY/CUT/PASTE action
+     * ids on every opened TextEditor.
+     * 
+     * Mainly copied from org.eclipse.jdt.internal.ui.javaeditor.ClipboardOperationAction
+     * which replaces the usual CCP actions with enhanced ones
+     */
+    public final class ECGTextOperationAction extends TextEditorAction {
+    	
+    	/** The text operation code */
+    	private int fOperationCode= -1;
+    	/** The text operation target */
+    	private ITextOperationTarget fOperationTarget;
+
+    	
+    	/**
+    	 * Creates the action.
+    	 */
+    	public ECGTextOperationAction(ResourceBundle bundle, String prefix, ITextEditor editor, int operationCode) {
+    		super(bundle, prefix, editor);
+    		fOperationCode= operationCode;
+    		
+    		if (operationCode == ITextOperationTarget.CUT) {
+    			setHelpContextId(IAbstractTextEditorHelpContextIds.CUT_ACTION);
+    			setActionDefinitionId(ITextEditorActionDefinitionIds.CUT);
+    		} else if (operationCode == ITextOperationTarget.COPY) {
+    			setHelpContextId(IAbstractTextEditorHelpContextIds.COPY_ACTION);
+    			setActionDefinitionId(ITextEditorActionDefinitionIds.COPY);
+    		} else if (operationCode == ITextOperationTarget.PASTE) {
+    			setHelpContextId(IAbstractTextEditorHelpContextIds.PASTE_ACTION);
+    			setActionDefinitionId(ITextEditorActionDefinitionIds.PASTE);
+    		} else {
+    			Assert.isTrue(false, "Invalid operation code"); //$NON-NLS-1$
+    		}
+    		update();
+    	}
+    	
+    	private boolean isReadOnlyOperation() {
+    		return fOperationCode == ITextOperationTarget.COPY;
+    	}
+
+    	
+    	/* (non-Javadoc)
+    	 * @see org.eclipse.jface.action.IAction#run()
+    	 */
+    	public void run() {
+    		if (fOperationCode == -1 || fOperationTarget == null)
+    			return;
+    			
+    		ITextEditor editor= getTextEditor();
+
+    		if (editor == null)
+    			return;
+
+    		if (!isReadOnlyOperation() && !validateEditorInputState())
+    			return;
+
+    		Clipboard clipboard= new Clipboard(getDisplay());
+    		TextTransfer textTransfer = TextTransfer.getInstance();
+    		ISelection sel = editor.getSelectionProvider().getSelection();
+    		String selection = (sel instanceof TextSelection ? ((TextSelection)sel).getText() : "");
+    		fOperationTarget.doOperation(fOperationCode);
+    		if (fOperationCode == ITextOperationTarget.CUT) {
+    			logger.log(ECGLevel.PACKET, "A Cut operation has been recorded");
+                processActivity(
+                    "msdt.user.xsd",
+                    "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+                        + getUsername()
+                        + "</username><projectname>"
+                        + getProjectnameFromLocation(editor.getTitleToolTip())
+                        + "</projectname></commonData><user><activity>cut</activity><param1>"
+                        + getFilenameFromLocation(editor.getTitleToolTip())
+                        + "</param1><param2><![CDATA["
+                        + selection
+                        + "]" + "]" + "></param2></user></microActivity>");
+    		} else if (fOperationCode == ITextOperationTarget.COPY) {
+    			logger.log(ECGLevel.PACKET, "A Copy operation has been recorded");
+                processActivity(
+                    "msdt.user.xsd",
+                    "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+                        + getUsername()
+                        + "</username><projectname>"
+                        + getProjectnameFromLocation(editor.getTitleToolTip())
+                        + "</projectname></commonData><user><activity>copy</activity><param1>"
+                        + getFilenameFromLocation(editor.getTitleToolTip())
+                        + "</param1><param2><![CDATA["
+                        + selection
+                        + "]" + "]" + "></param2></user></microActivity>");
+    		} else if (fOperationCode == ITextOperationTarget.PASTE) {
+    			logger.log(ECGLevel.PACKET, "A Paste operation has been recorded");
+                processActivity(
+                    "msdt.user.xsd",
+                    "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+                        + getUsername()
+                        + "</username><projectname>"
+                        + getProjectnameFromLocation(editor.getTitleToolTip())
+                        + "</projectname></commonData><user><activity>paste</activity><param1>"
+                        + getFilenameFromLocation(editor.getTitleToolTip())
+                        + "</param1><param2><![CDATA["
+                        + clipboard.getContents(textTransfer)
+                        + "]" + "]" + "></param2></user></microActivity>");
+    		}
+    		clipboard.dispose();
+
+    	}
+    	
+    	private Shell getShell() {
+    		ITextEditor editor= getTextEditor();
+    		if (editor != null) {
+    			IWorkbenchPartSite site= editor.getSite();
+    			Shell shell= site.getShell();
+    			if (shell != null && !shell.isDisposed()) {
+    				return shell;
+    			}
+    		}
+    		return null;
+    	}
+    	
+    	private Display getDisplay() {
+    		Shell shell= getShell();
+    		if (shell != null) {
+    			return shell.getDisplay();
+    		}
+    		return null;
+    	}
+    	
+    	
+    	/* (non-Javadoc)
+    	 * @see org.eclipse.ui.texteditor.IUpdate#update()
+    	 */
+    	public void update() {
+    		super.update();
+    		
+    		if (!isReadOnlyOperation() && !canModifyEditor()) {
+    			setEnabled(false);
+    			return;
+    		}
+    		
+    		ITextEditor editor= getTextEditor();
+    		if (fOperationTarget == null && editor!= null && fOperationCode != -1)
+    			fOperationTarget= (ITextOperationTarget) editor.getAdapter(ITextOperationTarget.class);
+    			
+    		boolean isEnabled= (fOperationTarget != null && fOperationTarget.canDoOperation(fOperationCode));
+    		setEnabled(isEnabled);
+    	}
+    	
+    	/* (non-Javadoc)
+    	 * @see org.eclipse.ui.texteditor.TextEditorAction#setEditor(org.eclipse.ui.texteditor.ITextEditor)
+    	 */
+    	public void setEditor(ITextEditor editor) {
+    		super.setEditor(editor);
+    		fOperationTarget= null;
+    	}
+    	
+
+    }
 }
   
