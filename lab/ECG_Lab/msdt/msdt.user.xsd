@@ -25,8 +25,8 @@
 						 <xs:element name="activity">
 						  <xs:simpleType>
 						   <xs:restriction base="xs:string">
-                            <xs:enumeration value="USER_ACTIVE"/>
-                            <xs:enumeration value="USER_INACTIVE"/>
+                            <xs:enumeration value="user_active"/>
+                            <xs:enumeration value="user_inactive"/>
                             <xs:enumeration value="copy"/>
                             <xs:enumeration value="cut"/>
                             <xs:enumeration value="paste"/>
