@@ -151,7 +151,7 @@ public class FileReaderThread extends EventReader {
 
         WellFormedEventPacket eventPacket = null;
 
-        boolean codechange = false;
+        boolean cdatafragment = false;
 
         int lineNumber = 0;
 
@@ -176,15 +176,14 @@ public class FileReaderThread extends EventReader {
                 return null;
             }
 
-            if ((line.contains("<codechange>") || line.contains("<codestatus>")) 
-                && !(line.contains("</codechange>") || line.contains("</codestatus>"))) {
+            if (line.contains("<![CDATA") && !line.contains("]]>")) {
 
-                codechange = true;
+                cdatafragment = true;
 
                 int beginOfCode = line.indexOf("<![CDATA");
 
                 logger.log(Level.FINE,
-                    "Begin of a multiline Codechange event at index: "
+                    "Begin of a CDATA section at index: "
                                     + beginOfCode);
 
                 int endOfCode = 0;
@@ -192,13 +191,13 @@ public class FileReaderThread extends EventReader {
                 String nextLine;
 
                 while ((nextLine = this.reader.readLine()) != null && this.run) {
-                    line += nextLine + NEW_LINE_CHAR;
+                    line += NEW_LINE_CHAR + nextLine;
 
                     lineNumber++;
 
-                    if (nextLine.contains("</codechange>") || nextLine.contains("</codestatus>")) {
+                    if (nextLine.contains("]]>")) {
 
-                        endOfCode = line.lastIndexOf("</document>");
+                        endOfCode = line.lastIndexOf("]]>");
 
                         logger.log(Level.FINE,
                             "Codechange event complete at index: " + endOfCode);
@@ -214,7 +213,7 @@ public class FileReaderThread extends EventReader {
                     logger.log(Level.WARNING,
                         "This line does not contain a valid codechange event.");
 
-                    codechange = false;
+                    cdatafragment = false;
 
                     return null;
                 }
@@ -325,7 +324,7 @@ public class FileReaderThread extends EventReader {
                 argListStringArray[i++] = argListTokenizer.nextToken();
             }
 
-            if (codechange) {
+            if (cdatafragment) {
                 if (code == null || code.equals("")) {
                     logger.log(Level.WARNING, "Error while reading line "
                                               + lineNumber + ":");
@@ -333,7 +332,7 @@ public class FileReaderThread extends EventReader {
                     logger.log(Level.WARNING,
                         "This line does not contain a valid codechange event.");
 
-                    codechange = false;
+                    cdatafragment = false;
 
                     return null;
                 }
@@ -347,7 +346,7 @@ public class FileReaderThread extends EventReader {
                     logger.log(Level.WARNING,
                         "This line does not contain a valid codechange event.");
 
-                    codechange = false;
+                    cdatafragment = false;
 
                     return null;
                 }
