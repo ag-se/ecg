@@ -40,6 +40,11 @@ public class FileSystemTargetModule extends TargetModule {
     private File outputFile;
 
     /**
+     * The original name of the output file.
+     */
+    private String outputFileName;
+
+    /**
      * The <em>PrintWriter</em> is used to write events into the
      * file.
      */
@@ -70,7 +75,7 @@ public class FileSystemTargetModule extends TargetModule {
     /**
      * This counter is indexing the output files for the rotation.
      */
-    private int count = 0;
+    private int count = 1;
 
     /**
      * The actual maximum file size for the rotation.
@@ -90,7 +95,7 @@ public class FileSystemTargetModule extends TargetModule {
     /**
      * A reference to the log directory.
      */
-    private File logDir;
+    private String logDir;
 
     /**
      * This creates the module instance. It is not to be called by
@@ -139,10 +144,10 @@ public class FileSystemTargetModule extends TargetModule {
 
                 this.writer.close();
 
-                this.outputFile = new File(this.logDir.getAbsoluteFile()
-                                           + File.separator + ++this.count
-                                           + "_"
-                                           + this.outputFile.getAbsolutePath());
+                this.outputFile = new File(this.logDir
+                                           + File.separator
+                                           + ++this.count + "_" 
+                                           + this.outputFileName);
 
                 this.writer = new PrintWriter(new FileWriter(this.outputFile));
 
@@ -184,10 +189,14 @@ public class FileSystemTargetModule extends TargetModule {
                     this.getId(), moduleProperty.getName(), moduleProperty
                         .getValue());
             }
+            
+            this.outputFileName = moduleProperty.getValue();
 
-            File propertyValueFile = new File(moduleProperty.getValue());
+            this.outputFile = new File(this.outputFileName);
 
-            this.outputFile = propertyValueFile;
+            this.logDir = this.outputFile.getAbsoluteFile().getParent();
+            if (this.logDir == null)
+            	this.logDir = ".";
 
             if (this.writer != null) {
                 this.writer.close();
@@ -311,7 +320,6 @@ public class FileSystemTargetModule extends TargetModule {
     /**
      * @see org.electrocodeogram.module.target.TargetModule#startWriter()
      */
-    @SuppressWarnings("unused")
     @Override
     public final void startWriter() throws TargetModuleException {
 
@@ -334,17 +342,19 @@ public class FileSystemTargetModule extends TargetModule {
                                     + "instead.");
             }
 
-            this.logDir = new File(this.homeDir + File.separator + LOG_SUBDIR);
+            File logDirFile = new File(this.homeDir + File.separator + LOG_SUBDIR);
 
-            if (!this.logDir.exists()) {
-                this.logDir.mkdir();
+            if (!logDirFile.exists()) {
+                logDirFile.mkdir();
             }
+            
+            this.logDir = logDirFile.getAbsolutePath();
 
-            String outputFileName = DEFAULT_FILENAME_PREFIX
+            this.outputFileName = this.logDir + File.separator 
+            						+ DEFAULT_FILENAME_PREFIX
                                     + DEFAULT_FILENAME_SUFFIX;
 
-            this.outputFile = new File(this.logDir.getAbsolutePath()
-                                       + File.separator + outputFileName);
+            this.outputFile = new File(this.outputFileName);
 
             try {
                 this.writer = new PrintWriter(new BufferedWriter(
@@ -358,6 +368,11 @@ public class FileSystemTargetModule extends TargetModule {
                 logger.log(Level.FINEST, e.getMessage());
             }
         }
+
+        this.logDir = this.outputFile.getAbsoluteFile().getParent();
+        if (this.logDir == null)
+        	this.logDir = ".";
+
         logger.exiting(this.getClass().getName(), "startWriter");
 
     }
