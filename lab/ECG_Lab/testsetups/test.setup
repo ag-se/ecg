@@ -34,7 +34,7 @@
 		<properties>
 			<property>
 				<name>Input File</name>
-				<value>testeventlogs/Acm3_060509.log</value>
+				<value>testeventlogs/ACM060530_acm2_events.log</value>
 				<type>java.io.File</type>
 			</property>
 			<property>
@@ -200,7 +200,7 @@
 					Columns
 				</name>
 				<value>
-					type,timestamp,endtime,resourcename,duration,changed
+					type,timestamp,endtime,resourcename,duration,changed,activity,param1,mode
 				</value>
 				<type>
 					java.lang.String
