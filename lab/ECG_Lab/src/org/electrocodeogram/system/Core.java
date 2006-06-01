@@ -824,7 +824,10 @@ public final class Core extends Observable implements ISystem, IModuleSystem,
         java.lang.System.out.println("Where options are:\n");
 
         java.lang.System.out
-            .println("-m <moduleDir>\tSets the module directory to moduleDir.\n");
+            .println("-m <modulesDir>\tSets the directory which contains the modules to <modulesDir>.\n");
+
+        java.lang.System.out
+        	.println("-madd <moduleDir>\tSets an additional module directory <moduleDir>.\n");
 
         java.lang.System.out
             .println("-s <moduleSetupFile>\tIs the file containing the module setup to load.\n");
