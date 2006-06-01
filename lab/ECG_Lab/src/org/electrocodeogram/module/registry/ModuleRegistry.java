@@ -17,6 +17,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Observable;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -68,7 +69,7 @@ public class ModuleRegistry extends Observable implements IModuleRegistry {
      * A reference to the member class containing the
      * <em>ModulePackages</em>.
      */
-    private ModulePackagesMap modulePackageMap;
+    private ModulePackagesMap modulePackageMap = new ModulePackagesMap(this);;
 
     /**
      * Creates the <em>ModuleRegistry</em> without a module
@@ -80,6 +81,7 @@ public class ModuleRegistry extends Observable implements IModuleRegistry {
         logger.entering(this.getClass().getName(), "ModuleRegistry");
 
         this.moduleInstanceMap = new ModuleInstanceMap();
+        this.modulePackageMap = new ModulePackagesMap(this);
 
         logger.exiting(this.getClass().getName(), "ModuleRegistry");
 
@@ -94,69 +96,51 @@ public class ModuleRegistry extends Observable implements IModuleRegistry {
      *             initialising the
      *             {@link org.electrocodeogram.modulepackage.classloader.ModuleClassLoader}
      */
-    public ModuleRegistry(final File moduleDirectory)
+    public ModuleRegistry(final File modulesDirectory)
         throws ModuleClassLoaderInitializationException {
         this();
 
         logger.entering(this.getClass().getName(), "ModuleRegistry",
-            new Object[] {moduleDirectory});
+            new Object[] {modulesDirectory});
 
-        if (moduleDirectory == null) {
-            logger.log(Level.WARNING,
-                "The parameter \"moduleDirectory\" is null.");
-
-            logger.exiting(this.getClass().getName(), "ModuleRegistry");
-
-            return;
-        }
-
-        this.modulePackageMap = new ModulePackagesMap(this, moduleDirectory);
-
-        this.modulePackageMap.initialize();
+        setModuleDirectory(modulesDirectory);
 
         setChanged();
-
         notifyObservers();
-
         clearChanged();
 
         logger.exiting(this.getClass().getName(), "ModuleRegistry");
 
     }
 
-    /**
-     * If the module directory is not known at
-     * <em>ModuleRegistry's</em> creation this method is used to set
-     * the module directory later.
+	/**
+     * This method is used to set the directory of modules.
      * @param moduleDirectory
      *            This directory is looked for <em>ModulePackages</em>
      * @throws ModuleClassLoaderInitializationException
      *             If an exception occurs while
      *             inititalising the
      *             {@link org.electrocodeogram.modulepackage.classloader.ModuleClassLoader}
+     * TODO rename this to setModulesDirectory()
      */
-    public final void setModuleDirectory(final File moduleDirectory)
+    public final void setModuleDirectory(final File modulesDirectory)
         throws ModuleClassLoaderInitializationException {
         logger.entering(this.getClass().getName(), "setModuleDirectory",
-            new Object[] {moduleDirectory});
+            new Object[] {modulesDirectory});
 
-        if (moduleDirectory == null) {
+        if (modulesDirectory == null) {
             logger.log(Level.WARNING,
-                "The parameter \"moduleDirectory\" is null.");
+                "The parameter \"modulesDirectory\" is null.");
 
             logger.exiting(this.getClass().getName(), "setModuleDirectory");
 
             return;
         }
 
-        this.modulePackageMap = new ModulePackagesMap(this, moduleDirectory);
-
-        this.modulePackageMap.initialize();
-
+        this.modulePackageMap.initializeModulesDirectory(modulesDirectory);
+        
         setChanged();
-
         notifyObservers();
-
         clearChanged();
 
         logger.exiting(this.getClass().getName(), "setModuleDirectory");
@@ -164,11 +148,39 @@ public class ModuleRegistry extends Observable implements IModuleRegistry {
     }
 
     /**
-     * @see org.electrocodeogram.module.registry.IModuleRegistry#geModulePackageIds()
+     * @see org.electrocodeogram.module.registry.IModuleRegistry#addModule(java.io.File)
      */
-    @SuppressWarnings("synthetic-access")
+    public void addModule(final File moduleDirectory) 
+    	throws ModuleClassLoaderInitializationException {
+
+    	logger.entering(this.getClass().getName(), "addModule",
+                new Object[] {moduleDirectory});
+
+        if (moduleDirectory == null) {
+            logger.log(Level.WARNING,
+                "The parameter \"moduleDirectory\" is null.");
+
+            logger.exiting(this.getClass().getName(), "addModule");
+
+            return;
+        }
+
+    	this.modulePackageMap.addModuleDirectory(moduleDirectory);
+    	
+        setChanged();
+        notifyObservers();
+        clearChanged();
+    	
+        logger.entering(this.getClass().getName(), "addModule",
+                new Object[] {moduleDirectory});
+	}
+
+	/**
+     * @see org.electrocodeogram.module.registry.IModuleRegistry#geModulePackageIds()
+     * TODO Rename this to getModulePackageIds()
+     */
     public final String[] geModulePackageIds() {
-        logger.entering(this.getClass().getName(), "setModuleDirectory");
+        logger.entering(this.getClass().getName(), "getModulePackageIds");
 
         if (this.modulePackageMap.availableModuleClassesMap.size() > 0) {
 
@@ -188,7 +200,7 @@ public class ModuleRegistry extends Observable implements IModuleRegistry {
                         .size()]);
         }
 
-        logger.exiting(this.getClass().getName(), "setModuleDirectory", new String[0]);
+        logger.exiting(this.getClass().getName(), "getModulePackageIds", new String[0]);
 
         return new String[0];
     }
@@ -204,7 +216,6 @@ public class ModuleRegistry extends Observable implements IModuleRegistry {
      *             <em>ModulePackage</em> could be found with the
      *             given id
      */
-    @SuppressWarnings({"synthetic-access","synthetic-access"})
     private Class getModulePackage(final String id)
         throws ModulePackageNotFoundException {
         logger.entering(this.getClass().getName(), "getModulePackage",
@@ -248,9 +259,7 @@ public class ModuleRegistry extends Observable implements IModuleRegistry {
             .entering(this.getClass().getName(), "fireNewModulePackage");
 
         setChanged();
-
         notifyObservers(moduleDescriptor);
-
         clearChanged();
 
         logger.exiting(this.getClass().getName(), "fireNewModulePackage");
@@ -281,12 +290,6 @@ public class ModuleRegistry extends Observable implements IModuleRegistry {
             .createLogger(ModulePackagesMap.class.getName());
 
         /**
-         * A reference to the module directory path that is currently
-         * looked up for <em>ModulePackages</em>.
-         */
-        private String currentModuleDirectoryString;
-
-        /**
          * This is the name of the module property file.
          */
         private static final String MODULE_PROPERTY_FILE = "module.properties.xml";
@@ -295,11 +298,6 @@ public class ModuleRegistry extends Observable implements IModuleRegistry {
          * This is the map itself.
          */
         private HashMap<String, ModuleDescriptor> availableModuleClassesMap = null;
-
-        /**
-         * The module directory.
-         */
-        private File moduleDirectory;
 
         /**
          * A reference to the surrounding <em>ModuleRegistry</em>.
@@ -315,23 +313,20 @@ public class ModuleRegistry extends Observable implements IModuleRegistry {
          * @param directory
          *            Is the module directory
          */
-        private ModulePackagesMap(final ModuleRegistry registry,
-            final File directory) {
+        private ModulePackagesMap(final ModuleRegistry registry) {
             modulePackagesMapLogger.entering(this.getClass().getName(),
-                "InstalledModules", new Object[] {registry, directory});
+                "InstalledModules", new Object[] {registry});
 
             this.availableModuleClassesMap = new HashMap<String, ModuleDescriptor>();
 
             this.moduleRegistry = registry;
-
-            this.moduleDirectory = directory;
 
             modulePackagesMapLogger.exiting(this.getClass().getName(),
                 "InstalledModules");
 
         }
 
-        /**
+		/**
          * This method is looking for <em>ModulePackages</em> inside
          * the module directory. For every found
          * <em>ModulePackage</em> the module property file is parsed
@@ -342,129 +337,137 @@ public class ModuleRegistry extends Observable implements IModuleRegistry {
          *             initializing the
          *             {@link org.electrocodeogram.modulepackage.classloader.ModuleClassLoader}
          */
-        void initialize() throws ModuleClassLoaderInitializationException {
-            modulePackagesMapLogger.entering(this.getClass().getName(),
-                "initialize");
+        void initializeModulesDirectory(final File modulesDirectory) 
+        	throws ModuleClassLoaderInitializationException {
 
-            String[] moduleDirectories = getModulePackages();
+        	modulePackagesMapLogger.entering(this.getClass().getName(),
+                "initializeModulesDirectory");
+
+            String[] moduleDirectories = getModulePackages(modulesDirectory);
 
             int length = moduleDirectories.length;
 
+            String currentModuleDirectoryString;
+
             for (int i = 0; i < length; i++) {
 
-                this.currentModuleDirectoryString = this.moduleDirectory
-                                                    + File.separator
-                                                    + moduleDirectories[i];
+                currentModuleDirectoryString = modulesDirectory.getAbsolutePath()
+                                               + File.separator
+                                               + moduleDirectories[i];
+                
+                File currentModuleDirectory = new File(currentModuleDirectoryString);
 
-                File currentModuleDirectory = new File(
-                    this.currentModuleDirectoryString);
-
-                // skip all simple files
-                if (!currentModuleDirectory.isDirectory()) {
-                    modulePackagesMapLogger.log(Level.FINE,
-                        "Skipping simple file in module directory: "
-                                        + currentModuleDirectory
-                                            .getAbsolutePath());
-
-                    continue;
-                }
-
-                String modulePropertyFileString = this.currentModuleDirectoryString
-                                                  + File.separator
-                                                  + MODULE_PROPERTY_FILE;
-
-                File modulePropertyFile = new File(modulePropertyFileString);
-
-                // inspect module.property file and skip if neccessary
-                if (!modulePropertyFile.exists()
-                    || !modulePropertyFile.isFile()) {
-
-                    modulePackagesMapLogger.log(Level.FINE,
-                        "The module property file does not exist or is not a file: "
-                                        + modulePropertyFileString);
-
-                    continue;
-
-                }
-
-                ModuleDescriptor moduleDescriptor = null;
-                try {
-                    moduleDescriptor = ECGParser
-                        .parseAsModuleDescriptor(modulePropertyFile);
-                } catch (ClassLoadingException e) {
-                    modulePackagesMapLogger.log(Level.WARNING,
-                        "Error while loading the module: "
-                                        + modulePropertyFileString);
-
-                    continue;
-                } catch (MicroSensorDataTypeException e) {
-                    modulePackagesMapLogger.log(Level.WARNING,
-                        "Error while loading the module: "
-                                        + modulePropertyFileString);
-
-                    continue;
-                } catch (SAXException e) {
-                    modulePackagesMapLogger.log(Level.WARNING,
-                        "Error while loading the module: "
-                                        + modulePropertyFileString);
-
-                    modulePackagesMapLogger.log(Level.FINEST, e.getMessage());
-
-                    continue;
-                } catch (IOException e) {
-                    modulePackagesMapLogger.log(Level.WARNING,
-                        "Error while loading the module: "
-                                        + modulePropertyFileString);
-
-                    modulePackagesMapLogger.log(Level.FINEST, e.getMessage());
-
-                    continue;
-                } catch (NodeException e) {
-                    modulePackagesMapLogger.log(Level.WARNING,
-                        "Error while loading the module: "
-                                        + modulePropertyFileString);
-
-                    modulePackagesMapLogger.log(Level.FINEST, e.getMessage());
-
-                    continue;
-
-                }
-                if (moduleDescriptor == null) {
-                    modulePackagesMapLogger.log(Level.WARNING,
-                        "Error while loading the module: "
-                                        + modulePropertyFileString);
-
-                    continue;
-                }
-
-                if (this.availableModuleClassesMap.containsKey(moduleDescriptor
-                    .getId())) {
-                    modulePackagesMapLogger.log(Level.SEVERE,
-                        "A module with the id " + moduleDescriptor.getId()
-                                        + " is allready loaded.");
-
-                    modulePackagesMapLogger.log(Level.FINEST,
-                        "The ModuleDescriptor was null.");
-
-                    continue;
-                }
-
-                // put the ModuleDescriptor into the HashMap
-                this.availableModuleClassesMap.put(moduleDescriptor.getId(),
-                    moduleDescriptor);
-
-                modulePackagesMapLogger.log(Level.INFO,
-                    "A ModulePaket has been registerd with id: "
-                                    + moduleDescriptor.getId());
-
-                this.moduleRegistry
-                    .fireNewModulePackage(moduleDescriptor);
+                addModuleDirectory(currentModuleDirectory);
 
             }
-
+            
             modulePackagesMapLogger.exiting(this.getClass().getName(),
-                "initialize");
+                "initializeModulesDirectory");
         }
+
+        /**
+         * Adds a module by its directory
+         * 
+         * @param moduleDirectory the directory which is assumed to contain the module description
+         * @param force if true, this module may overlay an already loaded module with the same module id
+         */
+        public void addModuleDirectory(final File moduleDirectory) {
+
+        	// skip all simple and hidden files/dirs
+            if (!moduleDirectory.isDirectory() || moduleDirectory.isHidden()) {
+                modulePackagesMapLogger.log(Level.FINE,
+                    "Skipping simple or hidden file in module directory: "
+                                    + moduleDirectory.getAbsolutePath());
+                return;
+            }
+
+            String modulePropertyFileString = moduleDirectory.getAbsolutePath()
+                                              + File.separator
+                                              + MODULE_PROPERTY_FILE;
+
+            File modulePropertyFile = new File(modulePropertyFileString);
+
+            // inspect module.property file and skip if neccessary
+            if (!modulePropertyFile.exists() || !modulePropertyFile.isFile()) {
+
+                modulePackagesMapLogger.log(Level.FINE,
+                    "The module property file does not exist or is not a file: "
+                                    + modulePropertyFileString);
+                return;
+            }
+
+            ModuleDescriptor moduleDescriptor = null;
+
+            try {
+
+            	moduleDescriptor = ECGParser
+                    .parseAsModuleDescriptor(modulePropertyFile);
+
+            } catch (ClassLoadingException e) {
+                modulePackagesMapLogger.log(Level.WARNING,
+                    "Error while loading the module: "
+                                    + modulePropertyFileString);
+                return;
+            } catch (MicroSensorDataTypeException e) {
+                modulePackagesMapLogger.log(Level.WARNING,
+                    "Error while loading the module: "
+                                    + modulePropertyFileString);
+                return;
+            } catch (SAXException e) {
+                modulePackagesMapLogger.log(Level.WARNING,
+                    "Error while loading the module: "
+                                    + modulePropertyFileString);
+                modulePackagesMapLogger.log(Level.FINEST, e.getMessage());
+                return;
+            } catch (IOException e) {
+                modulePackagesMapLogger.log(Level.WARNING,
+                    "Error while loading the module: "
+                                    + modulePropertyFileString);
+                modulePackagesMapLogger.log(Level.FINEST, e.getMessage());
+                return;
+            } catch (NodeException e) {
+                modulePackagesMapLogger.log(Level.WARNING,
+                    "Error while loading the module: "
+                                    + modulePropertyFileString);
+                modulePackagesMapLogger.log(Level.FINEST, e.getMessage());
+                return;
+            }
+
+            if (moduleDescriptor == null) {
+                modulePackagesMapLogger.log(Level.WARNING,
+                    "Error while loading the module: "
+                                    + modulePropertyFileString);
+                return;
+            }
+
+            if (this.availableModuleClassesMap.containsKey(moduleDescriptor
+                .getId())) {
+            	
+            	ModuleDescriptor origMD = this.availableModuleClassesMap.get(moduleDescriptor.getId());
+            	
+                modulePackagesMapLogger.log(Level.WARNING,
+                    "A module with the id " + moduleDescriptor.getId()
+                                    + " is already loaded and will not be replaced.");
+                modulePackagesMapLogger.log(Level.WARNING,
+                        "New module's directory: " + moduleDescriptor.getDirectory());
+                modulePackagesMapLogger.log(Level.WARNING,
+                        "Original module's directory: " + origMD.getDirectory());
+                
+                	return;
+            }
+
+            // put the ModuleDescriptor into the HashMap
+            this.availableModuleClassesMap.put(moduleDescriptor.getId(),
+                moduleDescriptor);
+
+            modulePackagesMapLogger.log(Level.INFO,
+                "A ModulePaket has been registerd with id: "
+                                + moduleDescriptor.getId());
+
+            this.moduleRegistry
+                .fireNewModulePackage(moduleDescriptor);
+
+		}
 
         /**
          * Returns all <em>ModulePackage</em> folder-names inside the
@@ -475,14 +478,14 @@ public class ModuleRegistry extends Observable implements IModuleRegistry {
          *             initializing the
          *             {@link org.electrocodeogram.modulepackage.classloader.ModuleClassLoader}
          */
-        private String[] getModulePackages()
+        private String[] getModulePackages(final File modulesDirectory)
             throws ModuleClassLoaderInitializationException {
 
             modulePackagesMapLogger.entering(this.getClass().getName(),
                 "getModulePackages");
 
             // is the parameter not null?
-            if (this.moduleDirectory == null) {
+            if (modulesDirectory == null) {
 
                 modulePackagesMapLogger.exiting(this.getClass().getName(),
                     "initialize");
@@ -492,8 +495,8 @@ public class ModuleRegistry extends Observable implements IModuleRegistry {
             }
 
             // does the file exist and is it a directory?
-            if (!this.moduleDirectory.exists()
-                || !this.moduleDirectory.isDirectory()) {
+            if (!modulesDirectory.exists()
+                || !modulesDirectory.isDirectory()) {
 
                 modulePackagesMapLogger.exiting(this.getClass().getName(),
                     "initialize");
@@ -503,10 +506,10 @@ public class ModuleRegistry extends Observable implements IModuleRegistry {
             }
 
             // get all filenames in it
-            String[] moduleDirectories = this.moduleDirectory.list();
+            String[] modulesDirectories = modulesDirectory.list();
 
             // assert no IO-Error has occurred
-            if (moduleDirectories == null) {
+            if (modulesDirectories == null) {
 
                 modulePackagesMapLogger.entering(this.getClass().getName(),
                     "getModulePackages");
@@ -516,7 +519,7 @@ public class ModuleRegistry extends Observable implements IModuleRegistry {
             }
 
             // are there any files in it?
-            if (!(moduleDirectories.length > 0)) {
+            if (!(modulesDirectories.length > 0)) {
 
                 modulePackagesMapLogger.entering(this.getClass().getName(),
                     "getModulePackages");
@@ -526,9 +529,9 @@ public class ModuleRegistry extends Observable implements IModuleRegistry {
             }
 
             modulePackagesMapLogger.entering(this.getClass().getName(),
-                "getModulePackages", moduleDirectories);
+                "getModulePackages", modulesDirectories);
 
-            return moduleDirectories;
+            return modulesDirectories;
         }
 
     }

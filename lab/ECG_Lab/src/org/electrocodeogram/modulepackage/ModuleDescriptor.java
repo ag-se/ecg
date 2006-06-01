@@ -34,6 +34,11 @@ public class ModuleDescriptor {
     private String moduleName;
 
     /**
+     * Is the directory where the module has been loaded from.
+     */
+    private String moduleDirectory;
+
+    /**
      * Is the name of the module provider.
      */
     private String moduleProviderName;
@@ -94,18 +99,20 @@ public class ModuleDescriptor {
      *            Is an array of <em>MicroSensorDataType</em> for
      *            the module
      */
-    public ModuleDescriptor(final String id, final String name,
+    public ModuleDescriptor(final String id, final String name, final String dir,
         final String providerName, final String version, final Class clazz,
         final String description, final ModuleType type,
         final ModuleProperty[] properties, final MicroSensorDataType[] msdts) {
 
         logger.entering(this.getClass().getName(), "ModuleDescriptor",
-            new Object[] {id, name, providerName, version, clazz, description,
+            new Object[] {id, name, dir, providerName, version, clazz, description,
                 type, properties, msdts});
 
         this.packageId = id;
 
         this.moduleName = name;
+        
+        this.moduleDirectory = dir;
 
         this.moduleProviderName = providerName;
 
@@ -179,6 +186,19 @@ public class ModuleDescriptor {
         logger.exiting(this.getClass().getName(), "getName", this.moduleName);
 
         return this.moduleName;
+    }
+
+    /**
+     * This method returns the module's directory.
+     * @return The module's directory
+     */
+    public final String getDirectory() {
+
+        logger.entering(this.getClass().getName(), "getDirectory");
+
+        logger.exiting(this.getClass().getName(), "getDirectory", this.moduleDirectory);
+
+        return this.moduleDirectory;
     }
 
     /**

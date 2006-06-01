@@ -96,9 +96,18 @@ public interface IModuleRegistry {
     /**
      * This method tells the <em>ModuleRegistry</em> where to look for
      * <em>ModulePackages</em>.
-     * @param moduleDirectory Is the directory to look for <em>ModulePackages</em>
+     * @param modulesDirectory The directory to look for <em>ModulePackages</em> directories
      * @throws ModuleClassLoaderInitializationException If an exception occures while initializing the {@link org.electrocodeogram.modulepackage.classloader.ModuleClassLoader}
      */
-    void setModuleDirectory(File moduleDirectory)
+    void setModuleDirectory(File modulesDirectory)
+        throws ModuleClassLoaderInitializationException;
+
+    /**
+     * This method tells the <em>ModuleRegistry</em> to add a 
+     * <em>ModulePackage</em> from directory moduleDirectory.
+     * @param moduleDirectory The directory which contains the <em>ModulePackage</em>
+     * @throws ModuleClassLoaderInitializationException If an exception occures while initializing the {@link org.electrocodeogram.modulepackage.classloader.ModuleClassLoader}
+     */
+    void addModule(File moduleDirectory)
         throws ModuleClassLoaderInitializationException;
 }

@@ -454,7 +454,7 @@ public final class ECGParser {
         MicroSensorDataType[] microSensorDataTypes = getMicroSensorDataTypes(
             document, file.getParent());
 
-        ModuleDescriptor toReturn = new ModuleDescriptor(id, name,
+        ModuleDescriptor toReturn = new ModuleDescriptor(id, name, file.getParent(),
             providerName, version, clazz, moduleDescription, moduleType,
             moduleProperties, microSensorDataTypes);
 
@@ -822,6 +822,9 @@ public final class ECGParser {
 
         if (classPath != null) {
             ModuleClassLoader.addPath(classPath);
+            ModuleClassLoader.addPath(classPath + File.separator + "bin");
+            ModuleClassLoader.addPath(classPath + File.separator + "classes");
+            ModuleClassLoader.addPath(classPath + File.separator + "lib");
         }
 
         try {

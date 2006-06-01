@@ -166,14 +166,14 @@ public final class Core extends Observable implements ISystem, IModuleSystem,
      *             could not be created
      */
     @SuppressWarnings("boxing")
-    private Core(final String moduleDir, final String moduleSetup,
-        final GuiKind guiKind) throws ModuleSetupLoadException,
-        ModuleClassLoaderInitializationException {
+    private Core(final String modulesDir, final String addModuleDir, 
+    	final String moduleSetup, final GuiKind guiKind) 
+    		throws ModuleSetupLoadException, ModuleClassLoaderInitializationException {
 
         this();
 
         logger.entering(this.getClass().getName(), "SystemRoot", new Object[] {
-            moduleDir, moduleSetup, guiKind});
+            modulesDir, moduleSetup, guiKind});
 
         Thread console = new Console();
 
@@ -240,27 +240,28 @@ public final class Core extends Observable implements ISystem, IModuleSystem,
             //
         }
 
-        if (moduleDir == null) {
-            logger.log(Level.INFO, "Using default module directory: "
+        if (this.moduleRegistry == null)
+            this.moduleRegistry = new ModuleRegistry();
+
+        if (addModuleDir != null)
+        {
+            logger.log(Level.INFO, "Using given additional module directory: " + addModuleDir);
+            this.moduleRegistry.addModule(new File(addModuleDir));
+        }
+        
+        if (modulesDir == null) {
+            logger.log(Level.INFO, "Using default modules directory: "
                                    + DEFAULT_MODULE_DIRECTORY);
 
-            if (this.moduleRegistry == null) {
-                this.moduleRegistry = new ModuleRegistry(new File(
+            this.moduleRegistry.setModuleDirectory(new File(
                     DEFAULT_MODULE_DIRECTORY));
-            } else {
-                this.moduleRegistry.setModuleDirectory(new File(
-                    DEFAULT_MODULE_DIRECTORY));
-            }
         } else {
             logger
-                .log(Level.INFO, "Using given module directory: " + moduleDir);
+                .log(Level.INFO, "Using given modules directory: " + modulesDir);
 
-            if (this.moduleRegistry == null) {
-                this.moduleRegistry = new ModuleRegistry(new File(moduleDir));
-            } else {
-                this.moduleRegistry.setModuleDirectory(new File(moduleDir));
-            }
+            this.moduleRegistry.setModuleDirectory(new File(modulesDir));
         }
+        
         if (moduleSetup != null) {
             logger.log(Level.INFO, "Loading module setup: " + moduleSetup);
 
@@ -441,7 +442,9 @@ public final class Core extends Observable implements ISystem, IModuleSystem,
 
         boolean help = isHelp(args);
 
-        String moduleDir = getModuleDir(args);
+        String addModuleDir = getAddModuleDir(args);
+
+        String modulesDir = getModulesDir(args);
 
         String moduleSetup = getModuleSetup(args);
 
@@ -456,7 +459,7 @@ public final class Core extends Observable implements ISystem, IModuleSystem,
         }
 
         try {
-            startSystem(moduleDir, moduleSetup, guiKind, logLevel, logFile);
+            startSystem(modulesDir, addModuleDir, moduleSetup, guiKind, logLevel, logFile);
         } catch (ModuleSetupLoadException e) {
             java.lang.System.err
                 .println("The following error occured while loading the given ModuleSetup: "
@@ -500,7 +503,7 @@ public final class Core extends Observable implements ISystem, IModuleSystem,
      *             which is needed to load modules into the ECG Lab,
      *             could not be created
      */
-    private static void startSystem(final String moduleDir,
+    private static void startSystem(final String modulesDir, final String addModuleDir, 
         final String moduleSetup, final GuiKind guiKind, final Level logLevel,
         final String logFile) throws ModuleSetupLoadException,
         ModuleClassLoaderInitializationException {
@@ -519,7 +522,7 @@ public final class Core extends Observable implements ISystem, IModuleSystem,
                                          + logFile);
         }
 
-        new Core(moduleDir, moduleSetup, guiKind);
+        new Core(modulesDir, addModuleDir, moduleSetup, guiKind);
 
         logger.exiting(Core.class.getName(), "startSystem");
 
@@ -527,17 +530,17 @@ public final class Core extends Observable implements ISystem, IModuleSystem,
 
     /**
      * Parses the command line parameters for the
-     * <em>ModuleDirectory</em>.
+     * <em>ModulesDirectory</em>.
      * @param args
      *            The command line parameters
      * @return The path to the <em>ModuleDirectory</em> as given as
      *         a command line parameter
      */
-    private static String getModuleDir(final String[] args) {
-        logger.entering(Core.class.getName(), "getModuleDir", args);
+    private static String getModulesDir(final String[] args) {
+        logger.entering(Core.class.getName(), "getModulesDir", args);
 
         if (args == null || args.length == 0) {
-            logger.exiting(Core.class.getName(), "getModuleDir");
+            logger.exiting(Core.class.getName(), "getModulesDir");
 
             return null;
         }
@@ -547,12 +550,48 @@ public final class Core extends Observable implements ISystem, IModuleSystem,
                     printHelpMessage();
                 }
                 if (args[i + 1] == null || args[i + 1].equals("")
-                    || args[i + 1].equals("-s") || args[i + 1].equals("-l")
-                    || args[i + 1].equals("--log-file")
-                    || args[i + 1].equals("-nogui")) {
+                    || args[i + 1].startsWith("-")) {
                     printHelpMessage();
                 } else {
-                    logger.exiting(Core.class.getName(), "getModuleDir",
+                    logger.exiting(Core.class.getName(), "getModulesDir",
+                        args[i + 1]);
+
+                    return args[i + 1];
+                }
+            }
+        }
+
+        logger.exiting(Core.class.getName(), "getModuleDir", null);
+
+        return null;
+    }
+
+    /**
+     * Parses the command line parameters for the
+     * <em>AdditionalModuleDirectory</em>.
+     * @param args
+     *            The command line parameters
+     * @return The path to the <em>ModuleDirectory</em> as given as
+     *         a command line parameter
+     */
+    private static String getAddModuleDir(final String[] args) {
+        logger.entering(Core.class.getName(), "getAddModuleDir", args);
+
+        if (args == null || args.length == 0) {
+            logger.exiting(Core.class.getName(), "getAddModuleDir");
+
+            return null;
+        }
+        for (int i = 0; i < args.length; i++) {
+            if (args[i].equals("-madd")) {
+                if (args.length - 1 < i + 1) {
+                    printHelpMessage();
+                }
+                if (args[i + 1] == null || args[i + 1].equals("")
+                    || args[i + 1].startsWith("-")) {
+                    printHelpMessage();
+                } else {
+                    logger.exiting(Core.class.getName(), "getAddModuleDir",
                         args[i + 1]);
 
                     return args[i + 1];
