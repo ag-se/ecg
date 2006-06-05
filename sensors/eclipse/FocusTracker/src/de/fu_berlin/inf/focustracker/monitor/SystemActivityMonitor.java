@@ -13,9 +13,6 @@ public class SystemActivityMonitor implements Listener {
 		lastActivityTimestamp = System.currentTimeMillis();
 	}
 
-	public long getLastActivityTimestamp() {
-		return lastActivityTimestamp;
-	}
 
 	
 }
