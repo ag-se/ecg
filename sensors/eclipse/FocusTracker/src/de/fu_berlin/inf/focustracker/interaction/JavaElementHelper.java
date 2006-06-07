@@ -16,9 +16,7 @@ public class JavaElementHelper {
 		JavaElementInformation elementInfo = getPackage(aJavaElement);
 		String path = aJavaElement.getPath().toString();
 		// remove the project name
-		System.err.println("path1: " + path + " projectname: " + aJavaElement.getJavaProject().getProject().getName());
 		path = path.replaceFirst("/" + aJavaElement.getJavaProject().getProject().getName(), "");
-		System.err.println("path2: " + path);
 		
 		return new JavaElementResourceAndName(path, getNameForElement(aJavaElement, elementInfo));
 	}

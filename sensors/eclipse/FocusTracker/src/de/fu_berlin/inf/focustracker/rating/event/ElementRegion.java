@@ -42,20 +42,6 @@ public class ElementRegion {
 
 	public double getPercentageVisible() {
 
-//    	int elementBottom = elementOffset + elementLength;
-//    	int visibleRegionBottom = visibleRegionOffset + visibleRegionLength;
-//
-//		// how much of the method is visible
-//		int missingTop = Math.max(0, visibleRegionOffset - elementOffset);
-//		int missingBottom = Math.max(0, elementBottom - visibleRegionBottom);
-//		
-//		if(missingTop + missingBottom > elementLength * 0.5) {
-//			// more than half of the element isn't visible
-//			p = 0.5d;
-//		} else {
-//			p = 0.75d;
-//		}
-
 		return 
 		(double)(Math.min(elementOffset + elementLength, visibleRegionOffset + visibleRegionLength) - 
 			Math.max(elementOffset, visibleRegionOffset)) / (double)elementLength; 
@@ -64,4 +50,11 @@ public class ElementRegion {
 	public boolean isFillingCompleteView() {
 		return (elementOffset <= visibleRegionOffset && elementLength + elementOffset >= visibleRegionLength + visibleRegionOffset);
 	}
+	
+	public double getPercentageOfView() {
+		return 
+		(double)(Math.min(elementOffset + elementLength, visibleRegionOffset + visibleRegionLength) - 
+			Math.max(elementOffset, visibleRegionOffset)) / (double)visibleRegionLength; 
+	}
+	
 }

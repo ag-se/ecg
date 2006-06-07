@@ -79,11 +79,13 @@
         			|| (event.getLastInteraction() != null && event.getLastInteraction().getSeverity() == 1)) {
 					p = 1d;        		
         		} else {
-					double percentageVisible = event.getElementRegion().getPercentageVisible();
+					double percentageVisible = event.getElementRegion().getPercentageOfView();
 		        	if(percentageVisible >= 0.9d) {
-		        		p = 0.25d;
+		        		p = 1d;
 		        	} else if (percentageVisible >= 0.5d) {
-		        			p = 0.2d;
+		        			p = 0.5d;
+		        	} else if (percentageVisible >= 0.25d) {
+		        			p = 0.25d;
 		        	} else {
 		        			p = 0.1d;
 		        	}

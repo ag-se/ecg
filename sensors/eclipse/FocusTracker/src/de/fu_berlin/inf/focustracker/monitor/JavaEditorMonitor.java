@@ -39,6 +39,7 @@ import org.eclipse.jface.text.source.IAnnotationModelListenerExtension;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.projection.ProjectionAnnotation;
 import org.eclipse.jface.text.source.projection.ProjectionAnnotationModel;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
@@ -67,7 +68,7 @@ import de.fu_berlin.inf.focustracker.util.Units;
 public class JavaEditorMonitor extends AbstractFocusTrackerMonitor implements 
 		IViewportListener, ITextListener, MouseMoveListener, IPropertyChangeListener, KeyListener {
 
-	private static final long CODECHANGE_INTERVAL = Units.SECOND;
+	private static final long CODECHANGE_INTERVAL = 500l;
 	private static final long SCROLLING_INTERVAL = Units.SECOND;
 	private static final long DELAY_BETWEEN_MOUSE_OVER_DETECTION = 1 * Units.SECOND;
 
@@ -306,13 +307,6 @@ public class JavaEditorMonitor extends AbstractFocusTrackerMonitor implements
 
 	public synchronized void textChanged(TextEvent aEvent) {
 		
-//		System.err.println("textChanged: " + aEvent.getDocumentEvent().getText() + " - " + aEvent.getDocumentEvent().getText().length());
-//		if(aEvent.getReplacedText() == null || aEvent.getReplacedText().length() == 0) {
-//			// no text was changed, eg a cursor key could have been pressed
-//			return;
-//		}
-//		System.err.println("tc " + System.currentTimeMillis());
-		
 		// this code is heavyly inspired by the ECGEclipseSensor...
 		delayedTextChangedTimer.cancel();
 		delayedTextChangedTimer = new Timer();
@@ -338,6 +332,7 @@ public class JavaEditorMonitor extends AbstractFocusTrackerMonitor implements
 					try {
 		//				System.err.println("tc offset: " + textChangedOffset + " - " + unit.getElementAt(textChangedOffset));
 						IJavaElement javaElement;
+						textChangedOffset = widgetOffset2ModelOffset(editor.getViewer(), textChangedOffset);
 						if(origin == Origin.JAVAEDITOR) {
 							javaElement = ((ICompilationUnit)compilationUnit).getElementAt(textChangedOffset);
 						} else {
@@ -577,15 +572,36 @@ public class JavaEditorMonitor extends AbstractFocusTrackerMonitor implements
 		// do nothing
 	}
 
-	public void keyReleased(KeyEvent aE) {
-//		try {
-//			IJavaElement element = compilationUnit.getElementAt(widgetOffset2ModelOffset(editor.getViewer(), textWidget.getCaretOffset()));
-//			JavaInteraction interaction = new JavaInteraction(Action.CURSOR_MOVED, element, 1d, origin);
-//			EventDispatcher.getInstance().notifyInteractionObserved(interaction);
-//		} catch (JavaModelException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
+	public void keyReleased(KeyEvent aEvent) {
+		if(	aEvent.keyCode == SWT.ARROW_DOWN || 
+				aEvent.keyCode == SWT.ARROW_LEFT || 
+				aEvent.keyCode == SWT.ARROW_RIGHT || 
+				aEvent.keyCode == SWT.ARROW_UP ||
+				aEvent.keyCode == SWT.PAGE_DOWN || 
+				aEvent.keyCode == SWT.PAGE_UP) { 
+			try {
+				IJavaElement element;
+				if(origin == Origin.JAVAEDITOR) {
+					element = ((ICompilationUnit)compilationUnit).getElementAt(widgetOffset2ModelOffset(editor.getViewer(), textWidget.getCaretOffset()));
+				} else {
+					element = ((IClassFile)compilationUnit).getElementAt(widgetOffset2ModelOffset(editor.getViewer(), textWidget.getCaretOffset()));
+				}
+		
+				if(element != null) {
+//				IJavaElement element = compilationUnit.getElementAt(widgetOffset2ModelOffset(editor.getViewer(), textWidget.getCaretOffset()));
+					JavaInteraction interaction = new JavaInteraction(Action.CURSOR_MOVED, element, 1d, origin);
+					EventDispatcher.getInstance().notifyInteractionObserved(interaction);
+				}
+			} catch (JavaModelException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+//		} else {
+//			delayedTextChangedTimer.cancel();
+//			delayedTextChangedTimer = new Timer();
+//			delayedTextChangedTimer.schedule(new DelayedTimerTask(textWidget.getCaretOffset()), CODECHANGE_INTERVAL);
+//
+		}
 	}
 
 	
