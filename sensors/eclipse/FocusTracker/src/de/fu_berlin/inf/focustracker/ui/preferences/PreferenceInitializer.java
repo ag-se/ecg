@@ -16,12 +16,12 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 	public void initializeDefaultPreferences() {
 		IPreferenceStore store = FocusTrackerPlugin.getDefault()
 				.getPreferenceStore();
-		store.setDefault(PreferenceConstants.P_ENABLE_JAVA_EDITOR_MOUSE_MOVE_LISTENER, false);
-		store.setDefault(PreferenceConstants.P_USER_INACTIVITY_DETECTION_TIMEOUT, 60);
+		store.setDefault(PreferenceConstants.P_ENABLE_JAVA_EDITOR_MOUSE_MOVE_LISTENER, true);
+		store.setDefault(PreferenceConstants.P_USER_INACTIVITY_DETECTION_TIMEOUT, 120);
 		
 		store.setDefault(PreferenceConstants.P_ECG_EXPORT_INTERVAL, 10);
-		store.setDefault(PreferenceConstants.P_ECG_EXPORT_MIN_PROBABILITY_FOR_APPEARANCE, 0.25d);
-		store.setDefault(PreferenceConstants.P_ECG_EXPORT_MIN_PROBABILITY_FOR_DISAPPEARANCE, 0.1d);
+		store.setDefault(PreferenceConstants.P_ECG_EXPORT_MIN_RATING_FOR_APPEARANCE, 0.25d);
+		store.setDefault(PreferenceConstants.P_ECG_EXPORT_MIN_RATING_FOR_DISAPPEARANCE, 0.1d);
 	}
 
 }

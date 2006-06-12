@@ -44,11 +44,11 @@ public class FocusTrackerPreferencePage
 	 */
 	public void createFieldEditors() {
 		addField(new IntegerFieldEditor(PreferenceConstants.P_ECG_EXPORT_INTERVAL, "ECG Export &Interval (in seconds)", getFieldEditorParent()));
-		addField(new ProbabilityFieldEditor(PreferenceConstants.P_ECG_EXPORT_MIN_PROBABILITY_FOR_APPEARANCE, "ECG Export mininum &probability where elements should be considered as visible", getFieldEditorParent()));
-		addField(new ProbabilityFieldEditor(PreferenceConstants.P_ECG_EXPORT_MIN_PROBABILITY_FOR_DISAPPEARANCE, "ECG Export &probability where already exported elements should be considered as invisible", getFieldEditorParent()));
+		addField(new ProbabilityFieldEditor(PreferenceConstants.P_ECG_EXPORT_MIN_RATING_FOR_APPEARANCE, "ECG Export mininum &rating where elements should be considered as visible", getFieldEditorParent()));
+		addField(new ProbabilityFieldEditor(PreferenceConstants.P_ECG_EXPORT_MIN_RATING_FOR_DISAPPEARANCE, "ECG Export &rating where already exported elements should be considered as invisible", getFieldEditorParent()));
 
 		addField(new IntegerFieldEditor(PreferenceConstants.P_USER_INACTIVITY_DETECTION_TIMEOUT, "Inactivity detection timeout (in seconds)", getFieldEditorParent()));
-		addField(new BooleanFieldEditor(PreferenceConstants.P_ENABLE_JAVA_EDITOR_MOUSE_MOVE_LISTENER, "Enable the JavaEditor MouseMoveListener (experimental)", getFieldEditorParent()));
+		addField(new BooleanFieldEditor(PreferenceConstants.P_ENABLE_JAVA_EDITOR_MOUSE_MOVE_LISTENER, "Enable the JavaEditor MouseMoveListener", getFieldEditorParent()));
 		
 		// link...
 		createPreferenceLink((IWorkbenchPreferenceContainer) getContainer(), getFieldEditorParent(), "org.eclipse.ui.preferencePages.Decorators", "See <a>''{0}''</a> to enable or disable decorations."); // 

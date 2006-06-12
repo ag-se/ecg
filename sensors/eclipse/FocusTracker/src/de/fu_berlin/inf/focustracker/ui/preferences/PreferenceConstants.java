@@ -10,7 +10,7 @@ public class PreferenceConstants {
 	
 	// ecg export preferences
 	public static final String P_ECG_EXPORT_INTERVAL = "ecgExportInterval";
-	public static final String P_ECG_EXPORT_MIN_PROBABILITY_FOR_DISAPPEARANCE = "ecgExportMinProbabilityForDisapperance";
-	public static final String P_ECG_EXPORT_MIN_PROBABILITY_FOR_APPEARANCE = "ecgExportMinProbabilityForApperance";
+	public static final String P_ECG_EXPORT_MIN_RATING_FOR_DISAPPEARANCE = "ecgExportMinRatingForDisapperance";
+	public static final String P_ECG_EXPORT_MIN_RATING_FOR_APPEARANCE = "ecgExportMinRatingForApperance";
 	
 }

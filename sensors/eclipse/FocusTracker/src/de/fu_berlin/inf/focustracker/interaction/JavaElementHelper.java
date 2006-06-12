@@ -6,6 +6,8 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IPackageDeclaration;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.jdt.internal.core.CompilationUnit;
+import org.eclipse.jdt.internal.core.JavaProject;
+import org.eclipse.jdt.internal.core.PackageFragment;
 import org.eclipse.jdt.internal.core.SourceField;
 import org.eclipse.jdt.internal.core.SourceMethod;
 
@@ -47,14 +49,19 @@ public class JavaElementHelper {
 			ret.append("(");
 			addParameters(ret, method.getParameterTypes());
 			ret.append(")");
+		} else if (aJavaElement instanceof JavaProject) {
+			ret.append(((JavaProject)aJavaElement).getElementName());
 		} else if (aJavaElement instanceof SourceField){
 			SourceField field = (SourceField) aJavaElement;
 			ret.append(field.getElementName());
 		} else if (aJavaElement instanceof CompilationUnit) {
 			// remove #
 //			ret.deleteCharAt(ret.length()-1);
+			ret.append(aJavaElement.getElementName());
 		} else if (aJavaElement instanceof IPackageDeclaration) {
 			ret = new StringBuffer(aElementInfo.getPackageName());
+		} else {
+			ret.append(aJavaElement.getElementName());
 		}
 		return ret.toString();
 	}

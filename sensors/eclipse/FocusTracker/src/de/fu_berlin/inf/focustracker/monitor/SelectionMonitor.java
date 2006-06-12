@@ -23,6 +23,7 @@ import de.fu_berlin.inf.focustracker.monitor.helper.RegionHelper;
 import de.fu_berlin.inf.focustracker.rating.RatingException;
 import de.fu_berlin.inf.focustracker.rating.event.EditorSelectionEvent;
 import de.fu_berlin.inf.focustracker.rating.event.ElementRegion;
+import de.fu_berlin.inf.focustracker.repository.Element;
 import de.fu_berlin.inf.focustracker.repository.InteractionRepository;
 
 
@@ -74,8 +75,8 @@ public class SelectionMonitor implements ISelectionListener {
 		JavaEditor editor = (JavaEditor) aPart;
 //		System.err.println("source: " + aEvent.getSource());
 		try {
-			IJavaElement javaElement = SelectionConverter.resolveEnclosingElement(editor, (ITextSelection)aSelection);
 
+			IJavaElement javaElement = SelectionConverter.resolveEnclosingElement(editor, (ITextSelection)aSelection);
 			// ignore main classes, since they are handled in a different way!
 			if(JavaEditorMonitor.ignoreElement(javaElement)) {
 				IJavaElement parent = JavaElementHelper.getCompilationUnit(javaElement); 
@@ -130,15 +131,20 @@ public class SelectionMonitor implements ISelectionListener {
 			ElementRegion elementRegion = RegionHelper.getElementRegion(editor, javaElement);
 //			System.err.println("sel-vis: " + elementRegion.getPercentageVisible());
 			
-			JavaInteraction lastInteraction = repository.getLastInteraction(javaElement);
-			EditorSelectionEvent editorSelectionEvent = new EditorSelectionEvent(
-					action,
-					elementRegion,
-					lastInteraction
-					);
-			
-			JavaInteraction interaction = new JavaInteraction(action, javaElement, EventDispatcher.getInstance().getRating().rateEvent(editorSelectionEvent), new Date(), null, Origin.JAVAEDITOR);
-			EventDispatcher.getInstance().notifyInteractionObserved(interaction);
+			if (!selectedBecauseTextWasChanged(javaElement, new Date())) {
+				JavaInteraction lastInteraction = repository.getLastInteraction(javaElement);
+				
+				
+				
+				EditorSelectionEvent editorSelectionEvent = new EditorSelectionEvent(
+						action,
+						elementRegion,
+						lastInteraction
+						);
+				
+				JavaInteraction interaction = new JavaInteraction(action, javaElement, EventDispatcher.getInstance().getRating().rateEvent(editorSelectionEvent), new Date(), null, Origin.JAVAEDITOR);
+				EventDispatcher.getInstance().notifyInteractionObserved(interaction);
+			}
 			oldSelection = javaElement;
 			
 		} catch (JavaModelException e) {
@@ -154,6 +160,19 @@ public class SelectionMonitor implements ISelectionListener {
 		
 //		System.err.println("editor top: " + ((ISourceViewer)aEvent.getSource()).getTopIndex());
 	}
+	
+	private boolean selectedBecauseTextWasChanged(IJavaElement aJavaElement, Date aTimestamp) {
+		Element element = repository.getElements().get(aJavaElement);
+		if (element == null || element.getLastInteraction() == null) {
+			return false;
+		}
+		
+		return element.getLastInteraction().getAction() == Action.TEXT_CHANGED &&
+				(Math.abs(aTimestamp.getTime() - element.getLastInteraction().getDate().getTime()) < 500)
+			;
+	}
+	
+	
 	private Action getAction(IJavaElement javaElement) {
 		Action action = Action.SELECTED;
 		if(oldSelection == javaElement) {

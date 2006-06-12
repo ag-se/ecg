@@ -86,6 +86,7 @@ public class JavaEditorMonitor extends AbstractFocusTrackerMonitor implements
 	private StyledText textWidget;
 //	private int textWidgetCaretOffset = 0;
 	private IJavaElement compilationUnit;
+	private static InteractionRepository interactionRepository = InteractionRepository.getInstance();
 	
 	
 	public JavaEditorMonitor() {
@@ -183,19 +184,20 @@ public class JavaEditorMonitor extends AbstractFocusTrackerMonitor implements
 
 		delayedViewPortChangedTimer.cancel();
 		delayedViewPortChangedTimer = new Timer();
+		final Date detectionTimestamp = new Date();
 		delayedViewPortChangedTimer.schedule(new TimerTask() {
 			@Override
 			public void run() {
 				Display.getDefault().asyncExec(new Runnable() {
 					public void run() {
-						handleViewportChanged(aVerticalOffset);
+						handleViewportChanged(aVerticalOffset, detectionTimestamp);
 					}
 				});
 			}
 			
 		}, SCROLLING_INTERVAL);
 	}
-	private void handleViewportChanged(int aVerticalOffset) {
+	private void handleViewportChanged(int aVerticalOffset, Date aTimestamp) {
 		try {
 			// editor could have been closed meanwhile
 			if(editor == null || editor.getViewer() == null) {
@@ -216,9 +218,9 @@ public class JavaEditorMonitor extends AbstractFocusTrackerMonitor implements
 			
 			// iterate through all java elements, to determine their status of visibility
 //			int numberOfElementsVisible = 0;
-			IJavaElement element = JavaUI.getEditorInputJavaElement(editor.getEditorInput());
-			if (element instanceof IParent) {
-				IParent compilationUnit = (IParent) element;
+			IJavaElement javaElement = JavaUI.getEditorInputJavaElement(editor.getEditorInput());
+			if (javaElement instanceof IParent) {
+				IParent compilationUnit = (IParent) javaElement;
 				List<IJavaElement> allChildren = getAllChildren(compilationUnit);
 				List<JavaInteraction> interacList = new ArrayList<JavaInteraction>();
 				for (IJavaElement child : allChildren) {
@@ -237,6 +239,14 @@ public class JavaEditorMonitor extends AbstractFocusTrackerMonitor implements
 //System.err.println(elementsInEditor.get(true));
 				for (Boolean visible : elementsInEditor.keySet()) {
 					for (IJavaElement child : elementsInEditor.get(visible)) {
+//						System.out.println(visible.booleanValue() + " - " + child.getElementName());
+						
+						// Don't rate the element that was selected and therefore is responsible for this viewport change.
+						// This would override the rating of the selection.
+						if (viewportChangeBecauseElementWasSelected(child, aTimestamp)) {
+							System.out.println("######################## viewportChangeBecauseElementWasSelected");
+							continue;
+						}
 						
 						boolean wasVisibleBefore = visibleElements.contains(child);
 						double lastSeverity = InteractionRepository.getInstance().getRating(child);
@@ -244,20 +254,29 @@ public class JavaEditorMonitor extends AbstractFocusTrackerMonitor implements
 						
 						ElementRegion elementRegion = RegionHelper.getElementRegion(editor, child);
 						ElementVisibiltyEvent visibiltyEvent = new ElementVisibiltyEvent(
-								action, element, visible, foldingListener.isCollapsed(element), elementRegion, numberOfElementsVisible, null);
+								action, child, visible, foldingListener.isCollapsed(child), elementRegion, numberOfElementsVisible, null);
 						
-						if (visible && !wasVisibleBefore) {
-							visibleElements.add(child);
+//						if (visible && !wasVisibleBefore) {
+//							visibleElements.add(child);
+//							action = Action.VISIBILITY_GAINED;
+//						} else if (!visible && lastSeverity > 0d /* && wasVisibleBefore*/) {
+//							visibleElements.remove(child);
+//							action = Action.VISIBILITY_LOST;
+//						} else if (visible && wasVisibleBefore && (lastSeverity != EventDispatcher.getInstance()
+//								.getRating().rateEvent(visibiltyEvent))) {
+//							action = Action.VISIBILITY_CHANGED;
+//						} else {
+//	
+//						}
+						Element element = interactionRepository.getElements().get(javaElement);
+						if(visible && (element == null || element.getRating() == 0) ) {
 							action = Action.VISIBILITY_GAINED;
-						} else if (!visible && lastSeverity > 0d /* && wasVisibleBefore*/) {
-							visibleElements.remove(child);
+						} else if(!visible && (element != null || element.getRating() > 0) ) {
 							action = Action.VISIBILITY_LOST;
-						} else if (visible && wasVisibleBefore && (lastSeverity != EventDispatcher.getInstance()
-								.getRating().rateEvent(visibiltyEvent))) {
+						} else if(visible){
 							action = Action.VISIBILITY_CHANGED;
-						} else {
-	
 						}
+						
 						visibiltyEvent.setAction(action);
 						
 						if (action != null) {
@@ -268,7 +287,7 @@ public class JavaEditorMonitor extends AbstractFocusTrackerMonitor implements
 							JavaInteraction interaction = new JavaInteraction(
 									action, child, EventDispatcher.getInstance()
 											.getRating().rateEvent(visibiltyEvent),
-									new Date(), null, origin);
+											aTimestamp, null, origin);
 							interacList.add(interaction);
 						}
 					}
@@ -290,6 +309,20 @@ public class JavaEditorMonitor extends AbstractFocusTrackerMonitor implements
 		}
 	}
 
+	private boolean viewportChangeBecauseElementWasSelected(IJavaElement aJavaElement, Date aTimestamp) {
+		Element element = interactionRepository.getElements().get(aJavaElement);
+		if (element == null || element.getLastInteraction() == null) {
+			return false;
+		}
+		
+		return (element.getLastInteraction().getAction() == Action.SELECTED ||
+					element.getLastInteraction().getAction() == Action.SELECTION_CHANGED	 ||
+					element.getLastInteraction().getAction() == Action.SELECTION_SAME_ELEMENT) &&
+				(Math.abs(aTimestamp.getTime() - element.getLastInteraction().getDate().getTime()) < 200)
+			;
+	}
+	
+	
 	private static List<IJavaElement> getAllChildren(IParent parentElement) {
 		List<IJavaElement> allChildren = new ArrayList<IJavaElement>();
 		try {

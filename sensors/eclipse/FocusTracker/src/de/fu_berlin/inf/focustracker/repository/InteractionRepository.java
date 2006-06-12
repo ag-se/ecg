@@ -10,6 +10,7 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IPackageDeclaration;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.internal.core.PackageFragment;
+import org.eclipse.jdt.internal.core.PackageFragmentRoot;
 
 import de.fu_berlin.inf.focustracker.EventDispatcher;
 import de.fu_berlin.inf.focustracker.interaction.Action;
@@ -53,9 +54,13 @@ public class InteractionRepository {
 	}
 	
 	private void add(JavaInteraction aJavaInteraction) {
-//		boolean createdNewElement = false;
 		
-		System.out.println(aJavaInteraction);
+		// ignore PackageFragment and PackageFragmentRoot
+		if(aJavaInteraction.getJavaElement() instanceof PackageFragment ||
+				aJavaInteraction.getJavaElement() instanceof PackageFragmentRoot) {
+			return;
+		}
+//		System.out.println(aJavaInteraction);
 		
 		Element element = null;
 		synchronized(elements) {
@@ -123,32 +128,38 @@ public class InteractionRepository {
 	}
 
 	private void addRecalculatedInteraction(Element aElement, double aRating) {
+		aElement.setRating(aRating);
 		addQuiet(aElement, new JavaInteraction(Action.RECALCULATED, aElement.getJavaElement(), aRating, Origin.SYSTEM));
 	}
 	
 	@SuppressWarnings("unchecked")
 	private void recalculateRatings(Element aElement) {
 		
-		if (aElement.getRating() < 1d) {
+		if (aElement.getRating() == 0d) {
 			return;
+		}
+		if (aElement.getRating() > 0d && aElement.getRating() < 1d) {
+			// check if an element in the same elementclass has the rating 1 to reveal it
+			for (Element element : getElementsWithRating()) {
+				if (element != aElement && element.getRating() == 1d && !(element.getJavaElement() instanceof ICompilationUnit || element.getJavaElement() instanceof IPackageDeclaration)) {
+					addRecalculatedInteraction(element, 0.5d);
+				}
+			}
 		} else if (aElement.getJavaElement() instanceof ICompilationUnit)  {
 			for (Element element : getElementsForClass(aElement.getJavaElement().getClass())) {
 				if(element != aElement) {
-					element.setRating(0d);
 					addRecalculatedInteraction(element, 0d);
 				}
 			}
 		} else if (aElement.getJavaElement() instanceof IPackageDeclaration || aElement.getJavaElement() instanceof IPackageFragment) {
 			for (Element element : getElementsForClass(new Class[] {IPackageDeclaration.class, IPackageFragment.class})) {
 				if(element != aElement) {
-					element.setRating(0d);
 					addRecalculatedInteraction(element, 0d);
 				}
 			}
 		} else {
 			for (Element element : getElementsWithRating()) {
 				if (element != aElement && !(element.getJavaElement() instanceof ICompilationUnit || element.getJavaElement() instanceof IPackageDeclaration)) {
-					element.setRating(0d);
 					addRecalculatedInteraction(element, 0d);
 				}
 			}

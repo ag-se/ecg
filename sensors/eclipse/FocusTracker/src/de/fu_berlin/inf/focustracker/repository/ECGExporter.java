@@ -4,10 +4,9 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.TimeZone;
@@ -79,7 +78,7 @@ public class ECGExporter implements IPropertyChangeListener {
 				+ timestampToXMLString(aJavaInteraction.getDate())
 				+ "</timestamp>" + "</focus></microActivity>";
 
-		System.out.println(data);
+//		System.out.println(data);
 		ECGEclipseSensor.getInstance().processActivity("msdt.focus.xsd", data);
 	}
 
@@ -98,25 +97,30 @@ public class ECGExporter implements IPropertyChangeListener {
 
 	public void exportCurrentInteractions() {
 
+		HashMap<IJavaElement, Element> elements = interactionRepository.getElements(); 
 		// export java interactions :
-		for (Element element : interactionRepository.getElements().values()) {
-			for (JavaInteraction interaction : element.getInteractions()) {
-				if (!interaction.isExported()) {
-					if(interaction.getLastInteraction() == null || 
-							interaction.getSeverity() != interaction.getLastInteraction().getSeverity()) {
-						boolean isInFocus = interaction.getSeverity() >= minProbabilityForApperance
-							|| (interaction.getSeverity() > minProbabilityForDisapperance && currentlyExportedElements
-							.contains(interaction.getJavaElement()));
-						
-						if(isInFocus) {
-							currentlyExportedElements.add(element.getJavaElement());
-						} else {
-							currentlyExportedElements.remove(element.getJavaElement());
+		synchronized (elements) {
+		for (Element element : elements.values()) {
+				for (JavaInteraction interaction : element.getInteractions()) {
+					if (!interaction.isExported()) {
+						if(interaction.getLastInteraction() == null || 
+								interaction.getSeverity() != interaction.getLastInteraction().getSeverity()) {
+							boolean isInFocus = interaction.getSeverity() >= minProbabilityForApperance
+								|| (interaction.getSeverity() > minProbabilityForDisapperance && currentlyExportedElements
+								.contains(interaction.getJavaElement()));
+							
+							if(isInFocus) {
+								currentlyExportedElements.add(element.getJavaElement());
+								export(interaction, isInFocus);
+							} else {
+								if(currentlyExportedElements.remove(element.getJavaElement())) {
+									export(interaction, isInFocus);
+								}
+							}
 						}
-						export(interaction, isInFocus);
+						
+						interaction.setExported(true);
 					}
-					
-					interaction.setExported(true);
 				}
 			}
 		}
@@ -160,10 +164,10 @@ public class ECGExporter implements IPropertyChangeListener {
 	}
 
 	public void propertyChange(PropertyChangeEvent aEvent) {
-		if (PreferenceConstants.P_ECG_EXPORT_MIN_PROBABILITY_FOR_APPEARANCE
+		if (PreferenceConstants.P_ECG_EXPORT_MIN_RATING_FOR_APPEARANCE
 				.equals(aEvent.getProperty())) {
 			minProbabilityForApperance = getMinProbabilityForApperance();
-		} else if (PreferenceConstants.P_ECG_EXPORT_MIN_PROBABILITY_FOR_DISAPPEARANCE
+		} else if (PreferenceConstants.P_ECG_EXPORT_MIN_RATING_FOR_DISAPPEARANCE
 				.equals(aEvent.getProperty())) {
 			minProbabilityForDisapperance = getMinProbabilityForDisapperance();
 		}
@@ -174,7 +178,7 @@ public class ECGExporter implements IPropertyChangeListener {
 				.getDefault()
 				.getPluginPreferences()
 				.getDouble(
-						PreferenceConstants.P_ECG_EXPORT_MIN_PROBABILITY_FOR_APPEARANCE);
+						PreferenceConstants.P_ECG_EXPORT_MIN_RATING_FOR_APPEARANCE);
 	}
 
 	private double getMinProbabilityForDisapperance() {
@@ -182,7 +186,7 @@ public class ECGExporter implements IPropertyChangeListener {
 				.getDefault()
 				.getPluginPreferences()
 				.getDouble(
-						PreferenceConstants.P_ECG_EXPORT_MIN_PROBABILITY_FOR_DISAPPEARANCE);
+						PreferenceConstants.P_ECG_EXPORT_MIN_RATING_FOR_DISAPPEARANCE);
 	}
 
 	private String timestampToXMLString(Date aDate) {

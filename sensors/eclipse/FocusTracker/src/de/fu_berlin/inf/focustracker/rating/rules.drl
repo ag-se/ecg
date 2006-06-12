@@ -46,6 +46,7 @@ rule "JavaEditor Visibility Changed"
 				p = 1;        		
     		} else {
 				double percentageVisible = event.getElementRegion().getPercentageOfView();
+//		System.out.println( event.getJavaElement().getElementName() + " - " + percentageVisible ); 
 	        	if(percentageVisible >= 0.9) {
 	        		p = 1;
 	        	} else if (percentageVisible >= 0.5) {
