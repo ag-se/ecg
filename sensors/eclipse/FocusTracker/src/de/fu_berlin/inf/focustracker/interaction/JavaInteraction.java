@@ -18,7 +18,7 @@ public class JavaInteraction extends Interaction {
 	}
 	@Override
 	public String toString() {
-		return date + ": "  + origin + " - " + action + " - " + javaElement ;
+		return date + ": "  + origin + " - " + action + " - " + severity + " - " + JavaElementHelper.toString(javaElement) ;
 	}
 
 	public IJavaElement getJavaElement() {

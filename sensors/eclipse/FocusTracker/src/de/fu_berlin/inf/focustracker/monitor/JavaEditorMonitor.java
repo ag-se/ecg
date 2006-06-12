@@ -307,6 +307,10 @@ public class JavaEditorMonitor extends AbstractFocusTrackerMonitor implements
 
 	public synchronized void textChanged(TextEvent aEvent) {
 		
+		if(aEvent.getDocumentEvent() == null) {
+			// a visual change, only
+			return;
+		}
 		// this code is heavyly inspired by the ECGEclipseSensor...
 		delayedTextChangedTimer.cancel();
 		delayedTextChangedTimer = new Timer();

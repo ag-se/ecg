@@ -35,7 +35,7 @@ public class JavaElementHelper {
 		ret.append(" in \"");
 		ret.append(aJavaElement.getPath());
 		ret.append("\"");
-		System.err.println(ret.toString());
+//		System.err.println(ret.toString());
 		return ret.toString();
 	}
 	

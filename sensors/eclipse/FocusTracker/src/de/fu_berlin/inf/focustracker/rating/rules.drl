@@ -1,0 +1,83 @@
+package de.fu_berlin.inf.focustracker.rating
+ 
+import de.fu_berlin.inf.focustracker.rating.event.EditorSelectionEvent;
+import de.fu_berlin.inf.focustracker.rating.event.ElementVisibiltyEvent;
+import de.fu_berlin.inf.focustracker.rating.event.ElementFoldingEvent;
+import de.fu_berlin.inf.focustracker.interaction.Action;
+ 
+rule "JavaEditor Selection Changed"
+	no-loop true
+	when
+		event : EditorSelectionEvent( action == Action.SELECTED) || EditorSelectionEvent( action == Action.SELECTION_SAME_ELEMENT)
+	then
+//		System.out.println( event.getAction() ); 
+		
+		double p = 0;
+		if(event.getElementRegion().isFillingCompleteView()) {
+			p = 1;
+		} else {
+			double percentageVisible = event.getElementRegion().getPercentageVisible();
+        	if(percentageVisible >= 0.5) {
+        		p = 1;
+        	} else if (percentageVisible >= 0.25) {
+        			p = 0.50;
+        	} else {
+        			p = 0.25;
+        	}
+    	}
+		event.setRating(p);		
+		modify( event );
+		
+end
+
+rule "JavaEditor Visibility Changed"
+	no-loop true
+	when
+		event : ElementVisibiltyEvent( action == Action.VISIBILITY_GAINED ) || 
+			ElementVisibiltyEvent( action == Action.VISIBILITY_LOST ) ||
+			ElementVisibiltyEvent( action == Action.VISIBILITY_CHANGED )
+	then
+		
+    	double p = 0;
+    	if(event.isVisible()) {
+    		if(event.getElementRegion().isFillingCompleteView() 
+    			|| event.getNumberOfElementsVisible() == 1 
+    			|| (event.getLastInteraction() != null && event.getLastInteraction().getSeverity() == 1)) {
+				p = 1;        		
+    		} else {
+				double percentageVisible = event.getElementRegion().getPercentageOfView();
+	        	if(percentageVisible >= 0.9) {
+	        		p = 1;
+	        	} else if (percentageVisible >= 0.5) {
+	        			p = 0.5;
+	        	} else if (percentageVisible >= 0.25) {
+	        			p = 0.25;
+	        	} else {
+	        			p = 0.1;
+	        	}
+        	}
+    	}
+		event.setRating(p);		
+		modify( event );
+		
+end
+
+rule "JavaEditor Folding Expanded"
+	no-loop true
+	when
+		event : ElementFoldingEvent( action == Action.FOLDING_EXPANDED )
+	then
+		event.setRating(0.5);		
+		modify( event );
+		
+end
+
+rule "JavaEditor Folding Collapsed"
+	no-loop true
+	when
+		event : ElementFoldingEvent( action == Action.FOLDING_COLLAPSED )
+	then
+		event.setRating(0.1);		
+		modify( event );
+		
+end

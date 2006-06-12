@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: FocusTracker Plug-in
 Bundle-SymbolicName: de.fu_berlin.inf.focustracker;singleton:=true
-Bundle-Version: 0.8.2
+Bundle-Version: 0.8.4
 Bundle-Activator: de.fu_berlin.inf.focustracker.FocusTrackerPlugin
 Bundle-Localization: plugin
 Require-Bundle: 
@@ -23,15 +23,16 @@ Require-Bundle:
  org.eclipse.ui.intro,
  org.junit,
  org.eclipse.core.resources,
- org.electrocodeogram.sensor.eclipse;resolution:=optional
+ org.electrocodeogram.sensor.eclipse
 Eclipse-LazyStart: true
 Bundle-ClassPath: focustracker.jar,
- lib/drools/antlr-2.7.6rc1.jar,
- lib/drools/commons-jci-patched.jar,
+ lib/drools/antlr-2.7.6.jar,
+ lib/drools/antlr-3.0ea8.jar,
+ lib/drools/commons-jci-core-1.0-406301.jar,
+ lib/drools/commons-jci-eclipse-3.2.0.666.jar,
  lib/drools/commons-logging-1.0.4.jar,
- lib/drools/drools-base-2.5-final.jar,
- lib/drools/drools-core-2.5-final.jar,
- lib/drools/drools-io-2.5-final.jar,
- lib/drools/drools-java-2.5-final.jar,
- lib/drools/drools-smf-2.5-final.jar
+ lib/drools/drools-compiler-3.0.1.jar,
+ lib/drools/drools-core-3.0.1.jar,
+ lib/drools/drools-jsr94-3.0.1.jar,
+ lib/drools/stringtemplate-2.3b6.jar
 Bundle-Vendor: Fu-Berlin

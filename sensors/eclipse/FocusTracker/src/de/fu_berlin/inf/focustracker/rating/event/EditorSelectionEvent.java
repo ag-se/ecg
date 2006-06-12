@@ -3,7 +3,7 @@ package de.fu_berlin.inf.focustracker.rating.event;
 import de.fu_berlin.inf.focustracker.interaction.Action;
 import de.fu_berlin.inf.focustracker.interaction.JavaInteraction;
 
-public class EditorSelectionEvent implements EventHolder {
+public class EditorSelectionEvent extends EventHolder {
 
 	private Action action;
 	private ElementRegion elementRegion;

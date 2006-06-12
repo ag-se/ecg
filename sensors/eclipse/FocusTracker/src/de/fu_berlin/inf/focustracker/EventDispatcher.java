@@ -194,13 +194,7 @@ public class EventDispatcher {
 		if(rating == null) {
 			try {
 				rating = new Rating();
-			} catch (IntegrationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (SAXException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
+			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}

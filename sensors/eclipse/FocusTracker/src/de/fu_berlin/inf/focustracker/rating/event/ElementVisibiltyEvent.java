@@ -5,7 +5,7 @@ import org.eclipse.jdt.core.IJavaElement;
 import de.fu_berlin.inf.focustracker.interaction.Action;
 import de.fu_berlin.inf.focustracker.interaction.JavaInteraction;
 
-public class ElementVisibiltyEvent implements EventHolder {
+public class ElementVisibiltyEvent extends EventHolder {
 
 	private Action action;
 	private IJavaElement javaElement;

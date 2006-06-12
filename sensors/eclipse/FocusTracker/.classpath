@@ -2,15 +2,18 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="test"/>
-	<classpathentry exported="true" kind="lib" path="lib/drools/antlr-2.7.6rc1.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/drools/commons-jci-patched.jar"/>
+	<classpathentry kind="src" path="evaluation"/>
+	<classpathentry exported="true" kind="lib" path="lib/drools/antlr-2.7.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/drools/antlr-3.0ea8.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/drools/commons-jci-core-1.0-406301.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/drools/commons-jci-eclipse-3.2.0.666.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/drools/commons-logging-1.0.4.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/drools/drools-base-2.5-final.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/drools/drools-core-2.5-final.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/drools/drools-io-2.5-final.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/drools/drools-java-2.5-final.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/drools/drools-smf-2.5-final.jar"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/executionEnvironments/J2SE-1.5"/>
+	<classpathentry exported="true" kind="lib" path="lib/drools/drools-compiler-3.0.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/drools/drools-core-3.0.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/drools/drools-jsr94-3.0.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/drools/stringtemplate-2.3b6.jar"/>
+	<classpathentry kind="lib" path="lib-eval/jaxb-api.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

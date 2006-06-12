@@ -1,14 +1,13 @@
 package de.fu_berlin.inf.focustracker.rating;
 
-import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.List;
 
 import org.drools.FactException;
-import org.drools.IntegrationException;
 import org.drools.RuleBase;
+import org.drools.RuleBaseFactory;
 import org.drools.WorkingMemory;
-import org.drools.io.RuleBaseLoader;
-import org.xml.sax.SAXException;
+import org.drools.compiler.PackageBuilder;
 
 import de.fu_berlin.inf.focustracker.rating.event.EventHolder;
 
@@ -17,9 +16,19 @@ public class Rating {
 
 	RuleBase ruleBase;
 	
-	public Rating() throws IntegrationException, SAXException, IOException {
+	public Rating() throws Exception {
 		
-		ruleBase = RuleBaseLoader.loadFromInputStream(this.getClass().getResourceAsStream( "rules.drl" ) );
+//		ruleBase = RuleBaseLoader.getInstance(). loadFromInputStream(this.getClass().getResourceAsStream( "rules.drl" ) );
+		
+		
+        final PackageBuilder builder = new PackageBuilder();
+        builder.addPackageFromDrl( new InputStreamReader( this.getClass().getResourceAsStream( "rules.drl" ) ) );
+
+        ruleBase = RuleBaseFactory.newRuleBase();
+        ruleBase.addPackage( builder.getPackage() );
+
+		
+		
 		System.err.println("RuleEngine started.");
 	}
 	
@@ -33,14 +42,15 @@ public class Rating {
 			workingMemory.assertObject(aEventHolder);
 			workingMemory.fireAllRules();
 			
-			List<Double> retValues = workingMemory.getObjects(Double.class); 
-			
-			if(retValues != null && retValues.size() > 0) {
-//				System.err.println(workingMemory.getObjects(Double.class).get(0));
-				return (Double)workingMemory.getObjects(Double.class).get(0);
-			} else {
-				return new Double(0);
-			}
+//			List<Double> retValues = workingMemory.getObjects(Double.class); 
+//			
+//			if(retValues != null && retValues.size() > 0) {
+////				System.err.println(workingMemory.getObjects(Double.class).get(0));
+//				return (Double)workingMemory.getObjects(Double.class).get(0);
+//			} else {
+//				return new Double(0);
+//			}
+			return aEventHolder.getRating();
 			
 		} catch (FactException e) {
 			throw new RatingException("Exception occured during rateEvent()", e);

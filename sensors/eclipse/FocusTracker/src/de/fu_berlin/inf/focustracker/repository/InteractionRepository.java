@@ -54,6 +54,9 @@ public class InteractionRepository {
 	
 	private void add(JavaInteraction aJavaInteraction) {
 //		boolean createdNewElement = false;
+		
+		System.out.println(aJavaInteraction);
+		
 		Element element = null;
 		synchronized(elements) {
 			element = elements.get(aJavaInteraction.getJavaElement());
@@ -113,6 +116,15 @@ public class InteractionRepository {
 //		}
 	}
 	
+	private void addQuiet(Element aElement, JavaInteraction aJavaInteraction) {
+		Interaction lastInteraction = getLastInteraction(aJavaInteraction.getJavaElement());
+		aJavaInteraction.setLastInteraction(lastInteraction);
+		aElement.getInteractions().add(aJavaInteraction);
+	}
+
+	private void addRecalculatedInteraction(Element aElement, double aRating) {
+		addQuiet(aElement, new JavaInteraction(Action.RECALCULATED, aElement.getJavaElement(), aRating, Origin.SYSTEM));
+	}
 	
 	@SuppressWarnings("unchecked")
 	private void recalculateRatings(Element aElement) {
@@ -123,18 +135,21 @@ public class InteractionRepository {
 			for (Element element : getElementsForClass(aElement.getJavaElement().getClass())) {
 				if(element != aElement) {
 					element.setRating(0d);
+					addRecalculatedInteraction(element, 0d);
 				}
 			}
 		} else if (aElement.getJavaElement() instanceof IPackageDeclaration || aElement.getJavaElement() instanceof IPackageFragment) {
 			for (Element element : getElementsForClass(new Class[] {IPackageDeclaration.class, IPackageFragment.class})) {
 				if(element != aElement) {
 					element.setRating(0d);
+					addRecalculatedInteraction(element, 0d);
 				}
 			}
 		} else {
 			for (Element element : getElementsWithRating()) {
 				if (element != aElement && !(element.getJavaElement() instanceof ICompilationUnit || element.getJavaElement() instanceof IPackageDeclaration)) {
 					element.setRating(0d);
+					addRecalculatedInteraction(element, 0d);
 				}
 			}
 		}
