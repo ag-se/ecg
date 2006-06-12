@@ -27,6 +27,8 @@
 							<xs:element name="elementtype" type="xs:token"/>
 							<xs:element name="hasfocus" type="xs:boolean"/>
 							<xs:element name="rating" type="xs:double" minOccurs="0"/>
+						 	<xs:element name="timestamp" type="xs:dateTime"/>
+							<xs:element name="comment" type="xs:token" minOccurs="0"/>
 						</xs:sequence>
 					</xs:complexType>			
 				</xs:element>
