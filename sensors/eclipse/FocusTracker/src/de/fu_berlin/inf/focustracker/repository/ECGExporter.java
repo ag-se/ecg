@@ -74,9 +74,9 @@ public class ECGExporter implements IPropertyChangeListener {
 				+ (aIsInFocus ? "<rating>" + decimalFormat.format(aJavaInteraction.getSeverity())
 						+ "</rating>" : "") // add rating only if element is in
 											// focus
-				+ "<timestamp>"
+				+ "<detectedtimestamp>"
 				+ timestampToXMLString(aJavaInteraction.getDate())
-				+ "</timestamp>" + "</focus></microActivity>";
+				+ "</detectedtimestamp>" + "</focus></microActivity>";
 
 //		System.out.println(data);
 		ECGEclipseSensor.getInstance().processActivity("msdt.focus.xsd", data);
@@ -158,10 +158,10 @@ public class ECGExporter implements IPropertyChangeListener {
 
 	}
 
-	private double normalizeRating(double aRating, int aNumberOfElements) {
-		// return aRating / aNumberOfElements;
-		return aRating;
-	}
+//	private double normalizeRating(double aRating, int aNumberOfElements) {
+//		// return aRating / aNumberOfElements;
+//		return aRating;
+//	}
 
 	public void propertyChange(PropertyChangeEvent aEvent) {
 		if (PreferenceConstants.P_ECG_EXPORT_MIN_RATING_FOR_APPEARANCE
