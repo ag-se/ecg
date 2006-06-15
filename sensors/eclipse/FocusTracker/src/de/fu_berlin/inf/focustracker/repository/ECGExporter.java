@@ -4,6 +4,7 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
+import java.util.ConcurrentModificationException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -99,30 +100,34 @@ public class ECGExporter implements IPropertyChangeListener {
 
 		HashMap<IJavaElement, Element> elements = interactionRepository.getElements(); 
 		// export java interactions :
-		synchronized (elements) {
-		for (Element element : elements.values()) {
-				for (JavaInteraction interaction : element.getInteractions()) {
-					if (!interaction.isExported()) {
-						if(interaction.getLastInteraction() == null || 
-								interaction.getSeverity() != interaction.getLastInteraction().getSeverity()) {
-							boolean isInFocus = interaction.getSeverity() >= minProbabilityForApperance
-								|| (interaction.getSeverity() > minProbabilityForDisapperance && currentlyExportedElements
-								.contains(interaction.getJavaElement()));
-							
-							if(isInFocus) {
-								currentlyExportedElements.add(element.getJavaElement());
-								export(interaction, isInFocus);
-							} else {
-								if(currentlyExportedElements.remove(element.getJavaElement())) {
+		try {
+			synchronized (elements) {
+			for (Element element : elements.values()) {
+					for (JavaInteraction interaction : element.getInteractions()) {
+						if (!interaction.isExported()) {
+							if(interaction.getLastInteraction() == null || 
+									interaction.getSeverity() != interaction.getLastInteraction().getSeverity()) {
+								boolean isInFocus = interaction.getSeverity() >= minProbabilityForApperance
+									|| (interaction.getSeverity() > minProbabilityForDisapperance && currentlyExportedElements
+									.contains(interaction.getJavaElement()));
+								
+								if(isInFocus) {
+									currentlyExportedElements.add(element.getJavaElement());
 									export(interaction, isInFocus);
+								} else {
+									if(currentlyExportedElements.remove(element.getJavaElement())) {
+										export(interaction, isInFocus);
+									}
 								}
 							}
+							
+							interaction.setExported(true);
 						}
-						
-						interaction.setExported(true);
 					}
 				}
 			}
+		} catch (ConcurrentModificationException e) {
+			// ignore this rare case, the interactions will be exported next run.
 		}
 		
 		
