@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	
+	<xs:annotation>
+		<xs:documentation>
+			This XML schema defines the structure of the "line diff" MicroSensorDataType.
+			It describes a set of line diffs between textfiles which were made at
+			a particular point of type. Diffs may be "inserted", "deleted" or "changed".
+		</xs:documentation>
+	</xs:annotation>
+
+	<xs:include schemaLocation="msdt.common.xsd"/>
+
+	<xs:element name="microActivity">
+		<xs:complexType>
+	    	<xs:sequence>
+				<xs:element name="commonData" type="commonDataType"/>
+				<xs:element name="linediff">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="documentname" type="xs:token"/>
+							<xs:element name="lines">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="line" maxOccurs="unbounded" minOccurs="0">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="type">
+														<xs:simpleType>
+			  												<xs:restriction base="xs:string">
+			  													<xs:enumeration value="changed"/>
+							 	   								<xs:enumeration value="inserted"/>
+				 	   											<xs:enumeration value="deleted"/>
+			  												</xs:restriction>
+														</xs:simpleType>
+													</xs:element>																						
+													<xs:element name="linenumber" type="xs:integer"/>
+													<xs:element name="from" minOccurs="0"/>
+													<xs:element name="to" minOccurs="0"/>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>			
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

@@ -4,20 +4,20 @@
 		org.electrocodeogram.module.intermediate.implementation.CodechangeDifferIntermediateModule
 	</id>
 	<provider-name>
-		Frank Schlesinger (Frank@Schlesinger.com)
+		FU Berlin
 	</provider-name>
 	<version>
 		0.6
 	</version>
 	<name>
-		Codechange Diff-Generator
+		Line diffs generator
 	</name>
 	<class>
 		org.electrocodeogram.module.intermediate.implementation.CodechangeDifferIntermediateModule
 	</class>
 	<description>
 		This module computes the difference between two msdt.codechange.xsd events.
-		It generates msdt.diff.xsd events.
+		It generates msdt.linediff.xsd events.
 	</description>
 	<type>
 		INTERMEDIATE
@@ -25,10 +25,10 @@
 	<microsensordatatypes>
 		<microsensordatatype>
 			<msdtName>
-				msdt.diff.xsd
+				msdt.linediff.xsd
 			</msdtName>
 			<msdtFile>
-				msdt.diff.xsd
+				msdt.linediff.xsd
 			</msdtFile>
 		</microsensordatatype>
 	</microsensordatatypes>

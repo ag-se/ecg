@@ -2,7 +2,7 @@
 
 <!-- Buildfile for the ECG CodeChangeDifferIntermediateModule -->
 
-<project name="ECG_CodeChangeDifferIntermediateModule" default="build" basedir=".">
+<project name="ECG_CodeChangeDifferIntermediateModule" default="deploy" basedir=".">
 
 	<!-- Project directories -->
 	<property name="src.dir" value="src"/>
