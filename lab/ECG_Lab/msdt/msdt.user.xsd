@@ -3,13 +3,13 @@
 
 	<xs:annotation>
 		<xs:documentation>
-			This XML schema defines the structure of the "FocusTracker" MicroSensorDataType.
-		</xs:documentation>
-	</xs:annotation>
-
-	<xs:annotation>
-		<xs:documentation>
-			This includes the data fields that are common to all MicroSensorDataTypes.
+			This XML schema defines the structure of the "User" MicroSensorDataType.
+			It summerizes various user activities, like:
+			* user_active, user_inactive: reports user in/activity after some idle time
+			* copy, paste, cut: reports clipboard operations issued by the user. The parameters are:
+			  * param1: active Editor while issuing command
+			  * param2: contents of selection of the Editor
+			  * param3: for paste only: contents of the clipboard contents
 		</xs:documentation>
 	</xs:annotation>
 
@@ -35,6 +35,7 @@
 						 </xs:element>
 						 <xs:element name="param1" type="xs:string" minOccurs="0"/>
 						 <xs:element name="param2" type="xs:string" minOccurs="0"/>
+						 <xs:element name="param3" type="xs:string" minOccurs="0"/>
 						</xs:sequence>
 					</xs:complexType>			
 				</xs:element>
