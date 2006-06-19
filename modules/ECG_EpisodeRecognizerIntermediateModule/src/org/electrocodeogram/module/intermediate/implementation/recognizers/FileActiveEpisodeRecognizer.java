@@ -4,21 +4,22 @@
  */
 package org.electrocodeogram.module.intermediate.implementation.recognizers;
 
-import java.text.DateFormat;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.electrocodeogram.event.IllegalEventParameterException;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.electrocodeogram.event.ValidEventPacket;
-import org.electrocodeogram.event.WellFormedEventPacket;
 import org.electrocodeogram.logging.LogHelper;
 import org.electrocodeogram.misc.xml.ECGParser;
+import org.electrocodeogram.misc.xml.ECGWriter;
 import org.electrocodeogram.misc.xml.NodeException;
 import org.electrocodeogram.module.intermediate.implementation.EpisodeRecognizer;
 import org.electrocodeogram.module.intermediate.implementation.EpisodeRecognizerIntermediateModule;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * Recognizes episodes of individual activity durations (start, end) of a text file
@@ -51,17 +52,19 @@ public class FileActiveEpisodeRecognizer implements EpisodeRecognizer {
     }
 	
     /**
-     * Used data format
-     * TODO: change this to a publicly accessable static 
-     */
-    public static DateFormat dateFormat = DateFormat.getDateTimeInstance(
-            DateFormat.MEDIUM, DateFormat.MEDIUM);
-
-    /**
      * General logger 
      */
     private static Logger logger = LogHelper
     .createLogger(EpisodeRecognizerIntermediateModule.class.getName());
+
+    // XML Document and Elements
+    private static Document msdt_fileactive_doc = null;
+    private static Element fileactive_username = null;
+    private static Element fileactive_projectname = null;
+    private static Element fileactive_endtime = null;
+    private static Element fileactive_duration = null;
+    private static Element fileactive_changecount = null;
+    private static Element fileactive_resourcename = null;
 
     /**
      * Stores time stamp of last change event. Resolves a bug in redundant code change events 
@@ -92,24 +95,50 @@ public class FileActiveEpisodeRecognizer implements EpisodeRecognizer {
 	 * Constructor to start the recognizer in initial state
 	 */
 	public FileActiveEpisodeRecognizer() {
-		state = FileActiveEpisodeState.START;
+
+        // Start in start state
+        state = FileActiveEpisodeState.START;
+        
+        // initialize static DOM skeleton for msdt.editor.xsd
+        if (msdt_fileactive_doc == null)
+            try {
+                msdt_fileactive_doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+                Element fileactive_microactivity = msdt_fileactive_doc.createElement("microActivity");                
+                fileactive_username = msdt_fileactive_doc.createElement("username");
+                fileactive_projectname = msdt_fileactive_doc.createElement("projectname");
+                fileactive_endtime = msdt_fileactive_doc.createElement("endtime");
+                fileactive_duration = msdt_fileactive_doc.createElement("duration");
+                fileactive_changecount = msdt_fileactive_doc.createElement("changed");
+                fileactive_resourcename = msdt_fileactive_doc.createElement("resourcename");
+        
+                msdt_fileactive_doc.appendChild(fileactive_microactivity);
+                fileactive_microactivity.appendChild(fileactive_username);
+                fileactive_microactivity.appendChild(fileactive_projectname);
+                fileactive_microactivity.appendChild(fileactive_endtime);
+                fileactive_microactivity.appendChild(fileactive_duration);
+                fileactive_microactivity.appendChild(fileactive_changecount);
+                fileactive_microactivity.appendChild(fileactive_resourcename);
+            } catch (ParserConfigurationException e) {
+                logger.log(Level.SEVERE, "Could not instantiate the DOM Document in FileActiveEpisodeRecognizer.");
+                logger.log(Level.FINE, e.getMessage());
+            }
 	}
 	
-    /* (non-Javadoc)
+    /**
      * @see org.electrocodeogram.module.intermediate.implementation.EpisodeRecognizer#isInInitialState()
      */
     public boolean isInInitialState() {
 		return state == FileActiveEpisodeState.START;
 	}
 	
-	/* (non-Javadoc)
+	/**
 	 * @see org.electrocodeogram.module.intermediate.implementation.EpisodeRecognizer#isInFinalState()
 	 */
 	public boolean isInFinalState() {
 		return state == FileActiveEpisodeState.STOP;
 	}
 	
-    /* (non-Javadoc)
+    /**
      * @see org.electrocodeogram.module.intermediate.implementation.EpisodeRecognizer#analyse(org.electrocodeogram.event.ValidEventPacket, int, long)
      */
     public ValidEventPacket analyse(ValidEventPacket packet, long minDuration) {
@@ -252,16 +281,16 @@ public class FileActiveEpisodeRecognizer implements EpisodeRecognizer {
 
 			}
 
-		} catch (NodeException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+		} catch (NodeException e) {
+            logger.log(Level.SEVERE, "Could not read XML string in FileActiveEpisodeRecognizer.");
+            logger.log(Level.FINE, e.getMessage());
 		}
 
         return event;
 
     }
 	
-	/* (non-Javadoc)
+	/**
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {
@@ -292,20 +321,23 @@ public class FileActiveEpisodeRecognizer implements EpisodeRecognizer {
 		if (duration < minDur)
 			return null;
 		
+        fileactive_projectname.setTextContent(projectname);
+        fileactive_username.setTextContent(username);
+        fileactive_endtime.setTextContent(ECGWriter.formatDate(end));
+        fileactive_duration.setTextContent(String.valueOf(duration));
+        fileactive_changecount.setTextContent(String.valueOf(count));
+        fileactive_resourcename.setTextContent(filename);
+
+        event = ECGWriter.createValidEventPacket("msdt.fileactive.xsd", begin, msdt_fileactive_doc);
+        
+        /*
         String data = "<?xml version=\"1.0\"?><microActivity>";
-		
 		data += "<username>"  + username  + "</username>";
-
 		data += "<projectname>" + projectname + "</projectname>";
-
 		data += "<endtime>" + dateFormat.format(end) + "</endtime>";
-
 		data += "<duration>" + duration + "</duration>";
-
 		data += "<changed>" + count + "</changed>";
-
 		data += "<resourcename>" + filename + "</resourcename>";
-
 		data += "</microActivity>";
 
         logger.log(Level.FINE, "fileactive event created");
@@ -323,17 +355,16 @@ public class FileActiveEpisodeRecognizer implements EpisodeRecognizer {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-		
+*/		
 		return event;
 
 	}
 
-    /* (non-Javadoc)
+    /**
      * @see java.lang.Object#equals(java.lang.Object)
      */
-    @Override
     public boolean equals(Object obj) {
-        // TODO Auto-generated method stub
+
         if((obj == null) || (obj.getClass() != this.getClass())) return false;
         if(obj == this) return true;
         FileActiveEpisodeRecognizer fileActiveRecog = (FileActiveEpisodeRecognizer)obj;
@@ -357,7 +388,6 @@ public class FileActiveEpisodeRecognizer implements EpisodeRecognizer {
      * @return State of episode recognizer
      */
     private FileActiveEpisodeState getState() {
-        // TODO Auto-generated method stub
         return state;
     }
 

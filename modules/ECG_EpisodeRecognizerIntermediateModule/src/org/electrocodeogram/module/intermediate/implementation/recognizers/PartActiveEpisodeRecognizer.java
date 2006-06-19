@@ -4,21 +4,22 @@
  */
 package org.electrocodeogram.module.intermediate.implementation.recognizers;
 
-import java.text.DateFormat;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.electrocodeogram.event.IllegalEventParameterException;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.electrocodeogram.event.ValidEventPacket;
-import org.electrocodeogram.event.WellFormedEventPacket;
 import org.electrocodeogram.logging.LogHelper;
 import org.electrocodeogram.misc.xml.ECGParser;
+import org.electrocodeogram.misc.xml.ECGWriter;
 import org.electrocodeogram.misc.xml.NodeException;
 import org.electrocodeogram.module.intermediate.implementation.EpisodeRecognizer;
 import org.electrocodeogram.module.intermediate.implementation.EpisodeRecognizerIntermediateModule;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * Recognizes episodes of individual activity durations (start, end) of a view
@@ -48,12 +49,6 @@ public class PartActiveEpisodeRecognizer implements EpisodeRecognizer {
         STOP
     }
 	
-    /**
-     * TODO: change to general static format 
-     */
-    public static DateFormat dateFormat = DateFormat.getDateTimeInstance(
-            DateFormat.MEDIUM, DateFormat.MEDIUM);
-        
 	/**
 	 * General Logger 
 	 */
@@ -90,28 +85,61 @@ public class PartActiveEpisodeRecognizer implements EpisodeRecognizer {
 	 */
 	private Date startDate = null;
 	
-	/**
+    // XML Document and Elements
+    private static Document msdt_partactive_doc = null;
+    private static Element partactive_username = null;
+    private static Element partactive_projectname = null;
+    private static Element partactive_endtime = null;
+    private static Element partactive_duration = null;
+    private static Element partactive_resourcename = null;
+
+    /**
 	 * Constructor to start recognizer in initial state 
 	 */
 	public PartActiveEpisodeRecognizer() {
-		state = PartActiveEpisodeState.START;
+
+        // Start automata in start state
+        state = PartActiveEpisodeState.START;
+
+        // initialize static DOM skeleton for msdt.editor.xsd
+        if (msdt_partactive_doc == null)
+            try {
+                msdt_partactive_doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+                Element partactive_microactivity = msdt_partactive_doc.createElement("microActivity");                
+                partactive_username = msdt_partactive_doc.createElement("username");
+                partactive_projectname = msdt_partactive_doc.createElement("projectname");
+                partactive_endtime = msdt_partactive_doc.createElement("endtime");
+                partactive_duration = msdt_partactive_doc.createElement("duration");
+                partactive_resourcename = msdt_partactive_doc.createElement("resourcename");
+        
+                msdt_partactive_doc.appendChild(partactive_microactivity);
+                partactive_microactivity.appendChild(partactive_username);
+                partactive_microactivity.appendChild(partactive_projectname);
+                partactive_microactivity.appendChild(partactive_endtime);
+                partactive_microactivity.appendChild(partactive_duration);
+                partactive_microactivity.appendChild(partactive_resourcename);
+            } catch (ParserConfigurationException e) {
+                logger.log(Level.SEVERE, "Could not instantiate the DOM Document in PartActiveEpisodeRecognizer.");
+                logger.log(Level.FINE, e.getMessage());
+            }
+
 	}
 	
-	/* (non-Javadoc)
+	/**
 	 * @see org.electrocodeogram.module.intermediate.implementation.EpisodeRecognizer#isInInitialState()
 	 */
 	public boolean isInInitialState() {
 		return state == PartActiveEpisodeState.START;
 	}
 	
-	/* (non-Javadoc)
+	/**
 	 * @see org.electrocodeogram.module.intermediate.implementation.EpisodeRecognizer#isInFinalState()
 	 */
 	public boolean isInFinalState() {
 		return state == PartActiveEpisodeState.STOP;
 	}
 	
-    /* (non-Javadoc)
+    /**
      * @see org.electrocodeogram.module.intermediate.implementation.EpisodeRecognizer#analyse(org.electrocodeogram.event.ValidEventPacket, int, long)
      */
     public ValidEventPacket analyse(ValidEventPacket packet, long minDuration) {
@@ -133,10 +161,11 @@ public class PartActiveEpisodeRecognizer implements EpisodeRecognizer {
 
                     String activity = ECGParser.getSingleNodeValue("activity", document);
     				String partname = ECGParser.getSingleNodeValue("partname", document);
+//System.out.println(timestamp + " / " + activity + " " + partname + " / " + packet.toString()); 
     				
     				if (state == PartActiveEpisodeState.START && activity.equals("activated")) {
     					state = PartActiveEpisodeState.PARTACTIVE;
-    					activePartName = partname;
+                        activePartName = partname;
     					startDate = timestamp;
     				}
     				else if (state == PartActiveEpisodeState.PARTACTIVE && 
@@ -215,9 +244,9 @@ public class PartActiveEpisodeRecognizer implements EpisodeRecognizer {
                 }
 			}
 
-		} catch (NodeException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+		} catch (NodeException e) {
+            logger.log(Level.SEVERE, "Could not read XML string in PartActiveEpisodeRecognizer.");
+            logger.log(Level.FINE, e.getMessage());
 		}
 
         return event;
@@ -230,7 +259,6 @@ public class PartActiveEpisodeRecognizer implements EpisodeRecognizer {
 	 * @return
 	 */
 	private boolean isSamePart(String partname1, String partname2) {
-        // TODO Auto-generated method stub
 
         for (int i = 0; i < generalParts.length; i++) {
             if (partname1.startsWith(generalParts[i]))
@@ -239,7 +267,7 @@ public class PartActiveEpisodeRecognizer implements EpisodeRecognizer {
         return partname1.equals(partname2);
     }
 
-    /* (non-Javadoc)
+    /**
      * @see java.lang.Object#toString()
      */
     public String toString() {
@@ -247,7 +275,7 @@ public class PartActiveEpisodeRecognizer implements EpisodeRecognizer {
 	}
 
 	/**
-     * Helper method to generate XML string for episode event
+     * Helper method to generate ValidEventPacket (including XML string) for episode event
      * 
 	 * @param id
 	 * @param minDur
@@ -268,7 +296,8 @@ public class PartActiveEpisodeRecognizer implements EpisodeRecognizer {
 		
 		if (duration < minDur)
 			return null;
-        /*
+        
+        /* This is for generalizing the part names
         for (int i = 0; i < generalParts.length; i++) {
             if (partname.startsWith(generalParts[i])) {
                 partname = generalParts[i];
@@ -276,18 +305,22 @@ public class PartActiveEpisodeRecognizer implements EpisodeRecognizer {
             }
         }
         */
+
+        partactive_projectname.setTextContent(projectname);
+        partactive_username.setTextContent(username);
+        partactive_duration.setTextContent(String.valueOf(duration));
+        partactive_endtime.setTextContent(ECGWriter.formatDate(end));
+        partactive_resourcename.setTextContent(partname);
+
+        event = ECGWriter.createValidEventPacket("msdt.partactive.xsd", begin, msdt_partactive_doc);
+
+        /*
         String data = "<?xml version=\"1.0\"?><microActivity>";
-		
 		data += "<username>"  + username  + "</username>";
-
 		data += "<projectname>" + projectname + "</projectname>";
-
 		data += "<endtime>" + dateFormat.format(end) + "</endtime>";
-
 		data += "<duration>" + duration + "</duration>";
-
 		data += "<resourcename>" + partname + "</resourcename>";
-
 		data += "</microActivity>";
 
         logger.log(Level.FINE, "PARTACTIVE event created");
@@ -295,27 +328,26 @@ public class PartActiveEpisodeRecognizer implements EpisodeRecognizer {
 
         String[] args = {WellFormedEventPacket.HACKYSTAT_ADD_COMMAND, msdt,
             data};
-
+        
         try {
             event = new ValidEventPacket(begin,
                 WellFormedEventPacket.HACKYSTAT_ACTIVITY_STRING, Arrays
                     .asList(args));
 
         } catch (IllegalEventParameterException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
+         */
 		
 		return event;
 
 	}
     
-    /* (non-Javadoc)
+    /**
      * @see java.lang.Object#equals(java.lang.Object)
      */
-    @Override
     public boolean equals(Object obj) {
-        // TODO Auto-generated method stub
+
         if((obj == null) || (obj.getClass() != this.getClass())) return false;
         if(obj == this) return true;
         PartActiveEpisodeRecognizer partActiveRecog = (PartActiveEpisodeRecognizer)obj;
@@ -330,7 +362,6 @@ public class PartActiveEpisodeRecognizer implements EpisodeRecognizer {
      * @return name of current activated view
      */
     private String getPartName() {
-        // TODO Auto-generated method stub
         return activePartName;
     }
 
@@ -338,7 +369,6 @@ public class PartActiveEpisodeRecognizer implements EpisodeRecognizer {
      * @return state of episode recognizer
      */
     private PartActiveEpisodeState getState() {
-        // TODO Auto-generated method stub
         return state;
     }
 

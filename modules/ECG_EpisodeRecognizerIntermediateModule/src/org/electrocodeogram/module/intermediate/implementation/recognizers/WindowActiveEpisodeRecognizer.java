@@ -4,21 +4,22 @@
  */
 package org.electrocodeogram.module.intermediate.implementation.recognizers;
 
-import java.text.DateFormat;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.electrocodeogram.event.IllegalEventParameterException;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.electrocodeogram.event.ValidEventPacket;
-import org.electrocodeogram.event.WellFormedEventPacket;
 import org.electrocodeogram.logging.LogHelper;
 import org.electrocodeogram.misc.xml.ECGParser;
+import org.electrocodeogram.misc.xml.ECGWriter;
 import org.electrocodeogram.misc.xml.NodeException;
 import org.electrocodeogram.module.intermediate.implementation.EpisodeRecognizer;
 import org.electrocodeogram.module.intermediate.implementation.EpisodeRecognizerIntermediateModule;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * Recognizes episodes of individual activity durations (start, end) of the main window
@@ -51,7 +52,15 @@ public class WindowActiveEpisodeRecognizer implements EpisodeRecognizer {
 	private static Logger logger = LogHelper
     .createLogger(EpisodeRecognizerIntermediateModule.class.getName());
 
-	/**
+    // XML Document and Elements
+    private static Document msdt_windowactive_doc = null;
+    private static Element windowactive_username = null;
+    private static Element windowactive_projectname = null;
+    private static Element windowactive_endtime = null;
+    private static Element windowactive_duration = null;
+    private static Element windowactive_resourcename = null;
+
+    /**
 	 * Current state of episode recognizer
 	 */
 	private WindowActiveEpisodeState state;
@@ -67,33 +76,51 @@ public class WindowActiveEpisodeRecognizer implements EpisodeRecognizer {
 	private Date startDate = null;
 	
 	/**
-	 * TODO: should be global
-	 */
-	public static DateFormat dateFormat = DateFormat.getDateTimeInstance(
-	        DateFormat.MEDIUM, DateFormat.MEDIUM);
-		
-	/**
 	 * Constructor to start recognizer in initial state
 	 */
 	public WindowActiveEpisodeRecognizer() {
-		state = WindowActiveEpisodeState.START;
+
+        // Start in start state
+        state = WindowActiveEpisodeState.START;
+        
+        // initialize static DOM skeleton for msdt.editor.xsd
+        if (msdt_windowactive_doc == null)
+            try {
+                msdt_windowactive_doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+                Element windowactive_microactivity = msdt_windowactive_doc.createElement("microActivity");                
+                windowactive_username = msdt_windowactive_doc.createElement("username");
+                windowactive_projectname = msdt_windowactive_doc.createElement("projectname");
+                windowactive_endtime = msdt_windowactive_doc.createElement("endtime");
+                windowactive_duration = msdt_windowactive_doc.createElement("duration");
+                windowactive_resourcename = msdt_windowactive_doc.createElement("resourcename");
+        
+                msdt_windowactive_doc.appendChild(windowactive_microactivity);
+                windowactive_microactivity.appendChild(windowactive_username);
+                windowactive_microactivity.appendChild(windowactive_projectname);
+                windowactive_microactivity.appendChild(windowactive_endtime);
+                windowactive_microactivity.appendChild(windowactive_duration);
+                windowactive_microactivity.appendChild(windowactive_resourcename);
+            } catch (ParserConfigurationException e) {
+                logger.log(Level.SEVERE, "Could not instantiate the DOM Document in WindowActiveEpisodeRecognizer.");
+                logger.log(Level.FINE, e.getMessage());
+            }
 	}
 	
-	/* (non-Javadoc)
+	/**
 	 * @see org.electrocodeogram.module.intermediate.implementation.EpisodeRecognizer#isInInitialState()
 	 */
 	public boolean isInInitialState() {
 		return state == WindowActiveEpisodeState.START;
 	}
 	
-	/* (non-Javadoc)
+	/**
 	 * @see org.electrocodeogram.module.intermediate.implementation.EpisodeRecognizer#isInFinalState()
 	 */
 	public boolean isInFinalState() {
 		return state == WindowActiveEpisodeState.STOP;
 	}
 	
-    /* (non-Javadoc)
+    /**
      * @see org.electrocodeogram.module.intermediate.implementation.EpisodeRecognizer#analyse(org.electrocodeogram.event.ValidEventPacket, int, long)
      */
     public ValidEventPacket analyse(ValidEventPacket packet, long minDuration) {
@@ -156,9 +183,9 @@ public class WindowActiveEpisodeRecognizer implements EpisodeRecognizer {
 
 			}
 
-		} catch (NodeException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+		} catch (NodeException e) {
+            logger.log(Level.SEVERE, "Could not read XML string in WindowActiveEpisodeRecognizer.");
+            logger.log(Level.FINE, e.getMessage());
 		}
 
         return event;
@@ -195,18 +222,22 @@ public class WindowActiveEpisodeRecognizer implements EpisodeRecognizer {
 		if (duration < minDur)
 			return null;
 
-        String data = "<?xml version=\"1.0\"?><microActivity>";
-		
+        
+        windowactive_projectname.setTextContent(projectname);
+        windowactive_username.setTextContent(username);
+        windowactive_endtime.setTextContent(ECGWriter.formatDate(end));
+        windowactive_duration.setTextContent(String.valueOf(duration));
+        windowactive_resourcename.setTextContent(filename);
+
+        event = ECGWriter.createValidEventPacket("msdt.windowactive.xsd", begin, msdt_windowactive_doc);
+        
+        /*
+        String data = "<?xml version=\"1.0\"?><microActivity>";		
 		data += "<username>"  + username  + "</username>";
-
 		data += "<projectname>" + projectname + "</projectname>";
-
 		data += "<endtime>" + dateFormat.format(end) + "</endtime>";
-
 		data += "<duration>" + duration + "</duration>";
-
 		data += "<resourcename>" + filename + "</resourcename>";
-
 		data += "</microActivity>";
 
         logger.log(Level.FINE, "windowactive event created");
@@ -221,15 +252,15 @@ public class WindowActiveEpisodeRecognizer implements EpisodeRecognizer {
                     .asList(args));
 
         } catch (IllegalEventParameterException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
-		
+		*/
+        
 		return event;
 
 	}
 
-    /* (non-Javadoc)
+    /**
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
