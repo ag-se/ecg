@@ -1,28 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry excluding="org/hackystat/stdext/sensor/eclipse/helper2x/" kind="src" path="src">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry combineaccessrules="false" kind="src" path="/ECG_Support">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/hackystat/sensor.eclipse.3x.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="/ECG_SensorShell/dist/lib/sensorshell.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
+	<classpathentry excluding="org/hackystat/stdext/sensor/eclipse/helper2x/" kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/ECG_Support"/>
+	<classpathentry kind="lib" path="lib/hackystat/sensor.eclipse.3x.jar"/>
+	<classpathentry kind="lib" path="/ECG_SensorShell/dist/lib/sensorshell.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

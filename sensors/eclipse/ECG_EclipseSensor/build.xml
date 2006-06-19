@@ -12,23 +12,14 @@
 	<property name="javacVerbose" value="false"/>
 	<property name="logExtension" value=".log"/>
 	<property name="compilerArg" value=""/>
-	<property name="javacSource" value="1.5"/>
-	<property name="javacTarget" value="1.5"/>
+	<property name="javacSource" value="1.3"/>
+	<property name="javacTarget" value="1.2"/>
 	<path id="path_bootclasspath">
 		<fileset dir="${java.home}/lib">
 			<include name="*.jar"/>
 		</fileset>
 	</path>
 	<property name="bootclasspath" refid="path_bootclasspath"/>
-	<condition property="bundleBootClasspath" value="${J2SE-1.5}">
-		<isset property="J2SE-1.5"/>
-	</condition>
-	<condition property="bundleJavacSource" value="1.5">
-		<isset property="J2SE-1.5"/>
-	</condition>
-	<condition property="bundleJavacTarget" value="1.5">
-		<isset property="J2SE-1.5"/>
-	</condition>
 	<property name="bundleJavacSource" value="${javacSource}"/>
 	<property name="bundleJavacTarget" value="${javacTarget}"/>
 	<property name="bundleBootClasspath" value="${bootclasspath}"/>
@@ -58,7 +49,7 @@
 		<antcall target="gather.bin.parts">
 			<param name="destination.temp.folder" value="${temp.folder}/"/>
 		</antcall>
-		<zip destfile="${plugin.destination}/org.electrocodeogram.sensor.eclipse_1.1.1.jar" basedir="${temp.folder}/org.electrocodeogram.sensor.eclipse_1.1.1" filesonly="false" whenempty="skip" update="false"/>
+		<zip destfile="${plugin.destination}/org.electrocodeogram.sensor.eclipse_1.1.2.jar" basedir="${temp.folder}/org.electrocodeogram.sensor.eclipse_1.1.2" filesonly="false" whenempty="skip" update="false"/>
 		<delete dir="${temp.folder}"/>
 	</target>
 
@@ -66,73 +57,76 @@
 		<delete dir="${temp.folder}/sensor.eclipse.jar.bin"/>
 		<mkdir dir="${temp.folder}/sensor.eclipse.jar.bin"/>
 		<path id="sensor.eclipse.jar.classpath">
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.jface.text_3.2.0.v20060518-0800.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/com.ibm.icu_3.4.4.1.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.core.runtime_3.2.0.v20060511.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.osgi_3.2.0.v20060510.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.equinox.common_3.2.0.v20060512.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.core.jobs_3.2.0.v20060511.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.core.runtime.compatibility.registry_3.2.0.v20060426/runtime_registry_compatibility.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.core.runtime.compatibility.registry_3.2.0.v20060426"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.equinox.registry_3.2.0.v20060511.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.equinox.preferences_3.2.0.v20060511.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.core.runtime.compatibility.registry_3.2.0.v20060426/@dot"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.core.contenttype_3.2.0.v20060511.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.core.runtime.compatibility.auth_3.2.0.v20060511.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.text_3.2.0.v20060518-0800.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.core.commands_3.2.0.I20060511-0800a.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.swt_3.2.0.v3232k.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.swt.win32.win32.x86_3.2.0.v3232g.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.jface_3.2.0.I20060526-0010a.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.ui.workbench.texteditor_3.2.0.v20060526-0010.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.core.expressions_3.2.0.v20060518-0800.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.core.filesystem_1.0.0.v20060510.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.core.filesystem.win32.x86_1.0.0.v20060510.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.ui_3.2.0.I20060526-0010.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.ui.workbench_3.2.0.I20060526-0010.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.ui.workbench.compatibility_3.2.0.I20060511-2000/@dot"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.ui.workbench.compatibility_3.2.0.I20060511-2000/compatibility.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.help_3.2.0.v20060518.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.core.resources_3.2.0.v20060512.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.core.resources.compatibility_3.2.0.v20060510.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.core.resources.spysupport_1.0.3.200508311457.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.core.resources.win32_3.2.0.v20060510.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.core.runtime.compatibility_3.1.100.v20060511.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.update.configurator_3.2.0.v20060511.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.ant.core_3.1.100.v20060511.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.core.variables_3.1.100.v20060517.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.ui.editors_3.2.0.v20060518-0800.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.ui.ide_3.2.0.I20060519-0010.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.ui.win32_3.2.0.I20060511-2000.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.ui.views_3.2.0.I20060511-2000.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.update.core_3.2.0.v20060511.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.update.core.win32_3.2.0.v20060511.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.update.ui_3.2.0.v20060511.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.ui.forms_3.2.0.v20060510.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.core.filebuffers_3.2.0.v20060518-0800.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.jdt.junit_3.2.0.v20060518-0800/junitsupport.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.debug.core_3.2.0.v20060525.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.debug.ui_3.2.0.v20060525a.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.ui.console_3.1.100.v20060518.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.jdt.core_3.2.0.v_668.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.team.core_3.2.0.I200605181830.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.jdt.ui_3.2.0.v20060526-0010.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.search_3.2.0.v20060526-0010.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.jdt.launching_3.2.0.v20060525.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.jdt.debug_3.2.0.v20060518/jdi.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.jdt.debug_3.2.0.v20060518/jdimodel.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.jdt.debug_3.2.0.v20060518/tools.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.compare_3.2.0.v20060525.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.team.ui_3.2.0.I200605181830.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.ui.navigator_3.2.0.I20060526-0010.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.ui.navigator.resources_3.2.0.I20060511-2000.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.ui.views.properties.tabbed_3.2.0.I20060511-0800a.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.ltk.core.refactoring_3.2.0.v20060526-0010.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.ltk.ui.refactoring_3.2.0.v20060526-0010.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.jdt.core.manipulation_1.0.0.v20060518-0800.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.jdt.debug.ui_3.2.0.v20060517.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.eclipse.jdt.junit.runtime_3.2.0.v20060526-0010/junitruntime.jar"/>
-			<pathelement path="../../../../Program Files/eclipse/plugins/org.junit_3.8.1/junit.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.ui.ide_3.2.0.I20060519-0010.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.ui.win32_3.2.0.I20060511-2000.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/com.ibm.icu_3.4.4.1.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.core.resources_3.2.0.v20060512.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.core.resources.compatibility_3.2.0.v20060510.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.core.resources.spysupport_1.0.3.200508311457.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.core.resources.win32_3.2.0.v20060510.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.core.runtime.compatibility_3.1.100.v20060511.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.apache.xerces_2.8.0.v200605280700/resolver.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.apache.xerces_2.8.0.v200605280700/xercesImpl.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.apache.xerces_2.8.0.v200605280700/xml-apis.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.core.runtime_3.2.0.v20060511.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.osgi_3.2.0.v20060510.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.equinox.common_3.2.0.v20060512.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.core.jobs_3.2.0.v20060511.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.core.runtime.compatibility.registry_3.2.0.v20060426/runtime_registry_compatibility.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.core.runtime.compatibility.registry_3.2.0.v20060426"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.equinox.registry_3.2.0.v20060511.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.equinox.preferences_3.2.0.v20060511.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.core.runtime.compatibility.registry_3.2.0.v20060426/@dot"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.core.contenttype_3.2.0.v20060511.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.core.runtime.compatibility.auth_3.2.0.v20060511.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.update.configurator_3.2.0.v20060511.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.ant.core_3.1.100.v20060511.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.core.variables_3.1.100.v20060517.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.core.expressions_3.2.0.v20060518-0800.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.core.filesystem_1.0.0.v20060510.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.core.filesystem.win32.x86_1.0.0.v20060510.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.help_3.2.0.v20060518.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.ui_3.2.0.I20060526-0010.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.swt_3.2.0.v3232k.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.swt.win32.win32.x86_3.2.0.v3232g.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.jface_3.2.0.I20060526-0010a.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.core.commands_3.2.0.I20060511-0800a.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.ui.workbench_3.2.0.I20060526-0010.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.ui.workbench.compatibility_3.2.0.I20060511-2000/@dot"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.ui.workbench.compatibility_3.2.0.I20060511-2000/compatibility.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.ui.views_3.2.0.I20060511-2000.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.update.core_3.2.0.v20060511.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.update.core.win32_3.2.0.v20060511.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.update.ui_3.2.0.v20060511.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.ui.forms_3.2.0.v20060510.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.jface.text_3.2.0.v20060518-0800.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.text_3.2.0.v20060518-0800.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.ui.workbench.texteditor_3.2.0.v20060526-0010.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.ui.editors_3.2.0.v20060518-0800.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.core.filebuffers_3.2.0.v20060518-0800.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.jdt.core_3.2.0.v_668.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.team.core_3.2.0.I200605181830.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.jdt.junit_3.2.0.v20060518-0800/junitsupport.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.debug.core_3.2.0.v20060525.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.debug.ui_3.2.0.v20060525a.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.ui.console_3.1.100.v20060518.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.jdt.ui_3.2.0.v20060526-0010.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.search_3.2.0.v20060526-0010.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.jdt.launching_3.2.0.v20060525.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.jdt.debug_3.2.0.v20060518/jdi.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.jdt.debug_3.2.0.v20060518/jdimodel.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.jdt.debug_3.2.0.v20060518/tools.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.compare_3.2.0.v20060525.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.team.ui_3.2.0.I200605181830.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.ui.navigator_3.2.0.I20060526-0010.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.ui.navigator.resources_3.2.0.I20060511-2000.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.ui.views.properties.tabbed_3.2.0.I20060511-0800a.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.ltk.core.refactoring_3.2.0.v20060526-0010.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.ltk.ui.refactoring_3.2.0.v20060526-0010.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.jdt.core.manipulation_1.0.0.v20060518-0800.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.jdt.debug.ui_3.2.0.v20060517.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.jdt.junit.runtime_3.2.0.v20060526-0010/junitruntime.jar"/>
+			<pathelement path="C:/Program Files/eclipse/plugins/org.junit_3.8.1/junit.jar"/>
 			<pathelement path="lib/hackystat/sensor.eclipse.3x.jar"/>
 			<pathelement path="${build.result.folder}/../org.electrocodeogram.sensor.eclipse/lib/hackystat/sensor.eclipse.3x.jar"/>
 			<pathelement path="sensorshell.jar"/>
@@ -173,11 +167,11 @@
 	</target>
 
 	<target name="gather.bin.parts" depends="init" if="destination.temp.folder">
-		<mkdir dir="${destination.temp.folder}/org.electrocodeogram.sensor.eclipse_1.1.1"/>
-		<copy todir="${destination.temp.folder}/org.electrocodeogram.sensor.eclipse_1.1.1" failonerror="true" overwrite="false">
+		<mkdir dir="${destination.temp.folder}/org.electrocodeogram.sensor.eclipse_1.1.2"/>
+		<copy todir="${destination.temp.folder}/org.electrocodeogram.sensor.eclipse_1.1.2" failonerror="true" overwrite="false">
 			<fileset dir="${build.result.folder}" includes="sensor.eclipse.jar"			/>
 		</copy>
-		<copy todir="${destination.temp.folder}/org.electrocodeogram.sensor.eclipse_1.1.1" failonerror="true" overwrite="false">
+		<copy todir="${destination.temp.folder}/org.electrocodeogram.sensor.eclipse_1.1.2" failonerror="true" overwrite="false">
 			<fileset dir="${basedir}" includes="plugin.xml,sensor.eclipse.jar,lib/hackystat/,sensorshell.jar,ecg/,META-INF/"			/>
 		</copy>
 	</target>
@@ -186,25 +180,25 @@
 	</target>
 
 	<target name="gather.sources" depends="init" if="destination.temp.folder">
-		<mkdir dir="${destination.temp.folder}/org.electrocodeogram.sensor.eclipse_1.1.1"/>
-		<copy file="${build.result.folder}/sensor.eclipsesrc.zip" todir="${destination.temp.folder}/org.electrocodeogram.sensor.eclipse_1.1.1" failonerror="false" overwrite="false"/>
+		<mkdir dir="${destination.temp.folder}/org.electrocodeogram.sensor.eclipse_1.1.2"/>
+		<copy file="${build.result.folder}/sensor.eclipsesrc.zip" todir="${destination.temp.folder}/org.electrocodeogram.sensor.eclipse_1.1.2" failonerror="false" overwrite="false"/>
 	</target>
 
 	<target name="gather.logs" depends="init" if="destination.temp.folder">
-		<mkdir dir="${destination.temp.folder}/org.electrocodeogram.sensor.eclipse_1.1.1"/>
-		<copy file="${temp.folder}/sensor.eclipse.jar.bin${logExtension}" todir="${destination.temp.folder}/org.electrocodeogram.sensor.eclipse_1.1.1" failonerror="false" overwrite="false"/>
+		<mkdir dir="${destination.temp.folder}/org.electrocodeogram.sensor.eclipse_1.1.2"/>
+		<copy file="${temp.folder}/sensor.eclipse.jar.bin${logExtension}" todir="${destination.temp.folder}/org.electrocodeogram.sensor.eclipse_1.1.2" failonerror="false" overwrite="false"/>
 	</target>
 
 	<target name="clean" depends="init" description="Clean the plug-in: org.electrocodeogram.sensor.eclipse of all the zips, jars and logs created.">
 		<delete file="${build.result.folder}/sensor.eclipse.jar"/>
 		<delete file="${build.result.folder}/sensor.eclipsesrc.zip"/>
-		<delete file="${plugin.destination}/org.electrocodeogram.sensor.eclipse_1.1.1.jar"/>
-		<delete file="${plugin.destination}/org.electrocodeogram.sensor.eclipse_1.1.1.zip"/>
+		<delete file="${plugin.destination}/org.electrocodeogram.sensor.eclipse_1.1.2.jar"/>
+		<delete file="${plugin.destination}/org.electrocodeogram.sensor.eclipse_1.1.2.zip"/>
 		<delete dir="${temp.folder}"/>
 	</target>
 
 	<target name="refresh" depends="init" if="eclipse.running" description="Refresh this folder.">
-		<eclipse.convertPath fileSystemPath="C:/Seba/Dev/ECG/ECG_EclipseSensor" property="resourcePath"/>
+		<eclipse.convertPath fileSystemPath="D:/Dev/ECG/ECG_EclipseSensor" property="resourcePath"/>
 		<eclipse.refreshLocal resource="${resourcePath}" depth="infinite"/>
 	</target>
 
@@ -222,7 +216,7 @@
 		<delete>
 			<fileset dir="${temp.folder}" includes="**/*.bin${logExtension}"			/>
 		</delete>
-		<zip destfile="${plugin.destination}/org.electrocodeogram.sensor.eclipse_1.1.1.zip" basedir="${temp.folder}" filesonly="true" whenempty="skip" update="false"/>
+		<zip destfile="${plugin.destination}/org.electrocodeogram.sensor.eclipse_1.1.2.zip" basedir="${temp.folder}" filesonly="true" whenempty="skip" update="false"/>
 		<delete dir="${temp.folder}"/>
 	</target>
 
