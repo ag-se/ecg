@@ -18,7 +18,7 @@ org.electrocodeogram.module.source.implementation.FileSystemSourceModule
 Input File
 </name>
 <value>
-testeventlogs/eventsTest.log
+testeventlogs/ACM060530_acm4_events.log
 </value>
 <type>
 java.io.File

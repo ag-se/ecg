@@ -34,7 +34,7 @@
 		<properties>
 			<property>
 				<name>Input File</name>
-				<value>testeventlogs/ACM060530_acm2_events.log</value>
+				<value>testeventlogs/small.log</value>
 				<type>java.io.File</type>
 			</property>
 			<property>
@@ -189,7 +189,7 @@
 					Output File
 				</name>
 				<value>
-					events.out
+					episodes.log
 				</value>
 				<type>
 					java.io.File

@@ -15,7 +15,7 @@ org.electrocodeogram.module.target.implementation.FileSystemTargetModule
 Output File
 </name>
 <value>
-out.log
+out_events.log
 </value>
 <type>
 java.io.File
@@ -63,7 +63,7 @@ org.electrocodeogram.module.source.implementation.FileSystemSourceModule
 Input File
 </name>
 <value>
-testeventlogs/eventsTest.log
+testeventlogs/small.log
 </value>
 <type>
 java.io.File
