@@ -195,12 +195,13 @@ public class FileReaderThread extends EventReader {
 
                     lineNumber++;
 
-                    if (nextLine.contains("]]>")) {
+                    // There may be many consequtive CDATA sections
+                    if (nextLine.contains("]]>") && !nextLine.contains("<![CDATA")) {
 
                         endOfCode = line.lastIndexOf("]]>");
 
                         logger.log(Level.FINE,
-                            "Codechange event complete at index: " + endOfCode);
+                            "CDATA section complete at index: " + endOfCode);
 
                         break;
                     }
@@ -211,7 +212,7 @@ public class FileReaderThread extends EventReader {
                                               + lineNumber + ":");
 
                     logger.log(Level.WARNING,
-                        "This line does not contain a valid codechange event.");
+                        "This line does not contain a valid CDATA section.");
 
                     cdatafragment = false;
 
@@ -228,12 +229,12 @@ public class FileReaderThread extends EventReader {
 
             }
 
+/* BUG 1: no good idea since the XML data may contain # as well. Just take the first two '#' seperators            
             // Get a new Tokenizer.
             eventTokenizer = new StringTokenizer(line,
                 WellFormedEventPacket.EVENT_SEPARATOR);
 
             // Check if the line is well formed.
-
             int tokens = eventTokenizer.countTokens();
             if (tokens != 3) {
                 logger.log(Level.WARNING, "Error while reading line "
@@ -244,10 +245,13 @@ public class FileReaderThread extends EventReader {
 
                 return null;
             }
-
+*/
+            int timeIndex = line.indexOf('#');
+            int datatypeIndex = line.indexOf('#', timeIndex+1);
+            
             // Get the timestamp String.
-            String timeStampString = eventTokenizer.nextToken();
-
+// BUG 1            String timeStampString = eventTokenizer.nextToken();
+            String timeStampString = line.substring(0, timeIndex);
             // Check if the timestamp String is well formed.
             if (timeStampString == null || timeStampString.equals("")) {
                 logger
@@ -261,8 +265,8 @@ public class FileReaderThread extends EventReader {
             }
 
             // Get the SensorDataType String.
-            String sensorDataTypeString = eventTokenizer.nextToken();
-
+// BUG 1            String sensorDataTypeString = eventTokenizer.nextToken();
+            String sensorDataTypeString = line.substring(timeIndex+1, datatypeIndex);
             // Check if the SensorDataType String is well formed.
             if (sensorDataTypeString == null || sensorDataTypeString.equals("")) {
                 logger.log(Level.WARNING,
@@ -275,8 +279,8 @@ public class FileReaderThread extends EventReader {
             }
 
             // Get the argList String.
-            String argListString = eventTokenizer.nextToken();
-
+// BUG 1            String argListString = eventTokenizer.nextToken();
+            String argListString = line.substring(datatypeIndex+1);
             // Check if the argList String is well formed.
             if (argListString == null || argListString.equals("")) {
                 logger.log(Level.WARNING,
@@ -308,6 +312,7 @@ public class FileReaderThread extends EventReader {
                 return null;
             }
 
+/* BUG 2: Bad idea as well, see BUG 1 with ";" instead of "#"            
             // This second level Tokenizer is used to dissasemble the
             // argList.
             StringTokenizer argListTokenizer = new StringTokenizer(
@@ -323,6 +328,15 @@ public class FileReaderThread extends EventReader {
             while (argListTokenizer.hasMoreTokens()) {
                 argListStringArray[i++] = argListTokenizer.nextToken();
             }
+*/
+            String[] argListStringArray = new String[3];
+            int firstSemi = argListString.indexOf(';');
+            int secondSemi = argListString.indexOf(';', firstSemi+1);
+            int thirdSemi = argListString.indexOf(';', secondSemi+1);
+            // ignore first (argListString.substring(0, firstSemi));
+            argListStringArray[0] = argListString.substring(firstSemi+1, secondSemi);
+            argListStringArray[1] = argListString.substring(secondSemi+1, thirdSemi);
+            argListStringArray[2] = argListString.substring(thirdSemi+1);
 
             if (cdatafragment) {
                 if (code == null || code.equals("")) {
@@ -330,7 +344,7 @@ public class FileReaderThread extends EventReader {
                                               + lineNumber + ":");
 
                     logger.log(Level.WARNING,
-                        "This line does not contain a valid codechange event.");
+                        "This line does not contain a valid CDATA section replacement.");
 
                     cdatafragment = false;
 
@@ -344,7 +358,7 @@ public class FileReaderThread extends EventReader {
                                               + lineNumber + ":");
 
                     logger.log(Level.WARNING,
-                        "This line does not contain a valid codechange event.");
+                        "This line does not contain a valid CDATA section replacement.");
 
                     cdatafragment = false;
 
@@ -361,7 +375,6 @@ public class FileReaderThread extends EventReader {
             List argList = Arrays.asList(argListStringArray);
 
             // Try to create an EventPacket object from the line's data.
-
             try {
                 eventPacket = new WellFormedEventPacket(timeStamp,
                     sensorDataTypeString, argList);
@@ -378,7 +391,7 @@ public class FileReaderThread extends EventReader {
 
             if (this.mode != ReadMode.BURST) {
 
-                logger.log(Level.FINER, "bin im RT mode.");
+                logger.log(Level.FINER, "Process real time mode.");
 
                 // If this was the first line, then no previous
                 // timestamp
@@ -390,7 +403,7 @@ public class FileReaderThread extends EventReader {
                     long eventDelta = eventPacket.getTimeStamp().getTime()
                                       - this.dateOfLastEvent.getTime();
 
-                    logger.log(Level.FINER, "ed " + eventDelta);
+                    logger.log(Level.FINER, "  event delta: " + eventDelta);
 
                     // Get the current Date
                     Date currentDate = new Date();
@@ -401,7 +414,7 @@ public class FileReaderThread extends EventReader {
                     long realDelta = currentDate.getTime()
                                      - this.relativeDate.getTime();
 
-                    logger.log(Level.FINER, "rd " + realDelta);
+                    logger.log(Level.FINER, "  real Delta " + realDelta);
 
                     // Get the delta in real realtime and compare
                     // it to the
@@ -409,7 +422,7 @@ public class FileReaderThread extends EventReader {
                     while (realDelta < eventDelta
                            && this.mode != ReadMode.BURST && this.run) {
 
-                        logger.log(Level.FINER, "Muss warten");
+                        logger.log(Level.FINER, "  Need to wait");
 
                         try {
                             // Wait some time and retry until the
@@ -417,14 +430,14 @@ public class FileReaderThread extends EventReader {
                             // ellapsed.
                             Thread.sleep(TIME_SPAN);
 
-                            logger.log(Level.FINER, "Hab gewartet");
+                            logger.log(Level.FINER, "  Waiting finished");
 
                             currentDate = new Date();
 
                             realDelta = currentDate.getTime()
                                         - this.relativeDate.getTime();
 
-                            logger.log(Level.FINER, "neues rd " + realDelta);
+                            logger.log(Level.FINER, "  new real Delta " + realDelta);
 
                         } catch (InterruptedException e) {
                             // No problem if and interruption
@@ -432,12 +445,12 @@ public class FileReaderThread extends EventReader {
                         }
                     }
 
-                    logger.log(Level.FINER, "Muss nicht warten");
+                    logger.log(Level.FINER, "  Do not need to wait");
 
                 }
 
             } else {
-                logger.log(Level.FINER, "Bin im Burst mode.");
+                logger.log(Level.FINER, "Process burst mode.");
             }
 
             // Store the timestamp of the current event for the
@@ -450,6 +463,7 @@ public class FileReaderThread extends EventReader {
         } catch (IOException e) {
             throw new EventReaderException(e.getMessage());
         }
+
         return eventPacket;
 
     }
