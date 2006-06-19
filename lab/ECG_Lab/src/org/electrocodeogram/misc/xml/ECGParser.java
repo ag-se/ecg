@@ -1029,6 +1029,34 @@ public final class ECGParser {
     }
 
     /**
+     * This helper method checks if there's a child with
+     * the requested name.
+     * @param parentNode
+     *            Is the parent node
+     * @param nodeName
+     *            Is the name of the child nodes to be checked
+     */
+    public static boolean hasChildNode(Node parentNode, String nodeName) {
+
+        logger.entering(ECGParser.class.getName(), "hasChildNode",
+                new Object[] {parentNode, nodeName});
+
+            if (parentNode == null || nodeName == null) {
+                logger.exiting(ECGParser.class.getName(), "hasChildNode", null);
+                return false;
+            }
+            
+            Node node = null;
+            try {
+                node = getChildNode(parentNode, nodeName);
+            } catch (NodeException e) {
+                return false;
+            }
+            
+            return node != null; 
+    }
+
+    /**
      * This helper method is returning an array of XML
      * nodes with the given name and of the given
      * parent node.
@@ -1112,7 +1140,7 @@ public final class ECGParser {
 
             throw new NodeException("The requested child node " + nodeName
                                     + " is not found.", parentNode
-                .getNodeName(), parentNode.getOwnerDocument().getNodeName());
+                .getNodeName(), (parentNode.getOwnerDocument() == null ? parentNode.toString() : parentNode.getOwnerDocument().getNodeName()));
         }
 
         logger.exiting(ECGParser.class.getName(), "getChildNodes",
@@ -1266,4 +1294,5 @@ public final class ECGParser {
 
         return attributeNode.getFirstChild().getNodeValue();
     }
+
 }
