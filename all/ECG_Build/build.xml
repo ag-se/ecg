@@ -25,6 +25,7 @@
 		<dirset dir="../ECG_CSVFileTargetModule/src" />
 		<dirset dir="../ECG_MSDTFilterIntermediateModule/src" />
 		<dirset dir="../ECG_CodeChangeDifferIntermediateModule/src" />
+		<dirset dir="../ECG_CodeLocationTrackerIntermediateModule/src" />
 		<dirset dir="../ECG_SocketSourceModule/src" />
 		<dirset dir="../ECG_StatisticsTargetModule/src" />
 	</path>
@@ -88,11 +89,11 @@
 		<ant dir="../ECG_FileSystemSourceModule" target="cleanall" />
 		<ant dir="../ECG_MSDTFilterIntermediateModule" target="cleanall" />
 		<ant dir="../ECG_StatisticsTargetModule" target="cleanall" />
-		<ant dir="../ECG_CodechangeDifferIntermediateModule" target="cleanall" />
+		<ant dir="../ECG_CodeChangeDifferIntermediateModule" target="cleanall" />
+		<ant dir="../ECG_CodeLocationTrackerIntermediateModule" target="cleanall" />
 		<ant dir="../ECG_ManualAnnotatorSourceModule" target="cleanall" />
 		<ant dir="../ECG_EpisodeRecognizerIntermediateModule" target="cleanall" />
 		<ant dir="../ECG_CSVFileTargetModule" target="cleanall" />
-		<!-- <ant dir="../ECG_TestFirstEpisodeRecognizerModule" target="cleanall" /> -->
 
 	</target>
 
@@ -163,11 +164,11 @@
 		<ant dir="../ECG_FileSystemSourceModule" target="deploy" />
 		<ant dir="../ECG_MSDTFilterIntermediateModule" target="deploy" />
 		<ant dir="../ECG_StatisticsTargetModule" target="deploy" />
-		<ant dir="../ECG_CodechangeDifferIntermediateModule" target="deploy" />
+		<ant dir="../ECG_CodeChangeDifferIntermediateModule" target="deploy" />
+		<ant dir="../ECG_CodeLocationTrackerIntermediateModule" target="deploy" />
 		<ant dir="../ECG_ManualAnnotatorSourceModule" target="deploy" />
 		<ant dir="../ECG_EpisodeRecognizerIntermediateModule" target="deploy" />
 		<ant dir="../ECG_CSVFileTargetModule" target="deploy" />
-		<!-- <ant dir="../ECG_TestFirstEpisodeRecognizerModule" target="deploy" /> -->
 	
 	</target>
 
