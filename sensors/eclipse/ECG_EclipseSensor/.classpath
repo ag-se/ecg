@@ -6,5 +6,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/ECG_Support"/>
 	<classpathentry kind="lib" path="lib/hackystat/sensor.eclipse.3x.jar"/>
 	<classpathentry kind="lib" path="/ECG_SensorShell/dist/lib/sensorshell.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/ECG_SensorShell"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

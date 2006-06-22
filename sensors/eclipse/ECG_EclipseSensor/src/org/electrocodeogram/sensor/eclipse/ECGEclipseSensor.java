@@ -1062,7 +1062,7 @@ public final class ECGEclipseSensor {
                                         
             } catch (ParserConfigurationException e) {
                 logger.log(Level.SEVERE,
-                    "Could not instantiate the DOM Document.");
+                    "Could not instantiate the DOM Document in ECGPartListener.");
                 logger.log(Level.FINE, e.getMessage());
             }
         }
@@ -2516,6 +2516,17 @@ public final class ECGEclipseSensor {
     	/** The text operation target */
     	private ITextOperationTarget fOperationTarget;
 
+        private Document msdt_user_doc;
+        
+        private Element user_username;
+        private Element user_projectname;
+        private Element user_activity;
+        private Element user_param1;
+        private Element user_param2;
+        private CDATASection user_param2_contents;
+        private Element user_param3;
+        private CDATASection user_param3_contents;
+        
     	
     	/**
     	 * Creates the action.
@@ -2524,6 +2535,39 @@ public final class ECGEclipseSensor {
     		super(bundle, prefix, editor);
     		fOperationCode= operationCode;
     		
+            // initialize DOM skeleton for msdt.editor.xsd
+            try {
+                msdt_user_doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+                Element user_microactivity = msdt_user_doc.createElement("microActivity");                
+                Element user_commondata = msdt_user_doc.createElement("commonData");
+                Element user_user = msdt_user_doc.createElement("user");
+                user_username = msdt_user_doc.createElement("username");
+                user_projectname = msdt_user_doc.createElement("projectname");
+                user_activity = msdt_user_doc.createElement("activity");
+                user_param1 = msdt_user_doc.createElement("param1");
+                user_param2 = msdt_user_doc.createElement("param2");
+                user_param2_contents = msdt_user_doc.createCDATASection("");
+                user_param3 = msdt_user_doc.createElement("param3");
+                user_param3_contents = msdt_user_doc.createCDATASection("");
+
+                msdt_user_doc.appendChild(user_microactivity);
+                  user_microactivity.appendChild(user_commondata);
+                    user_commondata.appendChild(user_username);
+                    user_commondata.appendChild(user_projectname);
+                  user_microactivity.appendChild(user_user);
+                    user_user.appendChild(user_activity);
+                    user_user.appendChild(user_param1);
+                    user_user.appendChild(user_param2);
+                      user_param2.appendChild(user_param2_contents);
+                    user_user.appendChild(user_param3);
+                      user_param3.appendChild(user_param3_contents);
+            } catch (ParserConfigurationException e) {
+                logger.log(Level.SEVERE,
+                    "Could not instantiate the DOM Document in ECGTextOperationAction.");
+                logger.log(Level.FINE, e.getMessage());
+            }
+
+            // Register action
     		if (operationCode == ITextOperationTarget.CUT) {
     			setHelpContextId(IAbstractTextEditorHelpContextIds.CUT_ACTION);
     			setActionDefinitionId(ITextEditorActionDefinitionIds.CUT);
@@ -2566,6 +2610,17 @@ public final class ECGEclipseSensor {
     		fOperationTarget.doOperation(fOperationCode);
     		if (fOperationCode == ITextOperationTarget.CUT) {
     			logger.log(ECGLevel.PACKET, "A Cut operation has been recorded");
+
+                user_projectname.setTextContent(getProjectnameFromLocation(editor.getTitleToolTip()));
+                user_username.setTextContent(getUsername());
+                user_activity.setTextContent("cut");
+                user_param1.setTextContent(getFilenameFromLocation(editor.getTitleToolTip()));
+                user_param2_contents.setNodeValue(selection);
+                user_param3_contents.setNodeValue("");
+
+                processActivity("msdt.user.xsd", 
+                        xmlDocumentSerializer.writeToString(msdt_user_doc));
+/*
                 processActivity(
                     "msdt.user.xsd",
                     "<?xml version=\"1.0\"?><microActivity><commonData><username>"
@@ -2577,8 +2632,20 @@ public final class ECGEclipseSensor {
                         + "</param1><param2><![CDATA["
                         + selection
                         + "]" + "]" + "></param2></user></microActivity>");
+*/
     		} else if (fOperationCode == ITextOperationTarget.COPY) {
     			logger.log(ECGLevel.PACKET, "A Copy operation has been recorded");
+
+                user_projectname.setTextContent(getProjectnameFromLocation(editor.getTitleToolTip()));
+                user_username.setTextContent(getUsername());
+                user_activity.setTextContent("copy");
+                user_param1.setTextContent(getFilenameFromLocation(editor.getTitleToolTip()));
+                user_param2_contents.setNodeValue(selection);
+                user_param3_contents.setNodeValue("");
+
+                processActivity("msdt.user.xsd", 
+                        xmlDocumentSerializer.writeToString(msdt_user_doc));
+/*
                 processActivity(
                     "msdt.user.xsd",
                     "<?xml version=\"1.0\"?><microActivity><commonData><username>"
@@ -2590,8 +2657,22 @@ public final class ECGEclipseSensor {
                         + "</param1><param2><![CDATA["
                         + selection
                         + "]" + "]" + "></param2></user></microActivity>");
+*/
     		} else if (fOperationCode == ITextOperationTarget.PASTE) {
     			logger.log(ECGLevel.PACKET, "A Paste operation has been recorded");
+
+                Object clipboardContents = clipboard.getContents(textTransfer);
+                user_projectname.setTextContent(getProjectnameFromLocation(editor.getTitleToolTip()));
+                user_username.setTextContent(getUsername());
+                user_activity.setTextContent("paste");
+                user_param1.setTextContent(getFilenameFromLocation(editor.getTitleToolTip()));
+                user_param2_contents.setNodeValue(selection);
+                user_param3_contents.setNodeValue(
+                        (clipboardContents != null ? clipboardContents.toString() : ""));
+
+                processActivity("msdt.user.xsd", 
+                        xmlDocumentSerializer.writeToString(msdt_user_doc));
+/*
                 processActivity(
                     "msdt.user.xsd",
                     "<?xml version=\"1.0\"?><microActivity><commonData><username>"
@@ -2605,6 +2686,7 @@ public final class ECGEclipseSensor {
                         + "]" + "]" + "></param2><param3><![CDATA["
                         + clipboard.getContents(textTransfer)
                         + "]" + "]" + "></param3></user></microActivity>");
+*/
     		}
     		clipboard.dispose();
 
