@@ -7,6 +7,7 @@
 
 package org.electrocodeogram.module.intermediate;
 
+import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -251,20 +252,20 @@ public abstract class IntermediateModule extends Module implements
         logger.entering(this.getClass().getName(), "receiveEventPacket",
             new Object[] {eventPacket});
 
-        if (this.processingMode == ProcessingMode.ANNOTATOR) {
-            ValidEventPacket resultPacket = getAnalysisResult(eventPacket);
+        Collection<ValidEventPacket> resultPackets = getAnalysisResult(eventPacket);
 
-            if (this.annotationStyle == AnnotationStyle.PRE_ANNOTATION) {
-                sendEventPacket(resultPacket);
+        if (this.processingMode == ProcessingMode.ANNOTATOR 
+                && this.annotationStyle != AnnotationStyle.PRE_ANNOTATION) {
                 sendEventPacket(eventPacket);
-            } else {
-                sendEventPacket(eventPacket);
-                sendEventPacket(resultPacket);
-            }
-        } else {
-            ValidEventPacket resultPacket = getAnalysisResult(eventPacket);
+        }
+            
+        if (resultPackets != null)
+            for (ValidEventPacket packet : resultPackets)
+                sendEventPacket(packet);
 
-            sendEventPacket(resultPacket);
+        if (this.processingMode == ProcessingMode.ANNOTATOR 
+                && this.annotationStyle == AnnotationStyle.PRE_ANNOTATION) {
+                sendEventPacket(eventPacket);
         }
 
         logger.exiting(this.getClass().getName(), "receiveEventPacket");
@@ -276,15 +277,15 @@ public abstract class IntermediateModule extends Module implements
      *            Is the event to be analysed
      * @return The event that is the result of the analysis
      */
-    private ValidEventPacket getAnalysisResult(
+    private Collection<ValidEventPacket> getAnalysisResult(
         final ValidEventPacket eventPacket) {
         logger.entering(this.getClass().getName(), "getAnalysisResult");
 
-        ValidEventPacket packet = analyse(eventPacket);
+        Collection<ValidEventPacket> packets = analyse(eventPacket);
 
-        logger.exiting(this.getClass().getName(), "getAnalysisResult", packet);
+        logger.exiting(this.getClass().getName(), "getAnalysisResult", packets);
 
-        return packet;
+        return packets;
     }
 
     /**
@@ -295,9 +296,9 @@ public abstract class IntermediateModule extends Module implements
      * at the moment, <code>null</code> can be returned.
      * @param eventPacket
      *            Is the original incoming event
-     * @return The data of an event that is a result of the analysis
+     * @return The data of a collection of events that is a result of the analysis
      */
-    public abstract ValidEventPacket analyse(ValidEventPacket eventPacket);
+    public abstract Collection<ValidEventPacket> analyse(ValidEventPacket eventPacket);
 
     /**
      * @see org.electrocodeogram.module.Module#initialize()
