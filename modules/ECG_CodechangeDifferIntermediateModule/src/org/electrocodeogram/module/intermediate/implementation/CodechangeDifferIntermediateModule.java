@@ -1,6 +1,5 @@
 package org.electrocodeogram.module.intermediate.implementation;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -25,7 +24,7 @@ import bmsi.util.Diff;
 import bmsi.util.DiffPrint.NormalPrint;
 
 /**
- *
+ * Iterator to provide single line diffs from a diff block
  */
 public class CodechangeDifferIntermediateModule extends IntermediateModule {
 
@@ -72,8 +71,8 @@ public class CodechangeDifferIntermediateModule extends IntermediateModule {
 				}        		  
 			}
 			if (next.inserted != 0 && next.deleted != 0) {
-if (next.line0 != next.line1) // TODO: Check this! Is it really o.k.? It happens from time to time 
-System.out.println("\nProblematic hunk (" + next.line0 + "," + next.line1 + "," + next.deleted + "," + next.inserted + ")");
+			    assert(next.line0 != next.line1); // TODO: Check this! Is it really o.k.? It happens from time to time 
+//if (next.line0 != next.line1) System.out.println("\nProblematic hunk (" + next.line0 + "," + next.line1 + "," + next.deleted + "," + next.inserted + ")");
                     
 				int affected = (next.deleted > next.inserted ? next.deleted : next.inserted);
 				for (int i = 0; i < affected; i++) {
@@ -82,8 +81,8 @@ System.out.println("\nProblematic hunk (" + next.line0 + "," + next.line1 + "," 
 								next.line0+i,
 								code1[next.line1 + i],
 								LineDiff.ChangeType.CHANGED));
-System.out.println("  " + (next.line0+i+1) + "<> " + code0[next.line0 + i]);
-System.out.println("  " + (next.line1+i+1) + ">< " + code1[next.line1 + i]);
+//System.out.println("  " + (next.line0+i+1) + "<> " + code0[next.line0 + i]);
+//System.out.println("  " + (next.line1+i+1) + ">< " + code1[next.line1 + i]);
 					} else if (i >= next.inserted && i < next.deleted) {
 						lineDiffs.add(new LineDiff(code0[next.line0 + i],
 								next.line0+i,
@@ -119,14 +118,19 @@ System.out.println("  " + (next.line1+i+1) + ">< " + code1[next.line1 + i]);
 		}
     }
 
+    /**
+     * Log member
+     */
     private static Logger logger = LogHelper
         .createLogger(CodechangeDifferIntermediateModule.class.getName());
 
+    /**
+     * Stores latest values of any document reported by codechange/status events
+     */
     private HashMap<String, String> codes = new HashMap<String, String>(); 
 
     /**
-     * @param arg0
-     * @param arg1
+     * Standard constructor 
      */
     public CodechangeDifferIntermediateModule(String arg0, String arg1) {
         super(arg0, arg1);
@@ -135,18 +139,18 @@ System.out.println("  " + (next.line1+i+1) + ">< " + code1[next.line1 + i]);
     /**
      * @see org.electrocodeogram.module.intermediate.implementation.IntermediateModule#analyse(org.electrocodeogram.event.ValidEventPacket)
      */
-    @Override
     public Collection<ValidEventPacket> analyse(ValidEventPacket packet) {
         
     	boolean isCodeStatus = false;
     	String msdt = packet.getMicroSensorDataType().getName();
-    	
+   	
         if (!msdt.equals("msdt.codechange.xsd") && !msdt.equals("msdt.codestatus.xsd"))
         	return null;
 
     	List<ValidEventPacket> events = new ArrayList<ValidEventPacket>();
 
     	if (msdt.equals("msdt.codestatus.xsd")) {
+            // denotes that just the initial version will be stored and no diff computation
     		isCodeStatus = true;
         }
         
@@ -158,7 +162,7 @@ System.out.println("  " + (next.line1+i+1) + ">< " + code1[next.line1 + i]);
 			documentname = ECGParser.getSingleNodeValue("documentname", document);
 			projectname = ECGParser.getSingleNodeValue("projectname", document);
 		} catch (NodeException e) {
-			logger.log(ECGLevel.SEVERE, "Couldn't fetch any of {id, projectname, documentname} " +
+			logger.log(ECGLevel.SEVERE, "Couldn't fetch any of {id, projectname, documentname, username} " +
 					"elements from event in CodechangeDifferIntermediateModule.");
 		}
 
@@ -175,7 +179,8 @@ System.out.println("  " + (next.line1+i+1) + ">< " + code1[next.line1 + i]);
     	if (oldCode == null)
     		isCodeStatus = true;
     	
-		codes.put(id, newCode);
+    	// store current version
+        codes.put(id, newCode);
 
 		if (isCodeStatus)
     		return events;
@@ -184,12 +189,14 @@ System.out.println("  " + (next.line1+i+1) + ">< " + code1[next.line1 + i]);
         String[] oldLines = getLines(oldCode);
         String[] newLines = getLines(newCode);
         Diff diff = new Diff(oldLines, newLines); 
-        Diff.change script = diff.diff_2(false);
-(new NormalPrint(oldLines,newLines)).print_script(script);
+        Diff.change script = diff.diff_2(false);  // compute diff
+//(new NormalPrint(oldLines,newLines)).print_script(script);
 
+        // For each diff section in diff analysis send single new msdt.linediff event
         for (Diff.change next = script; next != null; next = next.link)
         {
-    		LineChangeIterator it = new LineChangeIterator(oldLines, newLines, next);
+            // generates line diffs from diff
+            LineChangeIterator it = new LineChangeIterator(oldLines, newLines, next);
     
             String data = "<?xml version=\"1.0\"?><microActivity><commonData>";
             data += "<username>" + username + "</username>";
@@ -201,7 +208,6 @@ System.out.println("  " + (next.line1+i+1) + ">< " + code1[next.line1 + i]);
     
     		String diffs = "";
     		
-            // TODO Make DOM-like, no string-concats
     		while (it.hasNext()) {
     			LineDiff lc = it.next();
     			// write down line numbers with offset 1
@@ -227,6 +233,7 @@ System.out.println("  " + (next.line1+i+1) + ">< " + code1[next.line1 + i]);
             data += diffs + "</lines></linediff></microActivity>";
 //System.out.println("-----\nResults in event " + data);
     		
+            // send event
             String[] args = {WellFormedEventPacket.HACKYSTAT_ADD_COMMAND, "msdt.linediff.xsd", data};
     		try {
     		    events.add(new ValidEventPacket(timestamp,
@@ -239,56 +246,42 @@ System.out.println("  " + (next.line1+i+1) + ">< " + code1[next.line1 + i]);
 //System.out.println("-----------------------------------------------");
         
 		return events;
-
     }
-
-    private String getHashKey(ValidEventPacket packet) {
-
-    	Document document = packet.getDocument();
-    	String key = "unknown key";
-
-    	try {
-			key = ECGParser.getSingleNodeValue("documentname", document);
-		} catch (NodeException e) {
-			try {
-				key = ECGParser.getSingleNodeValue("id", document);
-			} catch (NodeException e1) {
-				assert(false);
-				return key;
-			}
-		}
-
-		return key;
-	}
 
 	/**
-     * @param code
-     * @return
-     * @throws IOException 
+     * Splits a file contents into an array of lines
+     * 
+     * @param contents A text file contents
+     * @return The single lines (seperated by \n) in code
      */
-    private String[] getLines(String code) {
-        if (code == null) {
-            return null;
+    private String[] getLines(String contents) {
+        if (contents == null) {
+            return new String[0];
         }
-        return code.split("\n");
+        return contents.split("\n");
     }
 
-    private String getCode(ValidEventPacket packet) {
+    /**
+     * Fetches the document contents from an event, if available.
+     * 
+     * @param event An event with a CDATA "document" tag
+     * @return Contents of the "document" in the event, empty string otherwise
+     */
+    private String getCode(ValidEventPacket event) {
     	try {
-        	Document document = packet.getDocument();
+        	Document document = event.getDocument();
 			return ECGParser.getSingleNodeValue("document", document);
 
     	} catch (NodeException e) {
-			logger.log(ECGLevel.SEVERE, "Could not fetch code for line diff computation in CodechangeDifferIntermediateModule.");
-			return null;
+			logger.log(ECGLevel.SEVERE, 
+                    "Could not fetch document contents in CodechangeDifferIntermediateModule on event " + event);
+			return "";
 		}
     }
 
     /**
-     * @param propertyName
-     * @param propertyValue
+     * @see org.electrocodeogram.module.Module#propertyChanged()
      */
-    @Override
     public void propertyChanged(ModuleProperty moduleProperty) {
 
     }
@@ -296,7 +289,6 @@ System.out.println("  " + (next.line1+i+1) + ">< " + code1[next.line1 + i]);
     /**
      * @see org.electrocodeogram.module.Module#analyseCoreNotification()
      */
-    @Override
     public void update() {
 
     }
@@ -304,10 +296,9 @@ System.out.println("  " + (next.line1+i+1) + ">< " + code1[next.line1 + i]);
     /**
      * @see org.electrocodeogram.module.intermediate.implementation.IntermediateModule#initialize()
      */
-    @Override
     public void initialize() {
-        this.setProcessingMode(ProcessingMode.ANNOTATOR);
-        this.setAnnnotationStyle(AnnotationStyle.PRE_ANNOTATION);
+        this.setProcessingMode(ProcessingMode.ANNOTATOR); // Module *adds* events
+        this.setAnnnotationStyle(AnnotationStyle.PRE_ANNOTATION); // ... before the triggering events
     }
 
 }
