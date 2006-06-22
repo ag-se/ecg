@@ -5,6 +5,9 @@
 package org.electrocodeogram.module.intermediate.implementation;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -66,9 +69,9 @@ public class EpisodeRecognizerIntermediateModule extends IntermediateModule {
      * @see org.electrocodeogram.module.intermediate.implementation.IntermediateModule#analyse(org.electrocodeogram.event.ValidEventPacket)
      */
     @Override
-    public ValidEventPacket analyse(ValidEventPacket packet) {
+    public Collection<ValidEventPacket> analyse(ValidEventPacket packet) {
 
-        return manager.analyse(packet);
+        return Collections.singleton(manager.analyse(packet));
 
     }
 
