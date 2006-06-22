@@ -3,9 +3,11 @@ package org.electrocodeogram.module.intermediate.implementation;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Logger;
 
 import org.electrocodeogram.event.IllegalEventParameterException;
@@ -34,7 +36,7 @@ public class CodechangeDifferIntermediateModule extends IntermediateModule {
     	String[] code0, code1;
     	// for this Iterator we do it the non-lazy but easy way: Compute Collection first in O(n)
     	//   and then deliver contents in O(1). This allows for O(1) implementation of size() as well. 
-    	ArrayList<LineChange> lineChanges = new ArrayList<LineChange>();
+    	ArrayList<LineDiff> lineDiffs = new ArrayList<LineDiff>();
     	int it = 0;
     	
 		public LineChangeIterator(String[] a, String[] b, Diff.change hunk) {
@@ -43,77 +45,77 @@ public class CodechangeDifferIntermediateModule extends IntermediateModule {
 		    compute(hunk);
 		}
 
-		private void compute(Diff.change hunk) {
-			if (hunk == null)
+		private void compute(Diff.change next) {
+			if (next == null)
 				return;
-			for (Diff.change next = hunk; next != null; next = next.link)
-			{
-//System.out.println("Analysing hunk (" + next.line0 + "," + next.line1 + "," + next.deleted + "," + next.inserted + ")");
-				if (next.inserted == 0 && next.deleted == 0)
-					continue;
-				if (next.inserted == 0) {
-					// no inserted => #deleted lines beggining at line0+1 deleted in a
-					for (int i = 0; i < next.deleted; i++) {
-						lineChanges.add(new LineChange(code0[next.line0 + i], 
+//System.out.println("\nAnalysing hunk (" + next.line0 + "," + next.line1 + "," + next.deleted + "," + next.inserted + ")");
+			if (next.inserted == 0 && next.deleted == 0)
+				return;
+			if (next.inserted == 0) {
+				// no inserted => #deleted lines beggining at line0+1 deleted in a
+				for (int i = 0; i < next.deleted; i++) {
+					lineDiffs.add(new LineDiff(code0[next.line0 + i], 
+							next.line0+i,
+							null,
+							LineDiff.ChangeType.DELETED));
+//System.out.println("  " + (next.line0+i+1) + "< " + code0[next.line0 + i]);
+				}
+			}
+			if (next.inserted != 0 && next.deleted == 0) {
+				// no deleted => #inserted lines beggining at line1+1 deleted in b
+				for (int i = 0; i < next.inserted; i++) {
+					lineDiffs.add(new LineDiff(null,
+							next.line1+i,
+							code1[next.line1 + i],
+							LineDiff.ChangeType.INSERTED));
+//System.out.println("  " + (next.line1+i+1) + "> " + code1[next.line1 + i]);
+				}        		  
+			}
+			if (next.inserted != 0 && next.deleted != 0) {
+if (next.line0 != next.line1) // TODO: Check this! Is it really o.k.? It happens from time to time 
+System.out.println("\nProblematic hunk (" + next.line0 + "," + next.line1 + "," + next.deleted + "," + next.inserted + ")");
+                    
+				int affected = (next.deleted > next.inserted ? next.deleted : next.inserted);
+				for (int i = 0; i < affected; i++) {
+					if (i < next.inserted && i < next.deleted) {
+						lineDiffs.add(new LineDiff(code0[next.line0 + i],
+								next.line0+i,
+								code1[next.line1 + i],
+								LineDiff.ChangeType.CHANGED));
+System.out.println("  " + (next.line0+i+1) + "<> " + code0[next.line0 + i]);
+System.out.println("  " + (next.line1+i+1) + ">< " + code1[next.line1 + i]);
+					} else if (i >= next.inserted && i < next.deleted) {
+						lineDiffs.add(new LineDiff(code0[next.line0 + i],
 								next.line0+i,
 								null,
-								LineChange.ChangeType.DELETED));
-//System.out.println("  " + (next.line0+i+1) + "< " + code0[next.line0 + i]);
-					}
-				}
-				if (next.inserted != 0 && next.deleted == 0) {
-					// no deleted => #inserted lines beggining at line1+1 deleted in b
-					for (int i = 0; i < next.inserted; i++) {
-						lineChanges.add(new LineChange(null,
+								LineDiff.ChangeType.DELETED));
+//System.out.println("  " + (next.line0+i+1) + "< " + code0[next.line0 + i]);						  
+					} else if (i < next.inserted && i >= next.deleted) {
+						lineDiffs.add(new LineDiff(null,
 								next.line1+i,
 								code1[next.line1 + i],
-								LineChange.ChangeType.INSERTED));
-//System.out.println("  " + (next.line1+i+1) + "> " + code1[next.line1 + i]);
-					}        		  
-				}
-				if (next.inserted != 0 && next.deleted != 0) {
-					assert (next.line0 == next.line1); // TODO: Check this!
-					int affected = (next.deleted > next.inserted ? next.deleted : next.inserted);
-					for (int i = 0; i < affected; i++) {
-						if (i < next.inserted && i < next.deleted) {
-							lineChanges.add(new LineChange(code0[next.line0 + i],
-									next.line0+i,
-									code1[next.line1 + i],
-									LineChange.ChangeType.CHANGED));
-//System.out.println("  " + (next.line0+i+1) + "<> " + code0[next.line0 + i]);
-//System.out.println("  " + (next.line1+i+1) + ">< " + code1[next.line1 + i]);
-						} else if (i > next.inserted && i <= next.deleted) {
-							lineChanges.add(new LineChange(code0[next.line0 + i],
-									next.line0+i,
-									null,
-									LineChange.ChangeType.DELETED));
-//System.out.println("  " + (next.line0+i+1) + "< " + code0[next.line0 + i]);						  
-						} else if (i <= next.inserted && i > next.deleted) {
-							lineChanges.add(new LineChange(null,
-									next.line1+i,
-									code1[next.line1 + i],
-									LineChange.ChangeType.INSERTED));
+								LineDiff.ChangeType.INSERTED));
 //System.out.println("  " + (next.line1+i+1) + "> " + code1[next.line1 + i]);						  
-						}
-					}
+					} else 
+                        assert (false);
 				}
       	  	}    	  
 		}
 
 		public boolean hasNext() {
-			return this.it < lineChanges.size();
+			return this.it < lineDiffs.size();
 		}
 
-		public LineChange next() {
-			return lineChanges.get(it++);
+		public LineDiff next() {
+			return lineDiffs.get(it++);
 		}
 
 		public void remove() {
-			lineChanges.remove(it);
+			lineDiffs.remove(it);
 		}
 
 		public int size() {
-			return lineChanges.size();
+			return lineDiffs.size();
 		}
     }
 
@@ -134,19 +136,18 @@ public class CodechangeDifferIntermediateModule extends IntermediateModule {
      * @see org.electrocodeogram.module.intermediate.implementation.IntermediateModule#analyse(org.electrocodeogram.event.ValidEventPacket)
      */
     @Override
-    public ValidEventPacket analyse(ValidEventPacket packet) {
+    public Collection<ValidEventPacket> analyse(ValidEventPacket packet) {
         
     	boolean isCodeStatus = false;
     	String msdt = packet.getMicroSensorDataType().getName();
     	
         if (!msdt.equals("msdt.codechange.xsd") && !msdt.equals("msdt.codestatus.xsd"))
-        	return packet;
+        	return null;
 
-    	ValidEventPacket event = null;
+    	List<ValidEventPacket> events = new ArrayList<ValidEventPacket>();
 
     	if (msdt.equals("msdt.codestatus.xsd")) {
     		isCodeStatus = true;
-    		event = packet;
         }
         
     	String id = "", projectname = "", documentname = "", username = "";
@@ -166,7 +167,9 @@ public class CodechangeDifferIntermediateModule extends IntermediateModule {
     	
     	String oldCode = codes.get(id);
     	String newCode = getCode(packet);
-    	
+
+//System.out.println("Old:\n" + oldCode + "----\nNew:\n" + newCode);        
+        
     	if (newCode == null)
     		newCode = "";
     	if (oldCode == null)
@@ -175,60 +178,67 @@ public class CodechangeDifferIntermediateModule extends IntermediateModule {
 		codes.put(id, newCode);
 
 		if (isCodeStatus)
-    		return event;
+    		return events;
     		
     	Date timestamp = packet.getTimeStamp();    	
         String[] oldLines = getLines(oldCode);
         String[] newLines = getLines(newCode);
         Diff diff = new Diff(oldLines, newLines); 
         Diff.change script = diff.diff_2(false);
-//(new NormalPrint(oldLines,newLines)).print_script(script);
+(new NormalPrint(oldLines,newLines)).print_script(script);
 
-		LineChangeIterator it = new LineChangeIterator(oldLines, newLines, script);
-        String data = "<?xml version=\"1.0\"?><microActivity><commonData>";
-        data += "<username>" + username + "</username>";
-        data += "<projectname>" + projectname + "</projectname>";
-        data += "<id>" + id + "</id></commonData>";
-        data += "<linediff><documentname>" + documentname + "</documentname><lines>\n";
-
-        logger.log(ECGLevel.FINE, "Diff found " + it.size() + " differing lines:");
-
-		String diffs = "";
-		
-		while (it.hasNext()) {
-			LineChange lc = it.next();
-			// write down line numbers with offset 1
-			if (lc.getType() == LineChange.ChangeType.CHANGED) {
-                diffs += " <line><type>changed</type><linenumber>"
-	                      + (lc.getLinenumber()+1) + "</linenumber>"
-	                      + "<from><![CDATA[" + lc.getFrom() + "]" + "]" + "></from>"
-	                      + "<to><![CDATA[" + lc.getTo() + "]" + "]" + "></to></line>\n";
-			} else if (lc.getType() == LineChange.ChangeType.INSERTED) {
-                diffs += " <line><type>inserted</type><linenumber>"
-                          + (lc.getLinenumber()+1) + "</linenumber>"
-                          + "<to><![CDATA[" + lc.getTo() + "]" + "]" + "></to></line>\n";
-			} else if (lc.getType() == LineChange.ChangeType.DELETED) {
-                diffs += " <line><type>deleted</type><linenumber>"
-                          + (lc.getLinenumber()+1) + "</linenumber>"
-                          + "<from><![CDATA[" + lc.getFrom()  + "]" + "]" + "></from></line>\n";
-			} else
-				logger.log(ECGLevel.SEVERE, "Unknown line change type in CodechangeDifferIntermediateModule.");
-		}
-
-        logger.log(ECGLevel.FINE, diffs);
-
-        data += diffs + "</lines></linediff></microActivity>";
-//System.out.println(data);
-		
-        String[] args = {WellFormedEventPacket.HACKYSTAT_ADD_COMMAND, "msdt.linediff.xsd", data};
-		try {
-		    event = new ValidEventPacket(timestamp,
-		        WellFormedEventPacket.HACKYSTAT_ACTIVITY_STRING, Arrays.asList(args));
-		} catch (IllegalEventParameterException e) {
-			logger.log(ECGLevel.SEVERE, "Wrong event parameters in CodechangeDifferIntermediateModule.");
-		}
-
-		return event;
+        for (Diff.change next = script; next != null; next = next.link)
+        {
+    		LineChangeIterator it = new LineChangeIterator(oldLines, newLines, next);
+    
+            String data = "<?xml version=\"1.0\"?><microActivity><commonData>";
+            data += "<username>" + username + "</username>";
+            data += "<projectname>" + projectname + "</projectname>";
+            data += "<id>" + id + "</id></commonData>";
+            data += "<linediff><documentname>" + documentname + "</documentname><lines>\n";
+    
+            logger.log(ECGLevel.FINE, "Diff found " + it.size() + " differing lines:");
+    
+    		String diffs = "";
+    		
+            // TODO Make DOM-like, no string-concats
+    		while (it.hasNext()) {
+    			LineDiff lc = it.next();
+    			// write down line numbers with offset 1
+    			if (lc.getType() == LineDiff.ChangeType.CHANGED) {
+                    diffs += " <line><type>changed</type><linenumber>"
+    	                      + (lc.getLinenumber()+1) + "</linenumber>"
+    	                      + "<from><![CDATA[" + lc.getFrom() + "]" + "]" + "></from>"
+    	                      + "<to><![CDATA[" + lc.getTo() + "]" + "]" + "></to></line>\n";
+    			} else if (lc.getType() == LineDiff.ChangeType.INSERTED) {
+                    diffs += " <line><type>inserted</type><linenumber>"
+                              + (lc.getLinenumber()+1) + "</linenumber>"
+                              + "<to><![CDATA[" + lc.getTo() + "]" + "]" + "></to></line>\n";
+    			} else if (lc.getType() == LineDiff.ChangeType.DELETED) {
+                    diffs += " <line><type>deleted</type><linenumber>"
+                              + (lc.getLinenumber()+1) + "</linenumber>"
+                              + "<from><![CDATA[" + lc.getFrom()  + "]" + "]" + "></from></line>\n";
+    			} else
+    				logger.log(ECGLevel.SEVERE, "Unknown line change type in CodechangeDifferIntermediateModule.");
+    		}
+    
+            logger.log(ECGLevel.FINE, diffs);
+    
+            data += diffs + "</lines></linediff></microActivity>";
+//System.out.println("-----\nResults in event " + data);
+    		
+            String[] args = {WellFormedEventPacket.HACKYSTAT_ADD_COMMAND, "msdt.linediff.xsd", data};
+    		try {
+    		    events.add(new ValidEventPacket(timestamp,
+    		        WellFormedEventPacket.HACKYSTAT_ACTIVITY_STRING, Arrays.asList(args)));
+    		} catch (IllegalEventParameterException e) {
+    			logger.log(ECGLevel.SEVERE, "Wrong event parameters in CodechangeDifferIntermediateModule.");
+    		}
+        }
+        
+//System.out.println("-----------------------------------------------");
+        
+		return events;
 
     }
 
@@ -296,7 +306,8 @@ public class CodechangeDifferIntermediateModule extends IntermediateModule {
      */
     @Override
     public void initialize() {
-        this.setProcessingMode(ProcessingMode.FILTER);
+        this.setProcessingMode(ProcessingMode.ANNOTATOR);
+        this.setAnnnotationStyle(AnnotationStyle.PRE_ANNOTATION);
     }
 
 }
