@@ -11,6 +11,8 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -132,7 +134,7 @@ public class MSDTFilterIntermediateModule extends IntermediateModule implements 
      * @see org.electrocodeogram.module.intermediate.IntermediateModule#analyse(org.electrocodeogram.event.ValidEventPacket)
      */
     @Override
-    public final ValidEventPacket analyse(final ValidEventPacket packet) {
+    public final Collection<ValidEventPacket> analyse(final ValidEventPacket packet) {
 
         logger.entering(this.getClass().getName(),
             "MSDTFilterIntermediateModule", new Object[] {packet});
@@ -174,7 +176,7 @@ public class MSDTFilterIntermediateModule extends IntermediateModule implements 
 
 		logger.exiting(this.getClass().getName(), null);
 
-        return result;
+        return Collections.singleton(result);
 
     }
 
