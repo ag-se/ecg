@@ -3,12 +3,8 @@
 	<id>
 		org.electrocodeogram.module.source.implementation.FileSystemSourceModule
 	</id>
-	<provider-name>
-		Frank Schlesinger (Frank@Schlesinger.com)
-	</provider-name>
-	<version>
-		0.6
-	</version>
+	<provider-name>FU Berlin</provider-name>
+	<version>0.7</version>
 	<name>
 		File Reader
 	</name>
@@ -52,6 +48,11 @@
 			</propertyType>
 			<propertyValue>
 			</propertyValue>
+		</property>
+		<property>
+			<propertyName>Send End Event</propertyName>
+			<propertyType>java.lang.Boolean</propertyType>
+			<propertyValue>true</propertyValue>
 		</property>
 	</properties>
 </module>

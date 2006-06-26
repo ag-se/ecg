@@ -1,12 +1,5 @@
 /*
- * Class: FileReaderThread
- * Version 1.1
- * Date 17.03.2006
- * Fixed Bug #6632
- * 
- * Version: 1.0
- * Date: 16.10.2005
- * By: Frank@Schlesinger.com
+ * FU Berlin, 2006
  */
 
 package org.electrocodeogram.module.source.implementation;
@@ -27,6 +20,7 @@ import java.util.logging.Logger;
 import org.electrocodeogram.event.IllegalEventParameterException;
 import org.electrocodeogram.event.WellFormedEventPacket;
 import org.electrocodeogram.logging.LogHelper;
+import org.electrocodeogram.misc.xml.ECGWriter;
 import org.electrocodeogram.module.source.EventReader;
 import org.electrocodeogram.module.source.EventReaderException;
 import org.electrocodeogram.module.source.SourceModule;
@@ -43,7 +37,8 @@ import org.electrocodeogram.module.source.implementation.FileSystemSourceModule.
 public class FileReaderThread extends EventReader {
 
 	/**
-	 * Holds the system dependent representation of a line separator. 
+	 * Holds the system dependent representation of a line separator.
+     * TODO Don't use this, because it simply needs to be the seperator of the file! 
 	 */
 	private static String NEW_LINE_CHAR = System.getProperty("line.separator");
 	
@@ -98,6 +93,14 @@ public class FileReaderThread extends EventReader {
     private ReadMode mode;
 
     /**
+     * If true, a special msdt.system event to denote the end of a 
+     * file is sent. Other modules may use this event type to
+     * invoke finalization code. The lab in nogui mode will
+     * terminate after processing this special event 
+     */
+    private boolean sendEndEvent = false;
+
+    /**
      * The state of this <code>Thread</code>.
      */
     private boolean run;
@@ -114,11 +117,11 @@ public class FileReaderThread extends EventReader {
      *            either "BURST" or "REALTIME" mode
      */
     public FileReaderThread(final SourceModule sourceModule,
-        final ReadMode readMode) {
+        final ReadMode readMode, final boolean sendEndEvent) {
         super(sourceModule);
 
         this.mode = readMode;
-
+        this.sendEndEvent = sendEndEvent;
         this.module = sourceModule;
 
         this.run = true;
@@ -126,25 +129,8 @@ public class FileReaderThread extends EventReader {
     }
 
     /**
-     * This method sets the <em>ReadMode</em> for the
-     * <em>FileReaderThread</em>.
-     * @param readMode
-     *            Is the ReadMode; either "BURST" or "REALTIME".
-     */
-    public final void setMode(final ReadMode readMode) {
-
-        logger.entering(this.getClass().getName(), "setMode",
-            new Object[] {readMode});
-
-        this.mode = readMode;
-
-        logger.exiting(this.getClass().getName(), "setMode");
-    }
-
-    /**
      * @see org.electrocodeogram.module.source.EventReader#read()
      */
-    @Override
     public final WellFormedEventPacket read() throws EventReaderException {
 
         logger.entering(this.getClass().getName(), "read");
@@ -152,14 +138,9 @@ public class FileReaderThread extends EventReader {
         WellFormedEventPacket eventPacket = null;
 
         boolean cdatafragment = false;
-
         int lineNumber = 0;
-
         String line = null;
-
         String code = null;
-
-        StringTokenizer eventTokenizer = null;
 
         try {
             line = this.reader.readLine();
@@ -168,12 +149,18 @@ public class FileReaderThread extends EventReader {
 
                 logger.log(Level.INFO,
                     "The read line is null. Assuming end of file.");
-
-                this.module.deactivate();
+                
+                if (this.sendEndEvent) {
+                    String eventStr = "<microActivity><system><type>termination</type></system></microActivity>";
+                    eventPacket = ECGWriter.createValidEventPacket("msdt.system.xsd", this.dateOfLastEvent, eventStr);
+                    this.sendEndEvent = false;
+                } else {
+                    this.module.deactivate();
+                }
 
                 logger.exiting(this.getClass().getName(), "read", null);
 
-                return null;
+                return eventPacket;
             }
 
             if (line.contains("<![CDATA") && !line.contains("]]>")) {
@@ -229,28 +216,10 @@ public class FileReaderThread extends EventReader {
 
             }
 
-/* BUG 1: no good idea since the XML data may contain # as well. Just take the first two '#' seperators            
-            // Get a new Tokenizer.
-            eventTokenizer = new StringTokenizer(line,
-                WellFormedEventPacket.EVENT_SEPARATOR);
-
-            // Check if the line is well formed.
-            int tokens = eventTokenizer.countTokens();
-            if (tokens != 3) {
-                logger.log(Level.WARNING, "Error while reading line "
-                                          + lineNumber + ":");
-
-                logger.log(Level.WARNING,
-                    "This line does not contain valid event data.");
-
-                return null;
-            }
-*/
             int timeIndex = line.indexOf('#');
             int datatypeIndex = line.indexOf('#', timeIndex+1);
             
             // Get the timestamp String.
-// BUG 1            String timeStampString = eventTokenizer.nextToken();
             String timeStampString = line.substring(0, timeIndex);
             // Check if the timestamp String is well formed.
             if (timeStampString == null || timeStampString.equals("")) {
@@ -265,7 +234,6 @@ public class FileReaderThread extends EventReader {
             }
 
             // Get the SensorDataType String.
-// BUG 1            String sensorDataTypeString = eventTokenizer.nextToken();
             String sensorDataTypeString = line.substring(timeIndex+1, datatypeIndex);
             // Check if the SensorDataType String is well formed.
             if (sensorDataTypeString == null || sensorDataTypeString.equals("")) {
@@ -279,7 +247,6 @@ public class FileReaderThread extends EventReader {
             }
 
             // Get the argList String.
-// BUG 1            String argListString = eventTokenizer.nextToken();
             String argListString = line.substring(datatypeIndex+1);
             // Check if the argList String is well formed.
             if (argListString == null || argListString.equals("")) {
@@ -312,23 +279,6 @@ public class FileReaderThread extends EventReader {
                 return null;
             }
 
-/* BUG 2: Bad idea as well, see BUG 1 with ";" instead of "#"            
-            // This second level Tokenizer is used to dissasemble the
-            // argList.
-            StringTokenizer argListTokenizer = new StringTokenizer(
-                argListString, WellFormedEventPacket.ARGLIST_SEPARATOR);
-
-            // The Array is used to temprarilly store the argList
-            // entries.
-            String[] argListStringArray = new String[argListTokenizer
-                .countTokens()];
-
-            int i = 0;
-
-            while (argListTokenizer.hasMoreTokens()) {
-                argListStringArray[i++] = argListTokenizer.nextToken();
-            }
-*/
             String[] argListStringArray = new String[3];
             int firstSemi = argListString.indexOf(';');
             int secondSemi = argListString.indexOf(';', firstSemi+1);
@@ -469,6 +419,22 @@ public class FileReaderThread extends EventReader {
     }
 
     /**
+     * This method sets the <em>ReadMode</em> for the
+     * <em>FileReaderThread</em>.
+     * @param readMode
+     *            Is the ReadMode; either "BURST" or "REALTIME".
+     */
+    public final void setMode(final ReadMode readMode) {
+    
+        logger.entering(this.getClass().getName(), "setMode",
+            new Object[] {readMode});
+    
+        this.mode = readMode;
+    
+        logger.exiting(this.getClass().getName(), "setMode");
+    }
+
+    /**
      * Sets the file to write the events in.
      * @param f Is the new output file
      * @throws IOException If an exception occurs while openeing the new output file
@@ -483,5 +449,13 @@ public class FileReaderThread extends EventReader {
 
         this.reader = new BufferedReader(new FileReader(this.file));
 
+    }
+
+    /**
+     * Set to true if a termination event should be sent
+     * @param sendEndEvent
+     */
+    public void setSendEndEvent(boolean sendEndEvent) {
+        this.sendEndEvent = sendEndEvent;
     }
 }

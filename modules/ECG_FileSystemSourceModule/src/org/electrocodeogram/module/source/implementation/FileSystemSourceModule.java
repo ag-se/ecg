@@ -1,8 +1,5 @@
 /*
- * Class: FileSystemSourceModule
- * Version: 1.0
- * Date: 16.10.2005
- * By: Frank@Schlesinger.com
+ * FU Berlin, 2006
  */
 
 package org.electrocodeogram.module.source.implementation;
@@ -72,6 +69,14 @@ public class FileSystemSourceModule extends SourceModule {
     private ReadMode readMode;
 
     /**
+     * If true, a special msdt.system event to denote the end of a 
+     * file is sent. Other modules may use this event type to
+     * invoke finalization code. The lab in nogui mode will
+     * terminate after processing this special event 
+     */
+    private boolean sendEndEvent = false;
+
+    /**
      * The creates the module instance. It is not to be called by
      * developers, instead it is called from the
      * <code>ModuleRegistry</code> when the user requested a new instance
@@ -133,6 +138,12 @@ public class FileSystemSourceModule extends SourceModule {
 
                 setMode();
             }
+        } else if (moduleProperty.getName().equals("Send End Event")) {
+            if (moduleProperty.getValue().equalsIgnoreCase("true")) {
+                this.sendEndEvent = true;
+
+                setMode();
+            }
         } else {
 
             logger.exiting(this.getClass().getName(), "propertyChanged");
@@ -147,7 +158,7 @@ public class FileSystemSourceModule extends SourceModule {
     }
 
     /**
-     * This method sets the <em>ReadMode</em> for the
+     * This method sets the <em>ReadMode</em> and end event status for the
      * <em>FileReaderThread</em>.
      */
     private void setMode() {
@@ -156,6 +167,7 @@ public class FileSystemSourceModule extends SourceModule {
 
         if (this.readerThread != null) {
             this.readerThread.setMode(this.readMode);
+            this.readerThread.setSendEndEvent(this.sendEndEvent);
         }
 
         logger.exiting(this.getClass().getName(), "setMode");
@@ -216,7 +228,7 @@ public class FileSystemSourceModule extends SourceModule {
 
         }
 
-        this.readerThread = new FileReaderThread(this, this.readMode);
+        this.readerThread = new FileReaderThread(this, this.readMode, this.sendEndEvent);
 
         logger.log(Level.FINE, "FileReader created.");
 
@@ -241,8 +253,15 @@ public class FileSystemSourceModule extends SourceModule {
      * @see org.electrocodeogram.module.source.SourceModule#postStop()
      *      This method is not implemented in this module.
      */
-    @Override
     public final void postStop() {
     // not implemented
+    }
+
+    /**
+     * @return true, if this module will send a termination event after 
+     * reading the last event from the file
+     */
+    public boolean isSendEndEvent() {
+        return sendEndEvent;
     }
 }
