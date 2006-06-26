@@ -50,6 +50,22 @@ public class ECGWriter {
         
         ValidEventPacket event = null;
         String docstring = xmlDocumentSerializer.writeToString(eventdoc);
+        
+        return createValidEventPacket(eventtype, timestamp, docstring);
+    }
+
+    /**
+     * Creates a valid event packet from eventtype ("msdt....xsd"), time stamp, and
+     * XML Document.
+     * 
+     * @param eventtype
+     * @param timestamp
+     * @param eventdoc
+     * @return
+     */
+    public static ValidEventPacket createValidEventPacket(String eventtype, Date timestamp, String docstring) {
+
+        ValidEventPacket event = null;
         String[] args = {WellFormedEventPacket.HACKYSTAT_ADD_COMMAND, eventtype, docstring};
         
         try {
@@ -65,6 +81,9 @@ public class ECGWriter {
         
     }
 
+    /**
+     * Initialzation of DOM API
+     */
     private static void initWriter() {
         try {
             // get DOM Implementation using DOM Registry
