@@ -71,7 +71,7 @@ public class CodechangeDifferIntermediateModule extends IntermediateModule {
 				}        		  
 			}
 			if (next.inserted != 0 && next.deleted != 0) {
-			    assert(next.line0 != next.line1); // TODO: Check this! Is it really o.k.? It happens from time to time 
+			    assert(next.line0 == next.line1); // TODO: Check this! Is it really o.k.? It happens from time to time 
 //if (next.line0 != next.line1) System.out.println("\nProblematic hunk (" + next.line0 + "," + next.line1 + "," + next.deleted + "," + next.inserted + ")");
                     
 				int affected = (next.deleted > next.inserted ? next.deleted : next.inserted);
