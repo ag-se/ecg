@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+	<xs:annotation>
+		<xs:documentation>
+			This XML schema defines the structure of the "System" MicroSensorDataType.
+			It summerizes various system events, like:
+			* termination: This event is ensured to be the last event
+		</xs:documentation>
+	</xs:annotation>
+
+	<xs:include schemaLocation="msdt.common.xsd"/>
+
+	<xs:element name="microActivity">
+		<xs:complexType>
+	    	<xs:sequence>
+				<xs:element name="system">
+					<xs:complexType>
+						<xs:sequence>
+						 <xs:element name="type">
+						  <xs:simpleType>
+						   <xs:restriction base="xs:string">
+                            <xs:enumeration value="termination"/>
+						   </xs:restriction>
+						  </xs:simpleType>
+						 </xs:element>
+						</xs:sequence>
+					</xs:complexType>			
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>
