@@ -17,6 +17,7 @@ public class TestRules extends TestCase {
 						new JavaInteraction(Action.SELECTED, null, 0, Origin.JAVAEDITOR)));
 		
 		System.err.println("Result : " + result);
+		assertEquals(0.25, result);
 	}
 	
 	public void testRateElementVisibiltyEvent() throws Exception {
@@ -32,29 +33,62 @@ public class TestRules extends TestCase {
 						new JavaInteraction(Action.SELECTED, null, 0, Origin.JAVAEDITOR)));
 		
 		System.err.println("Result : " + result);
+		assertEquals(0.1, result);
 	}
 	
-	public void testRateFoldingExpanded() throws Exception {
+	public void testRateFoldingExpandedJavaEditor() throws Exception {
 		Rating rating = new Rating();
 		double result = rating.rateEvent(
 				new ElementFoldingEvent(
 						Action.FOLDING_EXPANDED,
 						null,
 						true,
-						new JavaInteraction(Action.SELECTED, null, 0, Origin.JAVAEDITOR)));
+						new JavaInteraction(Action.SELECTED, null, 0, Origin.JAVAEDITOR),
+						Origin.JAVAEDITOR));
 		
 		System.err.println("Result : " + result);
+		assertEquals(0.5, result);
 	}
 	
-	public void testRateFoldingCollapsed() throws Exception {
+	public void testRateFoldingCollapsedJavaEditor() throws Exception {
 		Rating rating = new Rating();
 		double result = rating.rateEvent(
 				new ElementFoldingEvent(
 						Action.FOLDING_COLLAPSED,
 						null,
 						true,
-						new JavaInteraction(Action.SELECTED, null, 0, Origin.JAVAEDITOR)));
+						new JavaInteraction(Action.SELECTED, null, 0, Origin.JAVAEDITOR),
+						Origin.JAVAEDITOR));
 		
 		System.err.println("Result : " + result);
+		assertEquals(0.1, result);
+	}
+	
+	public void testRateFoldingExpandedPackageExplorer() throws Exception {
+		Rating rating = new Rating();
+		double result = rating.rateEvent(
+				new ElementFoldingEvent(
+						Action.FOLDING_EXPANDED,
+						null,
+						true,
+						new JavaInteraction(Action.SELECTED, null, 0, Origin.PACKAGE_EXPLORER),
+						Origin.PACKAGE_EXPLORER));
+		
+		System.err.println("Result : " + result);
+		assertEquals(0.5, result);
+	}
+	
+	public void testRateFoldingCollapsedPackageExplorer() throws Exception {
+		Rating rating = new Rating();
+		double result = rating.rateEvent(
+				new ElementFoldingEvent(
+						Action.FOLDING_COLLAPSED,
+						null,
+						true,
+						new JavaInteraction(Action.SELECTED, null, 0, Origin.PACKAGE_EXPLORER),
+						Origin.PACKAGE_EXPLORER));
+		
+		System.err.println("Result : " + result);
+		assertEquals(0.1, result);
 	}
 }

@@ -10,6 +10,8 @@ import de.fu_berlin.inf.focustracker.EventDispatcher;
 import de.fu_berlin.inf.focustracker.interaction.Action;
 import de.fu_berlin.inf.focustracker.interaction.JavaInteraction;
 import de.fu_berlin.inf.focustracker.interaction.Origin;
+import de.fu_berlin.inf.focustracker.rating.RatingException;
+import de.fu_berlin.inf.focustracker.rating.event.ElementFoldingEvent;
 
 public class PackageExplorerExpansionMonitor extends AbstractFocusTrackerMonitor implements ITreeViewerListener {
 
@@ -30,19 +32,30 @@ public class PackageExplorerExpansionMonitor extends AbstractFocusTrackerMonitor
 	}
 
 	public void treeCollapsed(TreeExpansionEvent aEvent) {
-		// TODO: add rating !
 		if (aEvent.getElement() instanceof IJavaElement) {
 			IJavaElement javaElement = (IJavaElement) aEvent.getElement();
-			JavaInteraction javaInteraction = new JavaInteraction(Action.COLLAPSED, javaElement, 0d, Origin.PACKAGE_EXPLORER);
-			EventDispatcher.getInstance().notifyInteractionObserved(javaInteraction);
+
+			try {
+				ElementFoldingEvent foldingEvent = new ElementFoldingEvent(Action.COLLAPSED, javaElement, true, null, Origin.PACKAGE_EXPLORER);
+				JavaInteraction javaInteraction = new JavaInteraction(Action.COLLAPSED, javaElement, EventDispatcher.getInstance().getRating().rateEvent(foldingEvent), Origin.PACKAGE_EXPLORER);
+				EventDispatcher.getInstance().notifyInteractionObserved(javaInteraction);
+			} catch (RatingException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
 	public void treeExpanded(TreeExpansionEvent aEvent) {
 		if (aEvent.getElement() instanceof IJavaElement) {
 			IJavaElement javaElement = (IJavaElement) aEvent.getElement();
-			JavaInteraction javaInteraction = new JavaInteraction(Action.EXPANDED, javaElement, 1d, Origin.PACKAGE_EXPLORER);
-			EventDispatcher.getInstance().notifyInteractionObserved(javaInteraction);
+			try {
+				ElementFoldingEvent foldingEvent = new ElementFoldingEvent(Action.EXPANDED, javaElement, false, null, Origin.PACKAGE_EXPLORER);
+				JavaInteraction javaInteraction = new JavaInteraction(Action.EXPANDED, javaElement, EventDispatcher.getInstance().getRating().rateEvent(foldingEvent), Origin.PACKAGE_EXPLORER);
+				EventDispatcher.getInstance().notifyInteractionObserved(javaInteraction);
+			} catch (RatingException e) {
+				e.printStackTrace();
+			}
+			
 		}
 	}
 

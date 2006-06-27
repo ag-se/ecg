@@ -287,7 +287,7 @@ public class JavaEditorMonitor extends AbstractFocusTrackerMonitor implements
 							JavaInteraction interaction = new JavaInteraction(
 									action, child, EventDispatcher.getInstance()
 											.getRating().rateEvent(visibiltyEvent),
-											aTimestamp, null, origin);
+											aTimestamp, origin);
 							interacList.add(interaction);
 						}
 					}
@@ -556,7 +556,7 @@ public class JavaEditorMonitor extends AbstractFocusTrackerMonitor implements
 			List<JavaInteraction> interacList = new ArrayList<JavaInteraction>();
 			for (IJavaElement child : allChildren) {
 				if(InteractionRepository.getInstance().getRating(child) > 0d) {
-					JavaInteraction interaction = new JavaInteraction(Action.VISIBILITY_LOST, child, 0d, new Date(), null, origin);
+					JavaInteraction interaction = new JavaInteraction(Action.VISIBILITY_LOST, child, 0d, origin);
 					interacList.add(interaction);
 				}
 			}
@@ -711,10 +711,9 @@ class FoldingListener implements IAnnotationModelListener,
 							action = Action.FOLDING_EXPANDED;
 						}
 						try {
-							ElementFoldingEvent foldingEvent = new ElementFoldingEvent(action, javaElement, isCollapsed, null);
+							ElementFoldingEvent foldingEvent = new ElementFoldingEvent(action, javaElement, isCollapsed, null, Origin.JAVAEDITOR);
 							JavaInteraction interaction = new JavaInteraction(
-									action, javaElement, EventDispatcher.getInstance().getRating().rateEvent(foldingEvent), new Date(), null,
-									origin);
+									action, javaElement, EventDispatcher.getInstance().getRating().rateEvent(foldingEvent), origin);
 							EventDispatcher.getInstance().notifyInteractionObserved(interaction);
 						} catch (RatingException e) {
 							// TODO Auto-generated catch block

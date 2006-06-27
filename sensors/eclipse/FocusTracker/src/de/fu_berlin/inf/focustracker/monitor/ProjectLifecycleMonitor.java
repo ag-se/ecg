@@ -19,8 +19,6 @@ public class ProjectLifecycleMonitor implements ILifecycleListener{
 		switch (aEvent.kind) {
 		case LifecycleEvent.PRE_PROJECT_OPEN:
 			// project opened
-//			IProject project = (IProject)aEvent.resource;
-//			System.err.println("project about to be opened: " + project.getName());
 			EventDispatcher.getInstance().notifyInteractionObserved(
 					new JavaInteraction(Action.PROJECT_OPENED, JavaCore.create((IProject)aEvent.resource), 1d, Origin.WORKSPACE)
 					);
@@ -29,7 +27,6 @@ public class ProjectLifecycleMonitor implements ILifecycleListener{
 		case LifecycleEvent.PRE_PROJECT_CLOSE:
 		case LifecycleEvent.PRE_PROJECT_DELETE:
 			// project closed or deleted
-//			System.err.println("project about to be closed/deleted: " + project.getName());
 			try {
 				EventDispatcher.getInstance().notifyInteractionObserved(
 						new JavaInteraction(Action.PROJECT_CLOSED,

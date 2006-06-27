@@ -113,7 +113,7 @@ public class LoggingView extends BeanView {
 						return "";
 					}
 				case 4:
-					return String.valueOf(interaction.getSeverity());
+					return String.valueOf(interaction.getRating());
 					
 				default:
 					return "";

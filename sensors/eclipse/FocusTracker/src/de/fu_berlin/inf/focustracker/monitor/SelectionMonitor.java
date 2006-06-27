@@ -142,7 +142,7 @@ public class SelectionMonitor implements ISelectionListener {
 						lastInteraction
 						);
 				
-				JavaInteraction interaction = new JavaInteraction(action, javaElement, EventDispatcher.getInstance().getRating().rateEvent(editorSelectionEvent), new Date(), null, Origin.JAVAEDITOR);
+				JavaInteraction interaction = new JavaInteraction(action, javaElement, EventDispatcher.getInstance().getRating().rateEvent(editorSelectionEvent), Origin.JAVAEDITOR);
 				EventDispatcher.getInstance().notifyInteractionObserved(interaction);
 			}
 			oldSelection = javaElement;

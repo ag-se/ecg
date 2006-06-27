@@ -26,6 +26,8 @@ import de.fu_berlin.inf.focustracker.ui.preferences.PreferenceConstants;
 
 public class ECGExporter implements IPropertyChangeListener {
 
+	public static final String ISO8601_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS";
+
 	private String username;
 
 	private double minProbabilityForApperance;
@@ -72,12 +74,16 @@ public class ECGExporter implements IPropertyChangeListener {
 				+ "</elementtype><hasfocus>"
 				+ aIsInFocus
 				+ "</hasfocus>"
-				+ (aIsInFocus ? "<rating>" + decimalFormat.format(aJavaInteraction.getSeverity())
+				+ (aIsInFocus ? "<rating>" + decimalFormat.format(aJavaInteraction.getRating())
 						+ "</rating>" : "") // add rating only if element is in
 											// focus
 				+ "<detectedtimestamp>"
 				+ timestampToXMLString(aJavaInteraction.getDate())
-				+ "</detectedtimestamp>" + "</focus></microActivity>";
+				+ "</detectedtimestamp>" 
+				+ "<comment>"
+				+ aJavaInteraction.getComment()
+				+ "</comment>" 
+				+ "</focus></microActivity>";
 
 //		System.out.println(data);
 		ECGEclipseSensor.getInstance().processActivity("msdt.focus.xsd", data);
@@ -106,9 +112,9 @@ public class ECGExporter implements IPropertyChangeListener {
 					for (JavaInteraction interaction : element.getInteractions()) {
 						if (!interaction.isExported()) {
 							if(interaction.getLastInteraction() == null || 
-									interaction.getSeverity() != interaction.getLastInteraction().getSeverity()) {
-								boolean isInFocus = interaction.getSeverity() >= minProbabilityForApperance
-									|| (interaction.getSeverity() > minProbabilityForDisapperance && currentlyExportedElements
+									interaction.getRating() != interaction.getLastInteraction().getRating()) {
+								boolean isInFocus = interaction.getRating() >= minProbabilityForApperance
+									|| (interaction.getRating() > minProbabilityForDisapperance && currentlyExportedElements
 									.contains(interaction.getJavaElement()));
 								
 								if(isInFocus) {
@@ -128,31 +134,10 @@ public class ECGExporter implements IPropertyChangeListener {
 			}
 		} catch (ConcurrentModificationException e) {
 			// ignore this rare case, the interactions will be exported next run.
+			e.printStackTrace();
 		}
 		
 		
-//		List<Element> focussedElementsToExport = new ArrayList<Element>();
-//		for (Element element : interactionRepository.getElements().values()) {
-//			if (element.getRating() >= minProbabilityForApperance
-//					|| (element.getRating() > minProbabilityForDisapperance && currentlyExportedElements
-//							.contains(element.getJavaElement()))) {
-//				// notify the ecg, that this element has (gained) focus
-//				currentlyExportedElements.add(element.getJavaElement());
-//				focussedElementsToExport.add(element);
-//			} else if (element.getRating() < minProbabilityForDisapperance
-//					&& currentlyExportedElements.contains(element
-//							.getJavaElement())) {
-//				// notify the ecg, that this element isn't focussed anymore
-//				currentlyExportedElements.remove(element.getJavaElement());
-//				export(element.getJavaElement(), element.getRating(), false);
-//			}
-//		}
-//
-//		for (Element element : focussedElementsToExport) {
-//			export(element.getJavaElement(), normalizeRating(element
-//					.getRating(), focussedElementsToExport.size()), true);
-//		}
-
 		// export system interactions
 		for (SystemInteraction interaction : interactionRepository
 				.getSystemInteractions()) {
@@ -162,11 +147,6 @@ public class ECGExporter implements IPropertyChangeListener {
 		}
 
 	}
-
-//	private double normalizeRating(double aRating, int aNumberOfElements) {
-//		// return aRating / aNumberOfElements;
-//		return aRating;
-//	}
 
 	public void propertyChange(PropertyChangeEvent aEvent) {
 		if (PreferenceConstants.P_ECG_EXPORT_MIN_RATING_FOR_APPEARANCE
@@ -196,7 +176,7 @@ public class ECGExporter implements IPropertyChangeListener {
 
 	private String timestampToXMLString(Date aDate) {
 
-		DateFormat ISO8601Local = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+		DateFormat ISO8601Local = new SimpleDateFormat(ISO8601_DATE_FORMAT);
 		TimeZone timeZone = TimeZone.getDefault();
 		ISO8601Local.setTimeZone(timeZone);
 		int offset = timeZone.getOffset(aDate.getTime());

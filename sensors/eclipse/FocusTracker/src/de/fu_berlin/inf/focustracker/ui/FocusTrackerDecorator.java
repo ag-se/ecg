@@ -28,9 +28,6 @@ public class FocusTrackerDecorator extends LabelProvider implements ILightweight
 	
 	private DecimalFormat decimalFormat = new DecimalFormat("0.00", new DecimalFormatSymbols(Locale.US)); 
 	
-//	public static final Color COLOR_0 = new Color(Display.getDefault(), 200, 10, 30);
-//	public static final Color COLOR_1 = new Color(Display.getDefault(), 200, 100, 30);
-
 	public FocusTrackerDecorator() {
 		// must use asyncExec, because otherwise the listener is added to soon.
 		PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
@@ -40,24 +37,18 @@ public class FocusTrackerDecorator extends LabelProvider implements ILightweight
 		});
 	}
 
-	public void decorate(Object element, IDecoration decoration) {
-		if(element instanceof IJavaElement) {
-//			System.err.println("decorate " + ((IJavaElement)element).getElementName());
-			double lastScore = InteractionRepository.getInstance().getRating((IJavaElement)element);
+	public void decorate(Object aElement, IDecoration aDecoration) {
+		if(aElement instanceof IJavaElement) {
+			double lastScore = InteractionRepository.getInstance().getRating((IJavaElement)aElement);
 			if(lastScore == 0) {
 				return;
 			}
 			if(lastScore > 0.5d) {
-				decoration.setFont(BOLD);
+				aDecoration.setFont(BOLD);
 			}
-			decoration.addSuffix(" [" + decimalFormat.format(lastScore) + "]");
+			aDecoration.addSuffix(" [" + decimalFormat.format(lastScore) + "]");
 		}
 	}
-
-//	public void addListener(ILabelProviderListener listener) {
-//		// don't care about listeners
-//		System.err.println(" FocusTrackerDecorator listener added! " + listener.getClass().getName());
-//	}
 
 	public void dispose() {
 		EventDispatcher.getInstance().removeListener(this);
@@ -67,32 +58,8 @@ public class FocusTrackerDecorator extends LabelProvider implements ILightweight
 		return true;
 	}
 
-//	public void removeListener(ILabelProviderListener listener) {
-//		// don't care about listeners
-//	}
-
-	public synchronized static void refresh() {
-//		Display.getDefault().syncExec(new Runnable() {
-		Display.getDefault().asyncExec(new Runnable() {
-			public void run() {
-				PlatformUI.getWorkbench().getDecoratorManager().update(FocusTrackerDecorator.ID);
-			}
-		});
-	}
-
 	public void notifyInteractionObserved(List<? extends Interaction> aInteractions) {
-//		refresh();
-//		List<IJavaElement> elements = new ArrayList<IJavaElement>();
-//		for (Interaction interaction : aInteractions) {
-//			if (interaction instanceof JavaInteraction) {
-//				JavaInteraction javaInteraction = (JavaInteraction) interaction;
-//				elements.add(javaInteraction.getJavaElement());
-//			}
-//		}
-//		postLabelEvent(new LabelProviderChangedEvent(FocusTrackerDecorator.this, elements.toArray()));
 		postLabelEvent(new LabelProviderChangedEvent(FocusTrackerDecorator.this, InteractionRepository.getInstance().getElements().keySet().toArray()));
-//		postLabelEvent(new LabelProviderChangedEvent(FocusTrackerDecorator.this));
-		
 	}
 	
 	/**
@@ -107,10 +74,6 @@ public class FocusTrackerDecorator extends LabelProvider implements ILightweight
 			}
 		});
 	}
-	
-//	public static boolean isDecoratorActivated() {
-//		return FocusTrackerPlugin.getDefault().getPluginPreferences().getBoolean(PreferenceConstants.P_DECORATOR_ACTIVATED);
-//	}
 	
 	
 }

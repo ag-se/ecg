@@ -4,6 +4,7 @@ import de.fu_berlin.inf.focustracker.rating.event.EditorSelectionEvent;
 import de.fu_berlin.inf.focustracker.rating.event.ElementVisibiltyEvent;
 import de.fu_berlin.inf.focustracker.rating.event.ElementFoldingEvent;
 import de.fu_berlin.inf.focustracker.interaction.Action;
+import de.fu_berlin.inf.focustracker.interaction.Origin;
  
 rule "JavaEditor Selection Changed"
 	no-loop true
@@ -42,7 +43,7 @@ rule "JavaEditor Visibility Changed"
     	if(event.isVisible()) {
     		if(event.getElementRegion().isFillingCompleteView() 
     			|| event.getNumberOfElementsVisible() == 1 
-    			|| (event.getLastInteraction() != null && event.getLastInteraction().getSeverity() == 1)) {
+    			|| (event.getLastInteraction() != null && event.getLastInteraction().getRating() == 1)) {
 				p = 1;        		
     		} else {
 				double percentageVisible = event.getElementRegion().getPercentageOfView();
@@ -66,8 +67,9 @@ end
 rule "JavaEditor Folding Expanded"
 	no-loop true
 	when
-		event : ElementFoldingEvent( action == Action.FOLDING_EXPANDED )
+		event : ElementFoldingEvent( action == Action.FOLDING_EXPANDED, origin == Origin.JAVAEDITOR )
 	then
+		System.out.println("JavaEditor Folding Expanded"); 
 		event.setRating(0.5);		
 		modify( event );
 		
@@ -76,7 +78,28 @@ end
 rule "JavaEditor Folding Collapsed"
 	no-loop true
 	when
-		event : ElementFoldingEvent( action == Action.FOLDING_COLLAPSED )
+		event : ElementFoldingEvent( action == Action.FOLDING_COLLAPSED, origin == Origin.JAVAEDITOR )
+	then
+		event.setRating(0.1);		
+		modify( event );
+		
+end
+
+rule "PackageExplorer Folding Expanded"
+	no-loop true
+	when
+		event : ElementFoldingEvent( action == Action.FOLDING_EXPANDED, origin == Origin.PACKAGE_EXPLORER )
+	then
+		System.out.println("PackageExplorer Folding Expanded"); 
+		event.setRating(0.5);		
+		modify( event );
+		
+end
+
+rule "PackageExplorer Folding Collapsed"
+	no-loop true
+	when
+		event : ElementFoldingEvent( action == Action.FOLDING_COLLAPSED, origin == Origin.PACKAGE_EXPLORER )
 	then
 		event.setRating(0.1);		
 		modify( event );

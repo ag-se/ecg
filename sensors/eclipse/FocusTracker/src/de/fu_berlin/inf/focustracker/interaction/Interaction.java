@@ -6,7 +6,7 @@ public abstract class Interaction {
 
 	protected Action action;
 
-	protected double severity;
+	protected double rating;
 
 	protected Date date;
 
@@ -15,11 +15,12 @@ public abstract class Interaction {
 	protected Interaction lastInteraction;
 
 	private boolean exported;
+	
+	protected String comment = "";
 
-	public Interaction(Action aAction, double aSeverity, Date aDate,
-			Date aEndDate, Origin aOrigin) {
+	public Interaction(Action aAction, double aRating, Date aDate, Origin aOrigin) {
 		action = aAction;
-		severity = aSeverity;
+		rating = aRating;
 		date = aDate;
 		origin = aOrigin;
 	}
@@ -48,12 +49,12 @@ public abstract class Interaction {
 		origin = aOrigin;
 	}
 
-	public double getSeverity() {
-		return severity;
+	public double getRating() {
+		return rating;
 	}
 
-	public void setSeverity(double aSeverity) {
-		severity = aSeverity;
+	public void setRating(double aSeverity) {
+		rating = aSeverity;
 	}
 
 	public Interaction getLastInteraction() {
@@ -70,6 +71,14 @@ public abstract class Interaction {
 
 	public void setExported(boolean aExported) {
 		exported = aExported;
+	}
+
+	public String getComment() {
+		return comment;
+	}
+
+	public void setComment(String aComment) {
+		comment = aComment;
 	}
 
 }

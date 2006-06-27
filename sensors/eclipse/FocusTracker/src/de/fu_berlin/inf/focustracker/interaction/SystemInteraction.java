@@ -4,8 +4,8 @@ import java.util.Date;
 
 public class SystemInteraction extends Interaction {
 
-	public SystemInteraction(Action aAction, double aSeverity, Date aDate, Date aEndDate, Origin aOrigin) {
-		super(aAction, aSeverity, aDate, aEndDate, aOrigin);
+	public SystemInteraction(Action aAction, double aRating, Date aDate, Date aEndDate, Origin aOrigin) {
+		super(aAction, aRating, aDate, aOrigin);
 	}
 
 	@Override

@@ -27,12 +27,10 @@ public class InteractionRepository {
 	private static final long INACTIVITY_OFFSET = 10 * Units.SECOND;
 	
 	private static InteractionRepository instance;
-//	private HashMap<IJavaElement, List<JavaInteraction>> elements = new HashMap<IJavaElement, List<JavaInteraction>>();
 	private HashMap<IJavaElement, Element> elements = new HashMap<IJavaElement, Element>();
 	private List<SystemInteraction> systemInteractions = new ArrayList<SystemInteraction>();
 	private List<Interaction> allInteractions = new ArrayList<Interaction>();
 	private IJavaElement lastVisitedJavaElement;
-//	private HashSet<Element> javaElements = new HashSet<Element>();
 	
 	private InteractionRepository() {};
 
@@ -66,13 +64,13 @@ public class InteractionRepository {
 		synchronized(elements) {
 			element = elements.get(aJavaInteraction.getJavaElement());
 			if(element == null) {
-				element = new Element(aJavaInteraction.getJavaElement(), aJavaInteraction.getSeverity());
+				element = new Element(aJavaInteraction.getJavaElement(), aJavaInteraction.getRating());
 				elements.put(aJavaInteraction.getJavaElement(), element);
 			}
 			Interaction lastInteraction = getLastInteraction(aJavaInteraction.getJavaElement());
 			aJavaInteraction.setLastInteraction(lastInteraction);
 			element.getInteractions().add(aJavaInteraction);
-			element.setRating(aJavaInteraction.getSeverity());
+			element.setRating(aJavaInteraction.getRating());
 			recalculateRatings(element);
 		}		
 //		System.err.println(aJavaInteraction.getJavaElement().getClass().getName() + " ... " + JavaElementHelper.toString(aJavaInteraction.getJavaElement()));
@@ -129,7 +127,7 @@ public class InteractionRepository {
 
 	private void addRecalculatedInteraction(Element aElement, double aRating) {
 		aElement.setRating(aRating);
-		addQuiet(aElement, new JavaInteraction(Action.RECALCULATED, aElement.getJavaElement(), aRating, Origin.SYSTEM));
+		addQuiet(aElement, new JavaInteraction(Action.RECALCULATED, aElement.getJavaElement(), aRating, Origin.SYSTEM, "recalculated"));
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -313,7 +311,7 @@ public class InteractionRepository {
 		long currentTime = System.currentTimeMillis();
 		long start = aElement.getLastInteraction().getDate().getTime() + INACTIVITY_OFFSET;
 		if(start < currentTime) {
-			double decValue = aElement.getLastInteraction().getSeverity() - ((currentTime - start) / Units.SECOND) * 0.005;
+			double decValue = aElement.getLastInteraction().getRating() - ((currentTime - start) / Units.SECOND) * 0.005;
 			if(decValue < 0d) {
 				decValue = 0d;
 			}

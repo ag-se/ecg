@@ -8,17 +8,23 @@ public class JavaInteraction extends Interaction {
 
 	private IJavaElement javaElement;
 	
-	public JavaInteraction(Action aAction, IJavaElement aJavaElement, double aSeverity, Date aDate, Date aEndDate, Origin aOrigin) {
-		super(aAction, aSeverity, aDate, aEndDate, aOrigin);
+	public JavaInteraction(Action aAction, IJavaElement aJavaElement, double aRating, Date aDate, Origin aOrigin) {
+		super(aAction, aRating, aDate, aOrigin);
 		javaElement = aJavaElement;
+		comment = aAction.toString();
+	}
+
+	public JavaInteraction(Action aAction, IJavaElement aJavaElement, double aRating, Origin aOrigin, String aComment) {
+		this(aAction, aJavaElement, aRating, aOrigin);
+		comment = aComment;
+	}	
+	public JavaInteraction(Action aAction, IJavaElement aJavaElement, double aRating, Origin aOrigin) {
+		this(aAction, aJavaElement, aRating, new Date(), aOrigin);
 	}
 	
-	public JavaInteraction(Action aAction, IJavaElement aJavaElement, double aSeverity, Origin aOrigin) {
-		this(aAction, aJavaElement, aSeverity, new Date(), null, aOrigin);
-	}
 	@Override
 	public String toString() {
-		return date.getTime() + " : "  + origin + " - " + action + " - " + severity + " - " + JavaElementHelper.toString(javaElement) ;
+		return date.getTime() + " : "  + origin + " - " + action + " - " + rating + " - " + JavaElementHelper.toString(javaElement) ;
 	}
 
 	public IJavaElement getJavaElement() {
