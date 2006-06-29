@@ -4,6 +4,8 @@ import java.util.Date;
 
 import org.eclipse.jdt.core.IJavaElement;
 
+import de.fu_berlin.inf.focustracker.repository.InteractionRepository;
+
 public class JavaInteraction extends Interaction {
 
 	private IJavaElement javaElement;
@@ -34,11 +36,5 @@ public class JavaInteraction extends Interaction {
 	public void setJavaElement(IJavaElement aJavaElement) {
 		javaElement = aJavaElement;
 	}
-	
-//	public String getJavaElementFormatted() {
-////		return javaElement.getPath() + "#" + javaElement.getPrimaryElement().toString().substring(0, javaElement.getPrimaryElement().toString().indexOf('['));
-////		return javaElement.getPath() + "#" + javaElement.getPrimaryElement().toString();
-//		return JavaElementHelper.toString(javaElement);
-//	}
-	
+
 }

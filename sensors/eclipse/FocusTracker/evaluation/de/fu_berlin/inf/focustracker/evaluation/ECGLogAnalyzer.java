@@ -2,6 +2,7 @@ package de.fu_berlin.inf.focustracker.evaluation;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -14,7 +15,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.jdt.internal.core.SourceMethod;
 import org.w3c.dom.Document;
@@ -25,12 +28,14 @@ import com.sun.org.apache.xerces.internal.parsers.DOMParser;
 
 public class ECGLogAnalyzer {
 
-	private static final long TIMEOFFSET = 0;
+	private static final String KEIN_ELEMENT = "<kein Element>";
 
-//	private String logFileName = "C:/Dokumente und Einstellungen/wenzlaff/ecg_log/out.log";
+	private static final long TIMEOFFSET = 0;
+	private static double MIN_RATING = 0.25;
+
 	private String logFileName = "/jekutsch_060621-4_events.log";
 	private String analysisFileName = "/sitzung-4.csv";
-	private String outputFile = "/output-4.csv";
+	private String outputFileName = "/output-4.csv";
 	private List<Interaction> rememberedInteractions = new ArrayList<Interaction>();
 	
 	
@@ -43,7 +48,8 @@ public class ECGLogAnalyzer {
 	}
 	
 	public void analyzeLog() throws IOException, SAXException, URISyntaxException, NumberFormatException, ParseException {
-		
+
+		long sessionDuration = 0;
 		DateFormat ISO8601Local = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss"); // change for any new sessions!
 //		DateFormat ISO8601Local = new SimpleDateFormat(ECGExporter.ISO8601_DATE_FORMAT);
 		List<Interaction> interactionsLog = new ArrayList<Interaction>();
@@ -51,7 +57,10 @@ public class ECGLogAnalyzer {
 
 		BufferedReader logBr = new BufferedReader(new FileReader(ECGLogAnalyzer.class.getResource(logFileName).getFile()));
 		BufferedReader analyseBr = new BufferedReader(new FileReader(ECGLogAnalyzer.class.getResource(analysisFileName).getFile()));
-		BufferedWriter outputBw = new BufferedWriter(new FileWriter(ECGLogAnalyzer.class.getResource(outputFile).getFile()));
+		File outputFile = new File(outputFileName);
+		outputFile.createNewFile();
+		System.err.println(outputFile.getAbsoluteFile());
+		BufferedWriter outputBw = new BufferedWriter(new FileWriter(outputFile));
 		
 		
 		// read logfile
@@ -120,8 +129,17 @@ public class ECGLogAnalyzer {
 			interaction = new Interaction(timestamp, parts[3], parts[2], null, true, 1d);
 			interactionsAnalyse.add(interaction);
 		}
+		sessionDuration = 
+			(interactionsAnalyse.get(interactionsAnalyse.size() - 1).timestamp.getTime() 
+			- interactionsAnalyse.get(0).timestamp.getTime()) / 1000;
+		
+		System.err.println("duration : " + sessionDuration);
 		int outputCtr = 1;
+		double result = 0;
 		for (Interaction interactionAnalyse : interactionsAnalyse) {
+			if("<EOF>".equals(interactionAnalyse.getElementName())) {
+				break;
+			}
 			List<Interaction> extendedInteractions = new ArrayList<Interaction>(rememberedInteractions);
 			rememberedInteractions = new ArrayList<Interaction>();
 			extendedInteractions.addAll(interactionsLog);
@@ -136,9 +154,10 @@ public class ECGLogAnalyzer {
 //			System.err.println("reference;" + interactionAnalyse);
 			long timespanReference = ((interactionAnalyse.getEndTimestamp().getTime() - interactionAnalyse.getTimestamp().getTime())/1000);
 			System.err.println("reference;" + timespanReference + ";" + interactionAnalyse.getTimestamp() + ";" + interactionAnalyse.getElementName() + ";" + interactionAnalyse.getRating() + ";" + interactionAnalyse.getResourceName());
-			outputBw.write(outputCtr++ + ";" + interactionAnalyse.getTimestamp() + ";" + interactionAnalyse.getElementName() + ";1.0;");
+			outputBw.write(timespanReference + ";" + df.format(interactionAnalyse.getTimestamp()) + ";" + trimMethodName(interactionAnalyse.getElementName()) + ";1,0;");
 			timespanReference = 0;
 			double sumOfDeltas = 0.0d;
+			Map<Interaction, Double> interactionMap = new HashMap<Interaction, Double>();
 			for (Interaction assignedInteraction : interactionAnalyse.getAssignedInteractions()) {
 				long timespan = ((assignedInteraction.getEndTimestamp().getTime() - assignedInteraction.getTimestamp().getTime())/1000);
 				double difference = 1.0d;
@@ -154,8 +173,13 @@ public class ECGLogAnalyzer {
 				System.err.println(difference + ";" + timespan + ";" + assignedInteraction.getTimestamp() + ";" + assignedInteraction.getElementName() + ";" + assignedInteraction.getRating() + ";" + assignedInteraction.getResourceName() + ";" + assignedInteraction.getEndTimestamp());
 //				System.err.println(";" + assignedInteraction);
 				sumOfDeltas += (difference * timespan);
-				if(difference != 0) {
+//				if(difference != 0) {
 					timespanReference += timespan;
+//				}
+				if(interactionMap.containsKey(assignedInteraction)) {
+					interactionMap.put(assignedInteraction, interactionMap.get(assignedInteraction) + (difference * timespan));
+				} else {
+					interactionMap.put(assignedInteraction, (difference * timespan));
 				}
 			}
 			if(timespanReference == 0) {
@@ -164,10 +188,49 @@ public class ECGLogAnalyzer {
 			String deltaOutput = (sumOfDeltas / timespanReference) + ";"  + ( 1  - (sumOfDeltas / timespanReference));
 			deltaOutput = deltaOutput.replace('.', ',');
 			System.err.println(deltaOutput);
-			outputBw.close();
+			
+			if(interactionMap.containsKey(interactionAnalyse)) {
+				Double rating = interactionMap.remove(interactionAnalyse);
+				outputBw.write(doubleToString(1 - rating/timespanReference) + ";" + doubleToString(rating/timespanReference) + ";" + doubleToString((rating/timespanReference) * ((double)timespanReference / sessionDuration)) + ";");
+				result += rating/timespanReference;
+			} else if (interactionAnalyse.getElementName() != null && interactionAnalyse.getElementName().length() > 0){
+				outputBw.write("0;1;" + doubleToString((1d/timespanReference) * (timespanReference / sessionDuration)) + ";");
+				result += 1;
+			} else {
+				outputBw.write("0;0;0;");
+			}
+			outputBw.write("\n");
+			for (Interaction interaction2 : interactionMap.keySet()) {
+				Double rating = interactionMap.get(interaction2);
+				if(rating == null) {
+					rating = 0d;
+				}
+				outputBw.write(";;" + trimMethodName(interaction2.getElementName()) + ";0,0;");
+				outputBw.write(doubleToString(rating/timespanReference) + ";" + doubleToString(rating/timespanReference) + ";" + doubleToString((rating/timespanReference) * (timespanReference / sessionDuration)) + ";");
+				result += rating/timespanReference;
+				outputBw.write("\n");
+			}
+			
 		}
+		outputBw.close();
 	}
 
+	
+	private String doubleToString(Double aValue) {
+		return String.valueOf(aValue).replace('.', ',');
+	}
+	
+	private String trimMethodName(String aValue) {
+		if(aValue == null || aValue.trim().length() == 0) {
+			return KEIN_ELEMENT;
+		}
+		int posOfLastChar = aValue.indexOf('(');
+		if(posOfLastChar != -1) {
+			return aValue.substring(0, posOfLastChar);
+		} else {
+			return aValue;
+		}
+	}
 	private Date findEndTimestamp(List<Interaction> aInteractions, Interaction aReference) {
 		for (Interaction interaction : aInteractions) {
 			if(interaction != aReference && (
@@ -188,7 +251,8 @@ public class ECGLogAnalyzer {
 		List<Interaction> interactions = new ArrayList<Interaction>();
 		for (Interaction interaction : aInteractions) {
 			if(interaction.getTimestamp().getTime() >= aBeginTimestamp.getTime() - TIMEOFFSET &&
-					interaction.getTimestamp().getTime() < aEndTimestamp.getTime() + TIMEOFFSET) {
+					interaction.getTimestamp().getTime() < aEndTimestamp.getTime() + TIMEOFFSET &&
+					(interaction.getRating() == null || interaction.getRating() > MIN_RATING )) {
 				
 				if(interaction.getEndTimestamp().getTime() > aEndTimestamp.getTime()) {
 					Interaction clonedInteraction = new Interaction(aEndTimestamp, interaction.getResourceName(), interaction.getElementName(), interaction.getElementType(), interaction.isFocus(), interaction.getRating());
@@ -287,6 +351,17 @@ public class ECGLogAnalyzer {
 
 		public String getResourceName() {
 			return resourceName;
+		}
+		
+		
+		@Override
+		public boolean equals(Object aObj) {
+			return elementName.equals(((Interaction)aObj).elementName);
+		}
+	
+		@Override
+		public int hashCode() {
+			return 4711;
 		}
 	}
 }

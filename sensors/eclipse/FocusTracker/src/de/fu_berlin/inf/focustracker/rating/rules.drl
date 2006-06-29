@@ -9,10 +9,9 @@ import de.fu_berlin.inf.focustracker.interaction.Origin;
 rule "JavaEditor Selection Changed"
 	no-loop true
 	when
-		event : EditorSelectionEvent( action == Action.SELECTED) || EditorSelectionEvent( action == Action.SELECTION_SAME_ELEMENT)
+		event : EditorSelectionEvent( action == Action.SELECTED) ||
+			EditorSelectionEvent( action == Action.SELECTION_SAME_ELEMENT)
 	then
-//		System.out.println( event.getAction() ); 
-		
 		double p = 0;
 		if(event.getElementRegion().isFillingCompleteView()) {
 			p = 1;
@@ -43,11 +42,11 @@ rule "JavaEditor Visibility Changed"
     	if(event.isVisible()) {
     		if(event.getElementRegion().isFillingCompleteView() 
     			|| event.getNumberOfElementsVisible() == 1 
-    			|| (event.getLastInteraction() != null && event.getLastInteraction().getRating() == 1)) {
+    			|| (event.getLastInteraction() != null && 
+    				event.getLastInteraction().getRating() == 1)) {
 				p = 1;        		
     		} else {
 				double percentageVisible = event.getElementRegion().getPercentageOfView();
-//		System.out.println( event.getJavaElement().getElementName() + " - " + percentageVisible ); 
 	        	if(percentageVisible >= 0.9) {
 	        		p = 1;
 	        	} else if (percentageVisible >= 0.5) {
@@ -67,7 +66,9 @@ end
 rule "JavaEditor Folding Expanded"
 	no-loop true
 	when
-		event : ElementFoldingEvent( action == Action.FOLDING_EXPANDED, origin == Origin.JAVAEDITOR )
+		event : ElementFoldingEvent( action == Action.FOLDING_EXPANDED, 
+			origin == Origin.JAVAEDITOR,
+			javaElementCurrentRating < 0.5)
 	then
 		System.out.println("JavaEditor Folding Expanded"); 
 		event.setRating(0.5);		
@@ -78,7 +79,8 @@ end
 rule "JavaEditor Folding Collapsed"
 	no-loop true
 	when
-		event : ElementFoldingEvent( action == Action.FOLDING_COLLAPSED, origin == Origin.JAVAEDITOR )
+		event : ElementFoldingEvent( action == Action.FOLDING_COLLAPSED, 
+			origin == Origin.JAVAEDITOR )
 	then
 		event.setRating(0.1);		
 		modify( event );
@@ -88,7 +90,9 @@ end
 rule "PackageExplorer Folding Expanded"
 	no-loop true
 	when
-		event : ElementFoldingEvent( action == Action.FOLDING_EXPANDED, origin == Origin.PACKAGE_EXPLORER )
+		event : ElementFoldingEvent( action == Action.FOLDING_EXPANDED, 
+			origin == Origin.PACKAGE_EXPLORER,
+			javaElementCurrentRating < 0.5 )
 	then
 		System.out.println("PackageExplorer Folding Expanded"); 
 		event.setRating(0.5);		
@@ -99,7 +103,8 @@ end
 rule "PackageExplorer Folding Collapsed"
 	no-loop true
 	when
-		event : ElementFoldingEvent( action == Action.FOLDING_COLLAPSED, origin == Origin.PACKAGE_EXPLORER )
+		event : ElementFoldingEvent( action == Action.FOLDING_COLLAPSED, 
+			origin == Origin.PACKAGE_EXPLORER )
 	then
 		event.setRating(0.1);		
 		modify( event );

@@ -17,7 +17,7 @@ public abstract class Interaction {
 	private boolean exported;
 	
 	protected String comment = "";
-
+	
 	public Interaction(Action aAction, double aRating, Date aDate, Origin aOrigin) {
 		action = aAction;
 		rating = aRating;

@@ -5,6 +5,7 @@ import org.eclipse.jdt.core.IJavaElement;
 import de.fu_berlin.inf.focustracker.interaction.Action;
 import de.fu_berlin.inf.focustracker.interaction.JavaInteraction;
 import de.fu_berlin.inf.focustracker.interaction.Origin;
+import de.fu_berlin.inf.focustracker.repository.InteractionRepository;
 
 public class ElementFoldingEvent extends EventHolder {
 
@@ -13,6 +14,7 @@ public class ElementFoldingEvent extends EventHolder {
 	private boolean collapsed;
 	private JavaInteraction lastInteraction;
 	private Origin origin;
+	private double javaElementCurrentRating;
 	
 	public ElementFoldingEvent(
 			Action aAction,
@@ -26,6 +28,7 @@ public class ElementFoldingEvent extends EventHolder {
 		collapsed = aCollapsed;
 		lastInteraction = aLastInteraction;
 		origin = aOrigin;
+		javaElementCurrentRating = InteractionRepository.getInstance().getRating(aJavaElement);
 	}
 	
 	public Action getAction() {
@@ -65,6 +68,10 @@ public class ElementFoldingEvent extends EventHolder {
 
 	public void setOrigin(Origin aOrigin) {
 		origin = aOrigin;
+	}
+
+	public double getJavaElementCurrentRating() {
+		return javaElementCurrentRating;
 	}
 	
 	
