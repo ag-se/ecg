@@ -128,7 +128,6 @@ public class EclipseSensorPlugin extends AbstractUIPlugin implements IStartup {
     /**
      * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
      */
-    @Override
     public final void stop(final BundleContext context) throws Exception {
 
         logger.entering(this.getClass().getName(), "stop",
