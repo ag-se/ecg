@@ -113,7 +113,9 @@ public class MsdtRegistry extends Observable implements IMsdtRegistry {
                 File defFile = new File(msdtDir.getAbsolutePath()
                                         + File.separator + def);
 
-                if (defFile.getName().equals("msdt.common.xsd")) {
+                if (defFile.getName().equals("msdt.common.xsd") || // TODO ooohhh!!!
+                        defFile.isDirectory() ||
+                        defFile.isHidden()) { 
                     continue;
                 }
 
