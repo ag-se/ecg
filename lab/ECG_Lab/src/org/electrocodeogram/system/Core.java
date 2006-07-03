@@ -165,7 +165,6 @@ public final class Core extends Observable implements ISystem, IModuleSystem,
      *             which is needed to load modules into the ECG Lab,
      *             could not be created
      */
-    @SuppressWarnings("boxing")
     private Core(final String modulesDir, final String addModuleDir, 
     	final String moduleSetup, final GuiKind guiKind) 
     		throws ModuleSetupLoadException, ModuleClassLoaderInitializationException {
@@ -190,7 +189,7 @@ public final class Core extends Observable implements ISystem, IModuleSystem,
         } else if (guiKind == GuiKind.NOGUI) {
 			
             logger.log(Level.INFO,
-            "Going to start ECG Lab without user interface.");			
+                "Going to start ECG Lab without user interface.");			
 		
 		} else {
 
@@ -324,9 +323,12 @@ public final class Core extends Observable implements ISystem, IModuleSystem,
     public void quit() {
         logger.entering(this.getClass().getName(), "quit");
 
-        logger.log(Level.INFO, "Exiting ECG Lab...");
-
-        java.lang.System.exit(0);
+        if (gui == null) {
+            logger.log(Level.INFO, "Exiting ECG Lab...");    
+            java.lang.System.exit(0);
+        }
+        else
+            logger.log(Level.INFO, "Not exiting ECG Lab because it has a GUI.");    
 
         logger.exiting(this.getClass().getName(), "quit");
     }

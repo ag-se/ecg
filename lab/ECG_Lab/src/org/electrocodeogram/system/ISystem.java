@@ -57,7 +57,7 @@ public interface ISystem extends Observer {
     JFrame getMainWindow();
 
     /**
-     * This method is used to quit the ECG Lab application.
+     * This method is used to quit the ECG Lab application in case of no GUI
      */
     void quit();
 
