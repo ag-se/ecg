@@ -17,6 +17,7 @@ import org.electrocodeogram.logging.LogHelper.ECGLevel;
 import org.electrocodeogram.misc.xml.ECGParser;
 import org.electrocodeogram.misc.xml.NodeException;
 import org.electrocodeogram.module.intermediate.IntermediateModule;
+import org.electrocodeogram.module.intermediate.implementation.linediff.LineDiff;
 import org.electrocodeogram.modulepackage.ModuleProperty;
 import org.w3c.dom.Document;
 

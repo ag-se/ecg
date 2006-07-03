@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.electrocodeogram.module.intermediate.implementation;
+package org.electrocodeogram.module.intermediate.implementation.linediff;
 
 import org.electrocodeogram.misc.xml.ECGParser;
 import org.electrocodeogram.misc.xml.NodeException;
