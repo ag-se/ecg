@@ -1,26 +1,26 @@
 /**
  * 
  */
-package org.electrocodeogram.module.intermediate.implementation;
+package org.electrocodeogram.module.intermediate.implementation.location.state;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
 
+
+
 public class Text {
     // line numbers begin with 0. Note that in events they start with 1
-    public List<Line> lines = new ArrayList<Line>();
-    public SortedSet<Location> locations = new TreeSet<Location>(LocationComparator.getComparator());
-    public int nextLocationId = 0;
+    private List<Line> lines = new ArrayList<Line>();
+    private SortedSet<Location> locations = new TreeSet<Location>(LocationComparator.getComparator());
+    private int nextLocationId = 0;
     
     public String printLocations() {
         String res = "";
         for (Location loc : locations)
-            res += loc.toString();
+            res += loc.printLocation();
         return res;
     }        
 
@@ -34,7 +34,7 @@ public class Text {
     public String printContents() {
         String res = "";
         for (Line l : lines)
-            res += l.contents + "\n";
+            res += l.getContents() + "\n";
         return res;            
     }
     
@@ -48,10 +48,10 @@ public class Text {
     public String toString() {
         String res = "";
         for (Line l : lines)
-            res += l.linenumber + "(" + l.location.getId() + ")\t" + l.contents + "\n";
+            res += l.getLinenumber() + "(" + l.getLocation().getId() + ")\t" + l.getContents() + "\n";
         res += "Locations: ";
         for (Location loc : locations)
-            res += loc.getId() + "(" + loc.startLinenumber + (loc.length == 1 ? "" : "-" + (loc.startLinenumber+(loc.length-1))) + ") ";
+            res += loc.toString() + " ";
         res += "\n";
         return res;
     }
@@ -65,5 +65,40 @@ public class Text {
             res &= lin.checkValidity();
         }
         return res;
+    }
+
+    /**
+     * @param lines the lines to set
+     */
+    public void setLines(List<Line> lines) {
+        this.lines = lines;
+    }
+
+    /**
+     * @return the lines
+     */
+    public List<Line> getLines() {
+        return lines;
+    }
+
+    /**
+     * @param locations the locations to set
+     */
+    public void setLocations(SortedSet<Location> locations) {
+        this.locations = locations;
+    }
+
+    /**
+     * @return the locations
+     */
+    public SortedSet<Location> getLocations() {
+        return locations;
+    }
+
+    /**
+     * @return the nextLocationId
+     */
+    public int getNextLocationId() {
+        return nextLocationId++;
     }
 }
