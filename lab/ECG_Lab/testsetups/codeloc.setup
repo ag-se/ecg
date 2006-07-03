@@ -18,7 +18,7 @@ org.electrocodeogram.module.source.implementation.FileSystemSourceModule
 Input File
 </name>
 <value>
-testeventlogs/ACM060530_acm3_events.log
+testeventlogs/ACM060530_acm4_events.log
 </value>
 <type>
 java.io.File
@@ -35,51 +35,44 @@ true
 java.lang.Boolean
 </type>
 </property>
-</properties>
-</module>
-<module id="1" active="true">
-<name>
-File Writer
-</name>
-<fromClassId>
-org.electrocodeogram.module.target.implementation.FileSystemTargetModule
-</fromClassId>
-<connectedTo>
-</connectedTo>
-<properties>
 <property>
 <name>
-Output File
+Send End Event
 </name>
 <value>
-out.log
-</value>
-<type>
-java.io.File
-</type>
-</property>
-<property>
-<name>
-Split Files
-</name>
-<value>
-false
+true
 </value>
 <type>
 java.lang.Boolean
 </type>
 </property>
-<property>
+</properties>
+</module>
+<module id="4" active="true">
 <name>
-File Size
+AdHoc Statistics
 </name>
-<value>
-100000
-</value>
-<type>
-java.lang.Integer
-</type>
-</property>
+<fromClassId>
+org.electrocodeogram.module.target.implementation.StatisticsTargetModule
+</fromClassId>
+<connectedTo>
+</connectedTo>
+<properties>
+</properties>
+</module>
+<module id="1" active="true">
+<name>
+Code location tracker
+</name>
+<fromClassId>
+org.electrocodeogram.module.intermediate.implementation.CodeLocationTrackerIntermediateModule
+</fromClassId>
+<connectedTo>
+<id>
+4
+</id>
+</connectedTo>
+<properties>
 </properties>
 </module>
 <module id="3" active="true">
