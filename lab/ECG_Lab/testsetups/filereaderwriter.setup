@@ -80,6 +80,17 @@ true
 java.lang.Boolean
 </type>
 </property>
+<property>
+<name>
+Send End Event
+</name>
+<value>
+true
+</value>
+<type>
+java.lang.Boolean
+</type>
+</property>
 </properties>
 </module>
 </modulesetup>

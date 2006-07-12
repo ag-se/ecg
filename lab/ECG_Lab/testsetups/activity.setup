@@ -34,11 +34,16 @@
 		<properties>
 			<property>
 				<name>Input File</name>
-				<value>testeventlogs/small.log</value>
+				<value>D:/Forschung/Kodierszenen/jekutsch/jekutsch_060621-4_events.log</value>
 				<type>java.io.File</type>
 			</property>
 			<property>
 				<name>Enable Burst Mode</name>
+				<value>true</value>
+				<type>java.lang.Boolean</type>
+			</property>
+			<property>
+				<name>Send End Event</name>
 				<value>true</value>
 				<type>java.lang.Boolean</type>
 			</property>
@@ -148,6 +153,7 @@
 					msdt.editor.xsd
 					msdt.part.xsd
 					msdt.dialog.xsd
+					msdt.focus.xsd
 				</value>
 				<type>java.lang.String</type>
 			</property>
@@ -189,7 +195,7 @@
 					Output File
 				</name>
 				<value>
-					episodes.log
+					D:/Forschung/Kodierszenen/jekutsch/jekutsch_060621-4_episodes.log
 				</value>
 				<type>
 					java.io.File
