@@ -25,6 +25,7 @@ import org.electrocodeogram.module.source.EventReader;
 import org.electrocodeogram.module.source.EventReaderException;
 import org.electrocodeogram.module.source.SourceModule;
 import org.electrocodeogram.module.source.implementation.FileSystemSourceModule.ReadMode;
+import org.electrocodeogram.system.ModuleSystem;
 
 /**
  * This {@link org.electrocodeogram.module.source.EventReader} is used
@@ -99,6 +100,12 @@ public class FileReaderThread extends EventReader {
      * terminate after processing this special event 
      */
     private boolean sendEndEvent = false;
+    
+    /**
+     * Is set to true after an end event has been sent to allow for
+     * lab termination. Of no meaning if sendEndEvent remains false
+     */
+    private boolean endEventSent = false;
 
     /**
      * The state of this <code>Thread</code>.
@@ -146,14 +153,16 @@ public class FileReaderThread extends EventReader {
             line = this.reader.readLine();
 
             if (line == null) {
-
                 logger.log(Level.INFO,
                     "The read line is null. Assuming end of file.");
                 
-                if (this.sendEndEvent) {
+                if (this.sendEndEvent && !this.endEventSent) {
                     String eventStr = "<microActivity><system><type>termination</type></system></microActivity>";
                     eventPacket = ECGWriter.createValidEventPacket("msdt.system.xsd", this.dateOfLastEvent, eventStr);
-                    this.sendEndEvent = false;
+                    this.endEventSent = true;
+                } else if (this.sendEndEvent && this.endEventSent) {
+                    // quitting Lab if end event has been sent (and Lab isn't in gui mode)
+                    ModuleSystem.getInstance().quit();
                 } else {
                     this.module.deactivate();
                 }
@@ -163,18 +172,16 @@ public class FileReaderThread extends EventReader {
                 return eventPacket;
             }
 
-            if (line.contains("<![CDATA") && !line.contains("]]>")) {
-
-                cdatafragment = true;
-
-                int beginOfCode = line.indexOf("<![CDATA");
-
-                logger.log(Level.FINE,
-                    "Begin of a CDATA section at index: "
-                                    + beginOfCode);
-
-                int endOfCode = 0;
-
+            // Parse lines until closing </microActivity> but beware that any enclosed CDATA section
+            // may contain the "</microActivity>" as well.
+            // It asserts that "</microActivity>" is the tail of the line.
+            int endOfMicroActivity = line.lastIndexOf("</microActivity>");
+            int cdataEnd = line.lastIndexOf("]]>");
+            int cdataStart = line.lastIndexOf("<![CDATA");
+            boolean isInCDataSection = (cdataStart > cdataEnd);
+            
+            if (endOfMicroActivity == -1 || isInCDataSection) {
+                // Seems that we need to parse more than one line
                 String nextLine;
 
                 while ((nextLine = this.reader.readLine()) != null && this.run) {
@@ -182,38 +189,23 @@ public class FileReaderThread extends EventReader {
 
                     lineNumber++;
 
-                    // There may be many consequtive CDATA sections
-                    if (nextLine.contains("]]>") && !nextLine.contains("<![CDATA")) {
-
-                        endOfCode = line.lastIndexOf("]]>");
-
-                        logger.log(Level.FINE,
-                            "CDATA section complete at index: " + endOfCode);
-
-                        break;
+                    cdataEnd = nextLine.lastIndexOf("]]>");
+                    if (isInCDataSection && cdataEnd != -1) {
+                        // has been in CDataSection before
+                        cdataStart = nextLine.lastIndexOf("<![CDATA");
+                        isInCDataSection = !(cdataEnd > cdataStart);
+                    } else if (!isInCDataSection) {
+                        cdataStart = nextLine.lastIndexOf("<![CDATA");
+                        isInCDataSection = (cdataStart > cdataEnd);
+                    }
+                    
+                    if (!isInCDataSection) {
+                       endOfMicroActivity = nextLine.lastIndexOf("</microActivity>");
+                       // Now </microActivity> has been parsed (in a non-cdata section)
+                       if (endOfMicroActivity >= 0)
+                           break;
                     }
                 }
-
-                if (endOfCode <= beginOfCode) {
-                    logger.log(Level.WARNING, "Error while reading line "
-                                              + lineNumber + ":");
-
-                    logger.log(Level.WARNING,
-                        "This line does not contain a valid CDATA section.");
-
-                    cdatafragment = false;
-
-                    return null;
-                }
-
-                code = line.substring(beginOfCode, endOfCode);
-
-                String preCode = line.substring(0, beginOfCode);
-
-                String postCode = line.substring(endOfCode, line.length());
-
-                line = preCode + CODE_REPLACEMENT + postCode;
-
             }
 
             int timeIndex = line.indexOf('#');
