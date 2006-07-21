@@ -1,7 +1,21 @@
-Folders:
+ElectroCodeoGram 1.1.5
+(c) FU Berlin, Frank Schlesinger, 2006
 
-ecg/ - An ECGLab distribution. NOTE: ecg.bat and ecg.sh are set for INLINE mode, i.e. -nogui. You may prefer to change this for REMOTE mode
+CONTENTS
+========
+ecg/ - An ECGLab distribution. 
 lib/ - ECG libs to develop modules and Java-based sensors
 doc/ - JavaDoc for Jars in /lib
 plugins/ - Eclipse-Plugin. NOTE: This does not contain the Lab for INLINE mode. Copy ecg/ to the plugin directory.
-user.home/ - Includes files to be copied in the home folder of each user who uses the Eclipse sensor
+user.home/ - Includes files to be copied in the home folder of each user who uses the Eclipse sensor. It is configured for INLINE mode. Change ECG_SERVER_TYPE=REMOTE and the ECG_SERVER_ADDRESS for true Client/Server functionality
+
+REQUIREMENTS
+============
+Requires Java 1.5 JVM as the default Java version for ECGLab
+Requires Java 1.4 for the Eclipse Sensore
+Eclipse Sensor runs on Eclipse 3.1 or 3.2
+
+CHANGE LOG
+==========
+Changes for 1.1.5:
+* 

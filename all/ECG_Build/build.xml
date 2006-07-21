@@ -252,10 +252,14 @@
 
 
 	<target name="Make Release Zip" depends="Package release">
+		
+		<copy failonerror="no" todir="dist/" file="ReadMe.txt"/>
 
-		<delete failonerror="no" file="dist/ElectroCodeoGram_vX.Y.Z.zip"/>
+		<delete failonerror="no">
+			<fileset dir="dist" includes="*.zip"/>
+		</delete>
 
-		<zip destfile="dist/ElectroCodeoGram_vX.Y.Z.zip" 
+		<zip destfile="dist/ElectroCodeoGram_v1.1.5.zip" 
 		 	 basedir="dist" filesonly="false" update="false"/>
 
 	</target>
