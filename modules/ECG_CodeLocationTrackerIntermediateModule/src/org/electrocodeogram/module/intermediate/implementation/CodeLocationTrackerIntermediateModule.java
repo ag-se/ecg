@@ -2,9 +2,10 @@ package org.electrocodeogram.module.intermediate.implementation;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -15,13 +16,16 @@ import org.electrocodeogram.misc.xml.ECGParser;
 import org.electrocodeogram.misc.xml.NodeException;
 import org.electrocodeogram.module.intermediate.IntermediateModule;
 import org.electrocodeogram.module.intermediate.implementation.location.change.BlockChange;
+import org.electrocodeogram.module.intermediate.implementation.location.change.History;
+import org.electrocodeogram.module.intermediate.implementation.location.change.LineChange;
 import org.electrocodeogram.module.intermediate.implementation.location.change.LocationChange;
+import org.electrocodeogram.module.intermediate.implementation.location.change.BlockChange.BlockChangeType;
+import org.electrocodeogram.module.intermediate.implementation.location.change.LineChange.LineChangeType;
 import org.electrocodeogram.module.intermediate.implementation.location.change.LocationChange.LocationChangeType;
 import org.electrocodeogram.module.intermediate.implementation.location.state.Line;
 import org.electrocodeogram.module.intermediate.implementation.location.state.Location;
+import org.electrocodeogram.module.intermediate.implementation.location.state.LocationComputationStrategy;
 import org.electrocodeogram.module.intermediate.implementation.location.state.Text;
-import org.electrocodeogram.module.intermediate.implementation.location.state.Line.Block;
-import org.electrocodeogram.module.intermediate.implementation.location.state.Line.Statement;
 import org.electrocodeogram.modulepackage.ModuleProperty;
 import org.electrocodeogram.modulepackage.ModulePropertyException;
 
@@ -48,13 +52,18 @@ public class CodeLocationTrackerIntermediateModule extends IntermediateModule {
     private HashMap<String, Text> texts = new HashMap<String, Text>();
 
     /**
-     * Holds for each Location a list of LocationChanges
+     * Holds for each Location a list of LocationChanges and for each block change the location changes
      * 
      * TODO Maybe not useful in later versions, because the history can be compiled 
      * from a BlockChange history
+     * TODO Is depedant on text (or not?)
      */
-    private LinkedHashMap<Location, List<LocationChange>> locationChangeHistories 
-                = new LinkedHashMap<Location, List<LocationChange>>();
+    private History history = new History();
+    
+    /**
+     * Holds methods to (re-)compute Line and Location instances and properties  
+     */
+    private LocationComputationStrategy strategy = new LocationComputationStrategy();
     
 	/**
      * Standard Intermediate Module constructor
@@ -84,19 +93,36 @@ public class CodeLocationTrackerIntermediateModule extends IntermediateModule {
 
             Text text = new Text();
             String code = getCode(eventPacket);
-
             String[] lines = getLines(code);
-    		Line newLine = null;
     		
-    		for (int lineNo = 0; lineNo < lines.length; lineNo++) {
+            // Prepare initial block change
+            BlockChange blockChange = new BlockChange(text, 
+                    eventPacket.getTimeStamp(), BlockChangeType.CREATED, 0, lines.length);
+            history.getBlockChangeHistory().add(blockChange);
+
+            // Create initial lines
+            Line newLine = null;
+    		List<Line> newLines = new ArrayList<Line>(lines.length);
+            for (int lineNo = 0; lineNo < lines.length; lineNo++) {
                 Line prevLine = newLine;
                 newLine = new Line(lineNo, lines[lineNo]);
-    			computeBasicLineProperties(newLine);
-    			computeCohesionAndLevel(newLine, prevLine);
-                text.getLines().add(lineNo, newLine);
+                blockChange.getLineChanges().add(
+                        new LineChange(LineChangeType.INSERTED, lineNo, "", lines[lineNo]));
+    			strategy.computeBasicLineProperties(newLine);
+                strategy.computeCohesionAndLevel(newLine, prevLine);
+                newLines.add(lineNo, newLine);
     		}
+            text.setLines(newLines);
             
-            computeLocations(text);
+    		// Compute initial locations, register them and report location changes
+            Collection<Location> newLocs = strategy.computeLocations(newLines);
+            
+            // Add locations
+            for (Location newLoc : newLocs) {
+                text.addLocation(newLoc);
+                history.addLocationChange(new LocationChange(newLoc, 
+                        LocationChangeType.INTIATED, -1), blockChange);
+            }
 /*    
 System.out.println("First locations computation on file " + documentName);
 System.out.println("at " + eventPacket.getTimeStamp() + ":");
@@ -105,8 +131,9 @@ System.out.println("---");
 */
             this.texts.put(documentName, text);
             
-            assert(text.checkValidity());
-            assert(text.printContents().trim().equals(code.trim()));
+            assert (text.checkValidity());
+            assert (text.printContents().trim().equals(code.trim()));
+            assert (history.checkValidity(text));
         }
         
         else if (eventPacket.getMicroSensorDataType().getName().equals("msdt.linediff.xsd")) {
@@ -116,7 +143,7 @@ System.out.println("---");
                 return null;
             
             Text text = texts.get(documentName);
-            assert(text != null);
+            assert (text != null);
             
             // TODO Better DOM usage necessary!
             Node[] linediffs = null;
@@ -128,36 +155,33 @@ System.out.println("---");
                                         ECGParser.getChildNode(xmlDoc, "microActivity"), 
                                         "linediff"),
                                 "lines"),  
-                        "line"); // Hier war CPC-Fehler!! Fehlendes Change (lines -> line) nach Paste
+                        "line"); 
             } catch (NodeException e) {
                 // TODO report this
                 e.printStackTrace();
                 return null;
             }
             
-            // count number of inserts/deletes to later shift line numbers
-            int deletesCount = 0;
-            BlockChange blockChange = new BlockChange(eventPacket.getTimeStamp());
+            Collection<BlockChange> blockChanges = new ArrayList<BlockChange>();
+            // The blockChange is for putting line changes together in blocks
+            BlockChange blockChange = null;
 
             // process each line diff
             for (int i = 0; i < linediffs.length; i++) {
                 
                 // parse line change
                 Node linediff = linediffs[i];
-                String diffType = "unknown";
+                LineChangeType lineType = LineChangeType.UNKNOWN;
                 String from = null;
                 String to = null;
+                LineChange lineChange = null;
                 int linenumber = -1;
                 try {
-                    diffType = ECGParser.getNodeValue(ECGParser.getChildNode(linediff, "type"));
+                    String diffType = ECGParser.getNodeValue(ECGParser.getChildNode(linediff, "type"));
+                    lineType = LineChange.getLineChangeTypeFromString(diffType);
                     linenumber = Integer.parseInt(
                         ECGParser.getNodeValue(ECGParser.getChildNode(linediff, "linenumber")));
                     linenumber -= 1; // in events the line numbers start with 1
-                    // the follwoing one is quite difficult to understand: shift line number due to already processed delete diffs
-                    // deletes are not reflected in the diffs linenumbers but are processed in the text (i.e. the line
-                    // do not exist any more). This is different to insertions which are reflected in the text and its line
-                    // numbers. The shift is necessary because the line numbers are retrieved by text.lines.get(linenumber)
-                    linenumber -= deletesCount;
                     if (ECGParser.hasChildNode(linediff, "from"))
                         from = ECGParser.getNodeValue(ECGParser.getChildNode(linediff, "from"));
                     if (from == null)
@@ -166,149 +190,386 @@ System.out.println("---");
                         to = ECGParser.getNodeValue(ECGParser.getChildNode(linediff, "to"));
                     if (to == null)
                         to = "";
+                    lineChange = new LineChange(lineType, linenumber, from, to);
                 } catch (NodeException e) {
                     // TODO report this
                     e.printStackTrace();
                 }
-
-/*                
-System.out.println("New change: '" + diffType + "' at line " + linenumber);
-System.out.println("from:" + from);
-System.out.println("  to:" + to);
-System.out.println("at " + eventPacket.getTimeStamp() + "\n");
-*/
-                // first get the affected Location and its Line
-                Line line = null;
-                Location location = null;
                 
-                if (linenumber < text.getLines().size()) {
-                    line = text.getLines().get(linenumber);
-                    location = line.getLocation();
-                } else {
-                    assert(diffType.equals("inserted"));
-                    // line will be computed later
-                    // inserted at the end, take the last location
-                    location = text.getLocations().last();
-                    // linenumber must be exactly after the last line in text
-                    assert(text.getLines().size() == linenumber); 
-                }
-                assert(location != null);
+                // Convert from LineChangeType to BlockChangeType
+                BlockChangeType blockType = BlockChange.convertTypeFromLineChange(lineType);
                 
-                LocationChange locationChange = null;
-                boolean locationChangeReported = false;
-
-                // now first perfom the linediff operation in the text
-                if (diffType.equals("changed")) {
-                    assert(line != null);
-                    // following is not always true because previous changes in this block may have already changed contents
-                    // assert(line.contents.trim().equals(from.trim()));
-                    line.setContents(to);
-                    this.computeBasicLineProperties(line);
-                    locationChange = new LocationChange(location.getId(), LocationChangeType.CHANGED, 
-                            location.printContents(), -1, blockChange);
-                } else if (diffType.equals("deleted")) {
-                    assert(line != null);
-                    deletesCount++;
-                    Collection<Location> tail = text.getLocations().tailSet(location);
-                    // resize location and remove it if necessary (and register location change)
-                    if (location.getLength() == 1) {
-                        // location will get empty
-                        text.getLocations().remove(location);
-                        locationChange = new LocationChange(location.getId(), 
-                                LocationChangeType.EMPTIED, "", -1, blockChange);
-                    } else {
-                        locationChange = new LocationChange(location.getId(), LocationChangeType.CHANGED, 
-                                location.printContents(), -1, blockChange);
-                    }
-                    location.setLength(location.getLength() - 1);
-                    // change following line numbers
-                    for (Line l : text.getLines().subList(linenumber, text.getLines().size())) {
-                        l.setLinenumber(l.getLinenumber() - 1);
-                    }
-                    // ...and startlinenumbers of the follwoing locations
-                    for (Location loc : tail) {
-                        if (loc != location)  // location itself is in the tail
-                            loc.setStartLinenumber(loc.getStartLinenumber() - 1);
-                    }
-                    // finally remove line
-                    text.getLines().remove(linenumber);
-                } else if (diffType.equals("inserted")) {
-                    // store in 'line' the inserted line
-                    line = new Line(linenumber, to);
-                    this.computeBasicLineProperties(line);
-                    // update location link and length
-                    line.setLocation(location);
-                    location.setLength(location.getLength() + 1);
-                    // add new line at position
-                    text.getLines().add(linenumber, line);
-                    // change following line numbers 
-                    for (Line lin : text.getLines().subList(linenumber+1, text.getLines().size())) {
-                        lin.setLinenumber(lin.getLinenumber() + 1);
-                    }
-                    for (Location loc : text.getLocations().tailSet(location)) {
-                        if (loc != location)  // location itself is correctly positioned
-                            loc.setStartLinenumber(loc.getStartLinenumber() + 1);
-                    }
-                    locationChange = new LocationChange(location.getId(), LocationChangeType.CHANGED, 
-                            location.printContents(), -1, blockChange);
-                } else
-                    assert(false);
-
-                // secondly perform recomputation of Locations at the new line neighborhoods
-                if (diffType.equals("changed") || diffType.equals("inserted")) {                    
-                    Line prevLine = null;
-                    Line nextLine = null;
-                    if (linenumber-1 >= 0)
-                        prevLine = text.getLines().get(linenumber-1);
-                    if (linenumber+1 < text.getLines().size())
-                        nextLine = text.getLines().get(linenumber+1); 
-                    boolean a = computeNewNeighborhood(prevLine, line, blockChange);
-                    boolean b = computeNewNeighborhood(line, nextLine, blockChange);
-                    locationChangeReported = (locationChangeReported || a || b);
-                } else if (diffType.equals("deleted")) {
-                    Line prevLine = null;
-                    if (linenumber-1 >= 0)
-                        prevLine = text.getLines().get(linenumber-1);
-                    Line nextLine = text.getLines().get(linenumber); // no +1 because line has been shifted
-                    boolean a = computeNewNeighborhood(prevLine, nextLine, blockChange);
-                    locationChangeReported = (locationChangeReported || a);
-                } 
-                
-                if (!locationChangeReported && locationChange != null)
-                    addLocationChangeToHistory(location, locationChange);
 /*
-System.out.println("New locations:\n" + text.printLocations());
-System.out.println("---");
+System.out.println("  New change: '" + type + "' at line " + linenumber);
+System.out.println("  from:" + from);
+System.out.println("    to:" + to);
+System.out.println("  at " + eventPacket.getTimeStamp() + "\n");
 */
-                assert(text.checkValidity());
-                assert(text.printContents().trim().equals(text.printContentsFromLocations().trim()));
+
+                // The following is segmenting a LineDiff event in a set of linediff blocks of 
+                //   equal type and consequtive line numbers which is required by the location
+                //   change and identity retaining algorithm
+                if (blockChange == null) {
+                    // Initialize blockChange, a line change collector to combine similar consequtive line changes
+                    blockChange = new BlockChange(text, eventPacket.getTimeStamp(), blockType, linenumber, 1);
+                    blockChange.getLineChanges().add(0, lineChange);
+                    history.getBlockChangeHistory().add(blockChange);
+                    blockChanges.add(blockChange);
+                } else {
+                    // Check for break in consequtiveness of the line changes
+                    BlockChangeType oldBlockType = blockChange.getBlockType();
+                    int blockStart = blockChange.getBlockStart();
+                    int blockLength = blockChange.getBlockLength();                
+                    if (blockType != oldBlockType || linenumber != blockStart + blockLength)  
+                    {
+                        // if block type changes or if line number is not consequtive
+                        blockChange = new BlockChange(text, eventPacket.getTimeStamp(), blockType, linenumber, 1);
+                        blockChange.getLineChanges().add(0, lineChange);
+                        history.getBlockChangeHistory().add(blockChange);
+                        blockChanges.add(blockChange);
+                    }   
+                    else {
+                        // put this line in blockChange as well
+                        blockChange.setBlockLength(blockLength+1);
+                        blockChange.getLineChanges().add(blockLength, lineChange);
+                    }
+                }
+                
+            }
+//System.out.println(blockChanges.size());
+            
+            for (BlockChange bc: blockChanges) {
+                
+                // Convert long change blocks into replace blocks. This is due to the fact that
+                //   its more likely that is an paste/overwrite block (i.e. complete replace)
+                //   than its a change of the lines, i.e. gradually changing each line individually
+                // TODO This needs more check: Check prevoious CCP events, and edit distance of changed lines
+                // long = more than 2
+                if (bc.getBlockType() == BlockChangeType.CHANGED && bc.getBlockLength() > 2)
+                    bc.setBlockType(BlockChangeType.REPLACED);
+                // replace will be processed as a delete followed by an insert
+                // TODO mostly, paste-replaces are combined with insertions and deletions because
+                //   the pasted block is often shorter or longer than the replaced one. currently
+                //   this results in a replace foloowed or preceeded by an delete or insert block
+                //   although it actually is a delete block followed by an insert block of
+                //   different length
+                
+//System.out.println(bc);
+
+                BlockChangeType type = bc.getBlockType();
+                
+                if (type == BlockChangeType.DELETED || type == BlockChangeType.REPLACED) {
+                    
+                    // Get block start
+                    Line startLine = text.getLine(bc.getBlockStart());
+                    Location location = startLine.getLocation();
+                    Collection<Location> tail = text.getLastLocations(location); // affected locations
+                    Iterator<Location> tailIt = tail.iterator();
+                    location = tailIt.next(); // at least on element (=location) must be present
+                    List<LocationChange> locChanges = new ArrayList<LocationChange>();
+                    
+                    // The location may contain the deleted block completely
+                    if (location.getStart() < bc.getBlockStart() && location.getEnd() > bc.getBlockEnd()) {
+                        location.setLength(location.getLength() - bc.getBlockLength());
+                        locChanges.add(new LocationChange(location, LocationChangeType.SHORTENED_IN_BETWEEN, -1));                        
+                        location = (tailIt.hasNext() ? tailIt.next() : null);
+                    }
+                    else // ok, seems to be more complicated: check three stages 
+                    {                     
+                        // The first location may be only truncated at the end
+                        if (location.getStart() < bc.getBlockStart() && location.getEnd() >= bc.getBlockStart()) {
+                            // the latter few lines will be deleted
+                            location.setLength(bc.getBlockStart() - location.getStart());
+                            locChanges.add(new LocationChange(location, LocationChangeType.SHORTENED_AT_END, -1));
+                            location = (tailIt.hasNext() ? tailIt.next() : null);
+                        }
+                        
+                        // The next few location which completely cover the deleted lines will be emptied
+                        while (location != null && location.getStart() >= bc.getBlockStart() && location.getEnd() <= bc.getBlockEnd()) {
+                            location.setLength(0); // set to 0 to correctly recompute the contents
+                            locChanges.add(new LocationChange(location, LocationChangeType.SHORTENED_AT_ALL, -1));
+                            tailIt.remove(); // 1. remove will be refelcted in text.getLocations(), 2. Really remove? Yes, because of the ordering in text
+                            location = (tailIt.hasNext() ? tailIt.next() : null);
+                        }
+                        
+                        // The next partly covered location will be shortend in the start
+                        if (location != null && location.getStart() <= bc.getBlockEnd() && location.getEnd() > bc.getBlockEnd()) {
+                            location.setLength(location.getEnd() - bc.getBlockEnd());
+                            location.setStart(bc.getBlockStart());
+                            locChanges.add(new LocationChange(location, LocationChangeType.SHORTENED_AT_START, -1));
+                            location = (tailIt.hasNext() ? tailIt.next() : null);
+                        }
+                    }
+                    
+                    // The location after the after the deleted block needs adjustment in their start line number
+                    while (location != null) {
+                        location.setStart(location.getStart() - bc.getBlockLength());
+                        location = (tailIt.hasNext() ? tailIt.next() : null);
+                    }
+
+                    // As well, the lines themselves after the deleted lines need adjustment in their line numbers
+                    for (Line l : text.getLastLines(bc.getBlockEnd() + 1)) { 
+                        l.setLinenumber(l.getLinenumber() - bc.getBlockLength());
+                    }
+                    
+                    // Now, actually delete the lines in the text
+                    for (int i = 0; i < bc.getBlockLength(); i++)
+                        text.deleteLine(bc.getBlockStart()); // it's always the first line number!
+                    
+                    // Register location change
+                    for (LocationChange locChange : locChanges) {
+                        // Will recompute the contents (necessary because only now the lines are corrrectly deleted)
+                        history.addLocationChange(locChange, bc);                        
+                    }
+                    
+                    // Finally, the new neighborhood needs to be analysed. bc.blockStart now
+                    // points to the first line *after* the deleted block
+                    if (type != BlockChangeType.REPLACED) {
+                        // In case of a replace, it will be followed by an insert at this plöace anyway
+                        Line prevLine = text.getLine(bc.getBlockStart()-1); // maybe null
+                        Line nextLine = text.getLine(bc.getBlockStart()); // maybe null
+                        strategy.computeNewNeighborhood(history, prevLine, nextLine, bc);
+                    }
+
+                }
+                
+                if (type == BlockChangeType.INSERTED || type == BlockChangeType.REPLACED) {
+
+                    // Compute the line just below the first new one. Note that "insert at line x"
+                    //   means that x is the line number of the first inserted line, and that the
+                    //   prior line x will be moved below the block, i.e. to line x + bc.blockLength
+                    LocationChange locChangedAbove = null, locChangedBelow = null, 
+                                    locForked = null, locSplit = null, 
+                                    locMergedAway = null, locMergedAdd = null; // some possible changes
+                    Line insertLineBelow = text.getLine(bc.getBlockStart());
+                    Location insertLocBelow = null; 
+                    if (insertLineBelow != null)
+                        insertLocBelow = insertLineBelow.getLocation();
+                    else
+                        insertLocBelow = text.getLastLocation(); // get last location if inserted at end 
+                    
+                    // fetch location just above insertion line
+                    Line insertLineAbove = text.getLine(insertLineBelow.getLinenumber()-1);
+                    Location insertLocAbove = null;
+                    if (insertLineBelow == null) { 
+                        // insertLoc/LineBelow == null means, inserted block at end of text, take last loc above
+                        insertLocAbove = text.getLastLocation();
+                    } else if (insertLineAbove == null) {
+                        // was insertion at line 0, so there's no above
+                        insertLocAbove = null;
+                    } else if (insertLineAbove.getLocation() != insertLocBelow ) { 
+                        // insertLineBelow is at the beginning of the insertLoc. then take prev location
+                        insertLocAbove = insertLineAbove.getLocation();
+                    } else {
+                        // Temporarly split the insertLocation at the insert position
+                        insertLocAbove = insertLocBelow.splitLocation(insertLineBelow);
+                        // register new location temporaly
+                        text.addLocation(insertLocAbove);
+                        locForked = new LocationChange(insertLocAbove, 
+                                LocationChangeType.SPLIT_ADD_AT_END, insertLocBelow.getId());
+                        locSplit = new LocationChange(insertLocBelow, 
+                                LocationChangeType.SPLIT_DEL_AT_START, insertLocAbove.getId());
+                        // Exchange LocAbove and LocBelow in case of wrong order due to split decision
+                        if (insertLocAbove.getStart() > insertLocBelow.getStart()) {
+                            Location tmp = insertLocAbove;
+                            insertLocAbove = insertLocBelow;
+                            insertLocBelow = tmp;
+                            locSplit.setType(LocationChangeType.SPLIT_DEL_AT_END);
+                            locForked.setType(LocationChangeType.SPLIT_ADD_AT_START);
+                        }
+                    }
+                    // retain location sizes for later comparison
+                    int insertLocAboveSize = (insertLocAbove != null ? insertLocAbove.getLength() : 0);
+                    int insertLocBelowSize = (insertLocBelow != null ? insertLocBelow.getLength() : 0);
+                    
+                    // Create Collection of new lines 
+                    Line[] newLines = new Line[bc.getBlockLength()];
+                    int lineOffset = 0;
+                    Line prevLine = insertLineAbove;
+                    while (lineOffset < bc.getBlockLength()) {
+                        int linenumber = bc.getBlockStart() + lineOffset;
+                        LineChange lineChange = bc.getLineChanges().get(lineOffset);
+                        Line newLine = new Line(linenumber, lineChange.getContents());
+                        strategy.computeBasicLineProperties(newLine);
+                        strategy.computeCohesionAndLevel(newLine, prevLine);
+                        newLines[lineOffset] = newLine;
+                        text.insertLine(linenumber, newLine);
+                        prevLine = newLine;
+                        lineOffset++;
+                    }
+                    // precompute cohesion of following line for better debugging
+                    if (insertLineBelow != null)
+                        strategy.computeCohesionAndLevel(insertLineBelow, newLines[newLines.length-1]);
+
+                    // Compute Locations in the block of new lines
+                    Collection<Location> newLocs = strategy.computeLocations(Arrays.asList(newLines));
+                    
+                    // change following line numbers and location
+                    int afterBlock = bc.getBlockEnd()+1;
+                    for (Line lin : text.getLastLines(afterBlock)) {
+                        lin.setLinenumber(lin.getLinenumber() + bc.getBlockLength());
+                    } 
+                    if (insertLocBelow != null) {
+                        for (Location loc : text.getLastLocations(insertLocBelow)) {
+                            loc.setStart(loc.getStart() + bc.getBlockLength());
+                        }
+                    }
+
+                    // now check start and end for possible merges, at start and at end
+                    // start: check cohesion of first line of the block with line at insert position (insertLine).
+                    if (insertLocAbove != null) { // the may be no above, than skip
+                        Line firstBlockLine = newLines[0];
+                        // note: the new cohesion has already been computed
+                        if (firstBlockLine.getCohesion() >= Location.MIN_COHESION) {
+                            // merge the new location with the old one
+                            Location firstBlockLocation = firstBlockLine.getLocation();
+                            newLocs.remove(firstBlockLocation); // remove first computes loc since it was merged away
+                            insertLocAbove.mergeLocation(firstBlockLocation); // merge locs
+                            // report the change of the insertLoc
+                            locChangedAbove = new LocationChange(insertLocAbove, 
+                                    LocationChangeType.EXTENDED_AT_END, -1);
+                        }
+                    }
+                    // end: check cohesion at end, if low merge them.
+                    if (insertLocBelow != null) { // the may be no below, than skip
+                        Line lastBlockLine = newLines[newLines.length-1];
+                        // note: the new cohesion has already been computed
+                        if (insertLineBelow.getCohesion() >= Location.MIN_COHESION) {
+                            Location lastBlockLocation = lastBlockLine.getLocation();
+                            // We have three special cases
+                            if (locSplit == null && insertLocAbove == lastBlockLocation) {
+                                // This is a special case: The new block (which generated 
+                                //   only one new location), merges together with previously distinct
+                                //   locations insertLocAbove and insertLocBelow
+                                // What already happened: insertLocAbove has been merged with the new block
+                                // Now decide which old location should win (the previously bigger one)
+                                assert (locChangedAbove.getLocation() == insertLocAbove);
+                                if (insertLocAboveSize >= insertLocBelowSize) {
+                                    text.removeLocation(insertLocBelow);
+                                    insertLocAbove.mergeLocation(insertLocBelow);
+                                    locMergedAway = new LocationChange(insertLocBelow, 
+                                            LocationChangeType.MERGED_DEL_AT_START, insertLocAbove.getId());
+                                    locMergedAdd = new LocationChange(insertLocAbove, 
+                                            LocationChangeType.MERGED_ADD_AT_END, insertLocBelow.getId());
+                                    locChangedAbove.setRelatedLocId(insertLocBelow.getId());
+                                } else {
+                                    text.removeLocation(insertLocAbove);
+                                    insertLocBelow.mergeLocation(insertLocAbove);
+                                    locMergedAway = new LocationChange(insertLocAbove, 
+                                            LocationChangeType.MERGED_DEL_AT_END, insertLocBelow.getId());
+                                    locMergedAdd = new LocationChange(insertLocBelow, 
+                                            LocationChangeType.MERGED_ADD_AT_START, insertLocAbove.getId());
+                                    // overwrite locChangedAbove event for insertLocBelow, locChnagedBelow will be ignored
+                                    locChangedAbove = new LocationChange(insertLocBelow, 
+                                            LocationChangeType.EXTENDED_AT_START, -1);
+                                }
+                            }
+                            else if (locSplit != null && insertLocAbove == lastBlockLocation) {
+                                // The second case is where insertLocBelow/Above has been split from
+                                //   insertLocAbove/Below and is now recombined together with the
+                                //   inserted block (consisting of only one location)
+                                // What already happened: insertLocAbove has been merged with the new block
+                                // Now decide which was the original location, abandon the split one and merge them all
+                                Location forkedLocation = locForked.getLocation();
+                                if (forkedLocation == insertLocBelow) { // abandon insertLocBelow
+                                    text.removeLocation(insertLocBelow); // has already been registered
+                                    insertLocAbove.mergeLocation(insertLocBelow);
+                                    locSplit = null; // act as like split has never been occured
+                                    locForked = null;
+                                    // set changed type to IN_BETWEEN, the rest has already been generated
+                                    locChangedAbove.setType(LocationChangeType.EXTENDED_IN_BETWEEN);
+                                } else {
+                                    text.removeLocation(insertLocAbove);
+                                    insertLocBelow.mergeLocation(insertLocAbove);
+                                    locSplit = null; // act as like split has never been occured
+                                    locForked = null;
+                                    // overwrite locChangedAbove event for insertLocBelow, locChnagedBelow will be ignored
+                                    locChangedAbove = new LocationChange(insertLocBelow, 
+                                            LocationChangeType.EXTENDED_IN_BETWEEN, -1);
+                                }
+                            }
+                            else {
+                                // The third and last case the the most general one: either the block
+                                //   introduced more than one location, or the cohesion above or
+                                //   below don't both lead the merges
+                                newLocs.remove(lastBlockLocation); // remove last block loc since it was merged away
+                                // merge the new location with the old one just like it was done in the firstBlockLocation case
+                                insertLocBelow.mergeLocation(lastBlockLocation);
+                                // report the change of the insertLoc
+                                locChangedBelow = new LocationChange(insertLocBelow, 
+                                        LocationChangeType.EXTENDED_AT_START, -1);
+                            }                                    
+                        }
+                    }
+                    // Ok, now there may be some overlapping location changes. Minimize them and report them
+                    // using the latest location contents
+                    if (locForked != null) {
+                        // check overlapping events (i.e. ADDED/FORKED + {ANYTHING} should become ADDED/FORKED only)
+                        if (locChangedAbove != null && locChangedAbove.getLocation() == locForked.getLocation())
+                            locChangedAbove = null;
+                        if (locChangedBelow != null && locChangedBelow.getLocation() == locForked.getLocation())
+                            locChangedBelow = null;
+                        if (locSplit != null && locSplit.getLocation() == locForked.getLocation())
+                            locSplit = null;
+                    }
+                    history.addLocationChange(locForked, bc);
+                    history.addLocationChange(locSplit, bc);
+                    history.addLocationChange(locChangedAbove, bc);
+                    history.addLocationChange(locChangedBelow, bc);
+                    history.addLocationChange(locMergedAway, bc);
+                    history.addLocationChange(locMergedAdd, bc);
+                    
+                    // register remaining new locations in text and report location changes 
+                    for (Location newLoc : newLocs) {
+                        text.addLocation(newLoc);
+                        history.addLocationChange(new LocationChange(newLoc, LocationChangeType.ADDED, -1), bc);
+                    }
+
+                }
+                
+                if (type == BlockChangeType.CHANGED) {
+                    
+                    // Change blocks are processed line by line
+                    // TODO should be a block operation as well, but that's not easy. I don't know
+                    //   of any algorithm which would result in a much different procedere like
+                    //   liny-by-line processing. Current- and additionally, long insert blocks
+                    //   are processed as replace blocks, so insert blocks will be small anyway.
+                    for (int lineOffset = 0; lineOffset < bc.getBlockLength(); lineOffset++) {
+    
+                        // first get the affected Location and its Line
+                        int linenumber = bc.getBlockStart() + lineOffset;
+                        LineChange lineChange = bc.getLineChanges().get(lineOffset);
+                        Line line = text.getLine(linenumber);
+                        Location location = line.getLocation();
+                        assert (location != null);
+                        assert (line != null);
+                        
+                        // secondly perfom the linediff operation in the text
+                        line.setContents(lineChange.getContents());
+                        strategy.computeBasicLineProperties(line);
+                        history.addLocationChange(new LocationChange(location, 
+                                LocationChangeType.CHANGED, -1), bc); 
+        
+                        // thirdly perform recomputation of Locations at the new line neighborhoods
+                        Line prevLine = text.getLine(linenumber-1); // maybe null
+                        Line nextLine = text.getLine(linenumber+1); // maybe nulla
+                        strategy.computeNewNeighborhood(history, prevLine, line, bc);
+                        strategy.computeNewNeighborhood(history, line, nextLine, bc);
+                        
+                    }
+                    
+                } 
+//System.out.println(history.printHistoryTextComparison(text));
+                assert (history.checkValidity(text));
+                assert (text.checkValidity());
+                assert (text.printContents().equals(text.printContentsFromLocations()));
+                assert (text.printContents().equals(history.printLastTextContents(text)));
 
             }                    
 /*
 System.out.println(text);
 System.out.println("---------------------------------------------------------");
 */          
-        }
-
-        // TODO just for debugging
-        else if (eventPacket.getMicroSensorDataType().getName().equals("msdt.system.xsd")) {
-            try {
-                if (ECGParser.getSingleNodeValue("type", eventPacket.getDocument()).equals("termination")) {
-                    for (Location loc : this.locationChangeHistories.keySet()) {
-                        System.out.println("Location " + loc.getId() + ": ");
-                        System.out.println("**********************************************");
-                        Collection<LocationChange> lcs = this.locationChangeHistories.get(loc);
-                        for (LocationChange lc : lcs) {
-                            System.out.println("---- " + lc.toString() + " ----");
-                            System.out.println(lc.getContents());
-                        }
-                    }
-                }
-            } catch (NodeException e) {
-                // TODO report this
-                e.printStackTrace();
-                return null;
-            }
         }
 
 		// TODO just for assertions
@@ -320,12 +581,22 @@ System.out.println("---------------------------------------------------------");
                 return null;
             
             Text text = texts.get(documentName);
-            assert(text != null);
+            assert (text != null);
 
             try {
                 Document xmlDoc = eventPacket.getDocument();
                 String resultingCode = ECGParser.getSingleNodeValue("document", xmlDoc); 
-                assert(text.printContents().trim().equals(resultingCode.trim()));
+//System.out.println(text.printContents().trim().equals(resultingCode.trim()));
+/*
+if (!text.printContents().equals(resultingCode)) {
+System.out.print("\n----------------------------------------\n");
+System.out.print("#" + text.printContents() + "#");
+System.out.print("\n---------\n");
+System.out.print("#" + resultingCode + "#");
+}
+*/
+                assert (text.printContents().trim().equals(resultingCode.trim()));
+
             } catch (NodeException e) {
                 // TODO report this
                 e.printStackTrace();
@@ -334,222 +605,26 @@ System.out.println("---------------------------------------------------------");
             
         }
 
+        // TODO just for debugging
+        else if (eventPacket.getMicroSensorDataType().getName().equals("msdt.system.xsd")) {
+            try {
+                if (ECGParser.getSingleNodeValue("type", eventPacket.getDocument()).equals("termination")) {
+                    
+System.out.println(history.printLocationChangeHistory());
+//System.out.println(history.printBlockChangeHistory());
+
+                }
+            } catch (NodeException e) {
+                // TODO report this
+                e.printStackTrace();
+                return null;
+            }
+        }
+
 		return null;
 	}
 
-    private void addLocationChangeToHistory(Location location, LocationChange locationChange) {
-        List<LocationChange> locationChanges = this.locationChangeHistories.get(location);
-        if (locationChanges == null) {
-            locationChanges = new ArrayList<LocationChange>();
-            this.locationChangeHistories.put(location, locationChanges);
-        }
-        locationChanges.add(locationChange);
-        if (locationChange.getBlockChange() != null)
-            locationChange.getBlockChange().getLocationChanges().add(locationChange); // TODO this is a bit strange
-    }
-
-    // simply for reuse
-    // return true, if location changes have been added 
-    private boolean computeNewNeighborhood(Line lineAbove, Line lineBelow, BlockChange blockChange) {
-        if (lineAbove == null || lineBelow == null)
-            return false; // has been at the begin/end of the text: no recompution necessary
-        Location locationAbove = lineAbove.getLocation();
-        Location locationBelow = lineBelow.getLocation();
-        // first compute new cohesion
-        this.computeCohesionAndLevel(lineBelow, lineAbove);
-        // no decide whether to split, merge or retain locations
-        if (lineBelow.getCohesion() >= Location.MIN_COHESION
-                && locationAbove != locationBelow) {
-            // different locations have high cohesion now => merge them
-            if (locationAbove.getLength() > locationBelow.getLength()) {
-                locationAbove.mergeLocation(locationBelow);
-                addLocationChangeToHistory(locationBelow, new LocationChange(locationBelow.getId(),  
-                        LocationChangeType.MERGEDAWAY, "", locationAbove.getId(), blockChange));
-                addLocationChangeToHistory(locationAbove, new LocationChange(locationAbove.getId(), 
-                        LocationChangeType.EXTENDEDBELOW, locationAbove.printContents(), locationBelow.getId(), blockChange));
-                return true;
-            } else {
-                locationBelow.mergeLocation(locationAbove);                
-                addLocationChangeToHistory(locationAbove, new LocationChange(locationAbove.getId(), 
-                        LocationChangeType.MERGEDAWAY, "", locationBelow.getId(), blockChange));
-                addLocationChangeToHistory(locationBelow, new LocationChange(locationBelow.getId(), 
-                        LocationChangeType.EXTENDEDABOVE, 
-                        locationBelow.printContents(), locationAbove.getId(), blockChange));
-                return true;
-            }
-        }
-        else if (lineBelow.getCohesion() < Location.MIN_COHESION
-                && locationAbove == locationBelow) {
-            // new low cohesion in a location => split it
-            Location newLoc = locationAbove.splitLocation(lineBelow);
-            LocationChangeType type = LocationChangeType.SPLITABOVE;
-            if (newLoc.getStartLinenumber() > locationAbove.getStartLinenumber())
-                type = LocationChangeType.SPLITBELOW;
-            addLocationChangeToHistory(newLoc, new LocationChange(newLoc.getId(),
-                    LocationChangeType.FORKED, newLoc.printContents(), locationAbove.getId(), blockChange));
-            addLocationChangeToHistory(locationAbove, new LocationChange(locationAbove.getId(),
-                    type, locationAbove.printContents(), newLoc.getId(), blockChange));
-            return true;
-        }
-        // else no changes
-        return false;
-    }
-
-    
-    /**
-     * TODO consider levels as well
-     * 
-     * @param text
-     * @return
-     */
-    private void computeLocations(Text text) {
-        Location curLoc = null;
-        for (Line line : text.getLines()) {
-            if (curLoc == null || line.getCohesion() < Location.MIN_COHESION) { // curLoc == null means first line
-                Location newLoc = new Location(text);
-                newLoc.setStartLinenumber(line.getLinenumber());
-                newLoc.setLength(1);
-                text.getLocations().add(newLoc);
-                line.setLocation(newLoc);
-                addLocationChangeToHistory(newLoc, new LocationChange(newLoc.getId(), 
-                        LocationChangeType.INTIATED, newLoc.printContents(), -1, null));
-                curLoc = newLoc;
-/*          } else if (line.level > loc.startLine.level) {
-                Location newLoc = new Location();
-                this.locations.add(newLoc);
-                newLoc.startLine = line;
-                newLoc.length = 1;
-                newLoc.parent = loc;
-                loc.children.add(newLoc);
-                loc.nextLocation = newLoc;
-                loc = newLoc;
-            } else if (line.level < loc.startLine.level) {
-                loc = loc.parent;
-*/          } else {
-                line.setLocation(curLoc);
-                curLoc.setLength(curLoc.getLength() + 1);
-            }
-        }
-    }
-
-	private void computeBasicLineProperties(Line line) {
-
-        // reset properties
-        line.setBlock(Block.NONE);
-        line.setStatement(Statement.UNKNOWN);
-
-        // ignore string literals, char literals, and white space
-        String contents = line.getContents().trim();
-    	contents = contents.replaceAll("\".*?\"", "STRINGLITERAL"); // TODO
-    	contents = contents.replaceAll("'.*?'", "CHARLITERAL"); // TODO
-
-    	// set Block
-    	int thisCurlyBraceA = contents.lastIndexOf('{');
-    	int thisCurlyBraceZ = contents.indexOf('}');
-    	if (thisCurlyBraceA >= 0 && thisCurlyBraceZ == -1)
-    		line.setBlock(Block.BEGIN);
-    	else if (thisCurlyBraceA == -1 && thisCurlyBraceZ >= 0)
-    		line.setBlock(Block.END);
-    	else if (thisCurlyBraceA < thisCurlyBraceZ)
-    		line.setBlock(Block.BEGIN_END);
-    	else if (thisCurlyBraceA > thisCurlyBraceZ)
-    		line.setBlock(Block.END_BEGIN);
-    	
-    	// set Comment Statement 1
-    	int thisLineComment = contents.indexOf("//");
-    	if (thisLineComment == 0) // comment for whole line
-    		line.setStatement(Statement.COMMENT);
-    	else if (thisLineComment > 0) // comment at the end. remove it.
-    		contents = contents.substring(0, thisLineComment);
-
-    	// set Comment Statement 2
-    	int thisBlockCommentA = contents.indexOf("/*");
-    	int thisBlockCommentB = contents.indexOf("*");
-    	int thisBlockCommentZ = contents.indexOf("*/");
-    	if (thisBlockCommentA >= 0 && thisBlockCommentZ == -1) // TODO Could be in the middle with valid code preceeding
-    		line.setStatement(Statement.COMMENT);
-    	else if (thisBlockCommentA == -1 && thisBlockCommentZ >= 0) // TODO Could be in the middle with valid code following
-    		line.setStatement(Statement.COMMENT);
-    	else if (thisBlockCommentA == -1 && thisBlockCommentZ == -1 && thisBlockCommentB == 0) {   
-    		// TODO Could be a multiply operator, even at the beginning!
-    		line.setStatement(Statement.COMMENT);
-    	}
-    	else if (thisBlockCommentA >= 0 && thisBlockCommentZ == contents.length()-1) {
-    		// comment at the end. remove it.
-    		contents = contents.substring(0, thisBlockCommentZ);
-    	}
-    	
-    	// set Code Statement
-    	int thisSemicolon = contents.lastIndexOf(';');
-    	if (thisSemicolon == contents.length()-1) { // ; at the end
-    		if (line.getStatement() == Statement.UNKNOWN) 
-    			line.setStatement(Statement.FULL);
-    	} else {
-    		if (line.getStatement() == Statement.UNKNOWN && line.getBlock() == Block.NONE) 
-    			line.setStatement(Statement.PART);    			
-    	}
-    	
-    	// set Empty Statement
-    	if (contents.length() == 0)
-    		line.setStatement(Statement.EMPTY);
-
-    }
-
-    private void computeCohesionAndLevel(Line thisLine, Line prevLine) {
-
-		if (thisLine.getLinenumber() == 0 || prevLine == null) {
-            thisLine.setCohesion(-10); // symbolic value for first line in text
-            return;
-        }
-
-		// set initial level and cohesion
-        thisLine.setLevel(prevLine.getLevel());
-        thisLine.setCohesion(0);
-        
-		// 1. test { and }
-    	if (thisLine.getBlock() == Block.END) { // 1.a
-    		if (thisLine.getLevel() > 0) thisLine.setLevel(thisLine.getLevel() - 1);
-    		thisLine.setCohesion(thisLine.getCohesion() + 1);
-    	}
-    	if (prevLine.getBlock() == Block.BEGIN) { // 1.b
-    		thisLine.setLevel(thisLine.getLevel() + 1);
-    		thisLine.setCohesion(thisLine.getCohesion() + 1);
-    	}
-    	if (prevLine.getBlock() == Block.END) { // 1.c
-            // Rational: Avoid multiple block ends below each other to be put together, see 1.a
-    		thisLine.setCohesion(thisLine.getCohesion() - 1);
-        }
-    	
-    	// 2. test comment 
-    	if (prevLine.getStatement() == Statement.COMMENT) // comment for whole line
-    		thisLine.setCohesion(thisLine.getCohesion() + 1);
-    	if (thisLine.getStatement() != Statement.COMMENT && prevLine.getStatement() == Statement.COMMENT)
-    		thisLine.setCohesion(thisLine.getCohesion() + 1);
-    	else if (thisLine.getStatement() == Statement.COMMENT && prevLine.getStatement() != Statement.COMMENT)
-    		thisLine.setCohesion(thisLine.getCohesion() - 1);
-    	
-    	// 3. test ;
-		if (prevLine.getStatement() == Statement.PART) 
-    		thisLine.setCohesion(thisLine.getCohesion() + 1);
-    	
-    	// 4. test empty lines
-    	if (thisLine.getStatement() == Statement.EMPTY && prevLine.getStatement() != Statement.EMPTY)
-    		thisLine.setCohesion(thisLine.getCohesion() - 1);
-    	if (thisLine.getStatement() != Statement.EMPTY && prevLine.getStatement() == Statement.EMPTY)
-    		thisLine.setCohesion(thisLine.getCohesion() - 1);
-    	
-    	// 5. test keywords
-    	boolean thisPublic = thisLine.getContents().startsWith("public");
-    	boolean thisPrivate = thisLine.getContents().startsWith("private");
-    	boolean thisProtected = thisLine.getContents().startsWith("protected");
-    	boolean thisStatic = thisLine.getContents().startsWith("static");
-    	if (thisPublic || thisPrivate || thisProtected || thisStatic)
-    		thisLine.setCohesion(thisLine.getCohesion() - 1);
-    	
-		return;
-	}
-
-	private String getDocumentName(ValidEventPacket packet) {
+    private String getDocumentName(ValidEventPacket packet) {
     	try {
         	Document document = packet.getDocument();
 			return ECGParser.getSingleNodeValue("documentname", document);
@@ -587,13 +662,11 @@ System.out.println("---------------------------------------------------------");
 
 	protected void propertyChanged(ModuleProperty moduleProperty)
 			throws ModulePropertyException {
-		// TODO Auto-generated method stub
-
+		// no properties
 	}
 
 	public void update() {
-		// TODO Auto-generated method stub
-
+		// no properties
 	}
 
 }

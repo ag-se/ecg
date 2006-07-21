@@ -53,17 +53,18 @@ public class Line {
             case EMPTY: mod += "0"; break;
     		case COMMENT: mod += "//"; break;
 		}
-		return linenumber + "@Loc" + location.getId() + "(#" + level + ")[" + mod + "] " + cohesion + "\t " + contents.trim() + "\n";
+        String loc = "@Loc" + (location != null ? location.getId() : "?");
+		return linenumber + loc + "(#" + level + ")[" + mod + "] " + cohesion + ":" + contents + "\n";
 	}
 
     public boolean checkValidity() {
         Location loc = this.location;
-        boolean check1 = loc.getText().getLocations().contains(loc);
-        boolean check2 = (this.linenumber >= loc.getStartLinenumber());
-        boolean check3 = (this.linenumber <= loc.getStartLinenumber() + (loc.getLength()-1));
-        assert(check1);
-        assert(check2);
-        assert(check3);
+        boolean check1 = loc.getText().containsLocation(loc);
+        boolean check2 = (this.linenumber >= loc.getStart());
+        boolean check3 = (this.linenumber <= loc.getStart() + (loc.getLength()-1));
+        assert (check1);
+        assert (check2);
+        assert (check3);
         return check1 && check2 && check3;
     }
 

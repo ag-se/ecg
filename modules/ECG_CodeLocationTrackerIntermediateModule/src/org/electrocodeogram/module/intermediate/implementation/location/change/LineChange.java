@@ -1,7 +1,6 @@
 package org.electrocodeogram.module.intermediate.implementation.location.change;
 
 
-
 /**
  * Represents a change of a line. There are three change types:
  * * New/Inserted line: contents contains initial text and linenumber initial position
@@ -16,20 +15,37 @@ public class LineChange {
         INSERTED,
         DELETED,
         CHANGED, 
-        MOVED
+        MOVED,
+        UNKNOWN
     }
+    
+    static private String[] typeStrings = new String[] {
+        "inserted", "deleted", "changed", "moved", "unknown"
+    };
     
     private int linenumber = -1;
     private String contents = null;
-    private LocationChange locChange = null;
     
-    public LineChange(LocationChange locChange) {
-        this.locChange = locChange;
+    static public LineChangeType getLineChangeTypeFromString(String type) {
+        if (type.equals(typeStrings[0])) {
+            return LineChangeType.INSERTED;
+        } else if (type.equals(typeStrings[1])) {
+            return LineChangeType.DELETED;            
+        } else if (type.equals(typeStrings[2])) {
+            return LineChangeType.CHANGED;            
+        } else if (type.equals(typeStrings[3])) {
+            return LineChangeType.MOVED;            
+        }
+        return LineChangeType.UNKNOWN;
     }
-
-    public LineChange(LocationChange locChange, LineChangeType type, int linenumber, String from, String to) { 
-        this(locChange);
-        
+    
+    static public String getStringForLineChangeType(LineChangeType type) {
+        return typeStrings[type.ordinal()];
+    }
+    
+    
+    public LineChange(LineChangeType type, int linenumber, String from, String to) { 
+        // TODO from currently not used
         if (type == LineChangeType.INSERTED) {
             this.linenumber = linenumber;
             this.contents = to;
@@ -62,16 +78,28 @@ public class LineChange {
     }
     
     public String toString() {
-        String res = "{unkown}";
-        if (this.isChange())
-            res = LineChangeType.CHANGED + " to " + contents;
-        if (this.isInsertion())
-            res = LineChangeType.INSERTED + " at line " + linenumber + " with " + contents;
-        if (this.isMovement())
-            res = LineChangeType.MOVED + " to " + linenumber;
-        if (this.isDeletion())
-            res = LineChangeType.DELETED.toString();
+        String res = LineChange.typeStrings[getChangeType().ordinal()];
+        if (getChangeType() == LineChangeType.CHANGED)
+            res += " to '" + contents.trim() + "'";
+        if (getChangeType() == LineChangeType.INSERTED)
+            res += " at line " + linenumber + " with '" + contents.trim() + "'";
+        if (getChangeType() == LineChangeType.MOVED)
+            res += " to " + linenumber;
+        if (getChangeType() == LineChangeType.DELETED)
+            res += "";
         return res;
+    }
+    
+    public LineChangeType getChangeType() {
+        if (this.isChange())
+            return LineChangeType.CHANGED;
+        if (this.isInsertion())
+            return LineChangeType.INSERTED;
+        if (this.isMovement())
+            return LineChangeType.MOVED;
+        if (this.isDeletion())
+            return LineChangeType.DELETED;
+        return LineChangeType.UNKNOWN;
     }
 
     /**
@@ -100,20 +128,6 @@ public class LineChange {
      */
     public String getContents() {
         return contents;
-    }
-
-    /**
-     * @param locChange the locChange to set
-     */
-    public void setLocChange(LocationChange locChange) {
-        this.locChange = locChange;
-    }
-
-    /**
-     * @return the locChange
-     */
-    public LocationChange getLocChange() {
-        return locChange;
     }
 
 }

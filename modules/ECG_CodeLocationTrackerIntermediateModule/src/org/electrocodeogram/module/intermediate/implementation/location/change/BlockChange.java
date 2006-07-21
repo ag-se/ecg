@@ -7,7 +7,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-
+import org.electrocodeogram.module.intermediate.implementation.location.change.LineChange.LineChangeType;
+import org.electrocodeogram.module.intermediate.implementation.location.state.Text;
 
 
 /**
@@ -15,6 +16,31 @@ import java.util.List;
  *
  */
 public class BlockChange {
+
+    public enum BlockChangeType {
+        CREATED,
+        INSERTED,
+        DELETED,
+        CHANGED, 
+        REPLACED,
+        UNKNOWN
+    }
+    
+    public static BlockChangeType convertTypeFromLineChange(LineChangeType type) {
+        if (type == LineChangeType.INSERTED) {
+            return BlockChangeType.INSERTED;
+        } else if (type == LineChangeType.DELETED) {
+            return BlockChangeType.DELETED;
+        } else if (type == LineChangeType.CHANGED) {
+            return BlockChangeType.CHANGED;
+        }
+        return BlockChangeType.UNKNOWN;
+    }
+    
+    /**
+     * 
+     */
+    private List<LocationChange> locationChanges = new ArrayList<LocationChange>();
 
     /**
      * 
@@ -24,42 +50,37 @@ public class BlockChange {
     /**
      * 
      */
-    private List<LocationChange> locationChanges = new ArrayList<LocationChange>();
-
-    /**
-     * 
-     */
     private Date timeStamp;
     
+    BlockChangeType blockType = BlockChangeType.UNKNOWN;
+    int blockStart = -1;
+    int blockLength = 1;
+    Text text = null;
+
     /**
      * @param timeStamp
      */
-    public BlockChange(Date timeStamp) {
+    public BlockChange(Text text, Date timeStamp) {
+        this.text = text;
         this.timeStamp = timeStamp;
     }
     
     public String toString() {
-        return lineChanges.size() + " line changes in " + locationChanges.size() + " location changes at " + timeStamp;
+        return "at " + timeStamp + " " + blockLength + " line(s) were " + 
+            blockType + " beginning at line number " + blockStart;
     }
 
-    /**
-     * @param lineChanges the lineChanges to set
-     */
-    public void setLineChanges(List<LineChange> lineChanges) {
-        this.lineChanges = lineChanges;
-    }
-
-    /**
-     * @return the lineChanges
-     */
-    public List<LineChange> getLineChanges() {
-        return lineChanges;
+    public BlockChange(Text text, Date timeStamp, BlockChangeType blockType, int blockStart, int blockLength) {
+        this(text, timeStamp);
+        this.blockType = blockType;
+        this.blockStart = blockStart;
+        this.blockLength = blockLength;
     }
 
     /**
      * @param locationChanges the locationChanges to set
      */
-    public void setLocationChanges(List<LocationChange> locationChanges) {
+    protected void setLocationChanges(List<LocationChange> locationChanges) {
         this.locationChanges = locationChanges;
     }
 
@@ -82,6 +103,46 @@ public class BlockChange {
      */
     public Date getTimeStamp() {
         return timeStamp;
+    }
+
+    public int getBlockLength() {
+        return blockLength;
+    }
+
+    public void setBlockLength(int blockLength) {
+        this.blockLength = blockLength;
+    }
+
+    public int getBlockStart() {
+        return blockStart;
+    }
+
+    public void setBlockStart(int blockStart) {
+        this.blockStart = blockStart;
+    }
+
+    public BlockChangeType getBlockType() {
+        return blockType;
+    }
+
+    public void setBlockType(BlockChangeType blockType) {
+        this.blockType = blockType;
+    }
+
+    public List<LineChange> getLineChanges() {
+        return lineChanges;
+    }
+
+    public void setLineChanges(List<LineChange> lineChanges) {
+        this.lineChanges = lineChanges;
+    }
+    
+    public int getBlockEnd() {
+        return blockStart + blockLength - 1;
+    }
+
+    public Text getText() {
+        return text;
     }
     
 }
