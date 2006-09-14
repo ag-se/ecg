@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<module>
+	<id>
+		org.electrocodeogram.module.target.implementation.DatabaseTargetModule
+	</id>
+	<provider-name>
+		FU Berlin
+	</provider-name>
+	<version>
+		1.0
+	</version>
+	<name>
+		Database Writer
+	</name>
+	<class>
+		org.electrocodeogram.module.target.implementation.DatabaseTargetModule
+	</class>
+	<description>
+		This module writes incoming events into a database. The properties are:
+		* JDBC Connection - A JDBC connection string
+		* Username - The name of the database user. the user should have sufficient privileges
+		  for the database to write event data
+		* Password - Password for the user
+	</description>
+	<type>
+		TARGET
+	</type>
+	<properties>
+		<property>
+			<propertyName>
+				JDBC Connection
+			</propertyName>
+			<propertyType>
+				java.lang.String
+			</propertyType>
+			<propertyValue>
+			</propertyValue>
+		</property>
+		<property>
+			<propertyName>
+				Username
+			</propertyName>
+			<propertyType>
+				java.lang.String
+			</propertyType>
+			<propertyValue>
+			</propertyValue>
+		</property>
+		<property>
+			<propertyName>
+				Password
+			</propertyName>
+			<propertyType>
+				java.lang.String
+			</propertyType>
+			<propertyValue>
+			</propertyValue>
+		</property>
+	</properties>
+</module>
