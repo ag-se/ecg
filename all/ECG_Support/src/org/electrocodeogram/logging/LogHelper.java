@@ -188,8 +188,12 @@ public final class LogHelper {
             logDir.mkdir();
         }
 
-        filename = homeDir + File.separator + LOG_DIR + File.separator
-                   + filename;
+        // If the filename isn't a complete file path but any other, put
+        //   it in the {home}/ecg_log directory
+        File lf = new File(filename);
+        if (!lf.isAbsolute() || !lf.isFile())
+            filename = homeDir + File.separator + LOG_DIR + File.separator
+                       + filename;
 
         // Create a file handler that write log record to a file
         // called my.log
