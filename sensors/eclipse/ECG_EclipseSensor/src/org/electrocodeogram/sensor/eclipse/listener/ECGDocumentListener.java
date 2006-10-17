@@ -10,11 +10,10 @@ import org.electrocodeogram.sensor.eclipse.ECGEclipseSensor;
 import java.util.TimerTask;
 import java.util.logging.Level;
 
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.ui.IEditorPart;
+import org.electrocodeogram.event.CommonData;
+import org.electrocodeogram.event.MicroActivity;
 import org.electrocodeogram.logging.LogHelper.ECGLevel;
 import org.w3c.dom.CDATASection;
 import org.w3c.dom.Document;
@@ -110,12 +109,13 @@ public class ECGDocumentListener implements IDocumentListener {
 
         private Document msdt_codechange_doc;
 
-        private Element codechange_username;
-        private Element codechange_projectname;
-        private Element codechange_id;        
+        //private Element codechange_username;
+        //private Element codechange_projectname;
+        //private Element codechange_id;        
         private Element codechange_document;
         private CDATASection codechange_contents;
         private Element codechange_documentname;
+        private MicroActivity microActivity;
         
         /**
          * This is the document that has been changed.
@@ -141,36 +141,19 @@ public class ECGDocumentListener implements IDocumentListener {
             this.doc = document;
             this.textEditor = textEditor;
 
-            try {
                 
-                // initialize DOM skeleton for msdt.codechange.xsd
-                msdt_codechange_doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-                Element codechange_microactivity = msdt_codechange_doc.createElement("microActivity");                
-                Element codechange_commondata = msdt_codechange_doc.createElement("commonData");
-                Element codechange_codechange = msdt_codechange_doc.createElement("codechange");
-                codechange_username = msdt_codechange_doc.createElement("username");
-                codechange_projectname = msdt_codechange_doc.createElement("projectname");
-                codechange_id = msdt_codechange_doc.createElement("id");
-                codechange_document = msdt_codechange_doc.createElement("document");
-                codechange_contents = msdt_codechange_doc.createCDATASection("");
-                codechange_documentname = msdt_codechange_doc.createElement("documentname");
-
-                msdt_codechange_doc.appendChild(codechange_microactivity);
-                  codechange_microactivity.appendChild(codechange_commondata);
-                    codechange_commondata.appendChild(codechange_username);
-                    codechange_commondata.appendChild(codechange_projectname);
-                    codechange_commondata.appendChild(codechange_id);
-                  codechange_microactivity.appendChild(codechange_codechange);
-                    codechange_codechange.appendChild(codechange_document);
-                      codechange_document.appendChild(codechange_contents);
-                    codechange_codechange.appendChild(codechange_documentname);
-                                        
-            } catch (ParserConfigurationException e) {
-                ECGEclipseSensor.logger.log(Level.SEVERE,
-                    "Could not instantiate the DOM Document.");
-                ECGEclipseSensor.logger.log(Level.FINE, e.getMessage());
-            }
-            
+            // initialize DOM skeleton for msdt.codechange.xsd
+            //msdt_codechange_doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+            //Element codechange_microactivity = msdt_codechange_doc.createElement("microActivity");                
+            //Element codechange_commondata = msdt_codechange_doc.createElement("commonData");
+            microActivity = new MicroActivity();
+            Document microactivity_doc = microActivity.getMicroActivityDoc();
+            Element codechange = microactivity_doc.createElement("codechange");
+            codechange_document = microactivity_doc.createElement("document");
+            codechange_contents = microactivity_doc.createCDATASection("");
+            codechange_documentname = microactivity_doc.createElement("documentname");
+            microActivity.setCustomElement(codechange);
+                                                    
             ECGEclipseSensor.logger.exiting(this.getClass().getName(), "CodeChangeTimerTask");
         }
 
@@ -182,17 +165,16 @@ public class ECGDocumentListener implements IDocumentListener {
 
             ECGEclipseSensor sensor = ECGEclipseSensor.getInstance();
 
-            ECGEclipseSensor.logger
-                .log(ECGLevel.PACKET, "A codechange event has been recorded.");
+            ECGEclipseSensor.logger.log(ECGLevel.PACKET, "A codechange event has been recorded.");
 
-            codechange_username.setTextContent(sensor.getUsername());
-            codechange_projectname.setTextContent(ECGEclipseSensor.getProjectnameFromLocation(textEditor.getTitleToolTip()));
-            codechange_id.setTextContent(String.valueOf(textEditor.hashCode()));
+            CommonData commonData = microActivity.getCommonData();
+            commonData.setUsername(sensor.getUsername());
+            commonData.setProjectname(ECGEclipseSensor.getProjectnameFromLocation(textEditor.getTitleToolTip()));
+            commonData.setId(String.valueOf(textEditor.hashCode()));
             codechange_contents.setNodeValue(this.doc.get());
             codechange_documentname.setTextContent(ECGEclipseSensor.getFilenameFromLocation(textEditor.getTitleToolTip()));
 
-            sensor.processActivity("msdt.codechange.xsd", 
-                sensor.xmlDocumentSerializer.writeToString(msdt_codechange_doc));                    
+            sensor.processActivity("msdt.codechange.xsd", microActivity.getSerializedMicroActivity());                    
             
             /* TODO Obsolete code
             sensor.processActivity(

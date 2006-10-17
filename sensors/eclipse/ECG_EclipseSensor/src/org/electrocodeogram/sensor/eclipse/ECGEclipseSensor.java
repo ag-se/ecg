@@ -7,6 +7,7 @@ package org.electrocodeogram.sensor.eclipse;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -16,6 +17,7 @@ import org.eclipse.core.filebuffers.FileBuffers;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.jdt.internal.junit.ui.JUnitPlugin;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
@@ -40,6 +42,8 @@ import org.electrocodeogram.sensor.eclipse.listener.ECGPartListener;
 import org.electrocodeogram.sensor.eclipse.listener.ECGRunDebugListener;
 import org.electrocodeogram.sensor.eclipse.listener.ECGShellListener;
 import org.electrocodeogram.sensor.eclipse.listener.ECGTestListener;
+import org.electrocodeogram.sensor.eclipse.preferences.ECGPreferenceConstants;
+import org.hackystat.kernel.admin.SensorProperties;
 import org.hackystat.kernel.shell.SensorShell;
 import org.hackystat.stdext.sensor.eclipse.EclipseSensor;
 import org.hackystat.stdext.sensor.eclipse.EclipseSensorPlugin;
@@ -104,8 +108,6 @@ public final class ECGEclipseSensor {
      */
     public LSSerializer xmlDocumentSerializer; 
 
-
-    
     /**
      * This is the <em>Singleton</em> instance of the
      * <em>ECGEclipseSensor</em>.
@@ -120,10 +122,15 @@ public final class ECGEclipseSensor {
 
     /**
      * This is another <em>HackyStat</em> object that is kind of a
-     * wrapper for the {@link SensorShell}. This sensor is using it
-     * to.
+     * wrapper for the {@link SensorShell}. 
      */
     private EclipseSensorShell eclipseSensorShell;
+    
+    /**
+     * This is another <em>HackyStat</em> object that holds the 
+     * properties, initially read from sensor.properties. 
+     */
+    private SensorProperties shellProperties;
     
     /**
      * The one and only PartListener, because all Parts are treated similarly 
@@ -166,43 +173,19 @@ public final class ECGEclipseSensor {
          * sensor instance.
          */
         this.hackyEclipse = EclipseSensor.getInstance();
-
         logger.log(Level.FINE, "HackyStat Eclipse sensor created.");
 
         this.eclipseSensorShell = this.hackyEclipse.getEclipseSensorShell();
-
+        this.shellProperties = this.eclipseSensorShell.getSensorProperties();
         logger.log(Level.FINE, "Got HackyStat EclipseSensorShell.");
-
-        /*
-         * The next line is needed for the InlineServer mode. In
-         * that case the ECG SensorShell needs to now where the ECG
-         * Lab application is stored locally. The ECG Lab is stored in
-         * a PlugIns subdirectory called "ecg" per default. So we get
-         * the PlugIn directory name itself and are adding the "ecg"
-         * subdirectory.
-         */
-        String[] path = {EclipseSensorPlugin.getInstance().getSensorPath()
-                         + File.separator + "ecg"};
-
-        List list = Arrays.asList(path);
-
-        /*
-         * The only way to communicate with the ECG SensorShell is by
-         * using the HackyStat's EclipseSensorShell, since we are not
-         * having a reference to the SensorShell itself.
-         */
-        this.eclipseSensorShell.doCommand(SensorShell.ECG_LAB_PATH, list);
-
-        logger.log(Level.FINE,
-            "The Sensorpath has been sent to the SensorShell.");
-
+        
         // Try to get the username from the operating system
         // environment
         this.username = System.getenv("username");
-
         if (this.username == null || this.username.equals("")) {
             this.username = "unknown";
         }
+        logger.log(Level.FINE, "Username is set to" + this.username);
         
         try {
             // get DOM Implementation using DOM Registry
@@ -222,24 +205,80 @@ public final class ECGEclipseSensor {
             logger.log(Level.FINE, e.getMessage());
         }
 
-        logger.log(Level.FINE, "Username is set to" + this.username);
-
-        // All the listener registration is done in the SWT event thread
-        //   to get sure that the GUI elements are completely built.
-        PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
-            public void run() {
-            	ECGEclipseSensor.this.init();
-            }
-        });
-
         logger.exiting(this.getClass().getName(), "ECGEclipseSensor");
                 
     }
 
     /**
+     * Does all the preference settings
+     */
+    protected void initPreferences() {
+        // Fetch eclipse's workspace properties
+        // TODO Doesn't listen to property changes currently, i.e. after changing the
+        //   values, Eclipse needs to be restarted
+        IPreferenceStore wsProperties = EclipseSensorPlugin.getInstance().getPreferenceStore();
+        // Now, in case the eclipse properties should be taken, set the properties
+        if (wsProperties.getBoolean(ECGPreferenceConstants.P_ECLIPSE_PROPERTIES)) {
+            this.shellProperties.setProperty(
+                    SensorProperties.ECG_SERVER_TYPE_KEY, 
+                    wsProperties.getString(ECGPreferenceConstants.P_SERVER_TYPE));
+            this.shellProperties.setProperty(
+                    SensorProperties.ECG_SERVER_ADDRESS_KEY, 
+                    wsProperties.getString(ECGPreferenceConstants.P_SERVER_ADDRESS));
+            this.shellProperties.setProperty(
+                    SensorProperties.ECG_SERVER_PORT_KEY, 
+                    wsProperties.getString(ECGPreferenceConstants.P_SERVER_PORT));
+            this.shellProperties.setProperty(
+                    SensorProperties.ECG_SERVER_PATH_KEY, 
+                    wsProperties.getString(ECGPreferenceConstants.P_SERVER_BATCH));
+            this.shellProperties.setProperty(
+                    SensorProperties.ECG_LOG_LEVEL_KEY, 
+                    wsProperties.getString(ECGPreferenceConstants.P_LOG_LEVEL));
+            this.shellProperties.setProperty(
+                    SensorProperties.ECG_LOG_FILE_KEY, 
+                    wsProperties.getString(ECGPreferenceConstants.P_LOG_FILE));
+        }        
+        
+        /*
+         * The next line is needed for the InlineServer mode. In
+         * that case the ECG SensorShell needs to now where the ECG
+         * Lab application is stored locally. The ECG Lab is stored in
+         * a PlugIns subdirectory called "ecg" per default - that's the
+         * default value of the sensor.properties' ECG_SERVER_PATH. Just
+         * get the PlugIn directory name itself add the ECG_SERVER_PATH
+         * The value could be already a file (the executable batch to start the
+         * server) in which case nothing will be changed.
+         */
+        String serverPath = this.shellProperties.getProperty(SensorProperties.ECG_SERVER_PATH_KEY);
+        if (!(new File(serverPath).isFile())) {
+            this.shellProperties.setProperty(SensorProperties.ECG_SERVER_PATH_KEY, 
+                    EclipseSensorPlugin.getInstance().getSensorPath()
+                    + File.separator + serverPath);
+        }
+        
+        /* 
+         * The initialization of the Socket thread and the Inline server has
+         * been artificially deferred and must be triggered now. The only way
+         * to communicate with the SensorShell is via the doCommand() method
+         * (which originally is only present for events). This is because we
+         * only have an EclipseSensorShell which wraps our SensorShell. So,
+         * this is really tricky, but after all, it works without altering
+         * Hackystat and still retaining our SensorShell for use with other
+         * Hackystat Sensors.
+         * Note that since the EventSender is not initialized, we may loose 
+         * events! But no ECGEclipseSensor listener is registered yet, so
+         * only Hackystat events may be lost, which doesn't matter
+         */
+        this.eclipseSensorShell.doCommand(SensorShell.Initialization, Collections.singletonList("Init"));
+
+        logger.log(Level.FINE, "The SensorShell's preferences have been initialized.");
+        
+    }
+    
+    /**
      * Does all the listener registration 
      */
-    protected void init() {
+    protected void initListeners() {
     	
     	IWorkbench workbench = PlatformUI.getWorkbench();
     	IWorkbenchWindow[] windows = workbench.getWorkbenchWindows();
@@ -360,6 +399,8 @@ public final class ECGEclipseSensor {
 		    IWorkbenchPart activePart = page.getActivePart();
 			partListener.partActivated(activePart);
 		}
+
+        logger.log(Level.FINE, "The SensorShell's listeners have been initialized.");
 	}
 
 	/**
@@ -393,6 +434,16 @@ public final class ECGEclipseSensor {
 
         if (theInstance == null) {
             theInstance = new ECGEclipseSensor();
+            theInstance.initPreferences();
+            // All the listener registration is done in the SWT event thread
+            //   to get sure that the GUI elements are completely built.
+            PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
+                public void run() {
+                    theInstance.initListeners();
+                }
+            });
+            // TODO Does this method needs to be synchronized because of the 
+            //   async creation of the instance?
         }
 
         logger.exiting(ECGEclipseSensor.class.getName(), "getInstance",
@@ -450,6 +501,13 @@ public final class ECGEclipseSensor {
     public void processActivity(final String msdt, final String data) {
         logger.entering(this.getClass().getName(), "processActivity",
             new Object[] {msdt, data});
+        
+        if (shellProperties.getECGServerType().equals(SensorShell.ServerMode.NULL.toString())) {
+            logger.log(Level.FINE,
+                "The server type is null. Don't send any event");
+            logger.exiting(this.getClass().getName(), "processActivity");
+            return;            
+        }
 
         if (data == null) {
             logger.log(Level.FINE,
@@ -476,6 +534,13 @@ public final class ECGEclipseSensor {
         }
 
         logger.exiting(this.getClass().getName(), "processActivity");
+    }
+
+    /**
+     * @return the shellProperties
+     */
+    public SensorProperties getShellProperties() {
+        return shellProperties;
     }
 }
   
