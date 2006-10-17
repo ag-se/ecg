@@ -239,6 +239,20 @@ public class EventSender extends Thread {
         logger.exiting(this.getClass().getName(), "connect");
 
     }
+    
+    /**
+     * Disable this EventSender
+     */
+    public void disconnect() {
+        try {
+            this.toEcgLab.close();
+            this.socketToEcgLab.close();
+        } catch (IOException e) {
+            logger
+            .log(Level.WARNING,
+                "The EventSender could not be disconnected dur to: \n" + e.getMessage());
+        }
+    }
 
     /**
      * This is doing the actual transmission to the ECG Lab. If any

@@ -72,28 +72,10 @@ public class SensorShell {
     private static final String ECG_TOOLNAME = "ElectroCodeoGram";
 
     /**
-     * This <code>String</code> is the key in the
-     * <em>sensor.properties</em> file under which the path to the
-     * ECG Lab is stored. This is only used, when the SensorShell
-     * operates in <em>Inlineserver</em> mode.
+     * Key to pass the server configuration (path, port, type, ip) through
+     * doCommand()
      */
-    public static final String ECG_LAB_PATH = "ECG_Lab_Path";
-
-    /**
-     * This <code>String</code> is the value in the
-     * <em>sensor.properties</em> file for the
-     * <em>ECG_SERVER_TYPE</em> key, telling the SensorShell to
-     * operate in <em>Inlineserver</em> mode.
-     */
-    public static final String INLINESERVER = "INLINE";
-
-    /**
-     * This <code>String</code> is the value in the
-     * <em>sensor.properties</em> file for the
-     * <em>ECG_SERVER_TYPE</em> key, telling the SensorShell to
-     * operate in <em>Remoteserver</em> mode.
-     */
-    public static final String REMOTESERVER = "REMOTE";
+    public static final String Initialization = "Initialization command";
 
     /**
      * The SensorShell can either run in <em>Inlinesever</em> mode,
@@ -102,6 +84,13 @@ public class SensorShell {
      * started manually and can be located on a different machine.
      */
     public enum ServerMode {
+        // Never change the constant names since their toString() is used!
+        /**
+         * In the <em>Nullserver</em> mode the SensorShell doesn't
+         * start the ECG Lab, i.e. no events are stored.
+         */
+        NULL,
+
         /**
          * In the <em>Inlineserver</em> mode the SensorShell starts
          * the ECG Lab automatically, by calling the
@@ -178,6 +167,16 @@ public class SensorShell {
     private String sensorPath;
 
     /**
+     * This is the IP address of the ECG lab server with the SocketSourceModule.
+     */
+    private String ecgLabIp;
+
+    /**
+     * This is the port number of the ECG lab server with the SocketSourceModule.
+     */
+    private String ecgLabPort;
+
+    /**
      * A flag that indicates if the <em>SensorShell</em> is able to
      * receive recorded events.
      */
@@ -190,7 +189,10 @@ public class SensorShell {
     private static InlineServer inlineServer;
 
     /**
-     * This creates the <em>ECG SensorShell</em>.
+     * This creates the <em>ECG SensorShell</em>. Note that for full ECG sensor shell
+     * functionality, it is necessary to call initializeCommuniaction() (which decides on
+     * null, inline or remote mode) and initializeLogging() afterwards.
+     * 
      * @param properties
      *            The <em>SensorProperties</em> configuring the ECG
      *            SensorShell
@@ -202,7 +204,7 @@ public class SensorShell {
      *            Is the name of the environment the sensor runs in
      */
     public SensorShell(final SensorProperties properties,
-        final boolean interactive, @SuppressWarnings("unused")
+        final boolean interactive,
         final String toolName) {
         logger.entering(this.getClass().getName(), "SensorShell", new Object[] {
             properties, new Boolean(interactive), toolName});
@@ -219,10 +221,18 @@ public class SensorShell {
         this.sensorProperties = properties;
 
         this.isInteractive = interactive;
-
-        initializeLogging();
-
-        initializeCommunication();
+        
+        // For this special ECG Shell, in case of an Eclipse Sensor
+        //  do not do the usual initialization now. It will be called
+        //  via doCommand later.
+        // TODO This is a dirty trick (especially because of the
+        //  "eclipse" literal which is defined by Hackystat but
+        //  not available here
+        if (!toolName.equals("eclipse") && 
+            !toolName.equals(SensorShell.ECG_TOOLNAME)) {
+            initializeCommunication();
+            initializeLogging();
+        }
 
         logger.exiting(this.getClass().getName(), "SensorShell");
     }
@@ -260,8 +270,7 @@ public class SensorShell {
      */
     public SensorShell(final SensorProperties properties,
         final boolean interactive, final String toolName,
-        @SuppressWarnings("unused")
-        final boolean enableOfflineData, @SuppressWarnings("unused")
+        final boolean enableOfflineData, 
         final File commandFile) {
         this(properties, interactive, toolName);
     }
@@ -282,7 +291,6 @@ public class SensorShell {
      */
     public SensorShell(final SensorProperties properties,
         final boolean interactive, final String toolName,
-        @SuppressWarnings("unused")
         final boolean enableOfflineData) {
         this(properties, interactive, toolName);
     }
@@ -298,7 +306,7 @@ public class SensorShell {
 
         if (this.sensorProperties.getECGServerType() == null) {
             logger.log(Level.WARNING,
-                "ECG_SEVER_TYPE is null in sensor.properties.");
+                "ECG_SEVER_TYPE is not specified.");
 
             this.serverMode = ServerMode.REMOTE;
 
@@ -306,25 +314,34 @@ public class SensorShell {
 
             initializeEventSender();
         } else if (this.sensorProperties.getECGServerType()
-            .equals(INLINESERVER)) {
-            logger.log(Level.INFO,
+            .equals(ServerMode.INLINE.toString())) {
+            logger.log(Level.FINE,
                 "The ECG_SEVER_TYPE is INLINE in sensor.properties.");
 
             this.serverMode = ServerMode.INLINE;
 
-            logger.log(Level.INFO, "Going Inlineserver...");
+            logger.log(Level.FINE, "Going Inlineserver...");
 
-            startInlineServer();
-
+            startInlineServer(); 
             initializeEventSender();
+            
         } else if (this.sensorProperties.getECGServerType()
-            .equals(REMOTESERVER)) {
-            logger.log(Level.INFO, "ECG_SEVER_TYPE is REMOTE Remoteserver...");
+            .equals(ServerMode.NULL.toString())) {
+            logger.log(Level.FINE, "ECG_SEVER_TYPE is NULL");
 
+            this.serverMode = ServerMode.NULL;
+
+            // dont do anything
+                
+        } else if (this.sensorProperties.getECGServerType()
+            .equals(ServerMode.REMOTE.toString())) {
+            logger.log(Level.FINE, "ECG_SEVER_TYPE is REMOTE Remoteserver...");
+            
             initializeEventSender();
+            
         } else {
             logger.log(Level.WARNING,
-                "ECG_SEVER_TYPE is not REMOTE or INLINE in sensor.properties.");
+                "ECG_SEVER_TYPE is not specified.");
 
             logger.log(Level.WARNING, "Going Remoteserver per default...");
 
@@ -341,13 +358,20 @@ public class SensorShell {
      * <code>Thread</code> that sends recorded events
      * asynchroneously to the ECG Lab.
      */
-    private void initializeEventSender() {
+    private boolean initializeEventSender() {
         logger.entering(this.getClass().getName(), "initializeEventSender");
 
         try {
             // Try to create the SendingThread with the given ECG
             // Lab address
-
+            
+            if (this.eventSender != null) {
+                // appempt to initializr Event Sender again, kill the first one
+                this.eventSender.disconnect();
+            }
+            if (this.serverMode == ServerMode.NULL) {
+                // dont start eventSender
+            }
             if (this.serverMode == ServerMode.INLINE) {
                 this.eventSender = new EventSender(InetAddress
                     .getByName("127.0.0.1"), this.sensorProperties
@@ -365,7 +389,7 @@ public class SensorShell {
 
             logger.exiting(this.getClass().getName(), "initializeEventSender");
 
-            return;
+            return false;
 
         } catch (UnknownHostException e) {
             logger
@@ -375,10 +399,12 @@ public class SensorShell {
 
             logger.exiting(this.getClass().getName(), "initializeEventSender");
 
-            return;
+            return false;
         }
 
         logger.exiting(this.getClass().getName(), "initializeEventSender");
+        
+        return true;
     }
 
     /**
@@ -388,9 +414,10 @@ public class SensorShell {
     private void startInlineServer() {
         logger.entering(this.getClass().getName(), "startInlineServer");
 
-        inlineServer = new InlineServer(this);
-
-        inlineServer.start();
+        if (inlineServer == null) {
+            inlineServer = new InlineServer(this);
+            inlineServer.start();            
+        }
 
         logger.exiting(this.getClass().getName(), "startInlineServer");
     }
@@ -403,7 +430,7 @@ public class SensorShell {
 
         logger.entering(SensorShell.class.getName(), "stop");
 
-        logger.log(Level.INFO, "The ECG SensorShell is stopping...");
+        logger.log(Level.FINE, "The ECG SensorShell is stopping...");
 
         if (inlineServer != null) {
             logger.log(Level.FINE, "An ECG Lab process is found.");
@@ -495,17 +522,18 @@ public class SensorShell {
             return false;
         }
 
-        if (sensorDataType != null && sensorDataType.equals(ECG_LAB_PATH)) {
+        // Hook for ecg to enable late configuration settings
+        if (sensorDataType != null && sensorDataType.equals(Initialization)) {
 
             logger.log(Level.FINE,
-                "The SensorShell is receiving the path to the ECG Lab.");
+                "The SensorShell is receiving the server configuration.");
 
-            result = analysePath(argList);
+            initializeCommunication();
+            initializeLogging();
 
-            logger.exiting(this.getClass().getName(), "doCommand", new Boolean(
-                result));
+            logger.exiting(this.getClass().getName(), "doCommand");
 
-            return result;
+            return true;
 
         }
 
@@ -538,8 +566,16 @@ public class SensorShell {
         logger.entering(this.getClass().getName(), "analyseEvent",
             new Object[] {timeStamp, sensorDataType, argList});
 
-        WellFormedEventPacket packet;
+        if (this.serverMode == ServerMode.NULL) {
+            logger.log(Level.FINE,
+                "Server type is NULLSERVER, event will be ignored.");
+            logger.exiting(this.getClass().getName(), "analyseEvent",
+                new Boolean(true));
+            return true;            
+        }
 
+        WellFormedEventPacket packet;
+        
         try {
             packet = new WellFormedEventPacket(timeStamp, sensorDataType, argList);
         } catch (IllegalEventParameterException e) {
@@ -551,8 +587,6 @@ public class SensorShell {
 
             return false;
         }
-
-        // if (this.serverMode == ServerMode.REMOTE) {
 
         if (this.eventSender != null) {
             // pass EventPacket to SendingThread
@@ -575,41 +609,6 @@ public class SensorShell {
                     "The stream to the ECG Lab is not open. Maybe the EventSender is not started yet?");
         }
         logger.exiting(this.getClass().getName(), "analyseEvent");
-
-        return true;
-    }
-
-    /**
-     * If the SensorShell gets the path to the ECG Lab, for starting
-     * it as a process, this methos is called.
-     * @param argList
-     *            Is the stringlist containing the path as the first
-     *            element
-     * @return <code>teue</code> if the path has been read
-     *         successfully nad <code>false</code> otherwise
-     */
-    private boolean analysePath(final List argList) {
-        logger.entering(this.getClass().getName(), "analysePath",
-            new Object[] {argList});
-
-        if (this.sensorPath == null) {
-            if (argList == null) {
-                logger.log(Level.WARNING, "The parameter \"argList\" is null");
-
-                logger.exiting(this.getClass().getName(), "analysePath");
-
-                return false;
-            }
-
-            this.sensorPath = (String) argList.get(0);
-
-            logger.log(Level.INFO,
-                "The SensorShell has read the ECG Lab's path to: "
-                                + this.sensorPath);
-
-        }
-
-        logger.exiting(this.getClass().getName(), "analysePath");
 
         return true;
     }
@@ -779,10 +778,10 @@ public class SensorShell {
     /**
      * Returns the absolute path to the ECG EclipseSensor plugin.
      * @return The absolute path to the ECG EclipseSensor plugin
-     */
     final String getSensorPath() {
         return this.sensorPath;
     }
+     */
 
     /**
      * This makes the <em>SensorShell</em> a process that
@@ -801,7 +800,7 @@ public class SensorShell {
         Thread
             .setDefaultUncaughtExceptionHandler(new DefaultExceptionHandler());
 
-        logger.log(Level.INFO, "Registered DefaultExceptionHandelr");
+        logger.log(Level.FINE, "Registered DefaultExceptionHandler");
 
         if ((args.length == 1) && (args[0].equalsIgnoreCase("-help"))) {
             logger.log(Level.INFO, "Help requested by user");
@@ -819,7 +818,7 @@ public class SensorShell {
         if (args.length >= 2) {
             sensorProperties = new SensorProperties("Shell", new File(args[1]));
 
-            logger.log(Level.INFO, "Loaded SensorProperties from file.");
+            logger.log(Level.FINE, "Loaded SensorProperties from file.");
 
             if (!sensorProperties.isFileAvailable()) {
                 System.out.println("Could not find sensor.properties file. ");
@@ -834,7 +833,7 @@ public class SensorShell {
         } else {
             sensorProperties = new SensorProperties("ECG SensorShell");
 
-            logger.log(Level.INFO, "Loaded default SensorProperties.");
+            logger.log(Level.FINE, "Loaded default SensorProperties.");
         }
 
         boolean interactive = true;
@@ -1024,20 +1023,20 @@ public class SensorShell {
         private Process ecgLab;
 
         /**
-         * A reference to the ECG Lab <em>SensorShell</em>.
+         * A reference to the <em>SensorShell</em>.
          */
-        private SensorShell sensorShell;
+        private SensorShell shell;
 
         /**
          * Creates the <code>Thread</code>.
-         * @param shell
-         *            Is a reference to the <em>SensorShell</em>f
+         * @param properties
+         *            Is a reference to the <em>SensorProperties</em>
          */
-        public InlineServer(final SensorShell shell) {
+        public InlineServer(SensorShell shell) {
             inlineServerLogger.entering(this.getClass().getName(),
                 "InlineServer", new Object[] {shell});
 
-            this.sensorShell = shell;
+            this.shell = shell;
 
             inlineServerLogger.exiting(this.getClass().getName(),
                 "InlineServer");
@@ -1067,13 +1066,13 @@ public class SensorShell {
             PrintWriter writer = new PrintWriter(new OutputStreamWriter(os));
 
             inlineServerLogger
-                .log(Level.FINE, "Stream to ECG Lab established.");
+                .log(Level.WARNING, "Stream to ECG Lab established.");
 
             writer.println("quit");
 
             writer.flush();
 
-            inlineServerLogger.log(Level.FINE,
+            inlineServerLogger.log(Level.WARNING,
                 "The quit-command has been sent.");
 
             inlineServerLogger.exiting(this.getClass().getName(),
@@ -1087,14 +1086,21 @@ public class SensorShell {
         public void run() {
             inlineServerLogger.entering(this.getClass().getName(), "run");
 
-            while (this.sensorShell.getSensorPath() == null) {
+            String labPath = this.shell.getSensorProperties().getECGServerPath();
+
+            while (labPath == null || labPath.equals("") || !(new File(labPath).exists())) {
+
                 try {
                     inlineServerLogger.log(Level.WARNING,
-                        "Path to ECG Lab not received yet. Waiting for "
+                        "Path to ECG Lab not resolved yet. Waiting for "
                                         + WAIT_FOR_PATH_DELAY / 1000
                                         + " seconds ...");
 
                     Thread.sleep(WAIT_FOR_PATH_DELAY);
+
+                    // refetch path
+                    labPath = this.shell.getSensorProperties().getECGServerPath(); 
+                
                 } catch (InterruptedException e) {
                     inlineServerLogger.log(Level.SEVERE,
                         "Path to ECG Lab not received yet.");
@@ -1110,92 +1116,93 @@ public class SensorShell {
             }
 
             try {
-
-                if (this.sensorShell.getSensorPath() != null
-                    && !this.sensorShell.getSensorPath().equals("")) {
-
-                    String osName = System.getProperty("os.name");
-
-                    if (osName == null || osName.equals("")) {
-                        inlineServerLogger
-                            .log(
-                                Level.SEVERE,
-                                "The operating system name could not be read from the system environment. Aborting Inlineserver startup...");
-
-                        inlineServerLogger.exiting(this.getClass().getName(),
-                            "run");
-
-                        return;
-                    }
-
-                    inlineServerLogger.log(Level.FINE,
-                        "The operating system name is: " + osName);
-
-                    ProcessBuilder pb = null;
-
-                    File ecgDir = null;
-
-                    if (osName.startsWith("Windows")) {
-                        inlineServerLogger.log(Level.INFO,
-                            "The operating system is a windows system.");
-
-                        pb = new ProcessBuilder("cmd.exe", "/C", "ecg.bat");
-
-                        ecgDir = new File(this.sensorShell.getSensorPath());
-
-                        inlineServerLogger
-                            .log(Level.FINE, "ECG Lab directory is: "
-                                             + ecgDir.getAbsolutePath());
-
-                    } else if (osName.startsWith("Linux")) {
-                        inlineServerLogger.log(Level.INFO,
-                            "The operating system is a linux system.");
-
-                        pb = new ProcessBuilder("sh", "./ecg.sh");
-
-                        ecgDir = new File(this.sensorShell.getSensorPath());
-
-                        inlineServerLogger
-                            .log(Level.FINE, "ECG Lab directory is: "
-                                             + ecgDir.getAbsolutePath());
-
-                    } else {
-                        inlineServerLogger
-                            .log(Level.SEVERE,
-                                "The operating system is an unknown system. Aborting Inlineserver startup...");
-
-                        return;
-                    }
-
-                    pb.directory(ecgDir);
-
-                    this.ecgLab = pb.start();
-
-                    inlineServerLogger.log(Level.INFO,
-                        "ECG Lab process started.");
-
-                    StreamGobbler errorGobbler = new StreamGobbler(this.ecgLab
-                        .getErrorStream(), "ERROR");
-
-                    StreamGobbler outputGobbler = new StreamGobbler(this.ecgLab
-                        .getInputStream(), "OUTPUT");
-
-                    errorGobbler.start();
-
-                    outputGobbler.start();
-
-                } else {
-                    inlineServerLogger.log(Level.SEVERE,
-                        "The ECG Lab path is null or empty.");
+                ProcessBuilder pb = null;
+    
+                File ecgDir = new File(labPath);
+                String shellCmd = null;
+                
+                // ecgDir could be the shell command directly or the directory of it
+                if (ecgDir.isFile()) {
+                    shellCmd = ecgDir.getName();
+                    ecgDir = ecgDir.getParentFile();
                 }
+    
+                String osName = System.getProperty("os.name");
+    
+                if (osName == null || osName.equals("")) {
+                    inlineServerLogger.log(Level.SEVERE,
+                        "The operating system name could not be read from the system environment. Aborting Inlineserver startup...");
+    
+                    inlineServerLogger.exiting(this.getClass().getName(),
+                        "run");
+    
+                    return;
+                }
+    
+                inlineServerLogger.log(Level.FINE,
+                    "The operating system name is: " + osName);
+    
+                if (osName.startsWith("Windows")) {
+                    inlineServerLogger.log(Level.FINE,
+                        "The operating system is a windows system.");
+                    
+                    if (shellCmd == null)
+                        shellCmd = "ecg.bat";
+    
+                    pb = new ProcessBuilder("cmd.exe", "/C", shellCmd);
+    
+                    inlineServerLogger
+                        .log(Level.FINE, "ECG Lab directory is: "
+                                         + ecgDir.getAbsolutePath());
+    
+                } else if (osName.startsWith("Linux")) {
+                    inlineServerLogger.log(Level.FINE,
+                        "The operating system is a linux system.");
+    
+                    if (shellCmd == null)
+                        shellCmd = "./ecg.sh";
+    
+                    pb = new ProcessBuilder("sh", shellCmd);
+    
+                    inlineServerLogger
+                        .log(Level.FINE, "ECG Lab directory is: "
+                                         + ecgDir.getAbsolutePath());
+    
+                } else {
+                    inlineServerLogger
+                        .log(Level.SEVERE,
+                            "The operating system is an unknown system. Aborting Inlineserver startup...");
+    
+                    return;
+                }
+    
+                pb.directory(ecgDir);
+    
+                this.ecgLab = pb.start();
+    
+                inlineServerLogger.log(Level.INFO,
+                    "ECG Lab process started.");
+    
+                StreamGobbler errorGobbler = new StreamGobbler(this.ecgLab
+                    .getErrorStream(), "ERROR");
+    
+                StreamGobbler outputGobbler = new StreamGobbler(this.ecgLab
+                    .getInputStream(), "OUTPUT");
+    
+                errorGobbler.start();
+    
+                outputGobbler.start();
+    
+                inlineServerLogger.exiting(this.getClass().getName(), "run");
+
             } catch (IOException e) {
+
                 inlineServerLogger
                     .log(Level.SEVERE, "Unable to start ECG Lab.");
 
                 inlineServerLogger.log(Level.SEVERE, e.getMessage());
             }
-
-            inlineServerLogger.exiting(this.getClass().getName(), "run");
+            
         }
     }
 

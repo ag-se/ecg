@@ -28,6 +28,58 @@ public class SensorProperties {
   /** State change interval */
   private static final String STATECHANGE_KEY = "HACKYSTAT_STATE_CHANGE_INTERVAL";
 
+  /**
+   * This <code>String</code> is the key in the
+   * <em>sensor.properties</em> file under which the type of
+   * the server is stored. See SensorShell#ServerMode
+   * 
+   */
+  public static final String ECG_SERVER_TYPE_KEY = "ECG_SERVER_TYPE";
+
+  /**
+   * This <code>String</code> is the key in the
+   * <em>sensor.properties</em> file under which the path to the
+   * ECG Lab is stored. This is only used, when the SensorShell
+   * operates in <em>Inlineserver</em> mode.
+   */
+  public static final String ECG_SERVER_PATH_KEY = "ECG_SERVER_PATH";
+
+  /**
+   * This <code>String</code> key is internal (although it may be set in sensor.properties)
+   * to provide the SensorShell with information on where to find the batch file to start an 
+   * inline ECGLab in case the ECG_SERVER_PATH can't be correctly resolved or the sensor's
+   * configuration forces to take the batch file path
+   */
+  public static final String ECG_SERVER_BATCH_KEY = "ECG_SERVER_BATCH";
+
+  /**
+   * This <code>String</code> is the key in the
+   * <em>sensor.properties</em> file under which the port number
+   * of the ECG Lab is stored.
+   */
+  public static final String ECG_SERVER_PORT_KEY = "ECG_SERVER_PORT";
+
+  /**
+   * This <code>String</code> is the key in the
+   * <em>sensor.properties</em> file under which the ip address 
+   * of the ECG Lab is stored. 
+   */
+  public static final String ECG_SERVER_ADDRESS_KEY = "ECG_SERVER_ADDRESS";
+
+  /**
+   * This <code>String</code> is the key in the
+   * <em>sensor.properties</em> file under which the logging level 
+   * of the ECG Lab is stored. 
+   */
+  public static final String ECG_LOG_LEVEL_KEY = "ECG_LOG_LEVEL";
+
+  /**
+   * This <code>String</code> is the key in the
+   * <em>sensor.properties</em> file under which the logging file 
+   * of the ECG Lab is stored. 
+   */
+  public static final String ECG_LOG_FILE_KEY = "ECG_LOG_FILE";
+
   /** The standard location of the sensor properties file. */
   private File sensorFile;
   /** The sensor type creating this instance. */
@@ -93,37 +145,52 @@ public class SensorProperties {
 
   public InetAddress getECGServerAddress() throws UnknownHostException
   {
-      String ECGServerAddressKey = "ECG_SERVER_ADDRESS";
-      String str = this.getProperty(ECGServerAddressKey).trim();
+      String str = this.getProperty(ECG_SERVER_ADDRESS_KEY);
       return InetAddress.getByName(str);
-    
+  }
+
+  public String getECGServerAddressAsString()
+  {
+      String res = this.getProperty(ECG_SERVER_ADDRESS_KEY);
+      return (res != null ? res.trim() : "");
   }
 
   public int getECGServerPort()
   {
-      String ECGServerPortKey = "ECG_SERVER_PORT";
-      String str = this.getProperty(ECGServerPortKey).trim();
-      
+      String str = this.getProperty(ECG_SERVER_PORT_KEY);
       return Integer.parseInt(str);
   }
 
   public String getECGServerType()
   {
-      String ECGServerType = "ECG_SERVER_TYPE";
-      String str = this.getProperty(ECGServerType).trim();
-      
-      return str;
+      String res = this.getProperty(ECG_SERVER_TYPE_KEY);
+      return (res != null ? res.trim() : "");
   }
   
   public String getECGServerPath()
   {
-      String ECGServerPath = "ECG_SERVER_PATH";
-      String str = this.getProperty(ECGServerPath).trim();
-      
-      return str;
+      String res = this.getProperty(ECG_SERVER_PATH_KEY);
+      return (res != null ? res.trim() : "");
   }
 
+  public String getECGServerBatch()
+  {
+      String res = this.getProperty(ECG_SERVER_BATCH_KEY);
+      return (res != null ? res.trim() : "");
+  }
+
+  public String getECGLogFile()
+  {
+      String res = this.getProperty(ECG_LOG_FILE_KEY);
+      return (res != null ? res.trim() : "");
+  }
   
+  public String getECGLogLevel()
+  {
+      String res = this.getProperty(ECG_LOG_LEVEL_KEY);
+      return (res != null ? res.trim().toLowerCase() : "");
+  }
+    
   /**
    * Returns the directory in which the sensor.properties file is located (if it exists). This is
    * normally the .hackystat directory. If this SensorProperties instance was created without a
@@ -160,6 +227,16 @@ public class SensorProperties {
    */
   public String getProperty(String key) {
     return sensorProps.getProperty(key);
+  }
+
+
+  /**
+   * Allows to set properties to overwrite (but not permenently store) sensor.properties file.
+   * @param key The parameter key.
+   * @param value The corresponding value
+   */
+  public void setProperty(String key, String value) {
+    sensorProps.setProperty(key, value);
   }
 
 
