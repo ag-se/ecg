@@ -30,26 +30,6 @@ public class DBCommunicator {
     private static Logger logger = LogHelper.createLogger(DBCommunicator.class
             .getName());
 
-    /**
-     * the used JDBC Driver
-     */
-    private static final String DB_DRIVER = "com.mysql.jdbc.Driver";
-
-    /**
-     * Database URL
-     */
-    private static final String DB_URL = "jdbc:mysql://127.0.0.1:3306/ecgtest";
-
-    /**
-     * username to connect the database
-     */
-    private static final String DB_USER = "ecg";
-
-    /**
-     * password to connect the database
-     */
-    private static final String DB_PWD = "ecg";
-
     private static Connection connection;
 
     /**
@@ -75,7 +55,7 @@ public class DBCommunicator {
             // the database connection which has to be returned
             try {
                 // register driver
-                Class.forName(DB_DRIVER).newInstance();
+                Class.forName(DBTargetModuleConstants.DB_DRIVER).newInstance();
             }
             catch (InstantiationException e) {
                 logger.severe("database driver could not be instantiated");
@@ -95,11 +75,11 @@ public class DBCommunicator {
             }
 
             try {
-                logger.info("want to connect the Database with URL " + DB_URL
-                        + " and User " + DB_USER);
+                logger.info("want to connect the Database with URL " + DBTargetModuleConstants.DB_URL
+                        + " and User " + DBTargetModuleConstants.DB_USER);
                 // Connect the Database with user and password
-                connection = (Connection) DriverManager.getConnection(DB_URL,
-                        DB_USER, DB_PWD);
+                connection = (Connection) DriverManager.getConnection(DBTargetModuleConstants.DB_URL,
+                        DBTargetModuleConstants.DB_USER, DBTargetModuleConstants.DB_PWD);
                 logger.info("Database connected with Connection: "
                         + connection.toString());
             }
@@ -196,8 +176,7 @@ public class DBCommunicator {
             stmt = (Statement) c.createStatement();
 
             // get the ResultSet from the executed Query
-            ResultSet rs = (ResultSet) stmt.executeQuery("SELECT * FROM "
-                    + table);
+            ResultSet rs = (ResultSet) stmt.executeQuery("SELECT * FROM "+ table);
 
             // get the Metadata of the table from the ResultSet
             rsmd = (ResultSetMetaData) rs.getMetaData();
@@ -243,7 +222,7 @@ public class DBCommunicator {
          */
         Connection conn = getDBConnection();
 
-        // Statement which executes the SQL
+        // Statement which executes the SQL statement
         Statement stmt = null;
         try {
             stmt = (Statement) conn.createStatement();
@@ -390,7 +369,7 @@ public class DBCommunicator {
                     Statement.RETURN_GENERATED_KEYS);
 
             /**
-             * 2nd get the auto-generated linkId value from the last insert
+             * 2nd get the auto-generated linkid value from the last insert
              * operation in the commondata table
              */
             ResultSet idKey = (ResultSet) stmt.getGeneratedKeys();
@@ -528,7 +507,7 @@ public class DBCommunicator {
         try {
             stmt = (Statement) c.createStatement();
             // select the right database from which to retrieve the tablenames
-            stmt.execute("USE ecgtest;"); // TODO
+            stmt.execute("USE ecg_test;"); // TODO
 
             // get Metadata from the selected database
             DatabaseMetaData dbmd = (DatabaseMetaData) c.getMetaData();

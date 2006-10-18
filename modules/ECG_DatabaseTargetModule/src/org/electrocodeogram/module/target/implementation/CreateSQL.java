@@ -9,7 +9,6 @@ import java.util.Vector;
 import java.util.logging.Logger;
 
 import org.electrocodeogram.logging.LogHelper;
-import org.electrocodeogram.module.target.exceptions.NoMetadataVectorException;
 
 /**
  * this class proviedes several methods to generate Strings which are SQL
@@ -44,7 +43,7 @@ public class CreateSQL {
      * the event, the username and the projectname of the event
      * 
      * the common data table in the database contains this four columns and an
-     * extra column linkId which is the table's primary key. because the primary
+     * extra column linkid which is the table's primary key. because the primary
      * key is auto incremented by the dbms for each inserted event the common
      * data insert String contains a NULL value for this first column
      * 
@@ -79,23 +78,18 @@ public class CreateSQL {
 
         // the columns of the common data table in the database
         Vector commonColumns = new Vector();
-        try {
-            /**
-             * get the column names and their datatypes of the common data table
-             * from the database
-             */
-            commonColumns = DBTablesMetadataPool.Instance().getMetadataVector(
-                    "commondata");
-        }
-        catch (NoMetadataVectorException e) {
-            logger
-                    .warning("no Metadata Vector for commonData found in the database");
-            e.printStackTrace();
-        }
-
+    
+        /**
+         * get the column names and their datatypes of the common data table
+         * from the database
+         */
+        
+        commonColumns = DBTablesMetadataPool.Instance().getMetadataVector(
+                "commondata");
+   
         insertCommonDataString = "INSERT INTO commondata VALUES (";
 
-        // the null value for the auto generated linkId
+        // the null value for the auto generated linkid
         insertCommonDataString = insertCommonDataString + "NULL,";
 
         // the event's timestamp
@@ -172,7 +166,7 @@ public class CreateSQL {
      * @param eventProxy
      *            the Proxy for the event from which to store the data
      * @param linkId
-     *            the linkID value for the foreign key column in each table
+     *            the linkid value for the foreign key column in each table
      * 
      * @return insertStmtsForAllTables the vector which holds the insert String
      *         for each table which is incorporated in storing the data of the
@@ -184,9 +178,6 @@ public class CreateSQL {
         // the logger entering the method
         logger.entering(CreateSQL.class.getName(), "createMSDTInsertStmt",
                 new Object[] { eventProxy, linkId });
-
-        // get the events name from the Proxy
-        // String msdt = eventProxy.getMSDTName();
 
         /**
          * Vector which holds the insert statement for all Tables which are
@@ -212,17 +203,11 @@ public class CreateSQL {
             String currentTable = (String) tableNamesInDatabase.get(k);
             Vector currentTableColumns = new Vector();
 
-            try {
-                /**
-                 * get the column names and their datatypes from the database
-                 */
-                currentTableColumns = DBTablesMetadataPool.Instance()
-                        .getMetadataVector(currentTable);
-            }
-            catch (NoMetadataVectorException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+            /**
+             * get the column names and their datatypes from the database
+             */
+            currentTableColumns = DBTablesMetadataPool.Instance()
+                    .getMetadataVector(currentTable);
 
             String insertDataString = "INSERT INTO " + currentTable;
             insertDataString = insertDataString + " VALUES (";
@@ -239,7 +224,7 @@ public class CreateSQL {
                 // get Name of the current column
                 String currentColumn = tmpEntity.getName();
 
-                if (currentColumn.equalsIgnoreCase("linkId")) {
+                if (currentColumn.equalsIgnoreCase("linkid")) {
                     continue;
                 }
 
@@ -312,10 +297,10 @@ public class CreateSQL {
 
         Vector columns = tableToCreate.getElements();
         if (columns.size() == 0) {
-            createTable = createTable + "linkId INTEGER);";
+            createTable = createTable + "linkid INTEGER);";
         }
         else {
-            createTable = createTable + "linkId INTEGER, ";
+            createTable = createTable + "linkid INTEGER, ";
         }
 
         for (int i = 0; i < columns.size(); i++) {
@@ -329,7 +314,7 @@ public class CreateSQL {
             else
                 createTable = createTable
                         + SqlDatatype
-                        + ", FOREIGN KEY (linkId) REFERENCES commonData(linkId) ON DELETE CASCADE);";
+                        + ", FOREIGN KEY (linkid) REFERENCES commonData(linkid) ON DELETE CASCADE);";
         }
         // the logger exiting the method
         logger.exiting(CreateSQL.class.getName(), "createTableStmt",
@@ -340,17 +325,20 @@ public class CreateSQL {
     /**
      * creates the commonData Table
      * 
+     * 
      * @return the String which represents the createCommonData Table Statement
      */
     public static String createCommonDataTable() {
         String createCommonData = "CREATE TABLE commonData (";
         createCommonData = createCommonData
-                + "linkID INTEGER NOT NULL AUTO_INCREMENT,";
+                + "linkid INTEGER NOT NULL AUTO_INCREMENT,";
         createCommonData = createCommonData + "timestamp TIMESTAMP NOT NULL,";
         createCommonData = createCommonData + "msdt VARCHAR(30),";
+        createCommonData = createCommonData + "version INT,";
         createCommonData = createCommonData + "username VARCHAR(100),";
         createCommonData = createCommonData + "projectname VARCHAR(100),";
-        createCommonData = createCommonData + "PRIMARY KEY(linkId)";
+        createCommonData = createCommonData + "id VARCHAR(255),";
+        createCommonData = createCommonData + "PRIMARY KEY(linkid)";
         createCommonData = createCommonData + ")ENGINE=INNODB;";
         return createCommonData;
     }
@@ -427,44 +415,5 @@ public class CreateSQL {
         return modifyColumnType;
     }
 
-    /**
-     * This Method return a String which is a join Statement over the all tables
-     * concerning an event the tables are joined by the value of their idLink
-     * column
-     * 
-     * @param idValue
-     *            the value if the idLink column
-     * @param tables
-     *            the tables to be joined
-     * @return the String representing the JOIN Statement
-     */
-    public static String createJoinStmt(int idValue, Vector tables) {
-        logger.entering(CreateSQL.class.getName(), "createJoinStmt");
-
-        // there must be more than one table for the join statement
-        if (tables.size() < 2) {
-            logger.warning("Cannot make join over one table");
-            return null;
-        }
-
-        // The String representing the Statment
-        String join = "SELECT * FROM commondata where linkId=" + idValue;
-        join = join + " AS tempTable INNER JOIN (";
-
-        // each tablename has to be included in the statement
-        for (int i = 0; i < tables.size(); i++) {
-            String tablename = (String) tables.get(i);
-            if (i == (tables.size() - 1)) {
-                join = join + tablename + ")";
-            }
-            else {
-                join = join + tablename + ", ";
-            }
-        }
-        // the element over which the tables are joined
-        join = join + " USING (linkid); ";
-        logger.info("Created join Statment: " + join);
-        logger.exiting(CreateSQL.class.getName(), "createJoinStmt");
-        return join;
-    }
+    
 }

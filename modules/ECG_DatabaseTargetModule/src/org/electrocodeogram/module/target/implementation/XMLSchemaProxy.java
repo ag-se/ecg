@@ -84,7 +84,7 @@ public class XMLSchemaProxy {
      */
     public XMLSchemaProxy(String schemaName) {
         this.schemaName = schemaName;
-        this.xsdFile = new File(DatabaseTargetModule.MSDT_FOLDER + schemaName);
+        this.xsdFile = new File(DBTargetModuleConstants.MSDT_FOLDER + schemaName);
         getCoreMsdtName();
     }
 

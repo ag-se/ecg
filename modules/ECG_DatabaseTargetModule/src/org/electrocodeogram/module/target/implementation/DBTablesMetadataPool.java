@@ -8,7 +8,7 @@ import java.util.Vector;
 import java.util.logging.Logger;
 
 import org.electrocodeogram.logging.LogHelper;
-import org.electrocodeogram.module.target.exceptions.NoMetadataVectorException;
+
 
 /**
  * @author jule
@@ -70,15 +70,14 @@ public class DBTablesMetadataPool {
 	 * as well as there is no MetadataVector for the given tablename
 	 * @param tableName the name of the table
 	 * @return the Vector containing the Metadata for the giben tablename
-	 * @throws NoMetadataVectorException 
 	 */
-	public Vector getMetadataVector(String tableName) throws NoMetadataVectorException{
+	public Vector getMetadataVector(String tableName){
 		if(metaInformationVectors.isEmpty())
             getMetadataForAllTables();
         
         if (poolInstance.metaInformationVectors.get(tableName)== null){
-			logger.warning("No MetadataVector found for "+tableName);
-            throw new NoMetadataVectorException();
+            logger.severe("Could not not find a Metadata Vecor for "+tableName);
+            return null;
 		}
 		else return (Vector)poolInstance.metaInformationVectors.get(tableName);
 	}
@@ -91,13 +90,13 @@ public class DBTablesMetadataPool {
 	 * @param v
 	 */
 	public void addMetadataVector(String tableName, Vector v){
-		if(poolInstance == null)
-            System.out.println("NULL");
-        
+		if(poolInstance == null){
+           logger.severe("No Instance of DBTablesMetadataPool available");
+           
+		}
+    
         poolInstance.metaInformationVectors.put(tableName, v);
 	}
-	
-	
 	
 	/**
      * 

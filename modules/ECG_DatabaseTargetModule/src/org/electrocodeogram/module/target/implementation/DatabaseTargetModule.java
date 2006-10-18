@@ -7,20 +7,16 @@
 
 package org.electrocodeogram.module.target.implementation;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.logging.LogHelper;
-import org.electrocodeogram.modulepackage.ModuleProperty;
-import org.electrocodeogram.modulepackage.ModulePropertyException;
 import org.electrocodeogram.module.target.TargetModule;
 import org.electrocodeogram.module.target.TargetModuleException;
+import org.electrocodeogram.modulepackage.ModuleProperty;
+import org.electrocodeogram.modulepackage.ModulePropertyException;
 
 /**
  * This class is an ECG module used to write ECG events into a file in
@@ -28,7 +24,7 @@ import org.electrocodeogram.module.target.TargetModuleException;
  */
 public class DatabaseTargetModule extends TargetModule {
 
-    public static final String MSDT_FOLDER = "../ECG_Lab/msdt/";
+    
 
     /**
      * This is the logger.
@@ -244,12 +240,11 @@ public class DatabaseTargetModule extends TargetModule {
          * each table of the schema --> synchronizeTableToDatabase
          */
 
-        File msdtFolder = new File(MSDT_FOLDER);
+        File msdtFolder = new File(DBTargetModuleConstants.MSDT_FOLDER);
         if (msdtFolder.exists()) {
-            // TODO
-            System.out.println("Ordner msdt exisitert");
+            logger.info("Folder msdt exists");
         }
-        String[] msdtNames = msdtDirectory.getSchemes(msdtFolder);
+        String[] msdtNames = getSchemes(msdtFolder);
         if (!(DBCommunicator.tableExists("commondata"))) DBCommunicator
                 .executeStmt(CreateSQL.createCommonDataTable());
 
@@ -267,7 +262,20 @@ public class DatabaseTargetModule extends TargetModule {
      * 
      */
     private void disconnectDatabase() {
-        // TODO Auto-generated method stub
-        
+    
     }
+    
+    private String[] getSchemes (File f){
+        
+        if (f.isDirectory())
+        {  
+           // der Ordnerinhalt als Array von Strings 
+           String[] msdtSchemes = f.list();
+           return msdtSchemes;
+        }
+        else
+        {  
+           return null;
+        }
+     }
 }
