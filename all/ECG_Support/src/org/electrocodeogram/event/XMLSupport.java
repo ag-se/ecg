@@ -1,4 +1,4 @@
-package org.electrocodeogram.xml;
+package org.electrocodeogram.event;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;

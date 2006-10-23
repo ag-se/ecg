@@ -3,7 +3,6 @@
  */
 package org.electrocodeogram.event;
 
-import org.electrocodeogram.xml.XMLSupport;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
