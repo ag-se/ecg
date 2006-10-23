@@ -34,7 +34,7 @@
 		<properties>
 			<property>
 				<name>Input File</name>
-				<value>D:/Forschung/Kodierszenen/jekutsch/jekutsch_060621-4_events.log</value>
+				<value>D:/Forschung/Kodierszenen/jekutsch/jekutsch_060718-2_events.log</value>
 				<type>java.io.File</type>
 			</property>
 			<property>
@@ -64,7 +64,9 @@
 			<property>
 				<name>Blocker</name>
 				<value>
+				    msdt.focus.xsd
 					msdt.testrun.xsd,
+					msdt.rundebug.xsd,
 					msdt.resource.xsd,
 					msdt.test.xsd,
 				</value>
@@ -144,16 +146,18 @@
 			<property>
 				<name>Blocker</name>
 				<value>
-					msdt.testrun.xsd,
 					msdt.codechange.xsd,
 					msdt.codestatus.xsd,
-					msdt.window.xsd,
-					msdt.resource.xsd,
-					msdt.test.xsd,
-					msdt.editor.xsd
-					msdt.part.xsd
 					msdt.dialog.xsd
-					msdt.focus.xsd
+					msdt.editor.xsd
+				    msdt.focus.xsd
+					msdt.part.xsd
+					msdt.resource.xsd,
+					msdt.rundebug.xsd
+					msdt.system.xsd,
+					msdt.test.xsd,
+					msdt.testrun.xsd,
+					msdt.window.xsd,
 				</value>
 				<type>java.lang.String</type>
 			</property>
@@ -195,7 +199,7 @@
 					Output File
 				</name>
 				<value>
-					D:/Forschung/Kodierszenen/jekutsch/jekutsch_060621-4_episodes.log
+					D:/Forschung/Kodierszenen/jekutsch/jekutsch_060718-2_episodes.log
 				</value>
 				<type>
 					java.io.File
