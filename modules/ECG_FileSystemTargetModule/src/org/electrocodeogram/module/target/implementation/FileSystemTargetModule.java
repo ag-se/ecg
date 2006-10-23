@@ -149,7 +149,8 @@ public class FileSystemTargetModule extends TargetModule {
                                            + ++this.count + "_" 
                                            + this.outputFileName);
 
-                this.writer = new PrintWriter(new FileWriter(this.outputFile));
+
+                this.writer = new PrintWriter(new FileWriter(this.outputFile, true));
 
                 logger.log(Level.INFO, "A new log-file has been created: "
                                        + this.outputFile.getAbsolutePath());
@@ -203,7 +204,7 @@ public class FileSystemTargetModule extends TargetModule {
             }
 
             try {
-                this.writer = new PrintWriter(new FileWriter(this.outputFile));
+                this.writer = new PrintWriter(new FileWriter(this.outputFile, true));
 
                 logger.log(Level.INFO, "Set the property: "
                                        + moduleProperty.getName() + " to "
