@@ -8,6 +8,9 @@
    class="org.hackystat.stdext.sensor.eclipse.EclipseSensorPlugin">
 
    <runtime>
+      <library name="lib/ecg_support.jar">
+         <export name="*"/>
+      </library>
       <library name="sensor.eclipse.jar">
          <export name="*"/>
       </library>

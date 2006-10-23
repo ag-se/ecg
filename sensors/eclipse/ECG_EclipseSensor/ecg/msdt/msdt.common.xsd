@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+	<xs:annotation>
+		<xs:documentation>
+			This XML schema defines the structure of the "Common" complexType
+			which is used in every MicroSensorDataType XML Schmema definition.
+		</xs:documentation>
+	</xs:annotation>
+	
+
+	<xs:complexType name="commonDataType">
+	    	<xs:sequence>
+			<xs:element name="version" type="xs:int" minOccurs="0"/>
+			<xs:element name="creator" type="xs:token" minOccurs="0"/>
+			<xs:element name="username" type="xs:token"/>
+			<xs:element name="projectname" type="xs:token" minOccurs="0"/>
+			<xs:element name="id" type="xs:token" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>
