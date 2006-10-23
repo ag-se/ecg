@@ -19,6 +19,8 @@ import org.eclipse.ui.texteditor.IAbstractTextEditorHelpContextIds;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.texteditor.ITextEditorActionDefinitionIds;
 import org.eclipse.ui.texteditor.TextEditorAction;
+import org.electrocodeogram.event.CommonData;
+import org.electrocodeogram.event.MicroActivity;
 import org.electrocodeogram.logging.LogHelper.ECGLevel;
 import org.electrocodeogram.sensor.eclipse.ECGEclipseSensor;
 import org.w3c.dom.CDATASection;
@@ -43,17 +45,16 @@ import org.w3c.dom.Element;
     	/** The text operation target */
     	private ITextOperationTarget fOperationTarget;
 
-        private Document msdt_user_doc;
-        
-        private Element user_username;
-        private Element user_projectname;
-        private Element user_activity;
-        private Element user_param1;
-        private Element user_param2;
-        private CDATASection user_param2_contents;
-        private Element user_param3;
-        private CDATASection user_param3_contents;
-        
+        private Element textop_activity;
+        private Element textop_editorname;
+        private Element textop_selection;
+        private CDATASection textop_selection_contents;
+        private Element textop_clipboard;
+        private CDATASection textop_clipboard_contents;
+        private Element textop_startline;
+        private Element textop_endline;
+        private Element textop_offset;
+        private MicroActivity microActivity;
     	
     	/**
     	 * Creates the action.
@@ -63,37 +64,35 @@ import org.w3c.dom.Element;
             this.sensor = sensor;
     		fOperationCode= operationCode;
     		
-            // initialize DOM skeleton for msdt.editor.xsd
-            try {
-                msdt_user_doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-                Element user_microactivity = msdt_user_doc.createElement("microActivity");                
-                Element user_commondata = msdt_user_doc.createElement("commonData");
-                Element user_user = msdt_user_doc.createElement("user");
-                user_username = msdt_user_doc.createElement("username");
-                user_projectname = msdt_user_doc.createElement("projectname");
-                user_activity = msdt_user_doc.createElement("activity");
-                user_param1 = msdt_user_doc.createElement("param1");
-                user_param2 = msdt_user_doc.createElement("param2");
-                user_param2_contents = msdt_user_doc.createCDATASection("");
-                user_param3 = msdt_user_doc.createElement("param3");
-                user_param3_contents = msdt_user_doc.createCDATASection("");
+            microActivity = new MicroActivity();
 
-                msdt_user_doc.appendChild(user_microactivity);
-                  user_microactivity.appendChild(user_commondata);
-                    user_commondata.appendChild(user_username);
-                    user_commondata.appendChild(user_projectname);
-                  user_microactivity.appendChild(user_user);
-                    user_user.appendChild(user_activity);
-                    user_user.appendChild(user_param1);
-                    user_user.appendChild(user_param2);
-                      user_param2.appendChild(user_param2_contents);
-                    user_user.appendChild(user_param3);
-                      user_param3.appendChild(user_param3_contents);
-            } catch (ParserConfigurationException e) {
-                ECGEclipseSensor.logger.log(Level.SEVERE,
-                    "Could not instantiate the DOM Document in ECGTextOperationAction.");
-                ECGEclipseSensor.logger.log(Level.FINE, e.getMessage());
-            }
+            Document doc = microActivity.getMicroActivityDoc();
+            Element textop = doc.createElement("textoperation");
+            textop_activity = doc.createElement("activity");
+            textop_editorname = doc.createElement("editorname");
+            textop_selection = doc.createElement("selection");
+            textop_selection_contents = doc.createCDATASection("");
+            textop_clipboard = doc.createElement("clipboard");
+            textop_clipboard_contents = doc.createCDATASection("");
+            textop_startline = doc.createElement("startline");
+            textop_endline = doc.createElement("endline");
+            textop_offset = doc.createElement("offset");
+
+            textop.appendChild(textop_activity);
+            textop.appendChild(textop_editorname);
+            textop.appendChild(textop_selection);
+            textop_selection.appendChild(textop_selection_contents);
+            textop.appendChild(textop_clipboard);
+            textop.appendChild(textop_startline);
+            textop.appendChild(textop_endline);
+            textop.appendChild(textop_offset);
+            
+            microActivity.setCustomElement(textop);            
+                                                    
+            CommonData commonData = microActivity.getCommonData();
+            commonData.setUsername(sensor.getUsername());
+            commonData.setVersion(1); // 1 is default
+            commonData.setCreator(ECGEclipseSensor.CREATOR); 
 
             // Register action
     		if (operationCode == ITextOperationTarget.CUT) {
@@ -131,92 +130,65 @@ import org.w3c.dom.Element;
     		if (!isReadOnlyOperation() && !validateEditorInputState())
     			return;
 
-    		Clipboard clipboard= new Clipboard(getDisplay());
+            CommonData commonData = microActivity.getCommonData();
+            commonData.setProjectname(ECGEclipseSensor.getProjectnameFromLocation(editor.getTitleToolTip()));
+            commonData.setId(String.valueOf(editor.hashCode()));
+
+            Clipboard clipboard= new Clipboard(getDisplay());
     		TextTransfer textTransfer = TextTransfer.getInstance();
     		ISelection sel = editor.getSelectionProvider().getSelection();
-    		String selection = (sel instanceof TextSelection ? ((TextSelection)sel).getText() : "");
+            String selection = "";
+            int startline = -1;
+            int endline = -1;
+            int offset = -1;
+            if (sel instanceof TextSelection) {
+                TextSelection textsel = (TextSelection)sel;
+                selection = textsel.getText();
+                startline = textsel.getStartLine();
+                endline = textsel.getEndLine();
+                offset = textsel.getOffset();
+            }
+            textop_startline.setTextContent(Integer.toString(startline));
+            textop_endline.setTextContent(Integer.toString(endline));
+            textop_offset.setTextContent(Integer.toString(offset));
+            
     		fOperationTarget.doOperation(fOperationCode);
-    		if (fOperationCode == ITextOperationTarget.CUT) {
+    		
+            if (fOperationCode == ITextOperationTarget.CUT) {
     			ECGEclipseSensor.logger.log(ECGLevel.PACKET, "A Cut operation has been recorded");
 
-                user_projectname.setTextContent(ECGEclipseSensor.getProjectnameFromLocation(editor.getTitleToolTip()));
-                user_username.setTextContent(this.sensor.getUsername());
-                user_activity.setTextContent("cut");
-                user_param1.setTextContent(ECGEclipseSensor.getFilenameFromLocation(editor.getTitleToolTip()));
-                user_param2_contents.setNodeValue(selection);
-                user_param3_contents.setNodeValue("");
+                textop_activity.setTextContent("cut");
+                textop_editorname.setTextContent(ECGEclipseSensor.getFilenameFromLocation(editor.getTitleToolTip()));
+                textop_selection_contents.setNodeValue(selection);
 
-                this.sensor.processActivity("msdt.user.xsd", 
-                        this.sensor.xmlDocumentSerializer.writeToString(msdt_user_doc));
-/*
-                processActivity(
-                    "msdt.user.xsd",
-                    "<?xml version=\"1.0\"?><microActivity><commonData><username>"
-                        + getUsername()
-                        + "</username><projectname>"
-                        + getProjectnameFromLocation(editor.getTitleToolTip())
-                        + "</projectname></commonData><user><activity>cut</activity><param1>"
-                        + getFilenameFromLocation(editor.getTitleToolTip())
-                        + "</param1><param2><![CDATA["
-                        + selection
-                        + "]" + "]" + "></param2></user></microActivity>");
-*/
-    		} else if (fOperationCode == ITextOperationTarget.COPY) {
+            } else if (fOperationCode == ITextOperationTarget.COPY) {
     			ECGEclipseSensor.logger.log(ECGLevel.PACKET, "A Copy operation has been recorded");
 
-                user_projectname.setTextContent(ECGEclipseSensor.getProjectnameFromLocation(editor.getTitleToolTip()));
-                user_username.setTextContent(this.sensor.getUsername());
-                user_activity.setTextContent("copy");
-                user_param1.setTextContent(ECGEclipseSensor.getFilenameFromLocation(editor.getTitleToolTip()));
-                user_param2_contents.setNodeValue(selection);
-                user_param3_contents.setNodeValue("");
+                textop_activity.setTextContent("copy");
+                textop_editorname.setTextContent(ECGEclipseSensor.getFilenameFromLocation(editor.getTitleToolTip()));
+                textop_selection_contents.setNodeValue(selection);
 
-                this.sensor.processActivity("msdt.user.xsd", 
-                        this.sensor.xmlDocumentSerializer.writeToString(msdt_user_doc));
-/*
-                processActivity(
-                    "msdt.user.xsd",
-                    "<?xml version=\"1.0\"?><microActivity><commonData><username>"
-                        + getUsername()
-                        + "</username><projectname>"
-                        + getProjectnameFromLocation(editor.getTitleToolTip())
-                        + "</projectname></commonData><user><activity>copy</activity><param1>"
-                        + getFilenameFromLocation(editor.getTitleToolTip())
-                        + "</param1><param2><![CDATA["
-                        + selection
-                        + "]" + "]" + "></param2></user></microActivity>");
-*/
-    		} else if (fOperationCode == ITextOperationTarget.PASTE) {
+            } else if (fOperationCode == ITextOperationTarget.PASTE) {
     			ECGEclipseSensor.logger.log(ECGLevel.PACKET, "A Paste operation has been recorded");
 
                 Object clipboardContents = clipboard.getContents(textTransfer);
-                user_projectname.setTextContent(ECGEclipseSensor.getProjectnameFromLocation(editor.getTitleToolTip()));
-                user_username.setTextContent(this.sensor.getUsername());
-                user_activity.setTextContent("paste");
-                user_param1.setTextContent(ECGEclipseSensor.getFilenameFromLocation(editor.getTitleToolTip()));
-                user_param2_contents.setNodeValue(selection);
-                user_param3_contents.setNodeValue(
+                textop_activity.setTextContent("paste");
+                textop_editorname.setTextContent(ECGEclipseSensor.getFilenameFromLocation(editor.getTitleToolTip()));
+                textop_selection_contents.setNodeValue(selection);
+                textop_clipboard.appendChild(textop_clipboard_contents);
+                textop_clipboard_contents.setNodeValue(
                         (clipboardContents != null ? clipboardContents.toString() : ""));
 
-                this.sensor.processActivity("msdt.user.xsd", 
-                        this.sensor.xmlDocumentSerializer.writeToString(msdt_user_doc));
-/*
-                processActivity(
-                    "msdt.user.xsd",
-                    "<?xml version=\"1.0\"?><microActivity><commonData><username>"
-                        + getUsername()
-                        + "</username><projectname>"
-                        + getProjectnameFromLocation(editor.getTitleToolTip())
-                        + "</projectname></commonData><user><activity>paste</activity><param1>"
-                        + getFilenameFromLocation(editor.getTitleToolTip())
-                        + "</param1><param2><![CDATA["
-                        + selection
-                        + "]" + "]" + "></param2><param3><![CDATA["
-                        + clipboard.getContents(textTransfer)
-                        + "]" + "]" + "></param3></user></microActivity>");
-*/
     		}
-    		clipboard.dispose();
+
+            this.sensor.processActivity("msdt.textoperation.xsd", 
+                    microActivity.getSerializedMicroActivity());
+            
+            if (textop_clipboard.hasChildNodes())
+                textop_clipboard.removeChild(textop_clipboard_contents);
+
+
+            clipboard.dispose();
 
     	}
     	
