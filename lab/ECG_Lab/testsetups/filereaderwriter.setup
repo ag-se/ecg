@@ -12,6 +12,17 @@ org.electrocodeogram.module.target.implementation.FileSystemTargetModule
 <properties>
 <property>
 <name>
+Append Data
+</name>
+<value>
+false
+</value>
+<type>
+java.lang.Boolean
+</type>
+</property>
+<property>
+<name>
 Output File
 </name>
 <value>
@@ -89,6 +100,16 @@ true
 </value>
 <type>
 java.lang.Boolean
+</type>
+</property>
+<property>
+<name>
+Ignored Event Types
+</name>
+<value>
+</value>
+<type>
+java.lang.String
 </type>
 </property>
 </properties>
