@@ -13,7 +13,6 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -92,6 +91,12 @@ public class FileReaderThread extends EventReader {
      * were written into the file.
      */
     private ReadMode mode;
+
+    /**
+     * This Pattern contains names of MSDTs which should be completely ignored
+     * by the Reader. It is configurable in the module's properties
+     */
+    private String ignorePattern;
 
     /**
      * If true, a special msdt.system event to denote the end of a 
@@ -250,9 +255,25 @@ public class FileReaderThread extends EventReader {
                 return null;
             }
 
+            String[] argListStringArray = new String[3];
+            int firstSemi = argListString.indexOf(';');
+            int secondSemi = argListString.indexOf(';', firstSemi+1);
+            int thirdSemi = argListString.indexOf(';', secondSemi+1);
+            // ignore first (argListString.substring(0, firstSemi));
+            argListStringArray[0] = argListString.substring(firstSemi+1, secondSemi); // always "add"
+            argListStringArray[1] = argListString.substring(secondSemi+1, thirdSemi); // the msdt
+            argListStringArray[2] = argListString.substring(thirdSemi+1); // the XML
+            
+            // Ignore MSDTs which are to be ignored according to the configuration
+            if (ignorePattern != null && ignorePattern.length() > 3 &&
+                    ignorePattern.indexOf(argListStringArray[1]) >= 0) {
+                logger.log(Level.FINE,
+                        "Read MSDT of type " + argListStringArray[1] + " is ignored due to configuration");
+                return null;
+            }
+            
             // Try to parse the timestamp String into a Date object.
             Date timeStamp = null;
-
             try {
                 timeStamp = new SimpleDateFormat(
                     WellFormedEventPacket.DATE_FORMAT_PATTERN)
@@ -270,15 +291,6 @@ public class FileReaderThread extends EventReader {
 
                 return null;
             }
-
-            String[] argListStringArray = new String[3];
-            int firstSemi = argListString.indexOf(';');
-            int secondSemi = argListString.indexOf(';', firstSemi+1);
-            int thirdSemi = argListString.indexOf(';', secondSemi+1);
-            // ignore first (argListString.substring(0, firstSemi));
-            argListStringArray[0] = argListString.substring(firstSemi+1, secondSemi);
-            argListStringArray[1] = argListString.substring(secondSemi+1, thirdSemi);
-            argListStringArray[2] = argListString.substring(thirdSemi+1);
 
             if (cdatafragment) {
                 if (code == null || code.equals("")) {
@@ -443,6 +455,15 @@ public class FileReaderThread extends EventReader {
 
     }
 
+    /**
+     * @param ignores String consisting of MSDT names, e.g. "msdt.codechange.xsd,msdt.user.xsd"
+     */
+    public void setIgnorePattern(String ignores) {
+        logger.log(Level.WARNING, "Following MSDTs will be ignored by the FileReader: " + ignores);
+
+        ignorePattern = ignores;
+    }
+    
     /**
      * Set to true if a termination event should be sent
      * @param sendEndEvent

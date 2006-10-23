@@ -76,6 +76,13 @@ public class FileSystemSourceModule extends SourceModule {
      */
     private boolean sendEndEvent = false;
 
+    
+    /**
+     * A string containing full msdt names which should be ignored by the file reader
+     * See module's properties description on "Ignored Event Types"
+     */
+    private String ignoredMsdts;
+
     /**
      * The creates the module instance. It is not to be called by
      * developers, instead it is called from the
@@ -144,6 +151,10 @@ public class FileSystemSourceModule extends SourceModule {
 
                 setMode();
             }
+        } else if (moduleProperty.getName().equals("Ignored Event Types")) {
+            
+            this.ignoredMsdts = moduleProperty.getValue();
+            
         } else {
 
             logger.exiting(this.getClass().getName(), "propertyChanged");
@@ -234,6 +245,7 @@ public class FileSystemSourceModule extends SourceModule {
 
         try {
             this.readerThread.setInputFile(this.inputFile);
+            this.readerThread.setIgnorePattern(this.ignoredMsdts);
 
             logger.log(Level.FINE, "input file set.");
         } catch (IOException e) {

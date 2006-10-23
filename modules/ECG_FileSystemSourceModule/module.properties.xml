@@ -12,7 +12,13 @@
 		org.electrocodeogram.module.source.implementation.FileSystemSourceModule
 	</class>
 	<description>
-		This module reads in a file for previously written events.
+		This module reads in a file for previously written events. The properties are:
+		* Input File - A file name to be read from
+		* Enable Burst Mode - If "true" the events will be generated without artificial pauses.
+		                      If "false" the events will be generated in real time, relative to the first events time stamp
+		* Send End Event - If "true" the Lab will be terminated after the last data has been read by the File Reader
+		* Ignored Event Types - A String consisting of full MSDT names which will be ignored by the Reader, fpr example
+		                        "msdt.codechange.xsd, msdt.user.xsd"
 	</description>
 	<type>
 		SOURCE
@@ -40,19 +46,19 @@
 			</propertyValue>
 		</property>
 		<property>
-			<propertyName>
-				Enable Realtime Mode
-			</propertyName>
-			<propertyType>
-				java.lang.Boolean
-			</propertyType>
-			<propertyValue>
-			</propertyValue>
-		</property>
-		<property>
 			<propertyName>Send End Event</propertyName>
 			<propertyType>java.lang.Boolean</propertyType>
 			<propertyValue>true</propertyValue>
+		</property>
+		<property>
+			<propertyName>
+				Ignored Event Types
+			</propertyName>
+			<propertyType>
+				java.lang.String
+			</propertyType>
+			<propertyValue>
+			</propertyValue>
 		</property>
 	</properties>
 </module>
