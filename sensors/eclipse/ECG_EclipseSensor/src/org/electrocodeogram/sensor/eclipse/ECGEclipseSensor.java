@@ -79,6 +79,11 @@ public final class ECGEclipseSensor {
     static public final int CODECHANGE_INTERVAL = 2000;
 
     /**
+     * This constant specifies the name of the Sensor.
+     */
+    static public final String CREATOR = "ECGEclipseSensor1.1.4";
+
+    /**
      * This is the name of the user, who is running <em>Eclipse</em>.
      */
     public String username;
@@ -181,7 +186,7 @@ public final class ECGEclipseSensor {
         
         // Try to get the username from the operating system
         // environment
-        this.username = System.getenv("username");
+        this.username = System.getenv("USERNAME");
         if (this.username == null || this.username.equals("")) {
             this.username = "unknown";
         }

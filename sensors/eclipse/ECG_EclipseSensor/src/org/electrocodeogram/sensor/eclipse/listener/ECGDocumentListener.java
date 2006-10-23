@@ -107,8 +107,7 @@ public class ECGDocumentListener implements IDocumentListener {
      */
     class CodeChangeTimerTask extends TimerTask {
 
-        private Document msdt_codechange_doc;
-
+        //private Document msdt_codechange_doc;
         //private Element codechange_username;
         //private Element codechange_projectname;
         //private Element codechange_id;        
@@ -141,19 +140,25 @@ public class ECGDocumentListener implements IDocumentListener {
             this.doc = document;
             this.textEditor = textEditor;
 
-                
-            // initialize DOM skeleton for msdt.codechange.xsd
-            //msdt_codechange_doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-            //Element codechange_microactivity = msdt_codechange_doc.createElement("microActivity");                
-            //Element codechange_commondata = msdt_codechange_doc.createElement("commonData");
             microActivity = new MicroActivity();
+
             Document microactivity_doc = microActivity.getMicroActivityDoc();
             Element codechange = microactivity_doc.createElement("codechange");
             codechange_document = microactivity_doc.createElement("document");
             codechange_contents = microactivity_doc.createCDATASection("");
             codechange_documentname = microactivity_doc.createElement("documentname");
-            microActivity.setCustomElement(codechange);
+
+            codechange.appendChild(codechange_document);
+            codechange_document.appendChild(codechange_contents);
+            codechange.appendChild(codechange_documentname);
+            
+            microActivity.setCustomElement(codechange);            
                                                     
+            CommonData commonData = microActivity.getCommonData();
+            commonData.setUsername(sensor.getUsername());
+            commonData.setVersion(1); // 1 is default
+            commonData.setCreator(ECGEclipseSensor.CREATOR); 
+
             ECGEclipseSensor.logger.exiting(this.getClass().getName(), "CodeChangeTimerTask");
         }
 
@@ -168,29 +173,12 @@ public class ECGDocumentListener implements IDocumentListener {
             ECGEclipseSensor.logger.log(ECGLevel.PACKET, "A codechange event has been recorded.");
 
             CommonData commonData = microActivity.getCommonData();
-            commonData.setUsername(sensor.getUsername());
             commonData.setProjectname(ECGEclipseSensor.getProjectnameFromLocation(textEditor.getTitleToolTip()));
             commonData.setId(String.valueOf(textEditor.hashCode()));
             codechange_contents.setNodeValue(this.doc.get());
             codechange_documentname.setTextContent(ECGEclipseSensor.getFilenameFromLocation(textEditor.getTitleToolTip()));
 
             sensor.processActivity("msdt.codechange.xsd", microActivity.getSerializedMicroActivity());                    
-            
-            /* TODO Obsolete code
-            sensor.processActivity(
-                "msdt.codechange.xsd",
-                "<?xml version=\"1.0\"?><microActivity><commonData><username>"
-                    + sensor.getUsername()
-                    + "</username><projectname>"
-                    + sensor.getProjectnameFromLocation(textEditor.getTitleToolTip())
-                    + "</projectname><id>"
-                    + textEditor.hashCode()
-                    + "</id></commonData><codechange><document><![CDATA["
-                    + this.doc.get()
-                    + "]" + "]" + "></document><documentname>"
-                    + sensor.getFilenameFromLocation(textEditor.getTitleToolTip())
-                    + "</documentname></codechange></microActivity>");
-             */
             
             ECGEclipseSensor.logger.exiting(this.getClass().getName(), "run");
 
