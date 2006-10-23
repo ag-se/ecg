@@ -10,6 +10,7 @@
 			  * param1: active Editor while issuing command
 			  * param2: contents of selection of the Editor
 			  * param3: for paste only: contents of the clipboard contents
+			  (Note that these have been substituted by the textoperation msdt)
 		</xs:documentation>
 	</xs:annotation>
 

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+	<xs:annotation>
+		<xs:documentation>
+			This XML schema defines the structure of the "Text Operation" MicroSensorDataType.
+			* activity: copy, paste, cut
+			* editorname: active Editor while issuing command
+			* selection: contents of selection of the Editor (CATA section)
+			* clipboard: (for paste only) contents of the clipboard, "" or omitted if not paste
+			* startline: start line of the selection in the editor before operation, -1 if not obtainable
+			* endline: end line of the selection in the editor before operation, -1 if not obtainable
+			* offset: offset of the selection in the editor's text before operation, -1 if not obtainable
+		</xs:documentation>
+	</xs:annotation>
+
+	<xs:include schemaLocation="msdt.common.xsd"/>
+
+	<xs:element name="microActivity">
+		<xs:complexType>
+	    	<xs:sequence>
+				<xs:element name="commonData" type="commonDataType"/>
+				<xs:element name="textoperation">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="activity">
+								<xs:simpleType>
+  									<xs:restriction base="xs:string">
+    									<xs:enumeration value="copy"/>
+	 	   								<xs:enumeration value="cut"/>
+	 	   								<xs:enumeration value="paste"/>
+  									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>							
+							<xs:element name="editorname" type="xs:token"/>
+							<xs:element name="selection"/>
+							<xs:element name="clipboard"  minOccurs="0"/>
+							<xs:element name="startline" type="xs:int"/>
+							<xs:element name="endline" type="xs:int"/>
+							<xs:element name="offset" type="xs:int"/>
+						</xs:sequence>
+					</xs:complexType>			
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

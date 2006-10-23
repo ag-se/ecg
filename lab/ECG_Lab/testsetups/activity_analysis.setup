@@ -156,6 +156,7 @@
 					msdt.rundebug.xsd
 					msdt.system.xsd,
 					msdt.test.xsd,
+					msdt.user.xsd,
 					msdt.testrun.xsd,
 					msdt.window.xsd,
 				</value>
@@ -210,7 +211,7 @@
 					Columns
 				</name>
 				<value>
-					type,timestamp,endtime,resourcename,duration,changed,activity,param1,mode
+					type,timestamp,endtime,resourcename,duration,changed,activity,mode
 				</value>
 				<type>
 					java.lang.String
