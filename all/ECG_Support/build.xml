@@ -113,13 +113,13 @@
 				jarfile="${dist.dir}/lib/ecg_support.jar"
 				basedir="${build.dir}" />
 
-		<!-- Copies lib to EclipseSensor 
-		<copy todir="../ECG_EclipseSensor/">
+		<!-- Copies lib to EclipseSensor -->
+		<copy todir="../ECG_EclipseSensor/lib">
 				
 			<fileset file="${dist.dir}/lib/ecg_support.jar"/>
 					
 		</copy>
-		-->
+		
 		<!-- Copy the documentation -->
 		<copy todir="${dist.dir}/doc">
 
