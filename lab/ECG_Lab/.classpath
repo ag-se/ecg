@@ -15,5 +15,8 @@
 	<classpathentry kind="lib" path="lib/misc/xml-apis.jar"/>
 	<classpathentry kind="lib" path="lib/hackystat/sensorshell.jar"/>
 	<classpathentry kind="lib" path="/ECG_Support/dist/lib/ecg_support.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Java/mysql-connector-java-5.0.3/mysql-connector-java-5.0.3-bin.jar"/>
+	<classpathentry kind="lib" path="lib/misc/jsr173_1.0_api.jar"/>
+	<classpathentry kind="lib" path="lib/misc/xbean.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
