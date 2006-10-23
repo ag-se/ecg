@@ -98,6 +98,11 @@ public class FileSystemTargetModule extends TargetModule {
     private String logDir;
 
     /**
+     * If true, append events to file, if false delete file first
+     */
+    private boolean append = true;
+
+    /**
      * This creates the module instance. It is not to be called by
      * developers, instead it is called from the ECG
      * <em>ModuleRegistry</em> subsystem, when the user requested a
@@ -150,7 +155,7 @@ public class FileSystemTargetModule extends TargetModule {
                                            + this.outputFileName);
 
 
-                this.writer = new PrintWriter(new FileWriter(this.outputFile, true));
+                this.writer = new PrintWriter(new FileWriter(this.outputFile, this.append));
 
                 logger.log(Level.INFO, "A new log-file has been created: "
                                        + this.outputFile.getAbsolutePath());
@@ -167,17 +172,27 @@ public class FileSystemTargetModule extends TargetModule {
     /**
      * @see org.electrocodeogram.module.Module#propertyChanged(org.electrocodeogram.modulepackage.ModuleProperty)
      */
-    @Override
     public final void propertyChanged(final ModuleProperty moduleProperty)
         throws ModulePropertyException {
 
         logger.entering(this.getClass().getName(), "propertyChanged",
             new Object[] {moduleProperty});
 
-        if (moduleProperty.getName().equals("Output File")) {
+        logger.log(Level.INFO, "Request to set the property: "
+                + moduleProperty.getName());
 
-            logger.log(Level.INFO, "Request to set the property: "
-                                   + moduleProperty.getName());
+        if (moduleProperty.getName().equals("Append Data")) {
+
+            if (moduleProperty.getValue().equalsIgnoreCase("true"))
+                this.append = true;
+            else
+                this.append = false;
+            
+            logger.log(Level.INFO, "Set the property: "
+                    + moduleProperty.getName() + " to "
+                    + Boolean.toString(this.append));            
+        
+        } else if (moduleProperty.getName().equals("Output File")) {
 
             if (moduleProperty.getValue() == null) {
                 logger.log(Level.WARNING, "The property value is null for: "
@@ -204,7 +219,7 @@ public class FileSystemTargetModule extends TargetModule {
             }
 
             try {
-                this.writer = new PrintWriter(new FileWriter(this.outputFile, true));
+                this.writer = new PrintWriter(new FileWriter(this.outputFile, this.append));
 
                 logger.log(Level.INFO, "Set the property: "
                                        + moduleProperty.getName() + " to "
@@ -224,8 +239,6 @@ public class FileSystemTargetModule extends TargetModule {
             }
 
         } else if (moduleProperty.getName().equals("Split Files")) {
-            logger.log(Level.INFO, "Request to set the property: "
-                                   + moduleProperty.getName());
 
             if (moduleProperty.getValue().equals("true")) {
                 this.rotateFiles = true;
@@ -254,8 +267,6 @@ public class FileSystemTargetModule extends TargetModule {
             }
 
         } else if (moduleProperty.getName().equals("File Size")) {
-            logger.log(Level.INFO, "Request to set the property: "
-                                   + moduleProperty.getName());
 
             try {
                 this.fileSize = Integer.parseInt(moduleProperty.getValue());

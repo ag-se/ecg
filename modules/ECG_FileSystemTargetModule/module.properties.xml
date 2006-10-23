@@ -18,6 +18,8 @@
 	<description>
 		This module writes incoming events into a file. The properties are:
 		* Output File - The name of the output file, either absolute or relative.
+		* Append Data - If true, event data will be appended to Output File (default)
+		                If false, the Output File will be deleted first
 		* Split Files - If "true", the Output File is split into several files 
 		  (with added prefix X_, where X from {1,2,..}) to keep the file size low. 
 		  Set "false" if not intended. See also property File Size.
@@ -35,6 +37,16 @@
 			</propertyName>
 			<propertyType>
 				java.io.File
+			</propertyType>
+			<propertyValue>
+			</propertyValue>
+		</property>
+		<property>
+			<propertyName>
+				Append Data
+			</propertyName>
+			<propertyType>
+				java.lang.Boolean
 			</propertyType>
 			<propertyValue>
 			</propertyValue>
