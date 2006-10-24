@@ -8,12 +8,6 @@
 		</xs:documentation>
 	</xs:annotation>
 
-	<xs:annotation>
-		<xs:documentation>
-			This includes the data fields that are common to all MicroSensorDataTypes.
-		</xs:documentation>
-	</xs:annotation>
-
 	<xs:include schemaLocation="msdt.common.xsd"/>
 
 	<xs:element name="microActivity">
@@ -24,7 +18,15 @@
 					<xs:complexType>
 						<xs:sequence>
 	                        <xs:element name="id" type="xs:string"/>
-	                        <xs:element name="mode" type="xs:string"/>
+	                        <xs:element name="mode">
+								<xs:simpleType>
+  									<xs:restriction base="xs:string">
+    									<xs:enumeration value="run"/>
+	 	   								<xs:enumeration value="debug"/>
+	 	   								<xs:enumeration value="termination"/>
+  									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>								                        
 							<xs:element name="launch" type="xs:string"/>
 						</xs:sequence>
 					</xs:complexType>			
