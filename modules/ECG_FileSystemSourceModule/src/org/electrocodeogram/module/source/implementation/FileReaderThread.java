@@ -166,6 +166,7 @@ public class FileReaderThread extends EventReader {
                     eventPacket = ECGWriter.createValidEventPacket("msdt.system.xsd", this.dateOfLastEvent, eventStr);
                     this.endEventSent = true;
                 } else if (this.sendEndEvent && this.endEventSent) {
+                    this.module.deactivate();
                     // quitting Lab if end event has been sent (and Lab isn't in gui mode)
                     ModuleSystem.getInstance().quit();
                 } else {
@@ -265,7 +266,7 @@ public class FileReaderThread extends EventReader {
             argListStringArray[2] = argListString.substring(thirdSemi+1); // the XML
             
             // Ignore MSDTs which are to be ignored according to the configuration
-            if (ignorePattern != null && ignorePattern.length() > 3 &&
+            if (ignorePattern != null && ignorePattern.length() > 0 &&
                     ignorePattern.indexOf(argListStringArray[1]) >= 0) {
                 logger.log(Level.FINE,
                         "Read MSDT of type " + argListStringArray[1] + " is ignored due to configuration");
@@ -459,7 +460,8 @@ public class FileReaderThread extends EventReader {
      * @param ignores String consisting of MSDT names, e.g. "msdt.codechange.xsd,msdt.user.xsd"
      */
     public void setIgnorePattern(String ignores) {
-        logger.log(Level.WARNING, "Following MSDTs will be ignored by the FileReader: " + ignores);
+        if (ignores != null)
+            logger.log(Level.WARNING, "Following MSDTs will be ignored by the FileReader: " + ignores);
 
         ignorePattern = ignores;
     }
