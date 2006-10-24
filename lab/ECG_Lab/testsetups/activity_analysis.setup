@@ -29,12 +29,12 @@
 			org.electrocodeogram.module.source.implementation.FileSystemSourceModule
 		</fromClassId>
 		<connectedTo>
-			<id>8</id>
+			<id>10</id>
 		</connectedTo>
 		<properties>
 			<property>
 				<name>Input File</name>
-				<value>D:/Forschung/Kodierszenen/jekutsch/jekutsch_060718-2_events.log</value>
+				<value>testeventlogs/events_with_ant.log</value>
 				<type>java.io.File</type>
 			</property>
 			<property>
@@ -50,7 +50,7 @@
 		</properties>
 	</module>
 
-	<module id="8" active="true">
+	<module id="10" active="true">
 		<name>
 			MicroActivity Filter1
 		</name>
@@ -111,13 +111,69 @@
 			org.electrocodeogram.module.intermediate.implementation.EpisodeRecognizerIntermediateModule
 		</fromClassId>
 		<connectedTo>
-			<id>4</id>
+			<id>8</id>
 		</connectedTo>
 		<properties>
 			<property>
 				<name>Recognizer</name>
 				<value>
 					PartActiveEpisodeRecognizer
+				</value>
+				<type>java.lang.String</type>
+			</property>
+			<property>
+				<name>MinDuration</name>
+				<value>
+					0
+				</value>
+				<type>java.lang.Long</type>
+			</property>
+		</properties>
+	</module>
+
+	<module id="8" active="true">
+		<name>
+			RunActive episode recognizer
+		</name>
+		<fromClassId>
+			org.electrocodeogram.module.intermediate.implementation.EpisodeRecognizerIntermediateModule
+		</fromClassId>
+		<connectedTo>
+			<id>9</id>
+		</connectedTo>
+		<properties>
+			<property>
+				<name>Recognizer</name>
+				<value>
+					RunActiveEpisodeRecognizer
+				</value>
+				<type>java.lang.String</type>
+			</property>
+			<property>
+				<name>MinDuration</name>
+				<value>
+					0
+				</value>
+				<type>java.lang.Long</type>
+			</property>
+		</properties>
+	</module>
+
+	<module id="9" active="true">
+		<name>
+			AntActive episode recognizer
+		</name>
+		<fromClassId>
+			org.electrocodeogram.module.intermediate.implementation.EpisodeRecognizerIntermediateModule
+		</fromClassId>
+		<connectedTo>
+			<id>4</id>
+		</connectedTo>
+		<properties>
+			<property>
+				<name>Recognizer</name>
+				<value>
+					AntActiveEpisodeRecognizer
 				</value>
 				<type>java.lang.String</type>
 			</property>
@@ -157,6 +213,7 @@
 					msdt.system.xsd,
 					msdt.test.xsd,
 					msdt.user.xsd,
+					msdt.run.xsd,
 					msdt.testrun.xsd,
 					msdt.window.xsd,
 				</value>
@@ -200,7 +257,7 @@
 					Output File
 				</name>
 				<value>
-					D:/Forschung/Kodierszenen/jekutsch/jekutsch_060718-2_episodes.log
+					episodes.log
 				</value>
 				<type>
 					java.io.File
@@ -211,12 +268,25 @@
 					Columns
 				</name>
 				<value>
-					type,timestamp,endtime,resourcename,duration,changed,activity,mode
+					type,timestamp,endtime,resourcename/launchname/buildfile,activity/mode/target,duration,changed
 				</value>
 				<type>
 					java.lang.String
 				</type>
 			</property>
+<!--
+			<property>
+				<name>
+					Delimiter
+				</name>
+				<value>
+					,
+				</value>
+				<type>
+					java.lang.String
+				</type>
+			</property>
+-->
 		</properties>
 	</module>
 
