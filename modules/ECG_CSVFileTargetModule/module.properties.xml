@@ -19,13 +19,18 @@
 		This module writes incoming events into a CSV-like formatted file. You can
 		specify the list of columns you'd like to fetch as well as how they are
 		seperated in the file. Properties are:
-		* OutputFile - absolute path of the file which should be wirtten
+		* OutputFile - absolute path of the file which should be written
 		* Columns - Comma-seperated list of column names to be printed per event.
-		  The column names are taken from the MSDT schemas and correspont to the
+		  The column names are taken from the MSDT schemas and must correspond to the
 		  non-complex entities' names. Two special column names are supported as well:
 		  * 'type' for the event's type, e.g. msdt.editor.sxd
 		  * 'timestamp' for the event's time stamp
-		  Example: "type, timestamp, starttime, resourcename" for msdt.fileactive.xsd
+		  Seperated by '/' column names may also consist groupes of columns. In case with
+		  'c1/c2' the column c1 doesn't have a value for the current event to print, c2
+		  will be taken. 'type' and 'timestamp' are allowed in groups as well.
+		  Example: "type, activity, resourcename/documentname"
+		* Delimiter - Character to seperate the printed columns. Default is TAB. Note:
+		  No \x characters may be used, the value is taken literally
 	</description>
 	<type>
 		TARGET

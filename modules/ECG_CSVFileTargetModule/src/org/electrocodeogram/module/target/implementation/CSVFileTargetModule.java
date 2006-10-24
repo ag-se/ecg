@@ -178,22 +178,26 @@ public class CSVFileTargetModule extends TargetModule {
      */
     private String getValueOfColumn(ValidEventPacket packet, String column) {
 
-        if (column.equals(TYPE_COLUMN)) {
-            return packet.getMicroSensorDataType().getName();
-        } else if (column.equals(TIMESTAMP_COLUMN)) {
-            return dateFormat.format(packet.getTimeStamp());
-        } 
-        
-        String value = "";
-        Document document = packet.getDocument();
-        
-        try {
-            value = ECGParser.getSingleNodeValue(column, document);
-        } catch (NodeException e) {
-            value = "";
+        String columns[] = column.split("/");
+        for (int i = 0; i < columns.length; i++) {
+            if (columns[i].equals(TYPE_COLUMN)) {
+                return packet.getMicroSensorDataType().getName();
+            } else if (columns[i].equals(TIMESTAMP_COLUMN)) {
+                return dateFormat.format(packet.getTimeStamp());
+            } 
+            
+            String value = "";
+            Document document = packet.getDocument();
+            
+            try {
+                value = ECGParser.getSingleNodeValue(columns[i], document);
+                return value;
+            } catch (NodeException e) {
+                // Just try the next column from the group
+            }
+            
         }
-        
-        return value;
+        return "";
     }
 
 	/**
