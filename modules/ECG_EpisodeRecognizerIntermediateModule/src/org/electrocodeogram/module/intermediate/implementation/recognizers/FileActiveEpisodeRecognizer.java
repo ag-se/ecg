@@ -161,14 +161,16 @@ public class FileActiveEpisodeRecognizer implements EpisodeRecognizer {
 
 					String activity = ECGParser.getSingleNodeValue("activity", document);
 					String editorname = ECGParser.getSingleNodeValue("editorname", document);
+                    if (editorname == null) // There're some problems with a few logs
+                        editorname = "null";
 					
-					if (state == FileActiveEpisodeState.START && activity.equals("activated")) {
+					if (state == FileActiveEpisodeState.START && "activated".equals(activity)) {
 						state = FileActiveEpisodeState.FILEACTIVE;
 						activeFileName = editorname;
 						startDate = timestamp;
                         changeCount = 0;
 					}
-                    else if (state == FileActiveEpisodeState.START && activity.equals("opened")) {
+                    else if (state == FileActiveEpisodeState.START && "opened".equals(activity)) {
                             // after Eclipse was deactivated, activating it again results in a single opened event
                             // for the former active editor - no activated event. In cases of newly opened editors,
                             // a code change follows to init the delta computation in the same second. 
@@ -183,7 +185,7 @@ public class FileActiveEpisodeRecognizer implements EpisodeRecognizer {
                             changeCount = 0;
                         }
 					else if ((state == FileActiveEpisodeState.FILEACTIVE) && 
-    							activity.equals("deactivated") && 
+    							"deactivated".equals(activity) && 
     							editorname.equals(activeFileName)) {
     						event = generateEpisode(minDuration, "msdt.fileactive.xsd", 
     								ECGParser.getSingleNodeValue("username", document),
@@ -197,7 +199,7 @@ public class FileActiveEpisodeRecognizer implements EpisodeRecognizer {
     						state = FileActiveEpisodeState.STOP;
     					}
                     else if ((state == FileActiveEpisodeState.FILEHOLD) && 
-                                activity.equals("deactivated") && 
+                                "deactivated".equals(activity) && 
                                 editorname.equals(activeFileName)) {
                             // File has been silently deactivated, discard it
                             activeFileName = null;
@@ -205,7 +207,7 @@ public class FileActiveEpisodeRecognizer implements EpisodeRecognizer {
                             state = FileActiveEpisodeState.STOP;
                         }
                     else if (state == FileActiveEpisodeState.FILEACTIVE && 
-                                activity.equals("activated") && 
+                                "activated".equals(activity) && 
                                 !editorname.equals(activeFileName)) {
                             // Another editor has been activated => this one will be deactivated 
                             event = generateEpisode(minDuration, "msdt.fileactive.xsd", 
@@ -225,7 +227,7 @@ public class FileActiveEpisodeRecognizer implements EpisodeRecognizer {
 					String activity = ECGParser.getSingleNodeValue("activity", document);
 					
 					if (state == FileActiveEpisodeState.FILEACTIVE && 
-                            (activity.equals("deactivated") || activity.equals("closed"))) {
+                            ("deactivated".equals(activity) || "closed".equals(activity))) {
     						state = FileActiveEpisodeState.FILEHOLD;
     						event = generateEpisode(minDuration, "msdt.fileactive.xsd", 
     								ECGParser.getSingleNodeValue("username", document),
@@ -236,7 +238,7 @@ public class FileActiveEpisodeRecognizer implements EpisodeRecognizer {
     								activeFileName);
     						startDate = null;
     					}
-					else if (state == FileActiveEpisodeState.FILEHOLD && activity.equals("activated")) {
+					else if (state == FileActiveEpisodeState.FILEHOLD && "activated".equals(activity)) {
     						state = FileActiveEpisodeState.FILEACTIVE;
     						startDate = timestamp;
                             changeCount = 0;
@@ -247,7 +249,7 @@ public class FileActiveEpisodeRecognizer implements EpisodeRecognizer {
                     String activity = ECGParser.getSingleNodeValue("activity", document);
 
                     if (state == FileActiveEpisodeState.FILEACTIVE && 
-                            activity.equals("activated")) {
+                            "activated".equals(activity)) {
                         // Another part has been activated => this one will be deactivated 
                         event = generateEpisode(minDuration, "msdt.fileactive.xsd", 
                                 ECGParser.getSingleNodeValue("username", document),
