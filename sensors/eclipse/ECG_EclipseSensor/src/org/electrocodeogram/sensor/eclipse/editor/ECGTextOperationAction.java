@@ -131,7 +131,7 @@ import org.w3c.dom.Element;
     			return;
 
             CommonData commonData = microActivity.getCommonData();
-            commonData.setProjectname(ECGEclipseSensor.getProjectnameFromLocation(editor.getTitleToolTip()));
+            commonData.setProjectname(ECGEclipseSensor.getProjectnameFromPart(editor));
             commonData.setId(String.valueOf(editor.hashCode()));
 
             Clipboard clipboard= new Clipboard(getDisplay());
@@ -158,14 +158,14 @@ import org.w3c.dom.Element;
     			ECGEclipseSensor.logger.log(ECGLevel.PACKET, "A Cut operation has been recorded");
 
                 textop_activity.setTextContent("cut");
-                textop_editorname.setTextContent(ECGEclipseSensor.getFilenameFromLocation(editor.getTitleToolTip()));
+                textop_editorname.setTextContent(ECGEclipseSensor.getFilenameFromPart(editor));
                 textop_selection_contents.setNodeValue(selection);
 
             } else if (fOperationCode == ITextOperationTarget.COPY) {
     			ECGEclipseSensor.logger.log(ECGLevel.PACKET, "A Copy operation has been recorded");
 
                 textop_activity.setTextContent("copy");
-                textop_editorname.setTextContent(ECGEclipseSensor.getFilenameFromLocation(editor.getTitleToolTip()));
+                textop_editorname.setTextContent(ECGEclipseSensor.getFilenameFromPart(editor));
                 textop_selection_contents.setNodeValue(selection);
 
             } else if (fOperationCode == ITextOperationTarget.PASTE) {
@@ -173,7 +173,7 @@ import org.w3c.dom.Element;
 
                 Object clipboardContents = clipboard.getContents(textTransfer);
                 textop_activity.setTextContent("paste");
-                textop_editorname.setTextContent(ECGEclipseSensor.getFilenameFromLocation(editor.getTitleToolTip()));
+                textop_editorname.setTextContent(ECGEclipseSensor.getFilenameFromPart(editor));
                 textop_selection_contents.setNodeValue(selection);
                 textop_clipboard.appendChild(textop_clipboard_contents);
                 textop_clipboard_contents.setNodeValue(

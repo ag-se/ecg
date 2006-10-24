@@ -173,10 +173,10 @@ public class ECGDocumentListener implements IDocumentListener {
             ECGEclipseSensor.logger.log(ECGLevel.PACKET, "A codechange event has been recorded.");
 
             CommonData commonData = microActivity.getCommonData();
-            commonData.setProjectname(ECGEclipseSensor.getProjectnameFromLocation(textEditor.getTitleToolTip()));
+            commonData.setProjectname(ECGEclipseSensor.getProjectnameFromPart(textEditor));
             commonData.setId(String.valueOf(textEditor.hashCode()));
             codechange_contents.setNodeValue(this.doc.get());
-            codechange_documentname.setTextContent(ECGEclipseSensor.getFilenameFromLocation(textEditor.getTitleToolTip()));
+            codechange_documentname.setTextContent(ECGEclipseSensor.getFilenameFromPart(textEditor));
 
             sensor.processActivity("msdt.codechange.xsd", microActivity.getSerializedMicroActivity());                    
             

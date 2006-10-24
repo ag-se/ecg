@@ -95,6 +95,10 @@ public class ECGRunDebugListener implements IDebugEventSetListener {
             ECGEclipseSensor.logger.exiting(this.getClass().getName(), "analyseLaunch");
             return false;
         }
+        
+        String launchMode = "run";
+        if (launch.getLaunchMode().equals("debug"))
+            launchMode = "debug";
 
         if (process != null 
         		&& process.getAttribute(IProcess.ATTR_PROCESS_TYPE) != null
@@ -141,7 +145,7 @@ public class ECGRunDebugListener implements IDebugEventSetListener {
                     + launch.hashCode()
                     + "</id></commonData><ant>"
                     + "<id>" + launch.hashCode() + "</id>"
-                    + "<mode>" + launch.getLaunchMode() + "</mode>"
+                    + "<mode>" + launchMode + "</mode>"
                     + "<buildfile>" + buildfile + "</buildfile>"
                     + "<target>" + target + "</target>"
                     + "</ant></microActivity>");
@@ -163,7 +167,7 @@ public class ECGRunDebugListener implements IDebugEventSetListener {
                     + launch.hashCode()
                     + "</id></commonData><run>"
                     + "<id>" + launch.hashCode() + "</id>"
-                    + "<mode>" + launch.getLaunchMode() + "</mode>"
+                    + "<mode>" + launchMode + "</mode>"
                     + "<launch>" + config + "</launch>"
                     + "</run></microActivity>");
         }

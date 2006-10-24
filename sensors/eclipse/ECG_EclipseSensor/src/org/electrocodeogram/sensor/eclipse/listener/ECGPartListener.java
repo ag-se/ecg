@@ -167,10 +167,10 @@ public class ECGPartListener implements IPartListener {
                 "An editorActivated event has been recorded.");
 
             editor_id.setTextContent(String.valueOf(part.hashCode()));
-            editor_projectname.setTextContent(ECGEclipseSensor.getProjectnameFromLocation(part.getTitleToolTip()));
+            editor_projectname.setTextContent(ECGEclipseSensor.getProjectnameFromPart(part));
             editor_username.setTextContent(this.sensor.username);
             editor_activity.setTextContent("activated");
-            editor_editorname.setTextContent(ECGEclipseSensor.getFilenameFromLocation(part.getTitleToolTip()));
+            editor_editorname.setTextContent(ECGEclipseSensor.getFilenameFromPart(part));
 
             this.sensor.processActivity("msdt.editor.xsd", 
                     this.sensor.xmlDocumentSerializer.writeToString(msdt_editor_doc));
@@ -238,10 +238,10 @@ public class ECGPartListener implements IPartListener {
                 "An editorClosed event has been recorded.");
 
             editor_id.setTextContent(String.valueOf(part.hashCode()));
-            editor_projectname.setTextContent(ECGEclipseSensor.getProjectnameFromLocation(part.getTitleToolTip()));
+            editor_projectname.setTextContent(ECGEclipseSensor.getProjectnameFromPart(part));
             editor_username.setTextContent(this.sensor.username);
             editor_activity.setTextContent("closed");
-            editor_editorname.setTextContent(ECGEclipseSensor.getFilenameFromLocation(part.getTitleToolTip()));
+            editor_editorname.setTextContent(ECGEclipseSensor.getFilenameFromPart(part));
 
             this.sensor.processActivity("msdt.editor.xsd",  
                     this.sensor.xmlDocumentSerializer.writeToString(msdt_editor_doc));
@@ -309,10 +309,10 @@ public class ECGPartListener implements IPartListener {
                 "An editorDeactivated event has been recorded.");
 
             editor_id.setTextContent(String.valueOf(part.hashCode()));
-            editor_projectname.setTextContent(ECGEclipseSensor.getProjectnameFromLocation(part.getTitleToolTip()));
+            editor_projectname.setTextContent(ECGEclipseSensor.getProjectnameFromPart(part));
             editor_username.setTextContent(this.sensor.username);
             editor_activity.setTextContent("deactivated");
-            editor_editorname.setTextContent(ECGEclipseSensor.getFilenameFromLocation(part.getTitleToolTip()));
+            editor_editorname.setTextContent(ECGEclipseSensor.getFilenameFromPart(part));
 
             this.sensor.processActivity("msdt.editor.xsd", 
                     this.sensor.xmlDocumentSerializer.writeToString(msdt_editor_doc));
@@ -381,10 +381,10 @@ public class ECGPartListener implements IPartListener {
                 "An editorOpened event has been recorded.");
             
             editor_id.setTextContent(String.valueOf(part.hashCode()));
-            editor_projectname.setTextContent(ECGEclipseSensor.getProjectnameFromLocation(part.getTitleToolTip()));
+            editor_projectname.setTextContent(ECGEclipseSensor.getProjectnameFromPart(part));
             editor_username.setTextContent(this.sensor.username);
             editor_activity.setTextContent("opened");
-            editor_editorname.setTextContent(ECGEclipseSensor.getFilenameFromLocation(part.getTitleToolTip()));
+            editor_editorname.setTextContent(ECGEclipseSensor.getFilenameFromPart(part));
 
             this.sensor.processActivity("msdt.editor.xsd", 
                     this.sensor.xmlDocumentSerializer.writeToString(msdt_editor_doc));
@@ -439,10 +439,10 @@ public class ECGPartListener implements IPartListener {
                 ECGEclipseSensor.logger.log(ECGLevel.PACKET, "A code status event has been recorded.");                    
 
                 codestatus_username.setTextContent(this.sensor.getUsername());
-                codestatus_projectname.setTextContent(ECGEclipseSensor.getProjectnameFromLocation(textEditor.getTitleToolTip()));
+                codestatus_projectname.setTextContent(ECGEclipseSensor.getProjectnameFromPart(textEditor));
                 codestatus_id.setTextContent(String.valueOf(part.hashCode()));
                 codestatus_contents.setNodeValue(document.get());
-                codestatus_documentname.setTextContent(ECGEclipseSensor.getFilenameFromLocation(textEditor.getTitleToolTip()));
+                codestatus_documentname.setTextContent(ECGEclipseSensor.getFilenameFromPart(textEditor));
 
                 this.sensor.processActivity("msdt.codestatus.xsd", 
                     this.sensor.xmlDocumentSerializer.writeToString(msdt_codestatus_doc));                    

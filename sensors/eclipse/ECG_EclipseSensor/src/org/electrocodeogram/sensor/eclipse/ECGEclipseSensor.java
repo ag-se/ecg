@@ -164,6 +164,12 @@ public final class ECGEclipseSensor {
 
     // TODO the next line is just for exploration
     private ECGElementStateListener elementStateListener;
+
+    /**
+     * true, if listeners have already been initialized, to prevent from multi-registration 
+     */
+    private boolean listenersAlreadyInitialized = false;
+    
     
     /**
      * This is the private contstructor creating the <em>ECG
@@ -284,6 +290,10 @@ public final class ECGEclipseSensor {
      * Does all the listener registration 
      */
     protected void initListeners() {
+        
+        if (listenersAlreadyInitialized)
+            return;
+        listenersAlreadyInitialized = true;
     	
     	IWorkbench workbench = PlatformUI.getWorkbench();
     	IWorkbenchWindow[] windows = workbench.getWorkbenchWindows();
@@ -457,22 +467,42 @@ public final class ECGEclipseSensor {
         return theInstance;
     }
 
+    static public String getFilenameFromPart(IWorkbenchPart part) {
+        String location = part.getTitleToolTip();
+        if (location == null || location.length() == 0)
+            location = part.getTitle();
+        if (location == null) {
+            return "{null}";
+        }
+        return getFilenameFromLocation(location);
+    }
+
     static public String getFilenameFromLocation(String location) {
-    	if (location != null) {
-    		if (location.charAt(0) == IPath.SEPARATOR)
-    			location = location.substring(1);
-    		int sepIndex = location.indexOf(IPath.SEPARATOR);
-    		if (sepIndex != -1)
-    		{
-    			String res = location.substring(sepIndex+1);
-    			return res;
-    		}
-    	}
+        if (location != null) {
+            if (location.charAt(0) == IPath.SEPARATOR)
+        		location = location.substring(1);
+        	int sepIndex = location.indexOf(IPath.SEPARATOR);
+        	if (sepIndex != -1)
+        	{
+        		String res = location.substring(sepIndex+1);
+        		return res;
+        	}
+        }
     	return "";
 	}
 
-	static public String getProjectnameFromLocation(String location) {
-    	if (location != null) {
+	static public String getProjectnameFromPart(IWorkbenchPart part) {
+        String location = part.getTitleToolTip();
+        if (location == null || location.length() == 0)
+            location = part.getTitle();
+        if (location == null) {
+            return "{null}";
+        }
+        return getProjectnameFromLocation(location);
+    }
+    
+    static public String getProjectnameFromLocation(String location) {
+        if (location != null) {
     		if (location.charAt(0) == IPath.SEPARATOR)
     			location = location.substring(1);
     		int sepIndex = location.indexOf(IPath.SEPARATOR);
@@ -481,7 +511,7 @@ public final class ECGEclipseSensor {
     			String res = location.substring(0, sepIndex);
     			return res;
     		}
-    	}
+        }
     	return "";
 	}
 
