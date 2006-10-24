@@ -74,5 +74,21 @@
 				msdt.partactive.xsd
 			</msdtFile>
 		</microsensordatatype>
+		<microsensordatatype>
+			<msdtName>
+				msdt.runactive.xsd
+			</msdtName>
+			<msdtFile>
+				msdt.runactive.xsd
+			</msdtFile>
+		</microsensordatatype>
+		<microsensordatatype>
+			<msdtName>
+				msdt.antactive.xsd
+			</msdtName>
+			<msdtFile>
+				msdt.antactive.xsd
+			</msdtFile>
+		</microsensordatatype>
 	</microsensordatatypes>
 </module>
