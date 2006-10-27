@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+	<xs:annotation>
+		<xs:documentation>
+			This XML schema defines the structure of the "Exact Codechange" MicroSensorDataType.
+			The instance documents, the XML documents using this schema, are actual
+			"Exact Codechange" MicroActivities.
+			An exact Codechange consists of the path and the information about what has happened;
+			type of change, element name, unique identifier, source code or new identifier
+			(in case of changed identifier).
+		</xs:documentation>
+	</xs:annotation>
+	
+	<xs:annotation>
+		<xs:documentation>
+			This includes the data fields that are common to all MicroSensorDataTypes.
+		</xs:documentation>
+	</xs:annotation>
+
+	<xs:include schemaLocation="msdt.common.xsd"/>
+	
+	<xs:element name="microActivity">
+		<xs:complexType>
+	    	<xs:sequence>
+				<xs:element name="commonData" type="commonDataType"/>
+				<xs:element name="exactCodeChange">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="path" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+							<xs:element name="change">
+								<xs:complexType>
+			    					<xs:sequence>
+			    						<xs:element name="typeOfChange">
+			    							<xs:simpleType>
+			  									<xs:restriction base="xs:string">
+			  										<xs:enumeration value="ADDED"/>
+				 	   								<xs:enumeration value="DELETED"/>
+				 	   								<xs:enumeration value="CHANGED"/>
+				 	   								<xs:enumeration value="IDENTIFIER_CHANGED"/>
+				 	   								<xs:enumeration value="INTIATED"/>
+				 	   								<xs:enumeration value="MERGED_DEL_AT_START"/>
+				 	   								<xs:enumeration value="MERGED_DEL_AT_END"/>
+				 	   								<xs:enumeration value="MERGED_ADD_AT_START"/>
+				 	   								<xs:enumeration value="MERGED_ADD_AT_END"/>
+				 	   								<xs:enumeration value="EXTENDED_AT_START"/>
+				 	   								<xs:enumeration value="EXTENDED_IN_BETWEEN"/>
+				 	   								<xs:enumeration value="EXTENDED_AT_END"/>
+				 	   								<xs:enumeration value="SPLIT_DEL_AT_START"/>
+				 	   								<xs:enumeration value="SPLIT_DEL_AT_END"/>
+				 	   								<xs:enumeration value="SPLIT_ADD_AT_END"/>
+				 	   								<xs:enumeration value="SPLIT_ADD_AT_START"/>
+				 	   								<xs:enumeration value="SHORTENED_AT_ALL"/>
+				 	   								<xs:enumeration value="SHORTENED_AT_START"/>
+				 	   								<xs:enumeration value="SHORTENED_IN_BETWEEN"/>
+				 	   								<xs:enumeration value="SHORTENED_AT_END"/>
+			  									</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="elementName"  type="xs:string"/>
+										<xs:element name="identifier"  type="xs:string"/>
+			    						<xs:element name="codeOrIdentifier"  type="xs:string"/>
+			    					</xs:sequence>
+			    				</xs:complexType>
+			    			</xs:element>	
+			    		</xs:sequence>
+			    	</xs:complexType>
+			    </xs:element>		
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>
