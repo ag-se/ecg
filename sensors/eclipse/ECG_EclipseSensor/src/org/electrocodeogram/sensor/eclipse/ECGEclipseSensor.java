@@ -16,6 +16,8 @@ import java.util.logging.Logger;
 import org.eclipse.core.filebuffers.FileBuffers;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.debug.core.DebugPlugin;
+import org.eclipse.jdt.core.ElementChangedEvent;
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.internal.junit.ui.JUnitPlugin;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
@@ -36,6 +38,7 @@ import org.electrocodeogram.event.WellFormedEventPacket;
 import org.electrocodeogram.logging.LogHelper;
 import org.electrocodeogram.sensor.eclipse.listener.ECGDisplayListener;
 import org.electrocodeogram.sensor.eclipse.listener.ECGDocumentListener;
+import org.electrocodeogram.sensor.eclipse.listener.ECGElementChangedListener;
 import org.electrocodeogram.sensor.eclipse.listener.ECGElementStateListener;
 import org.electrocodeogram.sensor.eclipse.listener.ECGFileBufferListener;
 import org.electrocodeogram.sensor.eclipse.listener.ECGPartListener;
@@ -414,6 +417,28 @@ public final class ECGEclipseSensor {
 		    IWorkbenchPart activePart = page.getActivePart();
 			partListener.partActivated(activePart);
 		}
+
+        // create ElementChangedListenerAdapter
+        ECGElementChangedListener javacodechange = null;
+        IWorkbenchPage page = windows[0].getActivePage();
+        IEditorPart editorPart = page.getActiveEditor();
+        System.out.println(page);
+        // if there's an open page in the editor at startup:
+        if(editorPart instanceof ITextEditor) 
+            javacodechange = new ECGElementChangedListener(editorPart);
+        else 
+            javacodechange = new ECGElementChangedListener();
+        // we only want to know about changes to the working copy of the documents,
+        // so we only need POST_RECONCILE events
+        JavaCore.addElementChangedListener(javacodechange, ElementChangedEvent.POST_RECONCILE);
+        
+        page = null;
+
+        for (int i = 0; i < windows.length; i++) {
+            page = windows[i].getActivePage();
+            // add javacodechange also as a partlistener
+            page.addPartListener(javacodechange);
+        }
 
         logger.log(Level.FINE, "The SensorShell's listeners have been initialized.");
 	}
