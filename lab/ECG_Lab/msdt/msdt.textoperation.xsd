@@ -33,9 +33,8 @@
 								</xs:simpleType>
 							</xs:element>							
 							<xs:element name="editorname" type="xs:token"/>
-							<xs:element name="selection"/>
-							<xs:element name="clipboard"  minOccurs="0"/>
-							<xs:element name="startline" type="xs:int"/>
+							<xs:element name="selection"/>  <!-- This actually contains CDATA -->
+							<xs:element name="startline" type="xs:int"/>  <!-- This actually contains CDATA -->
 							<xs:element name="endline" type="xs:int"/>
 							<xs:element name="offset" type="xs:int"/>
 						</xs:sequence>

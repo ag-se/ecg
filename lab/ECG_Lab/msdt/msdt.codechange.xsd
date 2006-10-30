@@ -24,7 +24,7 @@
 				<xs:element name="codechange">
 					<xs:complexType>
 						<xs:sequence>
-							<xs:element name="document" type="xs:string"/>
+							<xs:element name="document" type="xs:string"/>  <!-- This actually contains CDATA -->
 							<xs:element name="documentname" type="xs:token"/>
 						</xs:sequence>
 					</xs:complexType>			
