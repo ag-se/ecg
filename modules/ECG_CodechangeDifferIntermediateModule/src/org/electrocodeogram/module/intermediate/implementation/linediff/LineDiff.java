@@ -3,10 +3,6 @@
  */
 package org.electrocodeogram.module.intermediate.implementation.linediff;
 
-import org.electrocodeogram.misc.xml.ECGParser;
-import org.electrocodeogram.misc.xml.NodeException;
-import org.w3c.dom.Node;
-
 public class LineDiff {
     
     public enum ChangeType {

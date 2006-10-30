@@ -35,8 +35,8 @@
 														</xs:simpleType>
 													</xs:element>																						
 													<xs:element name="linenumber" type="xs:integer"/>
-													<xs:element name="from" minOccurs="0"/>
-													<xs:element name="to" minOccurs="0"/>
+													<xs:element name="from" type="xs:string" minOccurs="0"/> <!-- May actually contain CDATA -->
+													<xs:element name="to" type="xs:string" minOccurs="0"/> <!-- May actually contain CDATA -->
 												</xs:sequence>
 											</xs:complexType>
 										</xs:element>

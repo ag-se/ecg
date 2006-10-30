@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Vector;
 import java.util.logging.Logger;
 
 import org.electrocodeogram.event.IllegalEventParameterException;
@@ -22,6 +23,7 @@ import org.electrocodeogram.modulepackage.ModuleProperty;
 import org.w3c.dom.Document;
 
 import bmsi.util.Diff;
+import bmsi.util.Diff.change;
 import bmsi.util.DiffPrint.NormalPrint;
 
 /**
@@ -38,17 +40,24 @@ public class CodechangeDifferIntermediateModule extends IntermediateModule {
     	//   and then deliver contents in O(1). This allows for O(1) implementation of size() as well. 
     	ArrayList<LineDiff> lineDiffs = new ArrayList<LineDiff>();
     	int it = 0;
+        boolean reverse = false;
     	
-		public LineChangeIterator(String[] a, String[] b, Diff.change hunk) {
+        public LineChangeIterator(String[] a, String[] b, Diff.change hunk) {
+            this(a,b,hunk,false);
+        }
+
+		public LineChangeIterator(String[] a, String[] b, Diff.change hunk, boolean rev) {
 		    code0 = a;
 		    code1 = b;
 		    compute(hunk);
+            reverse = rev;
+            it = (rev ? lineDiffs.size()-1 : 0);
 		}
 
 		private void compute(Diff.change next) {
 			if (next == null)
 				return;
-//System.out.println("\nAnalysing hunk (" + next.line0 + "," + next.line1 + "," + next.deleted + "," + next.inserted + ")");
+System.out.println("\nAnalysing hunk (" + next.line0 + "," + next.line1 + "," + next.deleted + "," + next.inserted + ")");
 			if (next.inserted == 0 && next.deleted == 0)
 				return;
 			if (next.inserted == 0) {
@@ -58,7 +67,7 @@ public class CodechangeDifferIntermediateModule extends IntermediateModule {
 							next.line0+i,
 							null,
 							LineDiff.ChangeType.DELETED));
-//System.out.println("  " + (next.line0+i+1) + "< " + code0[next.line0 + i]);
+System.out.println("  " + (next.line0+i+1) + "<:" + code0[next.line0 + i]);
 				}
 			}
 			if (next.inserted != 0 && next.deleted == 0) {
@@ -68,34 +77,31 @@ public class CodechangeDifferIntermediateModule extends IntermediateModule {
 							next.line1+i,
 							code1[next.line1 + i],
 							LineDiff.ChangeType.INSERTED));
-//System.out.println("  " + (next.line1+i+1) + "> " + code1[next.line1 + i]);
+System.out.println("  " + (next.line1+i+1) + ">:" + code1[next.line1 + i]);
 				}        		  
 			}
 			if (next.inserted != 0 && next.deleted != 0) {
-			    assert(next.line0 == next.line1); // TODO: Check this! Is it really o.k.? It happens from time to time 
-//if (next.line0 != next.line1) System.out.println("\nProblematic hunk (" + next.line0 + "," + next.line1 + "," + next.deleted + "," + next.inserted + ")");
-                    
 				int affected = (next.deleted > next.inserted ? next.deleted : next.inserted);
 				for (int i = 0; i < affected; i++) {
 					if (i < next.inserted && i < next.deleted) {
 						lineDiffs.add(new LineDiff(code0[next.line0 + i],
-								next.line0+i,
+								next.line1+i,
 								code1[next.line1 + i],
 								LineDiff.ChangeType.CHANGED));
-//System.out.println("  " + (next.line0+i+1) + "<> " + code0[next.line0 + i]);
-//System.out.println("  " + (next.line1+i+1) + ">< " + code1[next.line1 + i]);
+System.out.println("  " + (next.line0+i+1) + "<>:" + code0[next.line0 + i]);
+System.out.println("  " + (next.line1+i+1) + "><:" + code1[next.line1 + i]);
 					} else if (i >= next.inserted && i < next.deleted) {
 						lineDiffs.add(new LineDiff(code0[next.line0 + i],
 								next.line0+i,
 								null,
 								LineDiff.ChangeType.DELETED));
-//System.out.println("  " + (next.line0+i+1) + "< " + code0[next.line0 + i]);						  
+System.out.println("  " + (next.line0+i+1) + "<:" + code0[next.line0 + i]);						  
 					} else if (i < next.inserted && i >= next.deleted) {
 						lineDiffs.add(new LineDiff(null,
 								next.line1+i,
 								code1[next.line1 + i],
 								LineDiff.ChangeType.INSERTED));
-//System.out.println("  " + (next.line1+i+1) + "> " + code1[next.line1 + i]);						  
+System.out.println("  " + (next.line1+i+1) + ">:" + code1[next.line1 + i]);						  
 					} else 
                         assert (false);
 				}
@@ -103,7 +109,9 @@ public class CodechangeDifferIntermediateModule extends IntermediateModule {
 		}
 
 		public boolean hasNext() {
-			return this.it < lineDiffs.size();
+			return (reverse ? 
+                        this.it >= 0:
+                        this.it < lineDiffs.size());
 		}
 
 		public LineDiff next() {
@@ -173,7 +181,7 @@ public class CodechangeDifferIntermediateModule extends IntermediateModule {
     	String oldCode = codes.get(id);
     	String newCode = getCode(packet);
 
-//System.out.println("Old:\n" + oldCode + "----\nNew:\n" + newCode);        
+System.out.println("Old:\n" + oldCode + "----\nNew:\n" + newCode + "----\n");        
         
     	if (newCode == null)
     		newCode = "";
@@ -232,7 +240,9 @@ public class CodechangeDifferIntermediateModule extends IntermediateModule {
             logger.log(ECGLevel.FINE, diffs);
     
             data += diffs + "</lines></linediff></microActivity>";
-//System.out.println("-----\nResults in event " + data);
+System.out.println("-----\nResults in event " + data);
+
+//            assert(applyDiffOnOldCode(oldLines, newLines, next));
     		
             // send event
             String[] args = {WellFormedEventPacket.HACKYSTAT_ADD_COMMAND, "msdt.linediff.xsd", data};
@@ -244,12 +254,41 @@ public class CodechangeDifferIntermediateModule extends IntermediateModule {
     		}
         }
         
-//System.out.println("-----------------------------------------------");
+System.out.println("-----------------------------------------------");
         
 		return events;
     }
 
-	/**
+/*    
+	private boolean applyDiffOnOldCode(String[] oldLines, String[] newLines, change next) {
+        boolean res = true;
+        LineChangeIterator it = new LineChangeIterator(oldLines, newLines, next);
+        // Make copy of old lines
+        ArrayList<String> oldLinesCopy = new ArrayList<String>(oldLines.length);
+        for (int i = 0; i < oldLines.length; i++)
+            oldLinesCopy.set(i, oldLines[i]);
+        // Manually apply each change
+        while (it.hasNext()) {
+            LineDiff lc = it.next();
+            if (lc.getType() == LineDiff.ChangeType.CHANGED) {
+                res &= (oldLinesCopy.get(lc.getLinenumber()).equals(lc.getFrom()));
+                oldLinesCopy.set(lc.getLinenumber(), lc.getTo());
+            } else if (lc.getType() == LineDiff.ChangeType.INSERTED) {
+                oldLinesCopy.ensureCapacity(lc.getLinenumber()+1);
+                oldLinesCopy.set(lc.getLinenumber(), lc.getTo());
+            } else if (lc.getType() == LineDiff.ChangeType.DELETED) {
+                res &= (oldLinesCopy.get(lc.getLinenumber()).equals(lc.getFrom()));
+                oldLinesCopy.remove(lc.getLinenumber());
+            } else
+                return false;            
+        }
+        for (int i = 0; i < newLines.length && res; i++)
+            res &= oldLinesCopy.get(i).equals(newLines[i]);
+        res &= (newLines.length == oldLinesCopy.size()); 
+        return res;
+    }
+*/
+    /**
      * Splits a file contents into an array of lines
      * 
      * @param contents A text file contents
@@ -259,7 +298,26 @@ public class CodechangeDifferIntermediateModule extends IntermediateModule {
         if (contents == null) {
             return new String[0];
         }
-        return contents.split("\n");
+        StringBuffer buffer=new StringBuffer();
+        Vector<String> res=new Vector<String>();
+        int size=contents.length();
+        for (int index=0;index<size;index++) {
+           char current=contents.charAt(index);
+           if (current==0x0D) {
+              if (index+1<size && contents.charAt(index+1)==0x0A)
+                  index++;
+              res.add(buffer.toString());
+              buffer.setLength(0);
+           } else if (current==0x0A) {
+              if (index+1<size && contents.charAt(index+1)==0x0D)
+                  index++;
+              res.add(buffer.toString());
+              buffer.setLength(0);
+           } else buffer.append(current);
+        }
+        if (buffer.length()>0)
+           res.add(buffer.toString());
+        return (String[])res.toArray(new String[0]);
     }
 
     /**
