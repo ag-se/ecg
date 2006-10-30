@@ -15,7 +15,7 @@ public class LocationComputationStrategy {
     // simply for reuse
     // return true, if location changes have been added
     // TODO blockChange should be omitted as a parameter
-    public void computeNewNeighborhood(History history, Line lineAbove, Line lineBelow, BlockChange blockChange) {
+    public void computeNewNeighborhood(Text text, History history, Line lineAbove, Line lineBelow, BlockChange blockChange) {
         if (lineAbove == null || lineBelow == null)
             return; // has been at the begin/end of the text: no recompution necessary
         Location locationAbove = lineAbove.getLocation();
@@ -28,7 +28,7 @@ public class LocationComputationStrategy {
             // different locations have high cohesion now => merge them
             if (locationAbove.getLength() > locationBelow.getLength()) { // prefer the bigger one
                 if (locationBelow != null)
-                    blockChange.getText().removeLocation(locationBelow);
+                    text.removeLocation(locationBelow);
                 locationAbove.mergeLocation(locationBelow);  // first remove, than merge!
                 history.addLocationChange(new LocationChange(locationBelow,  
                         LocationChangeType.MERGED_DEL_AT_START, locationAbove.getId()), blockChange);
@@ -37,7 +37,7 @@ public class LocationComputationStrategy {
                 return;
             } else {
                 if (locationAbove != null)
-                    blockChange.getText().removeLocation(locationAbove);
+                    text.removeLocation(locationAbove);
                 locationBelow.mergeLocation(locationAbove);                
                 history.addLocationChange(new LocationChange(locationAbove, 
                         LocationChangeType.MERGED_DEL_AT_END, locationBelow.getId()), blockChange);
@@ -51,7 +51,7 @@ public class LocationComputationStrategy {
             // new low cohesion in a location => split it
             Location newLoc = locationAbove.splitLocation(lineBelow);
             // Register new location
-            blockChange.getText().addLocation(newLoc);
+            text.addLocation(newLoc);
             LocationChangeType splitType = LocationChangeType.SPLIT_DEL_AT_START;
             LocationChangeType forkType = LocationChangeType.SPLIT_ADD_AT_END;
             if (newLoc.getStart() > locationAbove.getStart()) {
@@ -182,7 +182,7 @@ public class LocationComputationStrategy {
     	// 1. test { and }
     	if (thisLine.getBlock() == Block.END) { // 1.a
     		if (thisLine.getLevel() > 0) thisLine.setLevel(thisLine.getLevel() - 1);
-    		thisLine.setCohesion(thisLine.getCohesion() + 1);
+    		thisLine.setCohesion(thisLine.getCohesion() + 1); // TODO introduce "in/decreaseCohesion"
     	}
     	if (prevLine.getBlock() == Block.BEGIN) { // 1.b
     		thisLine.setLevel(thisLine.getLevel() + 1);

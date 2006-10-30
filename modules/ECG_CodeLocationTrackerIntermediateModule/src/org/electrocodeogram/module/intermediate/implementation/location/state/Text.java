@@ -10,7 +10,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 
-public class Text {
+public class Text implements IText {
     // line numbers begin with 0. Note that in events they start with 1
     private List<Line> lines = new ArrayList<Line>();
     private SortedSet<Location> locations = new TreeSet<Location>(LocationComparator.getComparator());

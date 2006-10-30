@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.electrocodeogram.module.intermediate.implementation.location.state.IText;
 import org.electrocodeogram.module.intermediate.implementation.location.state.Location;
 import org.electrocodeogram.module.intermediate.implementation.location.state.LocationComparator;
 import org.electrocodeogram.module.intermediate.implementation.location.state.Text;
@@ -84,7 +85,7 @@ public class History {
         return res;
     }
     
-    public String printLastTextContents(Text text) {
+    public String printLastTextContents(IText text) {
         String res = "";
         SortedSet<Location> locs = new TreeSet<Location>(LocationComparator.getComparator());
         locs.addAll(locationChangeHistories.keySet());

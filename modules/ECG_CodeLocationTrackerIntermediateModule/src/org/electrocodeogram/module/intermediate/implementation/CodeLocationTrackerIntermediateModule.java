@@ -1,12 +1,12 @@
 package org.electrocodeogram.module.intermediate.implementation;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Vector;
 import java.util.logging.Logger;
 
 import org.electrocodeogram.event.ValidEventPacket;
@@ -30,13 +30,14 @@ import org.electrocodeogram.modulepackage.ModuleProperty;
 import org.electrocodeogram.modulepackage.ModulePropertyException;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 
 /**
  * Module to assemble (code) location with retained identity over time and
  * send location change events.
  */
 public class CodeLocationTrackerIntermediateModule extends IntermediateModule {
+
+    static private int ccc = 0;
 
     /**
      * The class'es logger
@@ -145,100 +146,12 @@ System.out.println("---");
             Text text = texts.get(documentName);
             assert (text != null);
             
-            // TODO Better DOM usage necessary!
-            Node[] linediffs = null;
-            try {
-                Document xmlDoc = eventPacket.getDocument();
-                linediffs = ECGParser.getChildNodes( 
-                        ECGParser.getChildNode(
-                                ECGParser.getChildNode(
-                                        ECGParser.getChildNode(xmlDoc, "microActivity"), 
-                                        "linediff"),
-                                "lines"),  
-                        "line"); 
-            } catch (NodeException e) {
-                // TODO report this
-                e.printStackTrace();
-                return null;
-            }
-            
-            Collection<BlockChange> blockChanges = new ArrayList<BlockChange>();
-            // The blockChange is for putting line changes together in blocks
-            BlockChange blockChange = null;
-
-            // process each line diff
-            for (int i = 0; i < linediffs.length; i++) {
-                
-                // parse line change
-                Node linediff = linediffs[i];
-                LineChangeType lineType = LineChangeType.UNKNOWN;
-                String from = null;
-                String to = null;
-                LineChange lineChange = null;
-                int linenumber = -1;
-                try {
-                    String diffType = ECGParser.getNodeValue(ECGParser.getChildNode(linediff, "type"));
-                    lineType = LineChange.getLineChangeTypeFromString(diffType);
-                    linenumber = Integer.parseInt(
-                        ECGParser.getNodeValue(ECGParser.getChildNode(linediff, "linenumber")));
-                    linenumber -= 1; // in events the line numbers start with 1
-                    if (ECGParser.hasChildNode(linediff, "from"))
-                        from = ECGParser.getNodeValue(ECGParser.getChildNode(linediff, "from"));
-                    if (from == null)
-                        from = "";
-                    if (ECGParser.hasChildNode(linediff, "to"))
-                        to = ECGParser.getNodeValue(ECGParser.getChildNode(linediff, "to"));
-                    if (to == null)
-                        to = "";
-                    lineChange = new LineChange(lineType, linenumber, from, to);
-                } catch (NodeException e) {
-                    // TODO report this
-                    e.printStackTrace();
-                }
-                
-                // Convert from LineChangeType to BlockChangeType
-                BlockChangeType blockType = BlockChange.convertTypeFromLineChange(lineType);
-                
-/*
-System.out.println("  New change: '" + type + "' at line " + linenumber);
-System.out.println("  from:" + from);
-System.out.println("    to:" + to);
-System.out.println("  at " + eventPacket.getTimeStamp() + "\n");
-*/
-
-                // The following is segmenting a LineDiff event in a set of linediff blocks of 
-                //   equal type and consequtive line numbers which is required by the location
-                //   change and identity retaining algorithm
-                if (blockChange == null) {
-                    // Initialize blockChange, a line change collector to combine similar consequtive line changes
-                    blockChange = new BlockChange(text, eventPacket.getTimeStamp(), blockType, linenumber, 1);
-                    blockChange.getLineChanges().add(0, lineChange);
-                    history.getBlockChangeHistory().add(blockChange);
-                    blockChanges.add(blockChange);
-                } else {
-                    // Check for break in consequtiveness of the line changes
-                    BlockChangeType oldBlockType = blockChange.getBlockType();
-                    int blockStart = blockChange.getBlockStart();
-                    int blockLength = blockChange.getBlockLength();                
-                    if (blockType != oldBlockType || linenumber != blockStart + blockLength)  
-                    {
-                        // if block type changes or if line number is not consequtive
-                        blockChange = new BlockChange(text, eventPacket.getTimeStamp(), blockType, linenumber, 1);
-                        blockChange.getLineChanges().add(0, lineChange);
-                        history.getBlockChangeHistory().add(blockChange);
-                        blockChanges.add(blockChange);
-                    }   
-                    else {
-                        // put this line in blockChange as well
-                        blockChange.setBlockLength(blockLength+1);
-                        blockChange.getLineChanges().add(blockLength, lineChange);
-                    }
-                }
-                
-            }
+            Collection<BlockChange> blockChanges = BlockChange.parseLineDiffsEvent(text, eventPacket);            
 //System.out.println(blockChanges.size());
             
             for (BlockChange bc: blockChanges) {
+
+                history.getBlockChangeHistory().add(bc);
                 
                 // Convert long change blocks into replace blocks. This is due to the fact that
                 //   its more likely that is an paste/overwrite block (i.e. complete replace)
@@ -328,7 +241,7 @@ System.out.println("  at " + eventPacket.getTimeStamp() + "\n");
                         // In case of a replace, it will be followed by an insert at this plöace anyway
                         Line prevLine = text.getLine(bc.getBlockStart()-1); // maybe null
                         Line nextLine = text.getLine(bc.getBlockStart()); // maybe null
-                        strategy.computeNewNeighborhood(history, prevLine, nextLine, bc);
+                        strategy.computeNewNeighborhood(text, history, prevLine, nextLine, bc);
                     }
 
                 }
@@ -553,8 +466,8 @@ System.out.println("  at " + eventPacket.getTimeStamp() + "\n");
                         // thirdly perform recomputation of Locations at the new line neighborhoods
                         Line prevLine = text.getLine(linenumber-1); // maybe null
                         Line nextLine = text.getLine(linenumber+1); // maybe nulla
-                        strategy.computeNewNeighborhood(history, prevLine, line, bc);
-                        strategy.computeNewNeighborhood(history, line, nextLine, bc);
+                        strategy.computeNewNeighborhood(text, history, prevLine, line, bc);
+                        strategy.computeNewNeighborhood(text, history, line, nextLine, bc);
                         
                     }
                     
@@ -566,10 +479,10 @@ System.out.println("  at " + eventPacket.getTimeStamp() + "\n");
                 assert (text.printContents().equals(history.printLastTextContents(text)));
 
             }                    
-/*
-System.out.println(text);
+System.out.println("Codechange No. " + (++ccc) + " at time: " + eventPacket.getTimeStamp());
+//System.out.println(text);
 System.out.println("---------------------------------------------------------");
-*/          
+          
         }
 
 		// TODO just for assertions
@@ -610,7 +523,7 @@ System.out.print("#" + resultingCode + "#");
             try {
                 if (ECGParser.getSingleNodeValue("type", eventPacket.getDocument()).equals("termination")) {
                     
-System.out.println(history.printLocationChangeHistory());
+//System.out.println(history.printLocationChangeHistory());
 //System.out.println(history.printBlockChangeHistory());
 
                 }
@@ -644,16 +557,36 @@ System.out.println(history.printLocationChangeHistory());
 		}
     }
 
-	/**
-     * @param code
-     * @return
-     * @throws IOException 
+    /**
+     * Splits a file contents into an array of lines
+     * 
+     * @param contents A text file contents
+     * @return The single lines (seperated by \n) in code
      */
-    private String[] getLines(String code) {
-        if (code == null) {
-            return null;
+    private String[] getLines(String contents) {
+        if (contents == null) {
+            return new String[0];
         }
-        return code.split("\n");
+        StringBuffer buffer=new StringBuffer();
+        Vector<String> res=new Vector<String>();
+        int size=contents.length();
+        for (int index=0;index<size;index++) {
+           char current=contents.charAt(index);
+           if (current==0x0D) {
+              if (index+1<size && contents.charAt(index+1)==0x0A)
+                  index++;
+              res.add(buffer.toString());
+              buffer.setLength(0);
+           } else if (current==0x0A) {
+              if (index+1<size && contents.charAt(index+1)==0x0D)
+                  index++;
+              res.add(buffer.toString());
+              buffer.setLength(0);
+           } else buffer.append(current);
+        }
+        if (buffer.length()>0)
+           res.add(buffer.toString());
+        return (String[])res.toArray(new String[0]);
     }
 
 	public void initialize() {

@@ -19,8 +19,8 @@ public class LocationChange {
         EXTENDED_AT_END, // due to inserted lines, implies change of location
         SPLIT_DEL_AT_START, // due to split (changed or inserted lines), implies a change of location 
         SPLIT_DEL_AT_END, // due to split (changed or inserted lines), implies a change of location
-        SPLIT_ADD_AT_END, // due to split (changed or inserted lines), implies a creation of location
         SPLIT_ADD_AT_START, // due to split (changed or inserted lines), implies a creation of location
+        SPLIT_ADD_AT_END, // due to split (changed or inserted lines), implies a creation of location
         SHORTENED_AT_ALL, // due to deleted lines, implies deletion of location
         SHORTENED_AT_START, // due to deleted lines, implies change of location
         SHORTENED_IN_BETWEEN, // due to deleted lines, implies change of location
