@@ -53,7 +53,7 @@ public class CreateSQL {
      * @return the string which represents the insert Statement for the database
      */
     public static String createCommonDataInsertStmt(
-            ValidEventPacketProxy eventProxy) {
+            ValidEventPacketProxy eventProxy, DBCommunicator dbCommunicator ) {
 
         // the logger entering the method
         logger.entering(CreateSQL.class.getName(),
@@ -85,7 +85,7 @@ public class CreateSQL {
          */
         
         commonColumns = DBTablesMetadataPool.Instance().getMetadataVector(
-                "commondata");
+                "commondata", dbCommunicator);
    
         insertCommonDataString = "INSERT INTO commondata VALUES (";
 
@@ -173,7 +173,7 @@ public class CreateSQL {
      *         event
      */
     public static Vector createMSDTInsertStmts(
-            ValidEventPacketProxy eventProxy, int linkId) {
+            ValidEventPacketProxy eventProxy, int linkId, DBCommunicator dbCommunicator) {
 
         // the logger entering the method
         logger.entering(CreateSQL.class.getName(), "createMSDTInsertStmt",
@@ -190,7 +190,7 @@ public class CreateSQL {
          * holding the Information of this msdt Type in the Database
          */
 
-        XMLSchemaProxy proxy = new XMLSchemaProxy(eventProxy.getMsdt());
+        XMLSchemaProxy proxy = new XMLSchemaProxy(eventProxy.getMsdt(),dbCommunicator);
         proxy.getSchemaProperties();
         Vector tableNamesInDatabase = TableInformation.Instance()
                 .getTableNamesForMSDT(eventProxy.getMsdt());
@@ -207,7 +207,7 @@ public class CreateSQL {
              * get the column names and their datatypes from the database
              */
             currentTableColumns = DBTablesMetadataPool.Instance()
-                    .getMetadataVector(currentTable);
+                    .getMetadataVector(currentTable, dbCommunicator);
 
             String insertDataString = "INSERT INTO " + currentTable;
             insertDataString = insertDataString + " VALUES (";
@@ -328,18 +328,38 @@ public class CreateSQL {
      * 
      * @return the String which represents the createCommonData Table Statement
      */
-    public static String createCommonDataTable() {
-        String createCommonData = "CREATE TABLE commonData (";
+    public static String createCommonDataTable(Table commondataTable) {
+//    	 the logger entering the method
+        logger.entering(CreateSQL.class.getName(), "createCommonDataTable",
+                new Object[] { commondataTable });
+        
+        logger.info("CREATE TABLE " + commondataTable.getTableName());
+        // set the sql types or the given xml types in the table's elements
+        
+        SqlDatatypes sqlDT = new SqlDatatypes();
+        sqlDT.setSqlTypes4Elements(commondataTable.getElements());
+        Vector columns = commondataTable.getElements();
+    	
+    	
+    	String createCommonData = "CREATE TABLE commondata (";
         createCommonData = createCommonData
                 + "linkid INTEGER NOT NULL AUTO_INCREMENT,";
         createCommonData = createCommonData + "timestamp TIMESTAMP NOT NULL,";
         createCommonData = createCommonData + "msdt VARCHAR(30),";
-        createCommonData = createCommonData + "version INT,";
-        createCommonData = createCommonData + "username VARCHAR(100),";
-        createCommonData = createCommonData + "projectname VARCHAR(100),";
-        createCommonData = createCommonData + "id VARCHAR(255),";
-        createCommonData = createCommonData + "PRIMARY KEY(linkid)";
-        createCommonData = createCommonData + ")ENGINE=INNODB;";
+        
+        for (int i = 0; i < columns.size(); i++) {
+            ColumnElement temp = (ColumnElement) columns.get(i);
+            String columnName = temp.getName();
+            String SqlDatatype = temp.getSqlType();
+            createCommonData = createCommonData + columnName + " ";
+            if (i < columns.size() - 1) {
+            	createCommonData = createCommonData + SqlDatatype + ", ";
+            }
+            else
+            	createCommonData = createCommonData
+                        + SqlDatatype
+                        + ", PRIMARY KEY(linkid))ENGINE=INNODB; ";
+        }
         return createCommonData;
     }
 

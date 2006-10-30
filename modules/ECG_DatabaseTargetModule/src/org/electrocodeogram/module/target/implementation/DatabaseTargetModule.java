@@ -46,6 +46,14 @@ public class DatabaseTargetModule extends TargetModule {
      * The password for the user.
      */
     private String password;
+    
+    /**
+     * the driver for the database
+     */
+    private String jdbcDriver;
+    
+    
+    private DBCommunicator dbCommunicator;
 
     /**
      * This creates the module instance. It is called by the ECG
@@ -63,11 +71,41 @@ public class DatabaseTargetModule extends TargetModule {
 
         logger.entering(this.getClass().getName(), "DatabaseTargetModule",
             new Object[] {id, name});
+        
+        /**
+         * @TODO remove this
+         */
+        this.username = DBTargetModuleConstants.DB_USER;
+		this.password = DBTargetModuleConstants.DB_PWD;
+        this.jdbcConnection = DBTargetModuleConstants.DB_URL;
+        this.jdbcDriver = DBTargetModuleConstants.DB_DRIVER;
+        
+       
+        
+        /**
+         * TODO remove the block comment
+         */
+         /*
+          try {
+			this.username = this.getModuleProperty("Username").getValue();
+			this.password = this.getModuleProperty("Password").getValue();
+	        this.jdbcConnection = this.getModuleProperty("JDBC Connection").getValue();
+	        this.jdbcDriver = this.getModuleProperty("JDBC Driver").getValue();
+		} 
+        catch (ModulePropertyException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		* 
+          */
+        
+        
+        this.dbCommunicator = new DBCommunicator(username, password, jdbcConnection, jdbcDriver);
 
         logger.exiting(this.getClass().getName(), "DatabaseTargetModule");
 
     }
-
+    
     /**
      * @see org.electrocodeogram.module.target.TargetModule#write(org.electrocodeogram.event.ValidEventPacket)
      */
@@ -77,7 +115,7 @@ public class DatabaseTargetModule extends TargetModule {
         logger.entering(this.getClass().getName(), "write",
             new Object[] {packet});
         
-        DBCommunicator.insertEvent(packet);
+        dbCommunicator.insertEvent(packet);
 
         logger.log(Level.INFO, "An event has been written to the database "
                                + this.jdbcConnection
@@ -116,7 +154,9 @@ public class DatabaseTargetModule extends TargetModule {
             
             this.jdbcConnection = moduleProperty.getValue();
 
-            // TODO reconnect to database here
+            // reconnect to database here
+            dbCommunicator.closeDBConnection();
+            dbCommunicator = new DBCommunicator(username, password, jdbcConnection, jdbcDriver);
 
             logger.log(Level.INFO, "Set the property: "
                                    + moduleProperty.getName() + " to "
@@ -138,7 +178,10 @@ public class DatabaseTargetModule extends TargetModule {
                         .getValue());
             }
             
-            // TODO reconnect to database here
+            // reconnect to database here
+            dbCommunicator.closeDBConnection();
+            dbCommunicator = new DBCommunicator(username, password, jdbcConnection, jdbcDriver);
+            
 
             this.username  = moduleProperty.getValue(); 
 
@@ -158,12 +201,38 @@ public class DatabaseTargetModule extends TargetModule {
                         .getValue());
             }
             
-            // TODO reconnect to database here
+            // reconnect to database here
+            dbCommunicator.closeDBConnection();
+            dbCommunicator = new DBCommunicator(username, password, jdbcConnection, jdbcDriver);
 
             this.password  = moduleProperty.getValue(); 
 
 
-        } else {
+        }
+        else if (moduleProperty.getName().equals("JDBC Driver")) {
+            logger.log(Level.INFO, "Request to set the property: "
+                                   + moduleProperty.getName());
+
+            if (moduleProperty.getValue() == null) {
+                logger.log(Level.WARNING, "The property value is null for: "
+                                          + moduleProperty.getName());
+
+                logger.exiting(this.getClass().getName(), "propertyChanged");
+
+                throw new ModulePropertyException(
+                    "The property value is null.", this.getName(),
+                    this.getId(), moduleProperty.getName(), moduleProperty
+                        .getValue());
+            }
+            
+            // reconnect to database here
+            dbCommunicator.closeDBConnection();
+            dbCommunicator = new DBCommunicator(username, password, jdbcConnection, jdbcDriver);
+
+            this.jdbcDriver  = moduleProperty.getValue(); 
+        }
+        
+        else {
             logger.log(Level.WARNING,
                 "The module does not support a property with the given name: "
                                 + moduleProperty.getName());
@@ -245,13 +314,19 @@ public class DatabaseTargetModule extends TargetModule {
             logger.info("Folder msdt exists");
         }
         String[] msdtNames = getSchemes(msdtFolder);
-        if (!(DBCommunicator.tableExists("commondata"))) DBCommunicator
-                .executeStmt(CreateSQL.createCommonDataTable());
+//        if (!(DBCommunicator.tableExists("commondata"))){
+//        	XMLSchemaProxy commonProxy = new XMLSchemaProxy ("msdt.common.xsd");
+//        	Table commondataTable = commonProxy.getCommonProperties();
+//        	DBCommunicator.executeStmt(CreateSQL.createCommonDataTable());
+//        }
 
         for (int i = 0; i < msdtNames.length; i++) {
-            if (msdtNames[i].equalsIgnoreCase("msdt.common.xsd")) continue;
+            if (msdtNames[i].equalsIgnoreCase("msdt.common.xsd")) {
+            	XMLSchemaProxy commondataProxy = new XMLSchemaProxy("msdt.common.xsd", dbCommunicator);
+            	commondataProxy.synchronizeCommonSchemaToDatabase();
+            }
             if (msdtNames[i].contains("msdt")) {
-                XMLSchemaProxy schemaProxy = new XMLSchemaProxy(msdtNames[i]);
+                XMLSchemaProxy schemaProxy = new XMLSchemaProxy(msdtNames[i], dbCommunicator);
                 schemaProxy.synchronizeSchemaToDatabase();
             }
 
@@ -262,6 +337,7 @@ public class DatabaseTargetModule extends TargetModule {
      * 
      */
     private void disconnectDatabase() {
+    	dbCommunicator.closeDBConnection();
     
     }
     

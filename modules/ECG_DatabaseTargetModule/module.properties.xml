@@ -18,6 +18,7 @@
 	<description>
 		This module writes incoming events into a database. The properties are:
 		* JDBC Connection - A JDBC connection string
+		* JDBC Driver  - The Driver for the Database Connection
 		* Username - The name of the database user. the user should have sufficient privileges
 		  for the database to write event data
 		* Password - Password for the user
@@ -33,9 +34,22 @@
 			<propertyType>
 				java.lang.String
 			</propertyType>
+				jdbc:mysql://127.0.0.1:3306/ecg_test
 			<propertyValue>
+		</property>
+		
+		<property>
+			<propertyName>
+				JDBC Driver
+			</propertyName>
+			<propertyType>
+				java.lang.String
+			</propertyType>
+			<propertyValue>
+				com.mysql.jdbc.Driver
 			</propertyValue>
 		</property>
+		
 		<property>
 			<propertyName>
 				Username
@@ -44,8 +58,10 @@
 				java.lang.String
 			</propertyType>
 			<propertyValue>
+				ecg
 			</propertyValue>
 		</property>
+		
 		<property>
 			<propertyName>
 				Password
@@ -54,6 +70,7 @@
 				java.lang.String
 			</propertyType>
 			<propertyValue>
+				ecg
 			</propertyValue>
 		</property>
 	</properties>

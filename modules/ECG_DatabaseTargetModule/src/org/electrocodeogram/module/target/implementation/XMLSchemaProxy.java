@@ -52,12 +52,14 @@ public class XMLSchemaProxy {
 
     // the schema Type of a searched and found Element -- needed for the
     // findElementDeklaration Method
-    private SchemaType foundElement;
+    private SchemaType foundElement = null;
 
     // the Name of the Schema
     private String schemaName = null;
 
     private String coreSchemaName = "";
+    
+    private DBCommunicator dbCommunicator=null;
 
     /**
      * returns the name of the schema File without any prefix or suffix
@@ -82,8 +84,11 @@ public class XMLSchemaProxy {
      * @param schemaName
      *            the Filename of the schema for which the proxy stands
      */
-    public XMLSchemaProxy(String schemaName) {
-        this.schemaName = schemaName;
+    public XMLSchemaProxy(String schemaName, DBCommunicator dbCommunicator) {
+        this.dbCommunicator = dbCommunicator;
+    	
+    	this.schemaName = schemaName;
+        
         this.xsdFile = new File(DBTargetModuleConstants.MSDT_FOLDER + schemaName);
         getCoreMsdtName();
     }
@@ -350,6 +355,22 @@ public class XMLSchemaProxy {
         inf.addTableInformation(this.schemaName, tables);
         return this.tables;
     }
+    
+    public Table getCommonProperties(){
+    	
+    	/**
+         * the logger entering the method
+         */
+        logger.entering(this.getClass().getName(), "getCommonProperties");
+        SchemaType commonDataType = findElementDeklaration("commonDataType");
+        
+        Table commondata = new Table("commondata",
+                new Vector<ColumnElement>());
+        getElementProperties(commonDataType, commondata, "");
+        
+        return commondata;
+    	
+    }
 
     /**
      * This Method traverses the complete tree of a given node (element or type
@@ -425,6 +446,7 @@ public class XMLSchemaProxy {
              * if the element has a name then set this name for
              * currenElementName
              */
+            
             if (property.getName().toString() != null) {
                 currentElementName = property.getName().toString();
                 if (currentElementName.equalsIgnoreCase("commonData")) {
@@ -699,7 +721,21 @@ public class XMLSchemaProxy {
             synchronizeTable(table);
         }
     }
+    
+    public void synchronizeCommonSchemaToDatabase() {
+        Table commonTable = getCommonProperties();
+        synchronizeTable(commonTable);
+    }
 
+    
+    public boolean hasCommonDataPart(){
+    	if( this.findElementDeklaration("commonData")!= null){
+    		return true;
+    	}
+    	else 
+    		return false;
+    }
+    
     /**
      * Check for each element and attribute deklaration in a schema whether they
      * are represented in the corrensponding database table
@@ -707,10 +743,10 @@ public class XMLSchemaProxy {
      */
     private void synchronizeTable(Table schemaTable) {
         logger.info("tablename: " + schemaTable.getTableName());
-        if (!(DBCommunicator.tableExists(schemaTable.getTableName()))) {
+        if (!(dbCommunicator.tableExists(schemaTable.getTableName()))) {
             logger.info("Table " + schemaTable.getTableName()
                     + " does not exist in the database");
-            DBCommunicator.executeStmt(CreateSQL.createTableStmt(schemaTable));
+            dbCommunicator.executeStmt(CreateSQL.createTableStmt(schemaTable));
             return;
         }
         Vector schemaColumns = new Vector();
@@ -718,7 +754,7 @@ public class XMLSchemaProxy {
         SqlDatatypes sqlTypes = new SqlDatatypes();
         sqlTypes.setSqlTypes4Elements(schemaColumns);
 
-        Vector dbTableMetada = DBCommunicator
+        Vector dbTableMetada = dbCommunicator
                 .getMetadataInColumnOrder(schemaTable.getTableName());
 
         // complex type in schema = Table in Database
@@ -747,7 +783,7 @@ public class XMLSchemaProxy {
             }
             if (correspondingColumnFound) continue;
             else {
-                DBCommunicator.executeStmt(CreateSQL.alterTableNewColumn(
+                dbCommunicator.executeStmt(CreateSQL.alterTableNewColumn(
                         schemaTable, schemaElement));
             }
         }

@@ -32,6 +32,7 @@ public class DBTablesMetadataPool {
 	
 	private HashMap <String,Vector>metaInformationVectors = new HashMap<String,Vector>();
 	
+	
 	/**
 	 * private Constructor, so other classes can't instanciate
 	 */
@@ -42,11 +43,11 @@ public class DBTablesMetadataPool {
     /**
      * get the Metadata from all Tables in the database
      */
-    private static void getMetadataForAllTables() {
-        Vector v = DBCommunicator.getTableNames();
+    private static void getMetadataForAllTables(DBCommunicator dbCommunicator) {
+        Vector v = dbCommunicator.getTableNames();
         for (int i = 0; i<v.size(); i++){
             String tableName= (String) v.get(i);
-            Instance().addMetadataVector(tableName, DBCommunicator.getMetadataInColumnOrder(tableName));
+            Instance().addMetadataVector(tableName, dbCommunicator.getMetadataInColumnOrder(tableName));
         }
     }
 	
@@ -71,9 +72,9 @@ public class DBTablesMetadataPool {
 	 * @param tableName the name of the table
 	 * @return the Vector containing the Metadata for the giben tablename
 	 */
-	public Vector getMetadataVector(String tableName){
+	public Vector getMetadataVector(String tableName, DBCommunicator dbCommunicator){
 		if(metaInformationVectors.isEmpty())
-            getMetadataForAllTables();
+            getMetadataForAllTables(dbCommunicator);
         
         if (poolInstance.metaInformationVectors.get(tableName)== null){
             logger.severe("Could not not find a Metadata Vecor for "+tableName);
@@ -102,9 +103,10 @@ public class DBTablesMetadataPool {
      * 
      * @return the Vector with the Metadata Information for all Tables
 	 */
-    public HashMap getMetaInformationVectors(){
+    public HashMap getMetaInformationVectors(DBCommunicator dbCommunicator){
 		if(this.metaInformationVectors.isEmpty())
-            getMetadataForAllTables();
+            getMetadataForAllTables(dbCommunicator
+            		);
         return this.metaInformationVectors;
 	}
 	

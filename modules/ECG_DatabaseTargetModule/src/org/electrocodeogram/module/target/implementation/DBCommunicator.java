@@ -30,7 +30,22 @@ public class DBCommunicator {
     private static Logger logger = LogHelper.createLogger(DBCommunicator.class
             .getName());
 
-    private static Connection connection;
+    private Connection connection;
+    
+    private String db_user;
+    
+    private String db_pwd;
+    
+    private String db_URL;
+    
+    private String db_driver;
+    
+    public DBCommunicator(String user, String pwd, String dbURL, String jdbcDriver){
+    	this.db_user=user;
+    	this.db_pwd = pwd;
+    	this.db_URL = dbURL;
+    	this.db_driver = jdbcDriver;
+    }
 
     /**
      * this method connects the Database and returns a Connection object which
@@ -44,7 +59,7 @@ public class DBCommunicator {
      * @post null is returned if an exeption occured
      * @post Connection conn is still closed if an exception occured
      */
-    public static Connection getDBConnection() {
+    public Connection getDBConnection() {
 
         if (connection == null || connection.isClosed()) {
             // the logger logs entering this method
@@ -55,7 +70,7 @@ public class DBCommunicator {
             // the database connection which has to be returned
             try {
                 // register driver
-                Class.forName(DBTargetModuleConstants.DB_DRIVER).newInstance();
+                Class.forName(db_driver).newInstance();
             }
             catch (InstantiationException e) {
                 logger.severe("database driver could not be instantiated");
@@ -75,11 +90,11 @@ public class DBCommunicator {
             }
 
             try {
-                logger.info("want to connect the Database with URL " + DBTargetModuleConstants.DB_URL
-                        + " and User " + DBTargetModuleConstants.DB_USER);
+                logger.info("want to connect the Database with URL " + db_URL
+                        + " and User " + db_user);
                 // Connect the Database with user and password
-                connection = (Connection) DriverManager.getConnection(DBTargetModuleConstants.DB_URL,
-                        DBTargetModuleConstants.DB_USER, DBTargetModuleConstants.DB_PWD);
+                connection = (Connection) DriverManager.getConnection(db_URL,
+                        db_user, db_pwd);
                 logger.info("Database connected with Connection: "
                         + connection.toString());
             }
@@ -103,7 +118,7 @@ public class DBCommunicator {
      * @pre connection is opened
      * @post connection is closed
      */
-    public static void closeDBConnection() {
+    public void closeDBConnection() {
         // the logger logs entering this method
         logger.entering("org.electrocodeogram.module.target.implementation."
                 + "DBCommunicator", "closeDBConnection()");
@@ -131,7 +146,7 @@ public class DBCommunicator {
      * 
      * @return true if the database is connected
      */
-    public static boolean isDbConnected() {
+    public boolean isDbConnected() {
         if (connection.isClosed()) return false;
         else
             return true;
@@ -148,7 +163,7 @@ public class DBCommunicator {
      *         occured, suppose for example the table with the given name does
      *         not exist in the database
      */
-    private static ResultSetMetaData getMetadata(String table) {
+    private ResultSetMetaData getMetadata(String table) {
 
         // the logger logs entering this method
         logger.entering("org.electrocodeogram.module.target.implementation."
@@ -209,7 +224,7 @@ public class DBCommunicator {
      * @return true if the Statement could be executed or false if not or if a
      *         SQLException occured
      */
-    public static boolean executeStmt(String sqlString) {
+    public boolean executeStmt(String sqlString) {
 
         // the logger logs entering this method
         logger.entering("org.electrocodeogram.module.target.implementation."
@@ -258,7 +273,7 @@ public class DBCommunicator {
      *       query the returned ResultSet rs contains this data
      * @post the ResultSet rs is null if an exception occured
      */
-    public static ResultSet queryDB(String sqlString) {
+    public ResultSet executeQuery(String sqlString) {
         // the logger logs entering this method
         logger.entering("org.electrocodeogram.module.target.implementation."
                 + "DBCommunicator", "queryDB(...)");
@@ -327,7 +342,7 @@ public class DBCommunicator {
      *            the Event which has to be inserted in the db
      * @return true if the event's data was written in the db, otherwise false
      */
-    public static boolean insertEvent(final ValidEventPacket vPacket) {
+    public boolean insertEvent(final ValidEventPacket vPacket) {
 
         // the logger logs entering this method
         logger.entering("org.electrocodeogram.module.target.implementation."
@@ -360,10 +375,11 @@ public class DBCommunicator {
             conn.setAutoCommit(false);
             stmt = (Statement) conn.createStatement();
 
+            
             /**
              * 1st execute Statement to insert the event's common data
              */
-            String s = CreateSQL.createCommonDataInsertStmt(proxy);
+            String s = CreateSQL.createCommonDataInsertStmt(proxy, this);
             System.out.println(s);
             stmt.execute(s,
                     Statement.RETURN_GENERATED_KEYS);
@@ -384,7 +400,7 @@ public class DBCommunicator {
              * 3rd insert the msdt special Data in the corresponding tables with
              * id value as a link to the event's common data
              */
-            Vector insertStms = CreateSQL.createMSDTInsertStmts(proxy, idRow);
+            Vector insertStms = CreateSQL.createMSDTInsertStmts(proxy, idRow, this);
             for (Iterator iter = insertStms.iterator(); iter.hasNext();) {
                 String insertStatement = (String) iter.next();
                 stmt.execute(insertStatement);
@@ -444,7 +460,7 @@ public class DBCommunicator {
      * @return the Vector containing the Metadata as Elements
      * 
      */
-    public static Vector getMetadataInColumnOrder(String table) {
+    public Vector getMetadataInColumnOrder(String table) {
 
         logger.entering("org.electrocodeogramm.module.target.implementation."
                 + "DBCommunicator", "getMetadataInColumnOrder(...)");
@@ -487,7 +503,7 @@ public class DBCommunicator {
      *       vector
      * @return a Vector containing the names of all tables in the db
      */
-    public static Vector getTableNames() {
+    public Vector getTableNames() {
         // the logger logs entering this method
         logger.entering("org.electrocodeogramm.module.target.implementation."
                 + "DBCommunicator", "getTableNames()");
@@ -539,7 +555,7 @@ public class DBCommunicator {
      * @param tableName
      * @return true if the given table with the given table name exists
      */
-    public static boolean tableExists(String tableName) {
+    public boolean tableExists(String tableName) {
         Connection c = getDBConnection();
         Statement stmt = null;
         try {
