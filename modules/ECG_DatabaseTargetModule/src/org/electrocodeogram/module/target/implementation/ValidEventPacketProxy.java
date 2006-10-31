@@ -1,5 +1,6 @@
 package org.electrocodeogram.module.target.implementation;
 
+import java.io.File;
 import java.util.Date;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -87,7 +88,14 @@ public class ValidEventPacketProxy {
      */
     public String getMsdt() {
         return this.event.getMicroSensorDataType().getName();
+        
     }
+    
+    public File getMSDTDefFile(){
+    	return this.event.getMicroSensorDataType().getDefFile();
+    }
+    
+    
     
 
     /**

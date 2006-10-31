@@ -17,6 +17,9 @@ import org.electrocodeogram.module.target.TargetModule;
 import org.electrocodeogram.module.target.TargetModuleException;
 import org.electrocodeogram.modulepackage.ModuleProperty;
 import org.electrocodeogram.modulepackage.ModulePropertyException;
+import org.electrocodeogram.msdt.MicroSensorDataType;
+import org.electrocodeogram.system.ModuleSystem;
+
 
 /**
  * This class is an ECG module used to write ECG events into a file in
@@ -303,7 +306,10 @@ public class DatabaseTargetModule extends TargetModule {
      * 
      */
     private void connectDatabase() {
-        /**
+        
+    	MicroSensorDataType[] msdts = ModuleSystem.getInstance().getMicroSensorDataTypes();
+
+    	/**
          * 1. for each schema in ./msdt: a. create Proxy b.
          * getSchemaProperties(String) --> Vector with Table instances c. for
          * each table of the schema --> synchronizeTableToDatabase
@@ -313,22 +319,28 @@ public class DatabaseTargetModule extends TargetModule {
         if (msdtFolder.exists()) {
             logger.info("Folder msdt exists");
         }
-        String[] msdtNames = getSchemes(msdtFolder);
-//        if (!(DBCommunicator.tableExists("commondata"))){
-//        	XMLSchemaProxy commonProxy = new XMLSchemaProxy ("msdt.common.xsd");
-//        	Table commondataTable = commonProxy.getCommonProperties();
-//        	DBCommunicator.executeStmt(CreateSQL.createCommonDataTable());
-//        }
+        
+        File commondataSchema = new File(DBTargetModuleConstants.MSDT_FOLDER+"msdt.common.xsd");
+        XMLSchemaProxy commonProxy = new XMLSchemaProxy (commondataSchema, dbCommunicator);
+  
+        if (!(dbCommunicator.tableExists("commondata"))){
+        	Table commondataTable = commonProxy.getCommonProperties();
+        	String createCommondataTable  = CreateSQL.createCommonDataTable(commondataTable);
+        	logger.info("must create commondata table in database");
+        	dbCommunicator.executeStmt(createCommondataTable);
+        	logger.info("commondata table successfully created");
+        	
+        }
+        else{
+        	commonProxy.synchronizeCommonSchemaToDatabase();
+        	logger.info("synchronized commondata schema to database");
+        }
 
-        for (int i = 0; i < msdtNames.length; i++) {
-            if (msdtNames[i].equalsIgnoreCase("msdt.common.xsd")) {
-            	XMLSchemaProxy commondataProxy = new XMLSchemaProxy("msdt.common.xsd", dbCommunicator);
-            	commondataProxy.synchronizeCommonSchemaToDatabase();
-            }
-            if (msdtNames[i].contains("msdt")) {
-                XMLSchemaProxy schemaProxy = new XMLSchemaProxy(msdtNames[i], dbCommunicator);
+        for (int i = 0; i < msdts.length; i++) {
+            	logger.info("found MSDT: "+msdts[i].getName());
+                XMLSchemaProxy schemaProxy = new XMLSchemaProxy(msdts[i].getDefFile(), dbCommunicator);
                 schemaProxy.synchronizeSchemaToDatabase();
-            }
+            
 
         }        
     }
@@ -341,17 +353,17 @@ public class DatabaseTargetModule extends TargetModule {
     
     }
     
-    private String[] getSchemes (File f){
-        
-        if (f.isDirectory())
-        {  
-           // der Ordnerinhalt als Array von Strings 
-           String[] msdtSchemes = f.list();
-           return msdtSchemes;
-        }
-        else
-        {  
-           return null;
-        }
-     }
+//    private String[] getSchemes (File f){
+//        
+//        if (f.isDirectory())
+//        {  
+//           // der Ordnerinhalt als Array von Strings 
+//           String[] msdtSchemes = f.list();
+//           return msdtSchemes;
+//        }
+//        else
+//        {  
+//           return null;
+//        }
+//     }
 }

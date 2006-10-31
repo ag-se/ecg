@@ -53,7 +53,7 @@ public class SqlDatatypes {
         xml_sql_dt.put("XmlLong", "BIGINT");
         xml_sql_dt.put("XmlName", "VARCHAR(255)");
         xml_sql_dt.put("XmlNCName", "VARCHAR(255)");
-        xml_sql_dt.put("XmlNegativeInteger", "");
+        xml_sql_dt.put("XmlNegativeInteger", "INTEGER");
         xml_sql_dt.put("XmlNMTOKEN", "VARCHAR(255)");
         xml_sql_dt.put("XmlNMTOKENS", "TEXT");
         xml_sql_dt.put("XmlNonNegativeInteger", "INTEGER");

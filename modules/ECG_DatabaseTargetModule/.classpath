@@ -8,5 +8,6 @@
 	<classpathentry kind="lib" path="D:/uni/Studienarbeit/ElectroCodeoGram_v1.1.0/lib/ecg_support.jar"/>
 	<classpathentry kind="lib" path="D:/uni/Studienarbeit/ElectroCodeoGram_v1.1.0/lib/ecg_moduleapi.jar"/>
 	<classpathentry kind="lib" path="D:/uni/Studienarbeit/tools/xmlbeans-2.2.0/lib/jsr173_1.0_api.jar"/>
+	<classpathentry kind="lib" path="D:/uni/Studienarbeit/ElectroCodeoGram_v1.1.0/ecg/ecg_lab.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -84,12 +84,13 @@ public class XMLSchemaProxy {
      * @param schemaName
      *            the Filename of the schema for which the proxy stands
      */
-    public XMLSchemaProxy(String schemaName, DBCommunicator dbCommunicator) {
+    public XMLSchemaProxy(File schemaFile, DBCommunicator dbCommunicator) {
         this.dbCommunicator = dbCommunicator;
     	
-    	this.schemaName = schemaName;
+    	this.schemaName = schemaFile.getName();
         
-        this.xsdFile = new File(DBTargetModuleConstants.MSDT_FOLDER + schemaName);
+        this.xsdFile = schemaFile;
+        
         getCoreMsdtName();
     }
 

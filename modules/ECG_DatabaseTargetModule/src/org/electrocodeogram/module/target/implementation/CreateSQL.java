@@ -190,7 +190,7 @@ public class CreateSQL {
          * holding the Information of this msdt Type in the Database
          */
 
-        XMLSchemaProxy proxy = new XMLSchemaProxy(eventProxy.getMsdt(),dbCommunicator);
+        XMLSchemaProxy proxy = new XMLSchemaProxy(eventProxy.getMSDTDefFile(),dbCommunicator);
         proxy.getSchemaProperties();
         Vector tableNamesInDatabase = TableInformation.Instance()
                 .getTableNamesForMSDT(eventProxy.getMsdt());
