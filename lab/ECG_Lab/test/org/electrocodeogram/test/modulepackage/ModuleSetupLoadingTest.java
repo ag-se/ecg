@@ -17,7 +17,7 @@ import junit.framework.TestCase;
 
 /**
  * Collection of testcases that check the loading of
- * <em>ModuleSetups</em> from "./ECG_Lab/testmodulesetups/". Both
+ * <em>ModuleSetups</em> from "./ECG_Lab/testsetups/". Both
  * valid and invalid/not wellformed <em>ModuleSetup</em> files are
  * tested.
  */
@@ -43,7 +43,7 @@ public class ModuleSetupLoadingTest extends TestCase {
      * Testcase MS01 according to the document TESTPLAN Version 2.1 or
      * higher. This testcase is trying to load the
      * <em>ModuleSetup</em> from
-     * "testmodulesetups/duplicateModuleId". This <em>ModuleSetup</em>
+     * "testsetups/duplicateModuleId". This <em>ModuleSetup</em>
      * contains two identical moodule ids. The expected result is that
      * the test is throwing a {@link ModuleSetupLoadException}.
      */
@@ -51,7 +51,7 @@ public class ModuleSetupLoadingTest extends TestCase {
         try {
             this.moduleRegistry.setModuleDirectory(new File("modules"));
 
-            this.moduleRegistry.loadModuleSetup(new File("testmodulesetups"
+            this.moduleRegistry.loadModuleSetup(new File("testsetups"
                                                          + File.separator
                                                          + "duplicateModuleId"
                                                          + File.separator
@@ -71,7 +71,7 @@ public class ModuleSetupLoadingTest extends TestCase {
      * Testcase MS02 according to the document TESTPLAN Version 2.1 or
      * higher. This testcase is trying to load the
      * <em>ModuleSetup</em> from
-     * "testmodulesetups/emptyModuleSetup". This <em>ModuleSetup</em>
+     * "testsetups/emptyModuleSetup". This <em>ModuleSetup</em>
      * is empty. The expected result is that the test is throwing a
      * {@link ModuleSetupLoadException}.
      */
@@ -79,7 +79,7 @@ public class ModuleSetupLoadingTest extends TestCase {
         try {
             this.moduleRegistry.setModuleDirectory(new File("modules"));
 
-            this.moduleRegistry.loadModuleSetup(new File("testmodulesetups"
+            this.moduleRegistry.loadModuleSetup(new File("testsetups"
                                                          + File.separator
                                                          + "emptyModuleSetup"));
 
@@ -97,7 +97,7 @@ public class ModuleSetupLoadingTest extends TestCase {
     /**
      * Testcase MS03 according to the document TESTPLAN Version 2.1 or
      * higher. This testcase is trying to load the
-     * <em>ModuleSetup</em> from "testmodulesetups/invalidRootNode".
+     * <em>ModuleSetup</em> from "testsetups/invalidRootNode".
      * This <em>ModuleSetup's</em> root node is not
      * &lt;modulesetup&gt;. The expected result is that the test is
      * throwing a {@link ModuleSetupLoadException}.
@@ -106,7 +106,7 @@ public class ModuleSetupLoadingTest extends TestCase {
         try {
             this.moduleRegistry.setModuleDirectory(new File("modules"));
 
-            this.moduleRegistry.loadModuleSetup(new File("testmodulesetups"
+            this.moduleRegistry.loadModuleSetup(new File("testsetups"
                                                          + File.separator
                                                          + "invalidRootNode"
                                                          + File.separator
@@ -127,7 +127,7 @@ public class ModuleSetupLoadingTest extends TestCase {
      * Testcase MS04 according to the document TESTPLAN Version 2.1 or
      * higher. This testcase is trying to load the
      * <em>ModuleSetup</em> from
-     * "testmodulesetups/invalidModuleNode". This
+     * "testsetups/invalidModuleNode". This
      * <em>ModuleSetup's</em> root node is not &lt;modulesetup&gt;.
      * The expected result is that the test is throwing a
      * {@link ModuleSetupLoadException}.
@@ -136,7 +136,7 @@ public class ModuleSetupLoadingTest extends TestCase {
         try {
             this.moduleRegistry.setModuleDirectory(new File("modules"));
 
-            this.moduleRegistry.loadModuleSetup(new File("testmodulesetups"
+            this.moduleRegistry.loadModuleSetup(new File("testsetups"
                                                          + File.separator
                                                          + "invalidModuleNode"
                                                          + File.separator
@@ -157,7 +157,7 @@ public class ModuleSetupLoadingTest extends TestCase {
      * Testcase MS05 according to the document TESTPLAN Version 2.1 or
      * higher. This testcase is trying to load the
      * <em>ModuleSetup</em> from
-     * "testmodulesetups/illegalActiveAttribute". An "active"
+     * "testsetups/illegalActiveAttribute". An "active"
      * attribute is neither "true" nor "false" here. The expected
      * result is that the test is throwing a
      * {@link ModuleSetupLoadException}.
@@ -167,7 +167,7 @@ public class ModuleSetupLoadingTest extends TestCase {
             this.moduleRegistry.setModuleDirectory(new File("modules"));
 
             this.moduleRegistry.loadModuleSetup(new File(
-                "testmodulesetups" + File.separator + "illegalActiveAttribute"
+                "testsetups" + File.separator + "illegalActiveAttribute"
                                 + File.separator + "module.setup"));
 
             assertTrue(false);
@@ -185,7 +185,7 @@ public class ModuleSetupLoadingTest extends TestCase {
      * Testcase MS06 according to the document TESTPLAN Version 2.1 or
      * higher. This testcase is trying to load the
      * <em>ModuleSetup</em> from
-     * "testmodulesetups/illegalActiveAttribute". An "name" attribute
+     * "testsetups/illegalActiveAttribute". An "name" attribute
      * is empty. The expected result is that the test is throwing a
      * {@link ModuleSetupLoadException}.
      */
@@ -193,7 +193,7 @@ public class ModuleSetupLoadingTest extends TestCase {
         try {
             this.moduleRegistry.setModuleDirectory(new File("modules"));
 
-            this.moduleRegistry.loadModuleSetup(new File("testmodulesetups"
+            this.moduleRegistry.loadModuleSetup(new File("testsetups"
                                                          + File.separator
                                                          + "emptyModuleName"
                                                          + File.separator
@@ -214,7 +214,7 @@ public class ModuleSetupLoadingTest extends TestCase {
      * Testcase MS07 according to the document TESTPLAN Version 2.1 or
      * higher. This testcase is trying to load the
      * <em>ModuleSetup</em> from
-     * "testmodulesetups/illegalPropertyType". A &lt;propertyType&gt;
+     * "testsetups/illegalPropertyType". A &lt;propertyType&gt;
      * value is not a known java class name. The expected result is
      * that the test is throwing a {@link ModuleSetupLoadException}.
      */
@@ -223,7 +223,7 @@ public class ModuleSetupLoadingTest extends TestCase {
             this.moduleRegistry.setModuleDirectory(new File("modules"));
 
             this.moduleRegistry.loadModuleSetup(new File(
-                "testmodulesetups" + File.separator + "illegalPropertyType"
+                "testsetups" + File.separator + "illegalPropertyType"
                                 + File.separator + "module.setup"));
 
             assertTrue(false);
@@ -241,7 +241,7 @@ public class ModuleSetupLoadingTest extends TestCase {
      * Testcase MS08 according to the document TESTPLAN Version 2.1 or
      * higher. This testcase is trying to load the
      * <em>ModuleSetup</em> from
-     * "testmodulesetups/unknownModuleClass". The module class is
+     * "testsetups/unknownModuleClass". The module class is
      * unknown. The expected result is that the test is throwing a
      * {@link ModuleSetupLoadException}.
      */
@@ -249,7 +249,7 @@ public class ModuleSetupLoadingTest extends TestCase {
         try {
             this.moduleRegistry.setModuleDirectory(new File("modules"));
 
-            this.moduleRegistry.loadModuleSetup(new File("testmodulesetups"
+            this.moduleRegistry.loadModuleSetup(new File("testsetups"
                                                          + File.separator
                                                          + "unknownModuleClass"
                                                          + File.separator
@@ -270,7 +270,7 @@ public class ModuleSetupLoadingTest extends TestCase {
      * Testcase MS09 according to the document TESTPLAN Version 2.1 or
      * higher. This testcase is trying to load the
      * <em>ModuleSetup</em> from
-     * "testmodulesetups/connectedToUnknownModule". A module is
+     * "testsetups/connectedToUnknownModule". A module is
      * connected to an unknown module. The expected result is that the
      * test is throwing a {@link ModuleSetupLoadException}.
      */
@@ -279,7 +279,7 @@ public class ModuleSetupLoadingTest extends TestCase {
             this.moduleRegistry.setModuleDirectory(new File("modules"));
 
             this.moduleRegistry.loadModuleSetup(new File(
-                "testmodulesetups" + File.separator
+                "testsetups" + File.separator
                                 + "connectedToUnknownModule" + File.separator
                                 + "module.setup"));
 
@@ -298,7 +298,7 @@ public class ModuleSetupLoadingTest extends TestCase {
      * Testcase MS10 according to the document TESTPLAN Version 2.1 or
      * higher. This testcase is trying to load the
      * <em>ModuleSetup</em> from
-     * "testmodulesetups/validModuleSetup". This <em>ModuleSetup</em> is valid.
+     * "testsetups/validModuleSetup". This <em>ModuleSetup</em> is valid.
      * The expected result is that the
      * <em>ModuleSetup</em> id loaded and the test does not cause any exceptions.
      */
@@ -307,7 +307,7 @@ public class ModuleSetupLoadingTest extends TestCase {
         try {
             this.moduleRegistry.setModuleDirectory(new File("modules"));
 
-            this.moduleRegistry.loadModuleSetup(new File("testmodulesetups"
+            this.moduleRegistry.loadModuleSetup(new File("testsetups"
                                                          + File.separator
                                                          + "validModuleSetup"
                                                          + File.separator
