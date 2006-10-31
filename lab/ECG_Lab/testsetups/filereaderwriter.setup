@@ -1,117 +1,78 @@
 <?xml version="1.0"?>
 <modulesetup>
-<module id="4" active="true">
-<name>
-File Writer
-</name>
-<fromClassId>
-org.electrocodeogram.module.target.implementation.FileSystemTargetModule
-</fromClassId>
-<connectedTo>
-</connectedTo>
-<properties>
-<property>
-<name>
-Append Data
-</name>
-<value>
-false
-</value>
-<type>
-java.lang.Boolean
-</type>
-</property>
-<property>
-<name>
-Output File
-</name>
-<value>
-out_events.log
-</value>
-<type>
-java.io.File
-</type>
-</property>
-<property>
-<name>
-Split Files
-</name>
-<value>
-false
-</value>
-<type>
-java.lang.Boolean
-</type>
-</property>
-<property>
-<name>
-File Size
-</name>
-<value>
-100000
-</value>
-<type>
-java.lang.Integer
-</type>
-</property>
-</properties>
-</module>
-<module id="3" active="true">
-<name>
-File Reader
-</name>
-<fromClassId>
-org.electrocodeogram.module.source.implementation.FileSystemSourceModule
-</fromClassId>
-<connectedTo>
-<id>
-4
-</id>
-</connectedTo>
-<properties>
-<property>
-<name>
-Input File
-</name>
-<value>
-testeventlogs/small.log
-</value>
-<type>
-java.io.File
-</type>
-</property>
-<property>
-<name>
-Enable Burst Mode
-</name>
-<value>
-true
-</value>
-<type>
-java.lang.Boolean
-</type>
-</property>
-<property>
-<name>
-Send End Event
-</name>
-<value>
-true
-</value>
-<type>
-java.lang.Boolean
-</type>
-</property>
-<property>
-<name>
-Ignored Event Types
-</name>
-<value>
-</value>
-<type>
-java.lang.String
-</type>
-</property>
-</properties>
-</module>
+	<module id="4" active="true">
+		<name>
+		File Writer
+		</name>
+		<fromClassId>
+		org.electrocodeogram.module.target.implementation.FileSystemTargetModule
+		</fromClassId>
+		<connectedTo>
+		</connectedTo>
+		<properties>
+			<property>
+				<name>Output File</name>
+				<value>out_events.log</value>
+				<type>java.io.File</type>
+			</property>
+			<property>
+				<name>Append Data</name>
+				<value>true</value>
+				<type>java.lang.Boolean</type>
+			</property>
+			<property>
+				<name>Stamp File Name</name>
+				<value>true</value>
+				<type>java.lang.Boolean</type>
+			</property>
+			<property>
+				<name>Split Files</name>
+				<value>false</value>
+				<type>java.lang.Boolean</type>
+			</property>
+			<property>
+				<name>File Size</name>
+				<value>1000000</value>
+				<type>java.lang.Integer</type>
+			</property>
+		</properties>
+	</module>
+	<module id="3" active="true">
+		<name>
+		File Reader
+		</name>
+		<fromClassId>
+		org.electrocodeogram.module.source.implementation.FileSystemSourceModule
+		</fromClassId>
+		<connectedTo>
+		<id>
+		4
+		</id>
+		</connectedTo>
+		<properties>
+			<property>
+				<name>Input File</name>
+				<value>
+					testeventlogs/small.log
+				</value>
+				<type>java.io.File</type>
+			</property>
+			<property>
+				<name>Enable Burst Mode</name>
+				<value>true</value>
+				<type>java.lang.Boolean</type>
+			</property>
+			<property>
+				<name>Send End Event</name>
+				<value>true</value>
+				<type>java.lang.Boolean</type>
+			</property>
+			<property>
+				<name>Ignored Event Types</name>
+				<value>
+				</value>
+				<type>java.lang.String</type>
+			</property>
+		</properties>
+	</module>
 </modulesetup>
