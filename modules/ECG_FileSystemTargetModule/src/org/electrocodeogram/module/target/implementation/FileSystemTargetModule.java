@@ -7,11 +7,12 @@
 
 package org.electrocodeogram.module.target.implementation;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -37,34 +38,29 @@ public class FileSystemTargetModule extends TargetModule {
     /**
      * A reference to the output file.
      */
-    private File outputFile;
+    private File outputFile = null;
 
     /**
      * The original name of the output file.
      */
-    private String outputFileName;
+    private String outputFileName = null;
 
     /**
      * The <em>PrintWriter</em> is used to write events into the
      * file.
      */
-    private PrintWriter writer;
-
-    /**
-     * This is the default output filename prefix.
-     */
-    private static final String DEFAULT_FILENAME_PREFIX = "out";
-
-    /**
-     * This is the default output filename suffix.
-     */
-    private static final String DEFAULT_FILENAME_SUFFIX = ".log";
+    private PrintWriter writer = null;
 
     /**
      * This is the default output directory under the user's home
      * directory.
      */
     private static final String LOG_SUBDIR = "ecg_log";
+
+    /**
+     * This is the default output file name.
+     */
+    private static final String LOG_FILENAME = "out.log";
 
     /**
      * This is the default maximum file size for the rotation of
@@ -93,14 +89,14 @@ public class FileSystemTargetModule extends TargetModule {
     private String homeDir;
 
     /**
-     * A reference to the log directory.
-     */
-    private String logDir;
-
-    /**
      * If true, append events to file, if false delete file first
      */
     private boolean append = true;
+
+    /**
+     * If true, append date (in form _YYMMDD) to file name
+     */
+    private boolean stamp = true;
 
     /**
      * This creates the module instance. It is not to be called by
@@ -133,40 +129,13 @@ public class FileSystemTargetModule extends TargetModule {
         logger.entering(this.getClass().getName(), "write",
             new Object[] {packet});
 
-        try {
-            this.writer.println(packet.toString());
+        this.getOutputWriter().println(packet.toString());
 
-            this.writer.flush();
+        logger.log(Level.INFO, "An event has been written to the file "
+                               + this.outputFile.getAbsolutePath()
+                               + " by the module " + this.getName());
 
-            logger.log(Level.INFO, "An event has been written to the file "
-                                   + this.outputFile.getAbsolutePath()
-                                   + " by the module " + this.getName());
-
-            if (this.outputFile.length() >= this.fileSize && this.rotateFiles) {
-                logger.log(Level.INFO,
-                    "The log-file has reached the maximum file size of "
-                                    + this.fileSize);
-
-                this.writer.close();
-
-                this.outputFile = new File(this.logDir
-                                           + File.separator
-                                           + ++this.count + "_" 
-                                           + this.outputFileName);
-
-
-                this.writer = new PrintWriter(new FileWriter(this.outputFile, this.append));
-
-                logger.log(Level.INFO, "A new log-file has been created: "
-                                       + this.outputFile.getAbsolutePath());
-            }
-
-            logger.exiting(this.getClass().getName(), "write");
-        } catch (IOException e) {
-            logger.log(Level.SEVERE, "Error while writing to logfile: "
-                                     + this.outputFile.getAbsolutePath()
-                                     + "\nThe disk might be full.");
-        }
+        logger.exiting(this.getClass().getName(), "write");
     }
 
     /**
@@ -183,15 +152,26 @@ public class FileSystemTargetModule extends TargetModule {
 
         if (moduleProperty.getName().equals("Append Data")) {
 
-            if (moduleProperty.getValue().equalsIgnoreCase("true"))
-                this.append = true;
-            else
+            if (moduleProperty.getValue().equalsIgnoreCase("false"))
                 this.append = false;
+            else
+                this.append = true;
             
             logger.log(Level.INFO, "Set the property: "
                     + moduleProperty.getName() + " to "
                     + Boolean.toString(this.append));            
         
+        } else if (moduleProperty.getName().equals("Stamp File Name")) {
+
+                if (moduleProperty.getValue().equalsIgnoreCase("false"))
+                    this.stamp = false;
+                else
+                    this.stamp = true;
+                
+                logger.log(Level.INFO, "Set the property: "
+                        + moduleProperty.getName() + " to "
+                        + Boolean.toString(this.stamp));            
+            
         } else if (moduleProperty.getName().equals("Output File")) {
 
             if (moduleProperty.getValue() == null) {
@@ -207,64 +187,22 @@ public class FileSystemTargetModule extends TargetModule {
             }
             
             this.outputFileName = moduleProperty.getValue();
+            File tmpFile = new File(this.outputFileName);
 
-            this.outputFile = new File(this.outputFileName);
-
-            this.logDir = this.outputFile.getAbsoluteFile().getParent();
-            if (this.logDir == null)
-            	this.logDir = ".";
-
-            if (this.writer != null) {
-                this.writer.close();
-            }
-
-            try {
-                this.writer = new PrintWriter(new FileWriter(this.outputFile, this.append));
-
-                logger.log(Level.INFO, "Set the property: "
-                                       + moduleProperty.getName() + " to "
-                                       + this.outputFile.getAbsolutePath());
-            } catch (IOException e) {
-
-                logger.log(Level.SEVERE,
-                    "The file could not be opened for writing: "
-                                    + moduleProperty.getValue());
-
-                logger.exiting(this.getClass().getName(), "propertyChanged");
-
-                throw new ModulePropertyException(
-                    "The file could not be opened for writing.",
-                    this.getName(), this.getId(), moduleProperty.getName(),
-                    moduleProperty.getValue());
-            }
+            logger.log(Level.INFO, "Set the property: "
+                    + moduleProperty.getName() + " to "
+                    + tmpFile.getAbsolutePath());
 
         } else if (moduleProperty.getName().equals("Split Files")) {
 
-            if (moduleProperty.getValue().equals("true")) {
+            if (moduleProperty.getValue().equalsIgnoreCase("true"))
                 this.rotateFiles = true;
-
-                logger.log(Level.INFO, "Set the property: "
-                                       + moduleProperty.getName() + " to true");
-            } else if (moduleProperty.getValue().equals("false")) {
+            else
                 this.rotateFiles = false;
 
-                logger
-                    .log(Level.INFO, "Set the property: "
-                                     + moduleProperty.getName() + " to false");
-            } else {
-                logger.log(Level.WARNING,
-                    "The module does not support a property value of "
-                                    + moduleProperty.getValue()
-                                    + " with the given name: "
-                                    + moduleProperty.getName());
-
-                logger.exiting(this.getClass().getName(), "propertyChanged");
-
-                throw new ModulePropertyException(
-                    "The module does not support this property.", this
-                        .getName(), this.getId(), moduleProperty.getName(),
-                    moduleProperty.getValue());
-            }
+            logger.log(Level.INFO, "Set the property: "
+                                   + moduleProperty.getName() +
+                                   Boolean.toString(this.rotateFiles));
 
         } else if (moduleProperty.getName().equals("File Size")) {
 
@@ -332,60 +270,9 @@ public class FileSystemTargetModule extends TargetModule {
     /**
      * @see org.electrocodeogram.module.target.TargetModule#startWriter()
      */
-    @Override
     public final void startWriter() throws TargetModuleException {
 
-        logger.entering(this.getClass().getName(), "startWriter");
-
-        if (this.outputFile == null) {
-
-            this.homeDir = System.getProperty("user.home");
-
-            if (this.homeDir == null) {
-
-                logger.log(Level.WARNING,
-                    "The user's home directory can not be determined.");
-
-                this.homeDir = ".";
-
-                logger.log(Level.WARNING,
-                    "Using the current working directory "
-                                    + new File(".").getAbsolutePath()
-                                    + "instead.");
-            }
-
-            File logDirFile = new File(this.homeDir + File.separator + LOG_SUBDIR);
-
-            if (!logDirFile.exists()) {
-                logDirFile.mkdir();
-            }
-            
-            this.logDir = logDirFile.getAbsolutePath();
-
-            this.outputFileName = this.logDir + File.separator 
-            						+ DEFAULT_FILENAME_PREFIX
-                                    + DEFAULT_FILENAME_SUFFIX;
-
-            this.outputFile = new File(this.outputFileName);
-
-            try {
-                this.writer = new PrintWriter(new BufferedWriter(
-                    new FileWriter(this.outputFile, true)));
-
-            } catch (IOException e) {
-                logger.log(Level.SEVERE,
-                    "Error while opening the output file: "
-                                    + this.outputFile.getAbsolutePath());
-
-                logger.log(Level.FINEST, e.getMessage());
-            }
-        }
-
-        this.logDir = this.outputFile.getAbsoluteFile().getParent();
-        if (this.logDir == null)
-        	this.logDir = ".";
-
-        logger.exiting(this.getClass().getName(), "startWriter");
+        // not implemented
 
     }
 
@@ -393,10 +280,94 @@ public class FileSystemTargetModule extends TargetModule {
      * @see org.electrocodeogram.module.target.TargetModule#stopWriter()
      *      This method is not implemented in this module.
      */
-    @Override
     public void stopWriter() {
 
     // not implemented
 
+    }
+    
+    private PrintWriter getOutputWriter() {
+        
+        if (this.outputFile != null && 
+                this.outputFile.length() >= this.fileSize && 
+                this.rotateFiles) 
+        {
+            logger.log(Level.INFO,
+                "The log-file has reached the maximum file size of "
+                                + this.fileSize);
+            this.writer.close();
+            this.count++;
+            if (this.writer != null)
+                this.writer.close();
+            this.writer = null;
+            this.outputFile = null;
+        }
+
+        if (this.outputFile == null || this.writer == null) {
+            
+            if (this.outputFileName == null) {
+                // If property Output File not set, take {user.home}/out.log
+                this.homeDir = System.getProperty("user.home");
+    
+                if (this.homeDir == null) {
+    
+                    logger.log(Level.WARNING,
+                        "The user's home directory can not be determined.");
+    
+                    this.homeDir = ".";
+    
+                    logger.log(Level.WARNING,
+                        "Using the current working directory "
+                                        + new File(".").getAbsolutePath()
+                                        + "instead.");
+                }
+    
+                File logDirFile = new File(this.homeDir + File.separator + LOG_SUBDIR);
+    
+                if (!logDirFile.exists()) {
+                    logDirFile.mkdir();
+                }
+                
+                this.outputFileName = logDirFile.getAbsolutePath() 
+                                        + File.separator 
+                                        + LOG_FILENAME;
+            }
+            
+            // Seperate prefix (eg "out" in "out.log") from suffix (eg "log")
+            int dotPos = this.outputFileName.lastIndexOf('.');
+            String fileName = null;
+            String fileSuffix = null;
+            if (dotPos == -1) {
+                fileName = this.outputFileName;
+            } else {
+                fileName = this.outputFileName.substring(0, dotPos);
+                fileSuffix = this.outputFileName.substring(dotPos + 1);
+            }
+            
+            // Build current full file name
+            if (this.stamp) {
+                SimpleDateFormat sdf = new SimpleDateFormat();
+                sdf.applyPattern("yMMd");
+                String yymmdd = sdf.format(new Date());
+                fileName += "_" + yymmdd;
+            }
+            if (this.rotateFiles) {
+                fileName += "-" + String.format("%1$02d", this.count);
+            }
+            fileName += (fileSuffix != null ? ("." + fileSuffix) : "");
+            
+            try {
+                // create file
+                this.outputFile = new File(fileName);        
+                // create writer based on file
+                this.writer = new PrintWriter(new FileWriter(this.outputFile, this.append), true);
+            } catch (IOException e) {
+                logger.log(Level.SEVERE, "Error while creating or opening logfile named '"
+                        + this.outputFile.getAbsolutePath()
+                        + "'.");
+            }
+        } 
+        
+        return this.writer;
     }
 }

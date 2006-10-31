@@ -7,7 +7,7 @@
 		FU Berlin
 	</provider-name>
 	<version>
-		1.0
+		1.1
 	</version>
 	<name>
 		File Writer
@@ -18,14 +18,21 @@
 	<description>
 		This module writes incoming events into a file. The properties are:
 		* Output File - The name of the output file, either absolute or relative.
+		* Stamp File Name - If true, the date (in form _YYMMDD) will be appended
+		                    before the '.' in "Output File" as well as before any
+		                    count -X due to set "Split File" property. The name 
+		                    will be checked at activation of this module and remain 
+		                    until the module is stopped or the file is split.
 		* Append Data - If true, event data will be appended to Output File (default)
 		                If false, the Output File will be deleted first
 		* Split Files - If "true", the Output File is split into several files 
-		  (with added prefix X_, where X from {1,2,..}) to keep the file size low. 
-		  Set "false" if not intended. See also property File Size.
+		                (with added postfix -X right before a dot in the name, where 
+		                X from {1,2,..}) to keep the file size low. Set "false" if 
+		                not intended. See also property File Size.
 		* File Size - Maximum size of a log file in bytes. Default is 10 MByte.
-		  Note that the size of the file is checked *after* writing a single 
-		  event, so it's not guaranteed that the size really stays below the File Size
+		              Note that the size of the file is checked *after* writing a 
+		              single event, so it's not guaranteed that the size really stays 
+		              below the File Size
 	</description>
 	<type>
 		TARGET
@@ -69,6 +76,17 @@
 				java.lang.Integer
 			</propertyType>
 			<propertyValue>
+			</propertyValue>
+		</property>
+		<property>
+			<propertyName>
+				Stamp File Name
+			</propertyName>
+			<propertyType>
+				java.lang.Boolean
+			</propertyType>
+			<propertyValue>
+			    true
 			</propertyValue>
 		</property>
 	</properties>
