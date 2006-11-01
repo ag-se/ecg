@@ -127,6 +127,8 @@
 			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.jdt.debug.ui_3.2.0.v20060605.jar"/>
 			<pathelement path="C:/Program Files/eclipse/plugins/org.eclipse.jdt.junit.runtime_3.2.0.v20060605-1400/junitruntime.jar"/>
 			<pathelement path="C:/Program Files/eclipse/plugins/org.junit_3.8.1/junit.jar"/>
+			<pathelement path="lib/ecg_support.jar"/>
+			<pathelement path="${build.result.folder}/../org.electrocodeogram.sensor.eclipse/lib/ecg_support.jar"/>
 			<pathelement path="lib/hackystat/sensor.eclipse.3x.jar"/>
 			<pathelement path="${build.result.folder}/../org.electrocodeogram.sensor.eclipse/lib/hackystat/sensor.eclipse.3x.jar"/>
 			<pathelement path="sensorshell.jar"/>
@@ -172,7 +174,7 @@
 			<fileset dir="${build.result.folder}" includes="sensor.eclipse.jar"			/>
 		</copy>
 		<copy todir="${destination.temp.folder}/org.electrocodeogram.sensor.eclipse_1.1.4" failonerror="true" overwrite="false">
-			<fileset dir="${basedir}" includes="plugin.xml,sensor.eclipse.jar,lib/hackystat/,sensorshell.jar,ecg/"			/>
+			<fileset dir="${basedir}" includes="plugin.xml,sensor.eclipse.jar,lib/hackystat/,sensorshell.jar,ecg/,lib/ecg_support.jar"			/>
 		</copy>
 	</target>
 
