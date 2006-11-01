@@ -6,6 +6,13 @@
 			This XML schema defines the structure of the "line diff" MicroSensorDataType.
 			It describes a set of line diffs between textfiles which were made at
 			a particular point of type. Diffs may be "inserted", "deleted" or "changed".
+			The linediff element contains:
+			* documentname: taken from the codechange documentname, i.e. the filename
+			* lines: A set of consequtive line elements each containing
+			  * type: Any of changed, inserted, deleted
+			  * linenumber: The number of the line with respect to the old version of the file
+			  * from: The contents of the line before the diff (for deleted and changed), CDATA
+			  * to: the contents of the line after the diff (for inserted and changed)
 		</xs:documentation>
 	</xs:annotation>
 
