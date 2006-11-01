@@ -248,18 +248,19 @@
 	</target>
 
 	<!-- Invokes all ECG ant scripts -->
-	<target name="all" depends="cleanall, Package release" />
+	<target name="all" depends="cleanall, Package release, Make Release Zip" />
 
 
 	<target name="Make Release Zip" depends="Package release">
 		
-		<copy failonerror="no" todir="dist/" file="ReadMe.txt"/>
+		<copy failonerror="no" todir="dist/" file="ReleaseNotes.txt"/>
+		<copy failonerror="no" todir="dist/" file="ChangeLog.txt"/>
 
 		<delete failonerror="no">
-			<fileset dir="dist" includes="*.zip"/>
+			<fileset dir="." includes="*.zip"/>
 		</delete>
 
-		<zip destfile="dist/ElectroCodeoGram_v1.1.5.zip" 
+		<zip destfile="ElectroCodeoGram_v1.1.4.zip" 
 		 	 basedir="dist" filesonly="false" update="false"/>
 
 	</target>
