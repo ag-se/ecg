@@ -57,7 +57,7 @@ public class CodechangeDifferIntermediateModule extends IntermediateModule {
 		private void compute(Diff.change next) {
 			if (next == null)
 				return;
-System.out.println("\nAnalysing hunk (" + next.line0 + "," + next.line1 + "," + next.deleted + "," + next.inserted + ")");
+//System.out.println("\nAnalysing hunk (" + next.line0 + "," + next.line1 + "," + next.deleted + "," + next.inserted + ")");
 			if (next.inserted == 0 && next.deleted == 0)
 				return;
 			if (next.inserted == 0) {
@@ -67,7 +67,7 @@ System.out.println("\nAnalysing hunk (" + next.line0 + "," + next.line1 + "," + 
 							next.line0+i,
 							null,
 							LineDiff.ChangeType.DELETED));
-System.out.println("  " + (next.line0+i+1) + "<:" + code0[next.line0 + i]);
+//System.out.println("  " + (next.line0+i+1) + "<:" + code0[next.line0 + i]);
 				}
 			}
 			if (next.inserted != 0 && next.deleted == 0) {
@@ -77,7 +77,7 @@ System.out.println("  " + (next.line0+i+1) + "<:" + code0[next.line0 + i]);
 							next.line1+i,
 							code1[next.line1 + i],
 							LineDiff.ChangeType.INSERTED));
-System.out.println("  " + (next.line1+i+1) + ">:" + code1[next.line1 + i]);
+//System.out.println("  " + (next.line1+i+1) + ">:" + code1[next.line1 + i]);
 				}        		  
 			}
 			if (next.inserted != 0 && next.deleted != 0) {
@@ -88,20 +88,20 @@ System.out.println("  " + (next.line1+i+1) + ">:" + code1[next.line1 + i]);
 								next.line1+i,
 								code1[next.line1 + i],
 								LineDiff.ChangeType.CHANGED));
-System.out.println("  " + (next.line0+i+1) + "<>:" + code0[next.line0 + i]);
-System.out.println("  " + (next.line1+i+1) + "><:" + code1[next.line1 + i]);
+//System.out.println("  " + (next.line0+i+1) + "<>:" + code0[next.line0 + i]);
+//System.out.println("  " + (next.line1+i+1) + "><:" + code1[next.line1 + i]);
 					} else if (i >= next.inserted && i < next.deleted) {
 						lineDiffs.add(new LineDiff(code0[next.line0 + i],
 								next.line0+i,
 								null,
 								LineDiff.ChangeType.DELETED));
-System.out.println("  " + (next.line0+i+1) + "<:" + code0[next.line0 + i]);						  
+//System.out.println("  " + (next.line0+i+1) + "<:" + code0[next.line0 + i]);						  
 					} else if (i < next.inserted && i >= next.deleted) {
 						lineDiffs.add(new LineDiff(null,
 								next.line1+i,
 								code1[next.line1 + i],
 								LineDiff.ChangeType.INSERTED));
-System.out.println("  " + (next.line1+i+1) + ">:" + code1[next.line1 + i]);						  
+//System.out.println("  " + (next.line1+i+1) + ">:" + code1[next.line1 + i]);						  
 					} else 
                         assert (false);
 				}
@@ -181,7 +181,7 @@ System.out.println("  " + (next.line1+i+1) + ">:" + code1[next.line1 + i]);
     	String oldCode = codes.get(id);
     	String newCode = getCode(packet);
 
-System.out.println("Old:\n" + oldCode + "----\nNew:\n" + newCode + "----\n");        
+//System.out.println("Old:\n" + oldCode + "----\nNew:\n" + newCode + "----\n");        
         
     	if (newCode == null)
     		newCode = "";
@@ -240,9 +240,9 @@ System.out.println("Old:\n" + oldCode + "----\nNew:\n" + newCode + "----\n");
             logger.log(ECGLevel.FINE, diffs);
     
             data += diffs + "</lines></linediff></microActivity>";
-System.out.println("-----\nResults in event " + data);
+//System.out.println("-----\nResults in event " + data);
 
-//            assert(applyDiffOnOldCode(oldLines, newLines, next));
+//            TODO assert(applyDiffOnOldCode(oldLines, newLines, next));
     		
             // send event
             String[] args = {WellFormedEventPacket.HACKYSTAT_ADD_COMMAND, "msdt.linediff.xsd", data};
@@ -254,12 +254,12 @@ System.out.println("-----\nResults in event " + data);
     		}
         }
         
-System.out.println("-----------------------------------------------");
+//System.out.println("-----------------------------------------------");
         
 		return events;
     }
 
-/*    
+/*  TODO should check consistency of diffs with new lines 
 	private boolean applyDiffOnOldCode(String[] oldLines, String[] newLines, change next) {
         boolean res = true;
         LineChangeIterator it = new LineChangeIterator(oldLines, newLines, next);
