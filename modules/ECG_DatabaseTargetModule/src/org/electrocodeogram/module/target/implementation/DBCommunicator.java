@@ -3,6 +3,7 @@
  */
 package org.electrocodeogram.module.target.implementation;
 
+import java.io.File;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Iterator;
@@ -11,6 +12,8 @@ import java.util.logging.Logger;
 
 import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.logging.LogHelper;
+import org.electrocodeogram.msdt.MicroSensorDataType;
+import org.electrocodeogram.system.ModuleSystem;
 
 import com.mysql.jdbc.Connection;
 import com.mysql.jdbc.DatabaseMetaData;
@@ -573,6 +576,48 @@ public class DBCommunicator {
             return false;
         }
 
+    }
+    
+    public void getInformationAndSyncTables(){
+    	
+    	MicroSensorDataType[] msdts = ModuleSystem.getInstance().getMicroSensorDataTypes();
+
+    	/**
+         * For each schema: 
+         * 1. create Proxy 
+         * 2. getSchemaProperties(String) --> Vector with Table instances 
+         * 3. for each table of the schema --> synchronizeTableToDatabase
+         */
+
+        File msdtFolder = new File(DBTargetModuleConstants.MSDT_FOLDER);
+        if (msdtFolder.exists()) {
+            logger.info("Folder msdt exists");
+        }
+        
+        File commondataSchema = new File(DBTargetModuleConstants.MSDT_FOLDER+"msdt.common.xsd");
+        XMLSchemaProxy commonProxy = new XMLSchemaProxy (commondataSchema, this);
+  
+        if (!(tableExists("commondata"))){
+        	Table commondataTable = commonProxy.getCommonProperties();
+        	String createCommondataTable  = CreateSQL.createCommonDataTable(commondataTable);
+        	logger.info("must create commondata table in database");
+        	executeStmt(createCommondataTable);
+        	logger.info("commondata table successfully created");
+        	
+        }
+        else{
+        	commonProxy.synchronizeCommonSchemaToDatabase();
+        	logger.info("synchronized commondata schema to database");
+        }
+        
+        logger.info("Array with MSDTs has Length : "+msdts.length);
+
+        for (int i = 0; i < msdts.length; i++) {
+            	logger.info("found MSDT: "+msdts[i].getName());
+                XMLSchemaProxy schemaProxy = new XMLSchemaProxy(msdts[i].getDefFile(), this);
+                schemaProxy.synchronizeSchemaToDatabase();
+                logger.info("synchronized "+msdts[i].getName()+" schema to database");
+        }        
     }
 
 }

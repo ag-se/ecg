@@ -43,7 +43,7 @@ public class XMLSchemaProxy {
 
     /**
      * the vector which holds the information about all the tables which are
-     * involved in storing Xml Documents which correlate with ths given schema
+     * involved in storing Xml Documents which correlate with the given schema
      */
     private Vector<Table> tables = new Vector<Table>();
 
@@ -728,14 +728,6 @@ public class XMLSchemaProxy {
         synchronizeTable(commonTable);
     }
 
-    
-    public boolean hasCommonDataPart(){
-    	if( this.findElementDeklaration("commonData")!= null){
-    		return true;
-    	}
-    	else 
-    		return false;
-    }
     
     /**
      * Check for each element and attribute deklaration in a schema whether they
