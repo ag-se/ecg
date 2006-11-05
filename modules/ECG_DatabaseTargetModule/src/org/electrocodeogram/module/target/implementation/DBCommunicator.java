@@ -4,6 +4,8 @@
 package org.electrocodeogram.module.target.implementation;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Iterator;
@@ -619,5 +621,7 @@ public class DBCommunicator {
                 logger.info("synchronized "+msdts[i].getName()+" schema to database");
         }        
     }
+    
+    
 
 }

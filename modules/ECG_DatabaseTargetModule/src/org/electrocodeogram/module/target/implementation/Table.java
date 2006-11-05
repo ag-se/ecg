@@ -10,7 +10,12 @@ import java.util.Vector;
  */
 public class Table {
     
-    private String tableName;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	private String tableName;
     private Vector<ColumnElement> elements;
     
     
