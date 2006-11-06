@@ -347,7 +347,7 @@ public class FileSystemTargetModule extends TargetModule {
             // Build current full file name
             if (this.stamp) {
                 SimpleDateFormat sdf = new SimpleDateFormat();
-                sdf.applyPattern("yMMd");
+                sdf.applyPattern("yMMdd");
                 String yymmdd = sdf.format(new Date());
                 fileName += "_" + yymmdd;
             }
