@@ -19,7 +19,7 @@ Changes for 1.1.3:
 Changes for 1.1.4:
 * The Eclipse plug-in now has a property dialog. It serves as a workspace dependend setting of the values which by default are read from sensor.properties. The settings only take effect after reload of the workspace. Instead of an ECG_SERVER_PATH the dialog provides to set a link to a batch file which starts the inline ecg lab. The batch file will be ignored in remote mode. (rev935, rev936, rev937)
 * New ECG_SERVER_TYPE "NULL" for sensors which disables ECG logging completely. (rev935, rev937)
-* FileTargetModule (rev939, rev954, rev972):
+* FileTargetModule (rev939, rev954, rev972, rev985):
 ** Resolved bug on always overwriting the output file 
 ** Added property "Append Events" to switch between insertion and overwrite mode. Default is true.
 ** New property "Stamp File Name" which if set to true will append the day in YYMMDD format to the output file name. Appending to file means appending it right before the last '.' in the Output File.
@@ -28,13 +28,18 @@ Changes for 1.1.4:
 ** Updated properties file to 1.1 
 * CommonData (i.e. each basic event type) now contains a <version>X</version> tag with X being a simple integer. MSDTs by 1.1.3 or earlier should be interpreted as version 1 (rev930, rev937, rev942, rev949, rev952)
 * CommonData (i.e. each basic event type) now contains a <creator>ABC</creator> tag with ABC being a string. It should contain the creator of this event. The Eclipse-Seonsor sends a "ECGEclipseSensor1.1.4" in this version and must be updated for each new version. (rev942, rev946, rev949, rev952)
-* A new msdt.textoperation.xsd now send copy, cut, and paste events with selection contents, clipboard contents, startline, endline und offset. Offset is the position of the selection in chars from the beginning of the file. msdt.user.xsd is not used anymore for this CCP purpose. (rev950, rev951)
-* MSDTFileModule: New property "Ignored Event Types" may contain MSDT names which will not be parsed at all. This results in slightly better performance. (rev953, rev956)
+* A new msdt.textoperation.xsd now send copy, cut, and paste events with selection contents, clipboard contents, startline, endline und offset. Offset is the position of the selection in chars from the beginning of the file. msdt.user.xsd is not used anymore for this CCP purpose. (rev950, rev951, rev990)
+* FileSourceModule:  (rev953, rev956, rev992)
+** New property "Ignored Event Types" may contain MSDT names which will not be parsed at all. This results in slightly better performance.
+** Added the treatment of the Input File as a directory which loads .out/.log/.events/.ecg files in the directory in lexicographical order
+** Resolved bug in FileReader concerning "Send End Event" in GUI mode: Now the FileReader module will become inactive in case of "Send End Event" = true. The Warning "null has been read by the EventReader" will not occur anymore (rev956, rev991)
 * CSVFileWriter (rev957):
 ** Property "Delimiter" (default ist TAB character) specifies the seperator in der CSV file
 ** In the "Columns" perperty, a column may have alternative names set as a/b/c. For example, "resourcename/editorname" for a column means that if a "resourcename" is present it will be printed, if not, the editorname will be printed, if available 
-* Resolved bug in FileReader concerning "Send End Event" in GUI mode: Now the FileReader module will become inactive in case of "Send End Event" = true (rev956)
+* MSDTFilterModule (rev986):
+** Added "Passer" property which is the reverse to "Blocker" and should not be used in parallel to Blocker
 * New EpisodeRecognizer for msdt.runactive.xsd computed from msdt.run - run/debug- and -terminated event pairs (rev958,rev960,rev963)
 * New EpisodeRecognizer for msdt.antactive.xsd computed from msdt.ant - run/debug- and -terminated event pairs (rev958,rev960,rev963)
 * msdt.exactcodechanges.xsd support in EclipseSensor for the Replayer which will be released in 1.1.5 (rev965, rev966)
-* Bugfix in CodeLineDiffer (rev969)
+* CodeLineDiffer: Bugfixes and small changes in, especially correct deletion interpretation and handling of double code status events (rev969, rev977, rev981, rev987)
+* CodeLocationTracker: Sends msdt.codelocation events (rev988, rev993)
