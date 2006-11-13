@@ -5,6 +5,36 @@
 		<xs:documentation>
 			This XML schema defines the structure of the "code location" MicroSensorDataType.
 			It describes a change or birth of a code location computed from code changes.
+			The elements are (version 1):
+			commonData - As usual, mainly taken from the corresponding codediff events
+			path - An indicator of where in a hierarchy of location this location is located.
+			       The format is not definied in version 1. It is empty or missing.
+			type - Kind of metamorphosis of this location:
+				   * INTIATED = No history available, first compution without a diff
+				   * ADDED = Newly introduced location due to inserted lines
+				   * CHANGED = The contents of the location has changed without inserted or deleted lines
+				   * MERGED_DEL_AT_START = The location has been merged with the previous one and has been removed
+				   * MERGED_DEL_AT_END = The location has been merged with the subsequent one and has been removed
+				   * MERGED_ADD_AT_START = The location has been merged with the previous one and has been retained
+				   * MERGED_ADD_AT_END = The location has been merged with the subsequent one and has been retained
+				   * EXTENDED_AT_START = The location has been extended at the beginning due to inserted lines
+				   * EXTENDED_IN_BETWEEN = the location has been extended in the middle of it due to inserted lines
+				   * EXTENDED_AT_END = The location has been extended at the end due to inserted lines
+				   * SPLIT_DEL_AT_START = The location has been shortened in the beginning because a new location has been built
+				   * SPLIT_DEL_AT_END = The location has been shortened at the ned because a new location has been built
+				   * SPLIT_ADD_AT_START = This location has been created because its a split from the end of another location
+				   * SPLIT_ADD_AT_END = This location has been created because its a split from the beginning of another location
+				   * SHORTENED_AT_ALL = The location has been completely deleted due to deleted lines
+				   * SHORTENED_AT_START = The location has been shortened in the beginning due to deleted lines
+				   * SHORTENED_IN_BETWEEN = The location has been shortened in the middle of it due to deleted lines
+				   * SHORTENED_AT_END = The location has been shortened at the end due to deleted lines
+			id - The unique id of the location
+			related - An id of another location. Some of the metamorphosis types involve another location; this is the id of it.
+			location - A string denoting the position of the location in the project. 
+			           In version 1 it has the form "filename;startline;length". length is the number of lines
+			properties - A string representing some properties of the location change
+			             In version 1 the format is not sepcified. It is empty or missing.
+			contents - The code fragments of the latest microversion of this location, i.e. the results of the metamorphosis, the changed contents of the location
 		</xs:documentation>
 	</xs:annotation>
 
@@ -47,6 +77,7 @@
 							<xs:element name="id"  type="xs:integer"/>
 							<xs:element name="related"  type="xs:integer"/>
 							<xs:element name="location" type="xs:string"/>
+							<xs:element name="properties" type="xs:string" minOccurs="0"/>
     						<xs:element name="contents"  type="xs:string"/> <!-- contains CDATA section -->
 						</xs:sequence>
 					</xs:complexType>			

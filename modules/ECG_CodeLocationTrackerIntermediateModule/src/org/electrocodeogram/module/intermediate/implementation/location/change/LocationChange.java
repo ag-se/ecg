@@ -1,6 +1,11 @@
 package org.electrocodeogram.module.intermediate.implementation.location.change;
 
+import org.electrocodeogram.event.CommonData;
+import org.electrocodeogram.event.MicroActivity;
 import org.electrocodeogram.module.intermediate.implementation.location.state.Location;
+import org.w3c.dom.CDATASection;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 
 
@@ -151,7 +156,7 @@ public class LocationChange {
      * 
      */
     public String asEventString(String creator, String id, String projectname, String username) {
-        /* For some myterious reason, the xml way doesn't work here. The nodes (apart from the cdata section) simply ignore their values
+        
         MicroActivity microActivity;
         Element locchange_path;
         Element locchange_type;
@@ -185,24 +190,24 @@ public class LocationChange {
 
         CommonData commonData = microActivity.getCommonData();
         commonData.setVersion(1); // 1 is default
-        commonData.setCreator(CREATOR_STRING); 
-        commonData.setUsername(getUsername(eventPacket));
-        commonData.setProjectname(getProjectname(eventPacket));
+        commonData.setCreator(creator); 
+        commonData.setId(id);
+        commonData.setUsername(username);
+        commonData.setProjectname(projectname);
         
-        for (LocationChange lc : locChanges) {
-            locchange_path.setNodeValue(""); // TODO
-            locchange_type.setNodeValue(lc.getType().name());
-            locchange_id.setNodeValue(Integer.toString(lc.getLocation().getId()));
-            locchange_related.setNodeValue(Integer.toString(lc.getRelatedLocId()));
-            locchange_location.setNodeValue(
-                    lc.getLocation().getText().getId() + ";" +  
-                    lc.getLocation().getStart() + ";" +
-                    lc.getLocation().getLength());
-            locchange_contents_cdata.setTextContent(lc.getContents());
+        locchange_path.setTextContent(""); // TODO
+        locchange_type.setTextContent(this.getType().name());
+        locchange_id.setTextContent(Integer.toString(this.getLocation().getId()));
+        locchange_related.setTextContent(Integer.toString(this.getRelatedLocId()));
+        locchange_location.setTextContent(
+                this.getLocation().getText().getId() + ";" +  
+                this.getLocation().getStart() + ";" +
+                this.getLocation().getLength());
+        locchange_contents_cdata.setTextContent(this.getContents());
 
-            String data = microActivity.getSerializedMicroActivity(); 
-*/
+        String data = microActivity.getSerializedMicroActivity(); 
 
+/*
         String data = "<?xml version=\"1.0\"?><microActivity><commonData>";
         data += "<version>1</version>";
         data += "<creator>" + creator + "</creator>";
@@ -219,7 +224,9 @@ public class LocationChange {
                 this.getLocation().getLength() + "</location>";
         data += "<contents><![CDATA[" + this.getContents() + "]]></contents>";
         data += "</codelocation></microActivity>";
-//System.out.println(data);
+*/
+
+System.out.println(data);
         return data;
     }
 
