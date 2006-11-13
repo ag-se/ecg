@@ -7,9 +7,14 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.electrocodeogram.event.CommonData;
+import org.electrocodeogram.event.IllegalEventParameterException;
+import org.electrocodeogram.event.MicroActivity;
 import org.electrocodeogram.event.ValidEventPacket;
+import org.electrocodeogram.event.WellFormedEventPacket;
 import org.electrocodeogram.logging.LogHelper;
 import org.electrocodeogram.logging.LogHelper.ECGLevel;
 import org.electrocodeogram.misc.xml.ECGParser;
@@ -28,8 +33,11 @@ import org.electrocodeogram.module.intermediate.implementation.location.state.Lo
 import org.electrocodeogram.module.intermediate.implementation.location.state.Text;
 import org.electrocodeogram.modulepackage.ModuleProperty;
 import org.electrocodeogram.modulepackage.ModulePropertyException;
-
+import org.w3c.dom.CDATASection;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.bootstrap.DOMImplementationRegistry;
+import org.w3c.dom.ls.DOMImplementationLS;
 
 /**
  * Module to assemble (code) location with retained identity over time and
@@ -37,10 +45,12 @@ import org.w3c.dom.Document;
  */
 public class CodeLocationTrackerIntermediateModule extends IntermediateModule {
 
-    static private int ccc = 0;
+    private static final String CREATOR_STRING = "CodeLocationTrackerIntermediateModule1.1.4";
+
+    private int ccc = 0; // For Debugging purposes: A counter of the calls to analyse
 
     /**
-     * The class'es logger
+     * The class logger
      */
     public static Logger logger = LogHelper 
         .createLogger(CodeLocationTrackerIntermediateModule.class.getName());
@@ -57,7 +67,6 @@ public class CodeLocationTrackerIntermediateModule extends IntermediateModule {
      * 
      * TODO Maybe not useful in later versions, because the history can be compiled 
      * from a BlockChange history
-     * TODO Is depedant on text (or not?)
      */
     private History history = new History();
     
@@ -73,7 +82,7 @@ public class CodeLocationTrackerIntermediateModule extends IntermediateModule {
 	 * @param name
 	 */
 	public CodeLocationTrackerIntermediateModule(String id, String name) {
-		super(id, name);
+		super(id, name);        
 	}
 
 	/**
@@ -81,19 +90,35 @@ public class CodeLocationTrackerIntermediateModule extends IntermediateModule {
 	 */
 	public Collection<ValidEventPacket> analyse(ValidEventPacket eventPacket) {
 
-//System.out.println(eventPacket);        
-		if (eventPacket.getMicroSensorDataType().getName().equals("msdt.codestatus.xsd")) {
+//System.out.println(eventPacket);
+        ccc++;
+        
+        // a list of location changes which will be sent as event packets
+        List<LocationChange> locChanges = new ArrayList<LocationChange>();
+
+        if (eventPacket.getMicroSensorDataType().getName().equals("msdt.codestatus.xsd")) {
             // On code status events compile first set of locations and initial location changes
     		
             String documentName = getDocumentName(eventPacket); 
     		if (!documentName.endsWith(".java")) // TODO currently only for .java documents
     			return null;
-    		
-            if (texts.get(documentName) != null) // TODO What to do here?
-                System.err.println("A new codestatus for " + documentName + " at " + eventPacket.getTimeStamp());
+            String id = getId(eventPacket);
+            if (id == null || id.length() == 0)
+                id = documentName;
 
-            Text text = new Text();
             String code = getCode(eventPacket);
+
+            Text text = texts.get(id);
+            if (text != null) {
+                // This means a codestatus has already been sent some time ago
+                // The CodeChangeDiffer treats this just like a code change, so do we
+                // LineDiffs must have been send right before this one 
+                assert (text.printContents().trim().equals(code.trim()));
+                // A new codestatus isn't of any interest
+                return null;  
+            }
+
+            text = new Text(documentName);            
             String[] lines = getLines(code);
     		
             // Prepare initial block change
@@ -121,8 +146,10 @@ public class CodeLocationTrackerIntermediateModule extends IntermediateModule {
             // Add locations
             for (Location newLoc : newLocs) {
                 text.addLocation(newLoc);
-                history.addLocationChange(new LocationChange(newLoc, 
-                        LocationChangeType.INTIATED, -1), blockChange);
+                LocationChange lc = new LocationChange(newLoc, 
+                        LocationChangeType.INTIATED, -1);
+                history.addLocationChange(lc, blockChange);
+                locChanges.add(lc);
             }
 /*    
 System.out.println("First locations computation on file " + documentName);
@@ -130,7 +157,7 @@ System.out.println("at " + eventPacket.getTimeStamp() + ":");
 System.out.println(text.printLocations());
 System.out.println("---");
 */
-            this.texts.put(documentName, text);
+            this.texts.put(id, text);
             
             assert (text.checkValidity());
             assert (text.printContents().trim().equals(code.trim()));
@@ -142,9 +169,19 @@ System.out.println("---");
             String documentName = getDocumentName(eventPacket); 
             if (!documentName.endsWith(".java"))
                 return null;
+            String id = getId(eventPacket);
+            if (id == null || id.length() == 0)
+                id = documentName;
             
-            Text text = texts.get(documentName);
-            assert (text != null);
+            Text text = texts.get(id);
+            assert(text != null);            
+            
+            if (text == null) {
+                // A codestatus seem to be missing. This should not occur, but may happen
+                //   due to incomplete events. We assume this document has been empty before
+                text = new Text(documentName);
+                texts.put(id, text);
+            }
             
             Collection<BlockChange> blockChanges = BlockChange.parseLineDiffsEvent(text, eventPacket);            
 //System.out.println(blockChanges.size());
@@ -179,12 +216,12 @@ System.out.println("---");
                     Collection<Location> tail = text.getLastLocations(location); // affected locations
                     Iterator<Location> tailIt = tail.iterator();
                     location = tailIt.next(); // at least on element (=location) must be present
-                    List<LocationChange> locChanges = new ArrayList<LocationChange>();
+                    List<LocationChange> newLocChanges = new ArrayList<LocationChange>(); // temporarely stores new generated LocChanges
                     
                     // The location may contain the deleted block completely
                     if (location.getStart() < bc.getBlockStart() && location.getEnd() > bc.getBlockEnd()) {
                         location.setLength(location.getLength() - bc.getBlockLength());
-                        locChanges.add(new LocationChange(location, LocationChangeType.SHORTENED_IN_BETWEEN, -1));                        
+                        newLocChanges.add(new LocationChange(location, LocationChangeType.SHORTENED_IN_BETWEEN, -1));                        
                         location = (tailIt.hasNext() ? tailIt.next() : null);
                     }
                     else // ok, seems to be more complicated: check three stages 
@@ -193,14 +230,14 @@ System.out.println("---");
                         if (location.getStart() < bc.getBlockStart() && location.getEnd() >= bc.getBlockStart()) {
                             // the latter few lines will be deleted
                             location.setLength(bc.getBlockStart() - location.getStart());
-                            locChanges.add(new LocationChange(location, LocationChangeType.SHORTENED_AT_END, -1));
+                            newLocChanges.add(new LocationChange(location, LocationChangeType.SHORTENED_AT_END, -1));
                             location = (tailIt.hasNext() ? tailIt.next() : null);
                         }
                         
-                        // The next few location which completely cover the deleted lines will be emptied
+                        // The next few locations which completely cover the deleted lines will be emptied
                         while (location != null && location.getStart() >= bc.getBlockStart() && location.getEnd() <= bc.getBlockEnd()) {
                             location.setLength(0); // set to 0 to correctly recompute the contents
-                            locChanges.add(new LocationChange(location, LocationChangeType.SHORTENED_AT_ALL, -1));
+                            newLocChanges.add(new LocationChange(location, LocationChangeType.SHORTENED_AT_ALL, -1));
                             tailIt.remove(); // 1. remove will be refelcted in text.getLocations(), 2. Really remove? Yes, because of the ordering in text
                             location = (tailIt.hasNext() ? tailIt.next() : null);
                         }
@@ -209,7 +246,7 @@ System.out.println("---");
                         if (location != null && location.getStart() <= bc.getBlockEnd() && location.getEnd() > bc.getBlockEnd()) {
                             location.setLength(location.getEnd() - bc.getBlockEnd());
                             location.setStart(bc.getBlockStart());
-                            locChanges.add(new LocationChange(location, LocationChangeType.SHORTENED_AT_START, -1));
+                            newLocChanges.add(new LocationChange(location, LocationChangeType.SHORTENED_AT_START, -1));
                             location = (tailIt.hasNext() ? tailIt.next() : null);
                         }
                     }
@@ -230,9 +267,10 @@ System.out.println("---");
                         text.deleteLine(bc.getBlockStart()); // it's always the first line number!
                     
                     // Register location change
-                    for (LocationChange locChange : locChanges) {
+                    for (LocationChange locChange : newLocChanges) {
                         // Will recompute the contents (necessary because only now the lines are corrrectly deleted)
-                        history.addLocationChange(locChange, bc);                        
+                        history.addLocationChange(locChange, bc);
+                        locChanges.add(locChange);
                     }
                     
                     // Finally, the new neighborhood needs to be analysed. bc.blockStart now
@@ -258,14 +296,14 @@ System.out.println("---");
                     Location insertLocBelow = null; 
                     if (insertLineBelow != null)
                         insertLocBelow = insertLineBelow.getLocation();
-                    else
-                        insertLocBelow = text.getLastLocation(); // get last location if inserted at end 
+                    //else 
+                    //    insertLocBelow = text.getLastLocation(); // get last location if inserted at end 
                     
                     // fetch location just above insertion line
-                    Line insertLineAbove = text.getLine(insertLineBelow.getLinenumber()-1);
+                    Line insertLineAbove = text.getLine(bc.getBlockStart()-1);
                     Location insertLocAbove = null;
                     if (insertLineBelow == null) { 
-                        // insertLoc/LineBelow == null means, inserted block at end of text, take last loc above
+                        // insertLocBelow/insertLineBelow == null means, inserted block at end of text, take last loc above
                         insertLocAbove = text.getLastLocation();
                     } else if (insertLineAbove == null) {
                         // was insertion at line 0, so there's no above
@@ -431,11 +469,19 @@ System.out.println("---");
                     history.addLocationChange(locChangedBelow, bc);
                     history.addLocationChange(locMergedAway, bc);
                     history.addLocationChange(locMergedAdd, bc);
+                    if (locForked != null) locChanges.add(locForked);
+                    if (locSplit != null) locChanges.add(locSplit);
+                    if (locChangedAbove != null) locChanges.add(locChangedAbove);
+                    if (locChangedBelow != null) locChanges.add(locChangedBelow);
+                    if (locMergedAway != null) locChanges.add(locMergedAway);
+                    if (locMergedAdd != null) locChanges.add(locMergedAdd);
                     
                     // register remaining new locations in text and report location changes 
                     for (Location newLoc : newLocs) {
                         text.addLocation(newLoc);
-                        history.addLocationChange(new LocationChange(newLoc, LocationChangeType.ADDED, -1), bc);
+                        LocationChange lc = new LocationChange(newLoc, LocationChangeType.ADDED, -1);
+                        history.addLocationChange(lc, bc);
+                        locChanges.add(lc);
                     }
 
                 }
@@ -460,8 +506,9 @@ System.out.println("---");
                         // secondly perfom the linediff operation in the text
                         line.setContents(lineChange.getContents());
                         strategy.computeBasicLineProperties(line);
-                        history.addLocationChange(new LocationChange(location, 
-                                LocationChangeType.CHANGED, -1), bc); 
+                        LocationChange lc = new LocationChange(location, LocationChangeType.CHANGED, -1);
+                        history.addLocationChange(lc, bc);
+                        locChanges.add(lc);
         
                         // thirdly perform recomputation of Locations at the new line neighborhoods
                         Line prevLine = text.getLine(linenumber-1); // maybe null
@@ -478,10 +525,11 @@ System.out.println("---");
                 assert (text.printContents().equals(text.printContentsFromLocations()));
                 assert (text.printContents().equals(history.printLastTextContents(text)));
 
-            }                    
-System.out.println("Codechange No. " + (++ccc) + " at time: " + eventPacket.getTimeStamp());
+            }
+            
+//System.out.println("Codechange No. " + (++ccc) + " at time: " + eventPacket.getTimeStamp());
 //System.out.println(text);
-System.out.println("---------------------------------------------------------");
+//System.out.println("---------------------------------------------------------");
           
         }
 
@@ -492,30 +540,15 @@ System.out.println("---------------------------------------------------------");
             String documentName = getDocumentName(eventPacket); 
             if (!documentName.endsWith(".java"))
                 return null;
+            String id = getId(eventPacket);
+            if (id == null || id.length() == 0)
+                id = documentName;
             
-            Text text = texts.get(documentName);
+            Text text = texts.get(id);
             assert (text != null);
 
-            try {
-                Document xmlDoc = eventPacket.getDocument();
-                String resultingCode = ECGParser.getSingleNodeValue("document", xmlDoc); 
-//System.out.println(text.printContents().trim().equals(resultingCode.trim()));
-/*
-if (!text.printContents().equals(resultingCode)) {
-System.out.print("\n----------------------------------------\n");
-System.out.print("#" + text.printContents() + "#");
-System.out.print("\n---------\n");
-System.out.print("#" + resultingCode + "#");
-}
-*/
-                assert (text.printContents().trim().equals(resultingCode.trim()));
-
-            } catch (NodeException e) {
-                // TODO report this
-                e.printStackTrace();
-                return null;
-            }
-            
+            String code = getCode(eventPacket);
+            assert (text.printContents().trim().equals(code.trim()));
         }
 
         // TODO just for debugging
@@ -534,16 +567,42 @@ System.out.print("#" + resultingCode + "#");
             }
         }
 
-		return null;
+        // Finally send the collected location changes as events
+        List<ValidEventPacket> events = null; 
+        if (locChanges.size() > 0) {
+            events = new ArrayList<ValidEventPacket>();
+            for (LocationChange lc : locChanges) {
+                String data = lc.asEventString(CREATOR_STRING, 
+                        getId(eventPacket), 
+                        getProjectname(eventPacket), 
+                        getUsername(eventPacket));
+                String[] args = {WellFormedEventPacket.HACKYSTAT_ADD_COMMAND, 
+                                "msdt.codelocation.xsd", 
+                                data};
+                try {
+                    events.add(new ValidEventPacket(eventPacket.getTimeStamp(),
+                        WellFormedEventPacket.HACKYSTAT_ACTIVITY_STRING, Arrays.asList(args)));
+                } catch (IllegalEventParameterException e) {
+                    logger.log(ECGLevel.SEVERE, "Wrong event parameters in CodeLocationTrackerIntermediateModule.");
+                }
+            }
+        }
+        
+        return events;
+        
 	}
 
     private String getDocumentName(ValidEventPacket packet) {
     	try {
         	Document document = packet.getDocument();
-			return ECGParser.getSingleNodeValue("documentname", document);
+            String documentname = ECGParser.getSingleNodeValue("documentname", document);
+            if (documentname == null)
+                return "UNKNOWN";
+            return documentname;
     	} catch (NodeException e) {
-			logger.log(ECGLevel.SEVERE, "Could not fetch code for line diff computation in CodeLocarionTrackerIntermediateModule.");
-			return null;
+			logger.log(ECGLevel.SEVERE, "Could not fetch documentname in CodeLocationTrackerIntermediateModule.");
+            // Actually there has been a bug in older EclipseSensors which results in empty document names
+			return "UNKNOWN";
 		}
 	}
 
@@ -552,9 +611,42 @@ System.out.print("#" + resultingCode + "#");
         	Document document = packet.getDocument();
 			return ECGParser.getSingleNodeValue("document", document);
     	} catch (NodeException e) {
-			logger.log(ECGLevel.SEVERE, "Could not fetch code for line diff computation in CodeLocarionTrackerIntermediateModule.");
+			logger.log(ECGLevel.SEVERE, "Could not fetch code in CodeLocationTrackerIntermediateModule.");
+            assert (false);
 			return null;
 		}
+    }
+
+    private String getId(ValidEventPacket packet) {
+        try {
+            Document document = packet.getDocument();
+            return ECGParser.getSingleNodeValue("id", document);
+        } catch (NodeException e) {
+            // ignore it
+            return null;
+        }
+    }
+
+    private String getUsername(ValidEventPacket packet) {
+        try {
+            Document document = packet.getDocument();
+            return ECGParser.getSingleNodeValue("username", document);
+        } catch (NodeException e) {
+            logger.log(ECGLevel.SEVERE, "Could not fetch username in CodeLocationTrackerIntermediateModule.");
+            assert (false);
+            return null;
+        }
+    }
+
+    private String getProjectname(ValidEventPacket packet) {
+        try {
+            Document document = packet.getDocument();
+            return ECGParser.getSingleNodeValue("projectname", document);
+        } catch (NodeException e) {
+            logger.log(ECGLevel.SEVERE, "Could not fetch projectname in CodeLocationTrackerIntermediateModule.");
+            assert (false);
+            return null;
+        }
     }
 
     /**

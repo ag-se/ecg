@@ -2,6 +2,7 @@ package org.electrocodeogram.module.intermediate.implementation.location.change;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.SortedSet;
@@ -14,14 +15,21 @@ import org.electrocodeogram.module.intermediate.implementation.location.state.Te
 
 public class History {
 
-    private LinkedHashMap<Location, List<LocationChange>> locationChangeHistories 
-                = new LinkedHashMap<Location, List<LocationChange>>();
+    private HashMap<IText, HashMap<Location, List<LocationChange>>> textLocationChangeHistories 
+                = new HashMap<IText, HashMap<Location, List<LocationChange>>>();
+    
     private List<BlockChange> blockChangeHistory = new ArrayList<BlockChange>();
 
     public List<BlockChange> getBlockChangeHistory() {
         return blockChangeHistory;
     }
-    public LinkedHashMap<Location, List<LocationChange>> getLocationChangeHistories() {
+
+    private HashMap<Location, List<LocationChange>> getLocationChangeHistories(IText text) {
+        HashMap<Location, List<LocationChange>> locationChangeHistories = textLocationChangeHistories.get(text);
+        if (locationChangeHistories == null) {
+            locationChangeHistories = new LinkedHashMap<Location, List<LocationChange>>();
+            this.textLocationChangeHistories.put(text, locationChangeHistories);
+        }
         return locationChangeHistories;
     }
 
@@ -31,6 +39,8 @@ public class History {
      * @param locationChange, with be ignored if null
      */
     public void addLocationChange(LocationChange lc, BlockChange bc) {
+        IText text = bc.getText();
+        HashMap<Location, List<LocationChange>> locationChangeHistories = getLocationChangeHistories(text);
         if (lc == null)
             return;
         Location loc = lc.getLocation();
@@ -51,7 +61,8 @@ public class History {
             lc.getBlockChange().getLocationChanges().add(lc); // TODO this is a bit strange
     }
 
-    public String printLocationChangeHistory() {
+    public String printLocationChangeHistory(IText text) {
+        HashMap<Location, List<LocationChange>> locationChangeHistories = getLocationChangeHistories(text);
         String res = "";
         SortedSet<Location> locs = new TreeSet<Location>(LocationComparator.getComparator());
         locs.addAll(locationChangeHistories.keySet());
@@ -86,11 +97,12 @@ public class History {
     }
     
     public String printLastTextContents(IText text) {
+        HashMap<Location, List<LocationChange>> locationChangeHistories = getLocationChangeHistories(text);
         String res = "";
         SortedSet<Location> locs = new TreeSet<Location>(LocationComparator.getComparator());
         locs.addAll(locationChangeHistories.keySet());
         for (Location loc : locs) {
-            List<LocationChange> locChanges = this.locationChangeHistories.get(loc);
+            List<LocationChange> locChanges = locationChangeHistories.get(loc);
             if (locChanges != null && locChanges.get(locChanges.size()-1) != null) {
                 LocationChange locChange = locChanges.get(locChanges.size()-1);
                 if (locChange.isAlive())
@@ -102,12 +114,13 @@ public class History {
 
     // Just for debugging
     public String printHistoryTextComparison(Text text) {
+        HashMap<Location, List<LocationChange>> locationChangeHistories = getLocationChangeHistories(text);
         String res = "";
         SortedSet<Location> locs = new TreeSet<Location>(LocationComparator.getComparator());
         locs.addAll(locationChangeHistories.keySet());
         for (Location loc : locs) {
             res += loc + ":\n";
-            List<LocationChange> locChanges = this.locationChangeHistories.get(loc);
+            List<LocationChange> locChanges = locationChangeHistories.get(loc);
             if (locChanges != null && locChanges.get(locChanges.size()-1) != null) {
                 LocationChange locChange = locChanges.get(locChanges.size()-1);
                 String locStr = loc.getContents();
@@ -143,6 +156,7 @@ public class History {
         boolean checkInvalidLocs = true;
         // checkValidLocs checks for each Location from text whether its in the history
         boolean checkValidLocs = true;
+        HashMap<Location, List<LocationChange>> locationChangeHistories = getLocationChangeHistories(text);
         Collection<Location> locs = locationChangeHistories.keySet();
         for (Location loc : locs) {
             List<LocationChange> locChs = locationChangeHistories.get(loc);
@@ -153,7 +167,7 @@ public class History {
                     assert (checkInit);
                 } else if (i < locChs.size() - 1) {
                     checkInner &= locCh.isAlive();
-                    assert (checkInner);                    
+                    assert (checkInner);
                 }
                 if (locCh.isMerge() || locCh.isSplit()) {
                     checkRelated &= (locCh.getRelatedLocId() >= 0);

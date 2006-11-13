@@ -146,5 +146,81 @@ public class LocationChange {
     public int getRelatedLocId() {
         return relatedLocId;
     }
+    
+    /**
+     * 
+     */
+    public String asEventString(String creator, String id, String projectname, String username) {
+        /* For some myterious reason, the xml way doesn't work here. The nodes (apart from the cdata section) simply ignore their values
+        MicroActivity microActivity;
+        Element locchange_path;
+        Element locchange_type;
+        Element locchange_id;
+        Element locchange_related;
+        Element locchange_location;
+        Element locchange_contents;
+        CDATASection locchange_contents_cdata;
+        
+        microActivity = new MicroActivity();
+
+        Document microactivity_doc = microActivity.getMicroActivityDoc();
+        Element locchange = microactivity_doc.createElement("codelocation");
+        locchange_path = microactivity_doc.createElement("path");
+        locchange_type = microactivity_doc.createElement("type");
+        locchange_id = microactivity_doc.createElement("id");
+        locchange_related = microactivity_doc.createElement("related");
+        locchange_location = microactivity_doc.createElement("location");
+        locchange_contents = microactivity_doc.createElement("contents");
+        locchange_contents_cdata = microactivity_doc.createCDATASection("");
+
+        locchange.appendChild(locchange_path);
+        locchange.appendChild(locchange_type);
+        locchange.appendChild(locchange_id);
+        locchange.appendChild(locchange_related);
+        locchange.appendChild(locchange_location);
+        locchange.appendChild(locchange_contents);
+        locchange_contents.appendChild(locchange_contents_cdata);
+
+        microActivity.setCustomElement(locchange);            
+
+        CommonData commonData = microActivity.getCommonData();
+        commonData.setVersion(1); // 1 is default
+        commonData.setCreator(CREATOR_STRING); 
+        commonData.setUsername(getUsername(eventPacket));
+        commonData.setProjectname(getProjectname(eventPacket));
+        
+        for (LocationChange lc : locChanges) {
+            locchange_path.setNodeValue(""); // TODO
+            locchange_type.setNodeValue(lc.getType().name());
+            locchange_id.setNodeValue(Integer.toString(lc.getLocation().getId()));
+            locchange_related.setNodeValue(Integer.toString(lc.getRelatedLocId()));
+            locchange_location.setNodeValue(
+                    lc.getLocation().getText().getId() + ";" +  
+                    lc.getLocation().getStart() + ";" +
+                    lc.getLocation().getLength());
+            locchange_contents_cdata.setTextContent(lc.getContents());
+
+            String data = microActivity.getSerializedMicroActivity(); 
+*/
+
+        String data = "<?xml version=\"1.0\"?><microActivity><commonData>";
+        data += "<version>1</version>";
+        data += "<creator>" + creator + "</creator>";
+        data += "<username>" + username + "</username>";
+        data += "<projectname>" + projectname + "</projectname>";
+        data += "<id>" + id + "</id>";
+        data += "</commonData><codelocation>";
+        data += "<path>" + "" + "</path>"; // TODO
+        data += "<type>" + this.getType().name() + "</type>";
+        data += "<id>" + Integer.toString(this.getLocation().getId()) + "</id>";
+        data += "<related>" + Integer.toString(this.getRelatedLocId()) + "</related>";
+        data += "<location>" + this.getLocation().getText().getId() + ";" + 
+                this.getLocation().getStart() + ";" + 
+                this.getLocation().getLength() + "</location>";
+        data += "<contents><![CDATA[" + this.getContents() + "]]></contents>";
+        data += "</codelocation></microActivity>";
+//System.out.println(data);
+        return data;
+    }
 
 }

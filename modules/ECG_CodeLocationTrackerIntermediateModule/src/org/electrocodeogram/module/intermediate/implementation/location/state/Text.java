@@ -15,7 +15,16 @@ public class Text implements IText {
     private List<Line> lines = new ArrayList<Line>();
     private SortedSet<Location> locations = new TreeSet<Location>(LocationComparator.getComparator());
     private int nextLocationId = 0;
+    private String id = "";
     
+    public Text(String id) {
+        this.id = id;
+    }
+    
+    public String getId() {
+        return id;
+    }
+
     public String printLocations() {
         String res = "";
         for (Location loc : locations)

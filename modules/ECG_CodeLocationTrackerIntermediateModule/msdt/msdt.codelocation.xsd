@@ -3,9 +3,8 @@
 	
 	<xs:annotation>
 		<xs:documentation>
-			This XML schema defines the structure of the "line diff" MicroSensorDataType.
-			It describes a set of line diffs between textfiles which were made at
-			a particular point of type. Diffs may be "inserted", "deleted" or "changed".
+			This XML schema defines the structure of the "code location" MicroSensorDataType.
+			It describes a change or birth of a code location computed from code changes.
 		</xs:documentation>
 	</xs:annotation>
 
@@ -18,7 +17,37 @@
 				<xs:element name="codelocation">
 					<xs:complexType>
 						<xs:sequence>
-							<xs:element name="documentname" type="xs:token"/>
+							<xs:element name="path" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+			    			<xs:element name="type">
+			    				<xs:simpleType>
+			  						<xs:restriction base="xs:string">
+			  							<xs:enumeration value="ADDED"/>
+				 	   					<xs:enumeration value="DELETED"/>
+				 	   					<xs:enumeration value="CHANGED"/>
+				 	   					<xs:enumeration value="IDENTIFIER_CHANGED"/>
+				 	   					<xs:enumeration value="INTIATED"/>
+				 	   					<xs:enumeration value="MERGED_DEL_AT_START"/>
+				 	   					<xs:enumeration value="MERGED_DEL_AT_END"/>
+				 	   					<xs:enumeration value="MERGED_ADD_AT_START"/>
+				 	   					<xs:enumeration value="MERGED_ADD_AT_END"/>
+				 	   					<xs:enumeration value="EXTENDED_AT_START"/>
+				 	   					<xs:enumeration value="EXTENDED_IN_BETWEEN"/>
+				 	   					<xs:enumeration value="EXTENDED_AT_END"/>
+				 	   					<xs:enumeration value="SPLIT_DEL_AT_START"/>
+				 	   					<xs:enumeration value="SPLIT_DEL_AT_END"/>
+				 	   					<xs:enumeration value="SPLIT_ADD_AT_END"/>
+				 	   					<xs:enumeration value="SPLIT_ADD_AT_START"/>
+				 	   					<xs:enumeration value="SHORTENED_AT_ALL"/>
+				 	   					<xs:enumeration value="SHORTENED_AT_START"/>
+				 	   					<xs:enumeration value="SHORTENED_IN_BETWEEN"/>
+				 	   					<xs:enumeration value="SHORTENED_AT_END"/>
+			  						</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="id"  type="xs:integer"/>
+							<xs:element name="related"  type="xs:integer"/>
+							<xs:element name="location" type="xs:string"/>
+    						<xs:element name="contents"  type="xs:string"/> <!-- contains CDATA section -->
 						</xs:sequence>
 					</xs:complexType>			
 				</xs:element>
