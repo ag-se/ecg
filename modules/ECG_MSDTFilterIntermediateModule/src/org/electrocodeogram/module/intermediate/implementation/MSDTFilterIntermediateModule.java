@@ -49,8 +49,13 @@ public class MSDTFilterIntermediateModule extends IntermediateModule implements 
 	/**
      * Name of the blocker configuration property of the module
      */
-	private static final String CONF_PROPERTY = "Blocker";
+	private static final String BLOCKER_PROPERTY = "Blocker";
 	
+    /**
+     * Name of the passer configuration property of the module
+     */
+    private static final String PASSER_PROPERTY = "Passer";
+    
 	/**
      * Name of the filter1 configuration property of the module
      */
@@ -77,7 +82,7 @@ public class MSDTFilterIntermediateModule extends IntermediateModule implements 
 	private static final String FILTER5_PROPERTY = "Filter5";
 
 	/**
-     * This is a map of <em>MicroSensorDataTypes</em>, which are filtered.
+     * This is a map of <em>MicroSensorDataTypes</em>, which are blocked or passed.
      */
     private HashMap < MicroSensorDataType, Boolean > msdtFilterMap;
 
@@ -195,13 +200,20 @@ public class MSDTFilterIntermediateModule extends IntermediateModule implements 
 
 		String value = moduleProperty.getValue();
 		
-        if (moduleProperty.getName().equals(CONF_PROPERTY)) {
+        if (moduleProperty.getName().equals(BLOCKER_PROPERTY)) {
 
 	        logger.log(Level.INFO, "Request to set the property: "
 	                + moduleProperty.getName());
 
-			configureFilter(value);
+			configureBlocker(value);
 			
+        } else if (moduleProperty.getName().equals(PASSER_PROPERTY)) {
+
+            logger.log(Level.INFO, "Request to set the property: "
+                    + moduleProperty.getName());
+
+            configurePasser(value);
+                
         } else if (moduleProperty.getName().equals(FILTER1_PROPERTY)) {
             logger.log(Level.INFO, "Request to set the property: "
                                    + moduleProperty.getName());
@@ -304,9 +316,10 @@ public class MSDTFilterIntermediateModule extends IntermediateModule implements 
 
 		// Now (re-)set the correct values of the filter configuration
 		try {
-			configureFilter(this.getModuleProperty(CONF_PROPERTY).getValue());
+			configureBlocker(this.getModuleProperty(BLOCKER_PROPERTY).getValue());
+            configurePasser(this.getModuleProperty(PASSER_PROPERTY).getValue());
 		} catch (ModulePropertyException e) {
-			logger.log(Level.WARNING, "The filter module is supposed to support the property " +  CONF_PROPERTY);
+			logger.log(Level.WARNING, "The filter module is supposed to support the property " +  BLOCKER_PROPERTY + " and " + PASSER_PROPERTY);
 		}
 		
         logger.exiting(this.getClass().getName(), "setFilterMap");
@@ -331,17 +344,17 @@ public class MSDTFilterIntermediateModule extends IntermediateModule implements 
      * This method is used to configure this filter module.
      * It creates and displays a user dialog to set the filter rules.
      */
-    public final void configureFilter(String filterExpression) {
+    public final void configureBlocker(String blockerExpression) {
 
-        logger.entering(this.getClass().getName(), "configureFilter");
+        logger.entering(this.getClass().getName(), "configureBlocker");
 
-		if (filterExpression != null) {
+		if (blockerExpression != null) {
 			
 			for (MicroSensorDataType msdt : this.msdtFilterMap.keySet()) {
 	
 				// Use regular expression ".*msdt.TYPE.xsd.*" to be found in 
 				// the configuration property
-				if (filterExpression.matches(".*" + msdt.getName() + ".*")) {
+				if (blockerExpression.matches(".*" + msdt.getName() + ".*")) {
 	
 					this.msdtFilterMap.put(msdt, Boolean.FALSE);
 	
@@ -353,7 +366,36 @@ public class MSDTFilterIntermediateModule extends IntermediateModule implements 
 	        }
 		}
 
-        logger.exiting(this.getClass().getName(), "configureFilter");
+        logger.exiting(this.getClass().getName(), "configureBlocker");
+    }
+
+    /**
+     * This method is used to configure this filter module.
+     * It creates and displays a user dialog to set the filter rules.
+     */
+    public final void configurePasser(String passerExpression) {
+
+        logger.entering(this.getClass().getName(), "configurePasser");
+
+        if (passerExpression != null) {
+            
+            for (MicroSensorDataType msdt : this.msdtFilterMap.keySet()) {
+    
+                // Use regular expression ".*msdt.TYPE.xsd.*" to be found in 
+                // the configuration property
+                if (passerExpression.matches(".*" + msdt.getName() + ".*")) {
+    
+                    this.msdtFilterMap.put(msdt, Boolean.TRUE);
+    
+                } else {
+    
+                    this.msdtFilterMap.put(msdt, Boolean.FALSE);
+    
+                }
+            }
+        }
+
+        logger.exiting(this.getClass().getName(), "configurePasser");
     }
 
     /**
@@ -386,9 +428,9 @@ public class MSDTFilterIntermediateModule extends IntermediateModule implements 
 		
 		// set the new value of the filter property
 		try {
-			this.getModuleProperty(CONF_PROPERTY).setValue(filterExpression);
+			this.getModuleProperty(BLOCKER_PROPERTY).setValue(filterExpression);
 		} catch (ModulePropertyException e) {
-			logger.log(Level.WARNING, "The filter module is supposed to support the property " +  CONF_PROPERTY);
+			logger.log(Level.WARNING, "The filter module is supposed to support the property " +  BLOCKER_PROPERTY);
 		}
 			
 

@@ -22,12 +22,16 @@
 		
 		Use the properties as follows:
 		* Blocker is a String of MSDT names, e.g. "msdt.testrun.xsd, msdt.codechange.xsd, msdt.window.xsd".
-		  It doesn't matter how they are concatenating
+		  It doesn't matter how they are concatenating. Events which msdt names are in the Blocker string
+		  will not pass the filter. If Blocker is used, don't use Passer.
+		* Passer is a String of MSDT names, e.g. "msdt.testrun.xsd, msdt.codechange.xsd, msdt.window.xsd".
+		  It doesn't matter how they are concatenating. Events which msdt names are in the Passer string
+		  will pass the filter, the others won't. If Passer is used, don't use Blocker.
 		* Each FilterX is an expression of the kind {MSDTTYPE}={REGEX} where
 		  MSDTTYPE is a type name for which the following expression is evaluated
 		  REGEX is a regular expression (as used in String.matches()). Only events of the MSDTTYPE type 
 		     which confirm to this regex in its toString() representation are passed, i.e. MSDTTYPE-typed
-		     events which doesn't fulfill it are filtered.
+		     events which doesn't fulfill it are filtered. This is evaluated after Passer and Blocker.
 	</description>
 	<type>
 		INTERMEDIATE
@@ -36,6 +40,16 @@
 		<property>
 			<propertyName>
 				Blocker
+			</propertyName>
+			<propertyType>
+				java.lang.String
+			</propertyType>
+			<propertyValue>
+			</propertyValue>
+		</property>
+		<property>
+			<propertyName>
+				Passer
 			</propertyName>
 			<propertyType>
 				java.lang.String
