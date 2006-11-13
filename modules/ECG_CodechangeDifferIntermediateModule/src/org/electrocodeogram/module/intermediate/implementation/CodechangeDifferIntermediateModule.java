@@ -33,20 +33,20 @@ public class CodechangeDifferIntermediateModule extends IntermediateModule {
 
     /** Print a change list line by line
      */
-    public class LineChangeIterator implements Iterator {
+    public class LineDiffIterator implements Iterator {
 
-    	String[] code0, code1;
+    	final private String[] code0, code1;
     	// for this Iterator we do it the non-lazy but easy way: Compute Collection first in O(n)
     	//   and then deliver contents in O(1). This allows for O(1) implementation of size() as well. 
-    	ArrayList<LineDiff> lineDiffs = new ArrayList<LineDiff>();
-    	int it = 0;
-        boolean reverse = false;
+    	private ArrayList<LineDiff> lineDiffs = new ArrayList<LineDiff>();
+    	private int it = 0;
+        private boolean reverse = false;
     	
-        public LineChangeIterator(String[] a, String[] b, Diff.change hunk) {
+        public LineDiffIterator(String[] a, String[] b, Diff.change hunk) {
             this(a,b,hunk,false);
         }
 
-		public LineChangeIterator(String[] a, String[] b, Diff.change hunk, boolean rev) {
+		public LineDiffIterator(String[] a, String[] b, Diff.change hunk, boolean rev) {
 		    code0 = a;
 		    code1 = b;
 		    compute(hunk);
@@ -64,17 +64,17 @@ public class CodechangeDifferIntermediateModule extends IntermediateModule {
 				// no inserted => #deleted lines beggining at line0+1 deleted in a
 				for (int i = 0; i < next.deleted; i++) {
 					lineDiffs.add(new LineDiff(code0[next.line0 + i], 
-							next.line0+i,
+							next.line1 + i, // Needs to be line1 (don't really know why...) 
 							null,
 							LineDiff.ChangeType.DELETED));
 //System.out.println("  " + (next.line0+i+1) + "<:" + code0[next.line0 + i]);
 				}
 			}
 			if (next.inserted != 0 && next.deleted == 0) {
-				// no deleted => #inserted lines beggining at line1+1 deleted in b
+				// no deleted => #inserted lines beggining at line1+1 inserted in b
 				for (int i = 0; i < next.inserted; i++) {
 					lineDiffs.add(new LineDiff(null,
-							next.line1+i,
+							next.line1 + i,
 							code1[next.line1 + i],
 							LineDiff.ChangeType.INSERTED));
 //System.out.println("  " + (next.line1+i+1) + ">:" + code1[next.line1 + i]);
@@ -85,14 +85,14 @@ public class CodechangeDifferIntermediateModule extends IntermediateModule {
 				for (int i = 0; i < affected; i++) {
 					if (i < next.inserted && i < next.deleted) {
 						lineDiffs.add(new LineDiff(code0[next.line0 + i],
-								next.line1+i,
+								next.line1 + i,
 								code1[next.line1 + i],
 								LineDiff.ChangeType.CHANGED));
 //System.out.println("  " + (next.line0+i+1) + "<>:" + code0[next.line0 + i]);
 //System.out.println("  " + (next.line1+i+1) + "><:" + code1[next.line1 + i]);
 					} else if (i >= next.inserted && i < next.deleted) {
 						lineDiffs.add(new LineDiff(code0[next.line0 + i],
-								next.line0+i,
+								next.line1+i, // Needs to be line1 (don't really know why...)
 								null,
 								LineDiff.ChangeType.DELETED));
 //System.out.println("  " + (next.line0+i+1) + "<:" + code0[next.line0 + i]);						  
@@ -125,6 +125,7 @@ public class CodechangeDifferIntermediateModule extends IntermediateModule {
 		public int size() {
 			return lineDiffs.size();
 		}
+        
     }
 
     /**
@@ -146,67 +147,131 @@ public class CodechangeDifferIntermediateModule extends IntermediateModule {
     }
 
     /**
+     * @see org.electrocodeogram.module.intermediate.implementation.IntermediateModule#initialize()
+     */
+    public void initialize() {
+        this.setProcessingMode(ProcessingMode.ANNOTATOR); // Module *adds* events
+        this.setAnnnotationStyle(AnnotationStyle.PRE_ANNOTATION); // ... before the triggering events
+    }
+
+    /**
      * @see org.electrocodeogram.module.intermediate.implementation.IntermediateModule#analyse(org.electrocodeogram.event.ValidEventPacket)
      */
     public Collection<ValidEventPacket> analyse(ValidEventPacket packet) {
         
-    	boolean isCodeStatus = false;
-    	String msdt = packet.getMicroSensorDataType().getName();
-   	
+        String msdt = packet.getMicroSensorDataType().getName();   	
         if (!msdt.equals("msdt.codechange.xsd") && !msdt.equals("msdt.codestatus.xsd"))
         	return null;
 
     	List<ValidEventPacket> events = new ArrayList<ValidEventPacket>();
 
-    	if (msdt.equals("msdt.codestatus.xsd")) {
-            // denotes that just the initial version will be stored and no diff computation
-    		isCodeStatus = true;
-        }
+        // TODO Should report the fact that this diff relies on a codestatus, i.e. that in case 
+        //   the diff is big it may be due to lost text changes. This should be a property
+        //   of the diff in the event. The codestatus event should be filtered then
+    	//if (msdt.equals("msdt.codestatus.xsd")) {
+    	//	DO it here
+        //}
         
-    	String id = "", projectname = "", documentname = "", username = "";
+        Date timestamp = packet.getTimeStamp();     
+        Document document = packet.getDocument();
+
+    	String projectname = "", documentname = "", username = "";
     	try {
-    		Document document = packet.getDocument();
-			id = ECGParser.getSingleNodeValue("id", document);
 			username = ECGParser.getSingleNodeValue("username", document);
-			documentname = ECGParser.getSingleNodeValue("documentname", document);
 			projectname = ECGParser.getSingleNodeValue("projectname", document);
+            documentname = ECGParser.getSingleNodeValue("documentname", document);
 		} catch (NodeException e) {
 			logger.log(ECGLevel.SEVERE, "Couldn't fetch any of {id, projectname, documentname, username} " +
 					"elements from event in CodechangeDifferIntermediateModule.");
 		}
 
-		if (id == null || id.length() == 0)
+        String id = "";
+        try {
+            id = ECGParser.getSingleNodeValue("id", document);
+        } catch (NodeException e) {
+            // ignore id
+        }
+        
+        // Set useful documentname and id
+        if (documentname == null)
+            documentname = id;
+        if (documentname == null)
+            documentname = "UNKNOWN";
+        if (id == null || id.length() == 0)
 			id = documentname;
     	
     	String oldCode = codes.get(id);
     	String newCode = getCode(packet);
 
-//System.out.println("Old:\n" + oldCode + "----\nNew:\n" + newCode + "----\n");        
+//System.out.println("\n+++++++++++++++++++++++++++++++++++++++++++\nOld:\n" + oldCode + "----\nNew:\n" + newCode + "----\n");        
         
     	if (newCode == null)
     		newCode = "";
-    	if (oldCode == null)
-    		isCodeStatus = true;
-    	
+        
+        if (oldCode == null && msdt.equals("msdt.codestatus.xsd")) {
+            // store current version
+            codes.put(id, newCode);
+            // no diff computation necessary due to codestatus
+            return null;
+        }
+        
+        if (oldCode == null && !msdt.equals("msdt.codestatus.xsd")) {
+            // This is strange: No code yet but a codechange, i.e. a codestatus is missing
+            //   Reason: Old sensor data. 
+            //   Renaming of files is handled by using the constant id instead of the document name
+            //   TODO Currently only: Simply report this as a msdt.codestatus
+            String data = "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+                + username
+                + "</username><projectname>"
+                + projectname
+                + "</projectname><id>"
+                + id
+                + "</id></commonData><codestatus><document><![CDATA["  // TODO
+                + newCode
+                + "]" + "]" + "></document><documentname>"
+                + documentname
+                + "</documentname></codestatus></microActivity>";                                
+//System.out.println("Sending fake codetstatus: ...."); // + data);
+            String[] args = {WellFormedEventPacket.HACKYSTAT_ADD_COMMAND, "msdt.codestatus.xsd", data};
+            try {
+                events.add(new ValidEventPacket(timestamp,
+                    WellFormedEventPacket.HACKYSTAT_ACTIVITY_STRING, Arrays.asList(args)));
+            } catch (IllegalEventParameterException e) {
+                logger.log(ECGLevel.SEVERE, "Wrong event parameters in CodechangeDifferIntermediateModule.");
+            }
+            // store current version
+            codes.put(id, newCode);
+            // Note that since this is an annotator module, the similar msdt.codechange with retain as well
+            return events;
+        }
+        
     	// store current version
         codes.put(id, newCode);
 
-		if (isCodeStatus)
-    		return events;
-    		
-    	Date timestamp = packet.getTimeStamp();    	
         String[] oldLines = getLines(oldCode);
         String[] newLines = getLines(newCode);
         Diff diff = new Diff(oldLines, newLines); 
         Diff.change script = diff.diff_2(false);  // compute diff
 //(new NormalPrint(oldLines,newLines)).print_script(script);
 
-        // For each diff section in diff analysis send single new msdt.linediff event
-        for (Diff.change next = script; next != null; next = next.link)
-        {
+        List<LineDiffIterator> diffChanges = new ArrayList<LineDiffIterator>();
+        for (Diff.change next = script; next != null; next = next.link) {
             // generates line diffs from diff
-            LineChangeIterator it = new LineChangeIterator(oldLines, newLines, next);
-    
+            LineDiffIterator ldit = new LineDiffIterator(oldLines, newLines, next); 
+            diffChanges.add(ldit);
+        }
+
+        // Now recompute line numbers of following LineDiff objects, represented in 
+        //   the Iterator. Why? Each Diff.change will result in a new event. Although 
+        //   both events will share the same time stamp, they are in sequence, i.e. 
+        //   the first applies before the later ones. Opposed to that, all Diff.change 
+        //   object are computed based on the same text source: the state before the change
+        // Therefore we need to shift line numbers, i.e. apply each....
+            
+        // For each diff section in diff analysis send single new msdt.linediff event
+        for (LineDiffIterator it : diffChanges)
+        {
+            
             String data = "<?xml version=\"1.0\"?><microActivity><commonData>";
             data += "<username>" + username + "</username>";
             data += "<projectname>" + projectname + "</projectname>";
@@ -240,7 +305,7 @@ public class CodechangeDifferIntermediateModule extends IntermediateModule {
             logger.log(ECGLevel.FINE, diffs);
     
             data += diffs + "</lines></linediff></microActivity>";
-//System.out.println("-----\nResults in event " + data);
+//System.out.println("----- at " + timestamp + ":\nResults in event " + data);
 
 //            TODO assert(applyDiffOnOldCode(oldLines, newLines, next));
     		
@@ -262,14 +327,14 @@ public class CodechangeDifferIntermediateModule extends IntermediateModule {
 /*  TODO should check consistency of diffs with new lines 
 	private boolean applyDiffOnOldCode(String[] oldLines, String[] newLines, change next) {
         boolean res = true;
-        LineChangeIterator it = new LineChangeIterator(oldLines, newLines, next);
+        LineDiffIterator it = new LineDiffIterator(oldLines, newLines, next);
         // Make copy of old lines
         ArrayList<String> oldLinesCopy = new ArrayList<String>(oldLines.length);
         for (int i = 0; i < oldLines.length; i++)
             oldLinesCopy.set(i, oldLines[i]);
         // Manually apply each change
         while (it.hasNext()) {
-            LineDiff lc = it.next();
+            LineDiff lineDiff = it.next();
             if (lc.getType() == LineDiff.ChangeType.CHANGED) {
                 res &= (oldLinesCopy.get(lc.getLinenumber()).equals(lc.getFrom()));
                 oldLinesCopy.set(lc.getLinenumber(), lc.getTo());
@@ -350,14 +415,6 @@ public class CodechangeDifferIntermediateModule extends IntermediateModule {
      */
     public void update() {
 
-    }
-
-    /**
-     * @see org.electrocodeogram.module.intermediate.implementation.IntermediateModule#initialize()
-     */
-    public void initialize() {
-        this.setProcessingMode(ProcessingMode.ANNOTATOR); // Module *adds* events
-        this.setAnnnotationStyle(AnnotationStyle.PRE_ANNOTATION); // ... before the triggering events
     }
 
 }
