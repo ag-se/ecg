@@ -53,7 +53,7 @@
 			<property>
 				<name>Input File</name>
 				<value>
-					testeventlogs/small.log
+					testeventlogs/ACM060517_acm3_events.log
 				</value>
 				<type>java.io.File</type>
 			</property>

@@ -69,7 +69,7 @@ public abstract class EventReader extends Thread {
                 packet = read();
 
                 if (packet == null) {
-                    logger.log(Level.WARNING,
+                    logger.log(Level.FINE,
                         "Null has been read by the the EventReader of "
                                         + this.mySourceModule.getName());
 
