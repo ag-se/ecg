@@ -204,6 +204,7 @@ public final class ECGEclipseSensor {
         try {
             // get DOM Implementation using DOM Registry
             // TODO Besser auf Xerxes setzen. Dies ist auﬂerdem wohl nur in JDK 5.0
+            // XMLSupport also initializes this
             System.setProperty(DOMImplementationRegistry.PROPERTY, "com.sun.org.apache.xerces.internal.dom.DOMXSImplementationSourceImpl");
             DOMImplementationRegistry registry;
             registry = DOMImplementationRegistry.newInstance();

@@ -41,8 +41,8 @@ public class ECGMainPreferencePage
 	public ECGMainPreferencePage() {
 		super(GRID);
 		setPreferenceStore(EclipseSensorPlugin.getInstance().getPreferenceStore());
-		setDescription("You can overwrite the sensor.properties setting specific to this workbench.\n" +
-                "Just must restart the workbench for any changes to take effect.");
+		setDescription("You may redefine the sensor.properties settings specific to this workbench.\n" +
+                "Restart the workbench for any changes to take effect.");
 	}
 	
 	/**
