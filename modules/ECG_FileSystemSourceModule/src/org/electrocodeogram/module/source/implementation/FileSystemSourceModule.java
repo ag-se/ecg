@@ -118,9 +118,9 @@ public class FileSystemSourceModule extends SourceModule {
         if (moduleProperty.getName().equals("Input File")) {
 
             File propertyValueFile = new File(moduleProperty.getValue());
-
+            
             this.inputFile = propertyValueFile;
-
+            
             if (isActive()) {
                 deactivate();
 
@@ -133,18 +133,21 @@ public class FileSystemSourceModule extends SourceModule {
                         moduleProperty.getValue());
                 }
             }
+        
         } else if (moduleProperty.getName().equals("Enable Realtime Mode")) {
             if (moduleProperty.getValue().equalsIgnoreCase("true")) {
                 this.readMode = ReadMode.REALTIME;
 
                 setMode();
             }
+        
         } else if (moduleProperty.getName().equals("Enable Burst Mode")) {
             if (moduleProperty.getValue().equalsIgnoreCase("true")) {
                 this.readMode = ReadMode.BURST;
 
                 setMode();
             }
+        
         } else if (moduleProperty.getName().equals("Send End Event")) {
             if (moduleProperty.getValue().equalsIgnoreCase("true")) {
                 this.sendEndEvent = true;

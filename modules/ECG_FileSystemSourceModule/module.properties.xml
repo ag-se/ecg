@@ -4,7 +4,7 @@
 		org.electrocodeogram.module.source.implementation.FileSystemSourceModule
 	</id>
 	<provider-name>FU Berlin</provider-name>
-	<version>0.7</version>
+	<version>1.1 (ECG 1.1.4)</version>
 	<name>
 		File Reader
 	</name>
@@ -13,12 +13,13 @@
 	</class>
 	<description>
 		This module reads in a file for previously written events. The properties are:
-		* Input File - A file name to be read from
+		* Input File - A file name to be read from. Since 1.1: If it denotes a directory, all files from this directory with
+		               extension .out, .log, .events or .ecg will be read from, in lexicographical order.
 		* Enable Burst Mode - If "true" the events will be generated without artificial pauses.
 		                      If "false" the events will be generated in real time, relative to the first events time stamp
 		* Send End Event - If "true" the Lab will be terminated after the last data has been read by the File Reader
-		* Ignored Event Types - A String consisting of full MSDT names which will be ignored by the Reader, fpr example
-		                        "msdt.codechange.xsd, msdt.user.xsd"
+		* Ignored Event Types - A String consisting of full MSDT names which will be ignored by the Reader, for example
+		                        "msdt.codechange.xsd, msdt.user.xsd" (since 1.1)
 	</description>
 	<type>
 		SOURCE
@@ -33,6 +34,16 @@
 			</propertyType>
 			<propertyValue>
 				out.log
+			</propertyValue>
+		</property>
+		<property>
+			<propertyName>
+				Input Folder
+			</propertyName>
+			<propertyType>
+				java.io.File
+			</propertyType>
+			<propertyValue>
 			</propertyValue>
 		</property>
 		<property>

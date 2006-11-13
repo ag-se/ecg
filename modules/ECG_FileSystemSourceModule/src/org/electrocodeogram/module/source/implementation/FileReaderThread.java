@@ -6,11 +6,15 @@ package org.electrocodeogram.module.source.implementation;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileReader;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
@@ -36,7 +40,42 @@ import org.electrocodeogram.system.ModuleSystem;
  */
 public class FileReaderThread extends EventReader {
 
-	/**
+	public class ECGFileFilter implements FileFilter {
+
+        public boolean accept(File f) {
+            if (f.isDirectory())
+                return false;
+            if (f.isHidden())
+                return false;
+
+            String extension = getExtension(f);
+            if (extension != null) {
+                if (extension.equals("log") ||
+                    extension.equals("ecg") ||
+                    extension.equals("events") ||
+                    extension.equals("out")) {
+                        return true;
+                } else {
+                    return false;
+                }
+            }
+
+            return false;
+        }
+
+        public String getExtension(File f) {
+            String ext = null;
+            String s = f.getName();
+            int i = s.lastIndexOf('.');
+
+            if (i > 0 &&  i < s.length() - 1) {
+                ext = s.substring(i+1).toLowerCase();
+            }
+            return ext;
+        }        
+    }
+
+    /**
 	 * Holds the system dependent representation of a line separator.
      * TODO Don't use this, because it simply needs to be the seperator of the file! 
 	 */
@@ -117,6 +156,10 @@ public class FileReaderThread extends EventReader {
      */
     private boolean run;
 
+    private File[] fileList;
+
+    private int fileListCount = 0;
+
     private static int TIME_SPAN = 100;
 
     /**
@@ -148,22 +191,36 @@ public class FileReaderThread extends EventReader {
         logger.entering(this.getClass().getName(), "read");
 
         WellFormedEventPacket eventPacket = null;
-
+        
         boolean cdatafragment = false;
         int lineNumber = 0;
         String line = null;
         String code = null;
-
+        
         try {
-            line = this.reader.readLine();
 
+            if (this.reader == null)
+                line = null;
+            else
+                line = this.reader.readLine();
+            
+            if (line == null && this.fileList != null && this.fileListCount < this.fileList.length)
+            {
+                while (line == null && this.fileListCount < fileList.length) {
+                    this.reader = new BufferedReader(new FileReader(this.fileList[this.fileListCount]));
+//System.out.println(fileList[this.fileListCount].getAbsolutePath());
+                    this.fileListCount++;                
+                    line = this.reader.readLine();
+                }
+            }
+            
             if (line == null) {
                 logger.log(Level.INFO,
                     "The read line is null. Assuming end of file.");
                 
                 if (this.sendEndEvent && !this.endEventSent) {
                     String eventStr = "<microActivity><system><type>termination</type></system></microActivity>";
-                    eventPacket = ECGWriter.createValidEventPacket("msdt.system.xsd", this.dateOfLastEvent, eventStr);
+                    eventPacket = ECGWriter.createValidEventPacket("msdt.system.xsd", new Date(), eventStr);
                     this.endEventSent = true;
                 } else if (this.sendEndEvent && this.endEventSent) {
                     this.module.deactivate();
@@ -177,7 +234,7 @@ public class FileReaderThread extends EventReader {
 
                 return eventPacket;
             }
-
+            
             // Parse lines until closing </microActivity> but beware that any enclosed CDATA section
             // may contain the "</microActivity>" as well.
             // It asserts that "</microActivity>" is the tail of the line.
@@ -447,12 +504,24 @@ public class FileReaderThread extends EventReader {
     public final void setInputFile(final File f) throws IOException {
 
         this.file = f;
-
+        
         if (this.reader != null) {
             this.reader.close();
         }
 
-        this.reader = new BufferedReader(new FileReader(this.file));
+        if (f.isDirectory()) {
+            this.reader = null;
+            this.fileListCount = 0;
+            this.fileList = f.listFiles(new ECGFileFilter());
+            Arrays.sort(this.fileList);
+            if (this.fileList.length > 0) {
+                this.reader = new BufferedReader(new FileReader(fileList[0]));
+//System.out.println(fileList[0].getAbsolutePath());
+                this.fileListCount = 1;
+            }
+        }
+        else
+            this.reader = new BufferedReader(new FileReader(this.file));
 
     }
 
