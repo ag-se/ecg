@@ -31,5 +31,13 @@
 				msdt.linediff.xsd
 			</msdtFile>
 		</microsensordatatype>
+		<microsensordatatype>
+			<msdtName>
+				msdt.linediffbase.xsd
+			</msdtName>
+			<msdtFile>
+				msdt.linediffbase.xsd
+			</msdtFile>
+		</microsensordatatype>
 	</microsensordatatypes>
 </module>

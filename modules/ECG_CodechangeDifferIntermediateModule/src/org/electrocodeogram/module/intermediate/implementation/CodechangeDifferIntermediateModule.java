@@ -208,31 +208,21 @@ public class CodechangeDifferIntermediateModule extends IntermediateModule {
     	if (newCode == null)
     		newCode = "";
         
-        if (oldCode == null && msdt.equals("msdt.codestatus.xsd")) {
-            // store current version
-            codes.put(id, newCode);
-            // no diff computation necessary due to codestatus
-            return null;
-        }
-        
-        if (oldCode == null && !msdt.equals("msdt.codestatus.xsd")) {
-            // This is strange: No code yet but a codechange, i.e. a codestatus is missing
-            //   Reason: Old sensor data. 
-            //   Renaming of files is handled by using the constant id instead of the document name
-            //   TODO Currently only: Simply report this as a msdt.codestatus
+        if (oldCode == null) {
+            // No code available for this file yet. Report a msdt.linediffbase
             String data = "<?xml version=\"1.0\"?><microActivity><commonData><username>"
                 + username
                 + "</username><projectname>"
                 + projectname
                 + "</projectname><id>"
                 + id
-                + "</id></commonData><codestatus><document><![CDATA["  // TODO
+                + "</id></commonData><linediffbase><document><![CDATA["  // TODO
                 + newCode
                 + "]" + "]" + "></document><documentname>"
                 + documentname
-                + "</documentname></codestatus></microActivity>";                                
-//System.out.println("Sending fake codetstatus: ...."); // + data);
-            String[] args = {WellFormedEventPacket.HACKYSTAT_ADD_COMMAND, "msdt.codestatus.xsd", data};
+                + "</documentname></linediffbase></microActivity>";                                
+//System.out.println("Sending linediffbase: ...."); // + data);
+            String[] args = {WellFormedEventPacket.HACKYSTAT_ADD_COMMAND, "msdt.linediffbase.xsd", data};
             try {
                 events.add(new ValidEventPacket(timestamp,
                     WellFormedEventPacket.HACKYSTAT_ACTIVITY_STRING, Arrays.asList(args)));
