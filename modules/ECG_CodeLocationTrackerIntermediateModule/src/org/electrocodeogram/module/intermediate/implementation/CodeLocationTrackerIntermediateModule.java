@@ -96,7 +96,7 @@ System.out.println(ccc);
         // a list of location changes which will be sent as event packets
         List<LocationChange> locChanges = new ArrayList<LocationChange>();
 
-        if (eventPacket.getMicroSensorDataType().getName().equals("msdt.codestatus.xsd")) {
+        if (eventPacket.getMicroSensorDataType().getName().equals("msdt.linediffbase.xsd")) {
             // On code status events compile first set of locations and initial location changes
     		
             String documentName = getDocumentName(eventPacket); 
@@ -110,11 +110,11 @@ System.out.println(ccc);
 
             Text text = texts.get(id);
             if (text != null) {
-                // This means a codestatus has already been sent some time ago
+                // This means a linediffbase has already been sent some time ago
                 // The CodeChangeDiffer treats this just like a code change, so do we
                 // LineDiffs must have been send right before this one 
                 assert (text.printContents().trim().equals(code.trim()));
-                // A new codestatus isn't of any interest
+                // A new linediffbase isn't of any interest
                 return null;  
             }
 
@@ -177,7 +177,7 @@ System.out.println("---");
             assert(text != null);            
             
             if (text == null) {
-                // A codestatus seem to be missing. This should not occur, but may happen
+                // A linediffbase seem to be missing. This should not occur, but may happen
                 //   due to incomplete events. We assume this document has been empty before
                 text = new Text(documentName);
                 texts.put(id, text);
