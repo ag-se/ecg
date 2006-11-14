@@ -92,12 +92,12 @@ public class CodeLocationTrackerIntermediateModule extends IntermediateModule {
 
 //System.out.println(eventPacket);
         ccc++;
-System.out.println(ccc);        
+System.out.println("Event No. " + ccc + " of type " + eventPacket.getSensorDataType() + " from " + eventPacket.getTimeStamp());        
         // a list of location changes which will be sent as event packets
         List<LocationChange> locChanges = new ArrayList<LocationChange>();
 
         if (eventPacket.getMicroSensorDataType().getName().equals("msdt.linediffbase.xsd")) {
-            // On code status events compile first set of locations and initial location changes
+            // On line diff base events compile first set of locations and initial location changes
     		
             String documentName = getDocumentName(eventPacket); 
     		if (!documentName.endsWith(".java")) // TODO currently only for .java documents
@@ -107,8 +107,9 @@ System.out.println(ccc);
                 id = documentName;
 
             String code = getCode(eventPacket);
+            String projectName = getProjectname(eventPacket);
 
-            Text text = texts.get(id);
+            Text text = texts.get(projectName + ":" + documentName);
             if (text != null) {
                 // This means a linediffbase has already been sent some time ago
                 // The CodeChangeDiffer treats this just like a code change, so do we
@@ -157,7 +158,7 @@ System.out.println("at " + eventPacket.getTimeStamp() + ":");
 System.out.println(text.printLocations());
 System.out.println("---");
 */
-            this.texts.put(id, text);
+            this.texts.put(projectName + ":" + documentName, text);
             
             assert (text.checkValidity());
             assert (text.printContents().trim().equals(code.trim()));
@@ -172,15 +173,17 @@ System.out.println("---");
             String id = getId(eventPacket);
             if (id == null || id.length() == 0)
                 id = documentName;
-            
-            Text text = texts.get(id);
+
+            String projectName = getProjectname(eventPacket);
+
+            Text text = texts.get(projectName + ":" + documentName);
             assert(text != null);            
             
             if (text == null) {
                 // A linediffbase seem to be missing. This should not occur, but may happen
                 //   due to incomplete events. We assume this document has been empty before
                 text = new Text(documentName);
-                texts.put(id, text);
+                texts.put(projectName + ":" + documentName, text);
             }
             
             Collection<BlockChange> blockChanges = BlockChange.parseLineDiffsEvent(text, eventPacket);            
@@ -543,8 +546,10 @@ System.out.println("---");
             String id = getId(eventPacket);
             if (id == null || id.length() == 0)
                 id = documentName;
-            
-            Text text = texts.get(id);
+
+            String projectName = getProjectname(eventPacket);
+
+            Text text = texts.get(projectName + ":" + documentName);
             assert (text != null);
 
             String code = getCode(eventPacket);
