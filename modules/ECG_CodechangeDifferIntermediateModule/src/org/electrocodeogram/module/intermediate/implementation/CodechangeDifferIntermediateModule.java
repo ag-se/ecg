@@ -200,7 +200,7 @@ public class CodechangeDifferIntermediateModule extends IntermediateModule {
         if (id == null || id.length() == 0)
 			id = documentname;
     	
-    	String oldCode = codes.get(id);
+    	String oldCode = codes.get(projectname + ":" + documentname);
     	String newCode = getCode(packet);
 
 //System.out.println("\n+++++++++++++++++++++++++++++++++++++++++++\nOld:\n" + oldCode + "----\nNew:\n" + newCode + "----\n");        
@@ -221,7 +221,7 @@ public class CodechangeDifferIntermediateModule extends IntermediateModule {
                 + "]" + "]" + "></document><documentname>"
                 + documentname
                 + "</documentname></linediffbase></microActivity>";                                
-//System.out.println("Sending linediffbase: ...."); // + data);
+//System.out.println("Based on an " + packet.getSensorDataType() + ": Sending linediffbase for " + documentname + " at " + packet.getTimeStamp()); // + data);
             String[] args = {WellFormedEventPacket.HACKYSTAT_ADD_COMMAND, "msdt.linediffbase.xsd", data};
             try {
                 events.add(new ValidEventPacket(timestamp,
@@ -230,13 +230,13 @@ public class CodechangeDifferIntermediateModule extends IntermediateModule {
                 logger.log(ECGLevel.SEVERE, "Wrong event parameters in CodechangeDifferIntermediateModule.");
             }
             // store current version
-            codes.put(id, newCode);
+            codes.put(projectname + ":" + documentname, newCode);
             // Note that since this is an annotator module, the similar msdt.codechange with retain as well
             return events;
         }
         
     	// store current version
-        codes.put(id, newCode);
+        codes.put(projectname + ":" + documentname, newCode);
 
         String[] oldLines = getLines(oldCode);
         String[] newLines = getLines(newCode);
