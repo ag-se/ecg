@@ -3,8 +3,8 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="test"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/ECG_Support"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/ECG_TestHelper"/>
+	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/ECG_Support"/>
+	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/ECG_TestHelper"/>
 	<classpathentry kind="lib" path="/ECG_TestHelper/dist/lib/ecg_test.jar"/>
 	<classpathentry kind="lib" path="/ECG_TestHelper/dist/lib/junit.jar"/>
 	<classpathentry kind="lib" path="lib/misc/jgraph.jar"/>
