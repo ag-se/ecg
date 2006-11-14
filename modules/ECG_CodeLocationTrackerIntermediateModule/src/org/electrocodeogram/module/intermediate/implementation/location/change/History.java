@@ -14,6 +14,8 @@ import org.electrocodeogram.module.intermediate.implementation.location.state.Lo
 import org.electrocodeogram.module.intermediate.implementation.location.state.Text;
 
 public class History {
+    
+    private final boolean STORE_HISTORY = false;
 
     private HashMap<IText, HashMap<Location, List<LocationChange>>> textLocationChangeHistories 
                 = new HashMap<IText, HashMap<Location, List<LocationChange>>>();
@@ -39,6 +41,7 @@ public class History {
      * @param locationChange, with be ignored if null
      */
     public void addLocationChange(LocationChange lc, BlockChange bc) {
+        if (!STORE_HISTORY) return;
         IText text = bc.getText();
         HashMap<Location, List<LocationChange>> locationChangeHistories = getLocationChangeHistories(text);
         if (lc == null)
@@ -59,6 +62,15 @@ public class History {
             lc.setBlockChange(bc);
         if (lc.getBlockChange() != null)
             lc.getBlockChange().getLocationChanges().add(lc); // TODO this is a bit strange
+    }
+    
+    /**
+     * Adds blockChange to history. 
+     * @param blockChange, with be ignored if null
+     */
+    public void addBlockChange(BlockChange bc) {
+        if (!STORE_HISTORY) return;
+        getBlockChangeHistory().add(bc);
     }
 
     public String printLocationChangeHistory(IText text) {
@@ -96,7 +108,8 @@ public class History {
         return res;
     }
     
-    public String printLastTextContents(IText text) {
+    public String printLastTextContents(Text text) {
+        if (!STORE_HISTORY) return text.printContents();
         HashMap<Location, List<LocationChange>> locationChangeHistories = getLocationChangeHistories(text);
         String res = "";
         SortedSet<Location> locs = new TreeSet<Location>(LocationComparator.getComparator());
@@ -143,6 +156,7 @@ public class History {
     }
     
     public boolean checkValidity(Text text) {
+        if (!STORE_HISTORY) return true;        
         // checkInit checks whether each LocationChange begins with an initial state
         boolean checkInit = true;
         // checkInner checks whether each inner LocationChange isnt a final state

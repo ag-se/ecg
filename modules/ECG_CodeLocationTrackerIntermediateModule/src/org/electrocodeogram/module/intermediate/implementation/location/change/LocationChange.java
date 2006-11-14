@@ -226,7 +226,7 @@ public class LocationChange {
         data += "</codelocation></microActivity>";
 */
 
-System.out.println(data);
+//System.out.println(data);
         return data;
     }
 

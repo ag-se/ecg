@@ -92,7 +92,7 @@ public class CodeLocationTrackerIntermediateModule extends IntermediateModule {
 
 //System.out.println(eventPacket);
         ccc++;
-        
+System.out.println(ccc);        
         // a list of location changes which will be sent as event packets
         List<LocationChange> locChanges = new ArrayList<LocationChange>();
 
@@ -188,7 +188,7 @@ System.out.println("---");
             
             for (BlockChange bc: blockChanges) {
 
-                history.getBlockChangeHistory().add(bc);
+                history.addBlockChange(bc);
                 
                 // Convert long change blocks into replace blocks. This is due to the fact that
                 //   its more likely that is an paste/overwrite block (i.e. complete replace)
@@ -609,7 +609,10 @@ System.out.println("---");
 	private String getCode(ValidEventPacket packet) {
     	try {
         	Document document = packet.getDocument();
-			return ECGParser.getSingleNodeValue("document", document);
+            String code = ECGParser.getSingleNodeValue("document", document);
+            if (code == null)
+                return "";
+            return code;
     	} catch (NodeException e) {
 			logger.log(ECGLevel.SEVERE, "Could not fetch code in CodeLocationTrackerIntermediateModule.");
             assert (false);
