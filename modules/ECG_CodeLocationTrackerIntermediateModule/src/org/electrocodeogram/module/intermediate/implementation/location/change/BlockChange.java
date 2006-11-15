@@ -6,6 +6,7 @@ package org.electrocodeogram.module.intermediate.implementation.location.change;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Vector;
 
 import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.misc.xml.ECGParser;
@@ -23,32 +24,48 @@ import org.w3c.dom.Node;
 public class BlockChange {
 
     public enum BlockChangeType {
-        CREATED,
-        INSERTED,
-        DELETED,
-        CHANGED, 
-        REPLACED,
-        UNKNOWN
+        CREATED,  // not used yet
+        INSERTED, // contains inserted lines only
+        DELETED,  // contains deleted lines only
+        CHANGED,  // contains change of lines, may contain inserted and deleted lines as well
+        REPLACED, // only internal use yet
+        UNKNOWN   // for debugging purposes
     }
     
     /**
-     * 
+     * Associated location changes
      */
     private List<LocationChange> locationChanges = new ArrayList<LocationChange>();
 
     /**
-     * 
+     * Each block change contains a list of LineChange objects
      */
     private List<LineChange> lineChanges = new ArrayList<LineChange>();
 
     /**
-     * 
+     * The time stamp of the block change 
      */
     private Date timeStamp;
     
+    /**
+     * Type of BlockChange
+     * @see BlockChangeType
+     */
     BlockChangeType blockType = BlockChangeType.UNKNOWN;
+    
+    /**
+     * first line number of block in text (starting with 1)
+     */
     int blockStart = -1;
+
+    /**
+     * number of changed lines in text
+     */
     int blockLength = 1;
+
+    /**
+     * text where the block change occured
+     */
     IText text = null;
 
     /**
@@ -241,6 +258,7 @@ public class BlockChange {
                 }
             }            
         }
+        
         return blockChanges;
     }
 }

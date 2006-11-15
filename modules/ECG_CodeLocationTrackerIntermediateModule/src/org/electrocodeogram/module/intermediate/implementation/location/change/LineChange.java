@@ -12,18 +12,28 @@ package org.electrocodeogram.module.intermediate.implementation.location.change;
 public class LineChange {
 
     public enum LineChangeType {
-        INSERTED,
-        DELETED,
-        CHANGED, 
-        MOVED,
-        UNKNOWN
+        INSERTED, // line has been inserted at position linenumber
+        DELETED, // line has been deleted at position linenumber
+        CHANGED, // line has been changed at position linenumber
+        MOVED, // not used
+        UNKNOWN 
     }
     
+    /**
+     * text representation (in XML etc.) of LineChangeType
+     */
     static private String[] typeStrings = new String[] {
         "inserted", "deleted", "changed", "moved", "unknown"
     };
     
+    /**
+     * line number of changed line (
+     */
     private int linenumber = -1;
+    
+    /**
+     * text contents of line (in case of inserted or changed) after the change 
+     */
     private String contents = null;
     
     static public LineChangeType getLineChangeTypeFromString(String type) {
