@@ -16,8 +16,16 @@ public class LocationComputationStrategy {
     // return true, if location changes have been added
     // TODO blockChange should be omitted as a parameter
     public void computeNewNeighborhood(Text text, History history, Line lineAbove, Line lineBelow, BlockChange blockChange) {
-        if (lineAbove == null || lineBelow == null)
-            return; // has been at the begin/end of the text: no recompution necessary
+        if (lineAbove == null && lineBelow != null) {
+        	// has been at the begin of the text: if we have a new start line set cohesion
+        	if (lineBelow.getLinenumber() == 0)
+                computeCohesionAndLevel(lineBelow, lineAbove);        		
+        	return;
+        }
+        if (lineBelow == null) {
+        	// has been at the begin/end of the text: no recompution necessary
+        	return;
+        }
         Location locationAbove = lineAbove.getLocation();
         Location locationBelow = lineBelow.getLocation();
         // first compute new cohesion

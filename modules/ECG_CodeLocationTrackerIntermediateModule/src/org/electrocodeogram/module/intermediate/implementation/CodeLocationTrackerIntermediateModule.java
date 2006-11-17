@@ -254,7 +254,7 @@ System.out.println("---");
                         }
                     }
                     
-                    // The location after the after the deleted block needs adjustment in their start line number
+                    // The locations after the deleted block needs adjustment in their start line number
                     while (location != null) {
                         location.setStart(location.getStart() - bc.getBlockLength());
                         location = (tailIt.hasNext() ? tailIt.next() : null);
@@ -279,7 +279,7 @@ System.out.println("---");
                     // Finally, the new neighborhood needs to be analysed. bc.blockStart now
                     // points to the first line *after* the deleted block
                     if (type != BlockChangeType.REPLACED) {
-                        // In case of a replace, it will be followed by an insert at this plöace anyway
+                        // In case of a replace, it will be followed by an insert at this place anyway
                         Line prevLine = text.getLine(bc.getBlockStart()-1); // maybe null
                         Line nextLine = text.getLine(bc.getBlockStart()); // maybe null
                         strategy.computeNewNeighborhood(text, history, prevLine, nextLine, bc);

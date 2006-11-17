@@ -96,6 +96,8 @@ public class Text implements IText {
     }
     
     public Location getLastLocation() {
+    	if (this.locations.size() == 0)
+    		return null;
         return this.locations.last();
     }
     
