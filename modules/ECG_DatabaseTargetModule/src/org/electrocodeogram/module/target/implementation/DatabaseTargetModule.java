@@ -54,6 +54,8 @@ public class DatabaseTargetModule extends TargetModule {
     
     
     private DBCommunicator dbCommunicator;
+    
+    private EventBuffer eventBuffer;
 
     /**
      * This creates the module instance. It is called by the ECG
@@ -101,7 +103,10 @@ public class DatabaseTargetModule extends TargetModule {
         
         
         this.dbCommunicator = new DBCommunicator(username, password, jdbcConnection, jdbcDriver);
-
+        this.eventBuffer = new EventBuffer(1000);
+        BufferThread bufferThread = new BufferThread(this);
+        bufferThread.start();
+        
         logger.exiting(this.getClass().getName(), "DatabaseTargetModule");
 
     }
@@ -115,7 +120,11 @@ public class DatabaseTargetModule extends TargetModule {
         logger.entering(this.getClass().getName(), "write",
             new Object[] {packet});
         
-        dbCommunicator.insertEvent(packet);
+        if(!dbCommunicator.insertEvent(packet)){
+        	eventBuffer.put(packet);
+        }
+        
+    
 
         logger.log(Level.INFO, "An event has been written to the database "
                                + this.jdbcConnection
@@ -313,6 +322,20 @@ public class DatabaseTargetModule extends TargetModule {
     	dbCommunicator.closeDBConnection();
     
     }
+
+	/**
+	 * @return the dbCommunicator
+	 */
+	public DBCommunicator getDbCommunicator() {
+		return dbCommunicator;
+	}
+
+	/**
+	 * @return the eventBuffer
+	 */
+	public EventBuffer getEventBuffer() {
+		return eventBuffer;
+	}
     
 //    private String[] getSchemes (File f){
 //        

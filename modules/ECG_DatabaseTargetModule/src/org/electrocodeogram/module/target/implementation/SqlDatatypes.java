@@ -71,7 +71,7 @@ public class SqlDatatypes {
         xml_sql_dt.put("XmlUnsignedLong", "BIGINT");
         xml_sql_dt.put("XmlUnsignedShort", "SMALLINT");
         xml_sql_dt.put("BLOB", "BLOB");
-        xml_sql_dt.put("mixedContent", "TEXT");
+        xml_sql_dt.put("Tinytext", "TINYTEXT");
 
     }    
 
