@@ -419,6 +419,7 @@ public final class ECGEclipseSensor {
 			partListener.partActivated(activePart);
 		}
 
+/* commented for 1.1.4 release
         // create ElementChangedListenerAdapter
         ECGElementChangedListener javacodechange = null;
         IWorkbenchPage page = windows[0].getActivePage();
@@ -432,7 +433,7 @@ public final class ECGEclipseSensor {
         // we only want to know about changes to the working copy of the documents,
         // so we only need POST_RECONCILE events
         JavaCore.addElementChangedListener(javacodechange, ElementChangedEvent.POST_RECONCILE);
-        
+
         page = null;
 
         for (int i = 0; i < windows.length; i++) {
@@ -440,6 +441,7 @@ public final class ECGEclipseSensor {
             // add javacodechange also as a partlistener
             page.addPartListener(javacodechange);
         }
+*/        
 
         logger.log(Level.FINE, "The SensorShell's listeners have been initialized.");
 	}
