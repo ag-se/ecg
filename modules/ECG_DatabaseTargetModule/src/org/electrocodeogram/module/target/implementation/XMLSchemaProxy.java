@@ -4,9 +4,7 @@
 package org.electrocodeogram.module.target.implementation;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -350,7 +348,7 @@ public class XMLSchemaProxy {
 		SchemaType microActivity = findElementDeklaration("microActivity");
 		Table microActivityTable = new Table("microActivity",
 				new Vector<ColumnElement>());
-		getElementProperties(microActivity, microActivityTable, "");
+		mapElementsToDB(microActivity, microActivityTable, "");
 
 		// Information about the tables which are linked to store a msdt with
 		// the given schema
@@ -368,7 +366,7 @@ public class XMLSchemaProxy {
 		SchemaType commonDataType = findElementDeklaration("commonDataType");
 
 		Table commondata = new Table("commondata", new Vector<ColumnElement>());
-		getElementProperties(commonDataType, commondata, "");
+		mapElementsToDB(commonDataType, commondata, "");
 
 		return commondata;
 
@@ -398,7 +396,7 @@ public class XMLSchemaProxy {
 	 *            the name of the complex father element of the current explored
 	 *            element
 	 */
-	private void getElementProperties(SchemaType schemaType, Table table,
+	private void mapElementsToDB(SchemaType schemaType, Table table,
 			String father) {
 
 		/*
@@ -442,7 +440,6 @@ public class XMLSchemaProxy {
 
 			String currentElementName = "";
 
-			Table newTable;
 
 			/*
 			 * if the element has a name then set this name for
@@ -460,6 +457,21 @@ public class XMLSchemaProxy {
 			 * if the current element is a simple type
 			 */
 			if (currentSchemaType.isSimpleType()) {
+				
+				if (property.getMaxOccurs().compareTo((BigInteger.ONE)) == 1){
+					maxOccursTable(currentElementName,fatherElementName, currentSchemaType);
+					return;
+				}
+				
+				/*
+				 * if the maxOccurs value of the element is > 1 a new table
+				 * for only this element is created the name of the table
+				 * consists of the name of the father element, then an
+				 * underline followed by the name of the current explored
+				 * element
+				 */
+				
+
 
 				switch (currentSchemaType.getSimpleVariety()) {
 
@@ -467,28 +479,9 @@ public class XMLSchemaProxy {
 
 					tableColumn = createElement(currentElementName,
 							currentSchemaType);
-
-					/*
-					 * if the maxOccurs value of the element is > 1 a new table
-					 * for only this element is created the name of the table
-					 * consists of the name of the father element, then an
-					 * underline followed by the name of the current explored
-					 * element
-					 */
-					if (property.getMaxOccurs().compareTo((BigInteger.ONE)) == 1) {
-
-						newTable = new Table(this.coreSchemaName + "_"
-								+ fatherElementName + "_maxOccurs_"
-								+ currentElementName,
-								new Vector<ColumnElement>());
-						newTable.addVectorElement(tableColumn);
-						this.tables.add(newTable);
-						break;
-
-					}
-
-					else
-						table.addVectorElement(tableColumn);
+					
+					
+					table.addVectorElement(tableColumn);
 					break;
 
 				/*
@@ -501,14 +494,17 @@ public class XMLSchemaProxy {
 				case org.apache.xmlbeans.SchemaType.LIST:
 
 					tableColumn = createColumnElementWithGivenType(
-							currentElementName, "BLOB");
+							currentElementName, "TINYTEXT");
 
 					table.addVectorElement(tableColumn);
 					break;
 
 				case org.apache.xmlbeans.SchemaType.UNION:
-					logger
-							.warning("Union Datatypes are not supported by this SchemaProxy!");
+					
+					tableColumn = createColumnElementWithGivenType(
+							currentElementName, "TINYTEXT");
+
+					table.addVectorElement(tableColumn);
 					break;
 
 				default:
@@ -558,6 +554,7 @@ public class XMLSchemaProxy {
 				 */
 				case org.apache.xmlbeans.SchemaType.SIMPLE_CONTENT:
 					logger.info("SIMPLE_CONTENT " + currentElementName);
+					
 					Table simpleTable = new Table(this.coreSchemaName + "_"
 							+ currentElementName, new Vector<ColumnElement>());
 					// getElementProperties(currentSchemaType, simpleTable,
@@ -589,7 +586,7 @@ public class XMLSchemaProxy {
 							+ currentElementName, new Vector<ColumnElement>());
 					// recursive call with the currentSchemaType with its
 					// subelements and a new table
-					getElementProperties(currentSchemaType, complexTable,
+					mapElementsToDB(currentSchemaType, complexTable,
 							currentElementName);
 					// check the currentSchemaType for attributes
 					checkForAttributes(currentSchemaType, currentElementName,
@@ -610,14 +607,10 @@ public class XMLSchemaProxy {
 							+ currentElementName, new Vector<ColumnElement>());
 					// Column for the text content
 					ColumnElement mixedContent = createColumnElementWithGivenType(
-							currentElementName, "mixedContent");
+							currentElementName, "TINYTEXT");
 
 					mixedTable.addVectorElement(mixedContent);
-					// if there are any Sub-Elements
-					if (currentSchemaType.getElementProperties().length > 0) {
-						getElementProperties(currentSchemaType, mixedTable,
-								currentElementName);
-					}
+					
 					// check if there are any Attributes
 					checkForAttributes(currentSchemaType, currentElementName,
 							mixedTable);
@@ -699,6 +692,45 @@ public class XMLSchemaProxy {
 		ColumnElement element = new ColumnElement(elementName, null,
 				xmlDatatypeName);
 		return element;
+	}
+	
+	private void maxOccursTable(String currentElementName,String fatherElementName, SchemaType currentSchemaType){
+		
+		Table maxOccursTable = new Table(this.coreSchemaName + "_"
+				+ fatherElementName + "_maxOccurs_"
+				+ currentElementName,
+				new Vector<ColumnElement>());
+		
+		ColumnElement tableColumn = null;
+		
+		
+		switch (currentSchemaType.getSimpleVariety()) {
+
+			case org.apache.xmlbeans.SchemaType.ATOMIC:
+				tableColumn = createElement(currentElementName,
+						currentSchemaType);
+	
+				maxOccursTable.addVectorElement(tableColumn);
+			break;
+		
+			case org.apache.xmlbeans.SchemaType.LIST:
+	
+				tableColumn = createColumnElementWithGivenType(
+						currentElementName, "TINYTEXT");
+	
+				maxOccursTable.addVectorElement(tableColumn);
+				break;
+
+		case org.apache.xmlbeans.SchemaType.UNION:
+			
+				tableColumn = createColumnElementWithGivenType(
+						currentElementName, "TINYTEXT");
+	
+				maxOccursTable.addVectorElement(tableColumn);
+				break;
+
+		}
+		this.tables.add(maxOccursTable);
 	}
 
 	/**
