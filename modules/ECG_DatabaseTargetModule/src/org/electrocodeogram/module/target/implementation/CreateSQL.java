@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.electrocodeogram.module.target.implementation;
 
 import java.sql.Timestamp;
@@ -53,7 +50,7 @@ public class CreateSQL {
      * @return the string which represents the insert Statement for the database
      */
     public static String createCommonDataInsertStmt(
-            ValidEventPacketProxy eventProxy, DBCommunicator dbCommunicator ) {
+            ValidEventPacketProxy eventProxy, DBCommunicator dbCommunicator) {
 
         // the logger entering the method
         logger.entering(CreateSQL.class.getName(),
@@ -75,18 +72,15 @@ public class CreateSQL {
         Date timestamp = eventProxy.getTimestamp();
         // generate SQL Timestamp from java Date
         Timestamp sqlTimestamp = new Timestamp(timestamp.getTime());
-
-        // the columns of the common data table in the database
-        Vector commonColumns = new Vector();
-    
         /**
          * get the column names and their datatypes of the common data table
          * from the database
          */
-        
-        commonColumns = DBTablesMetadataPool.Instance().getMetadataVector(
-                "commondata", dbCommunicator);
-   
+
+        // the columns of the common data table in the database
+        Vector commonColumns = DBTablesMetadataPool.Instance()
+                .getMetadataVector("commondata", dbCommunicator);
+
         insertCommonDataString = "INSERT INTO commondata VALUES (";
 
         // the null value for the auto generated linkid
@@ -112,10 +106,12 @@ public class CreateSQL {
              * in the table
              */
             if (eventProxy.getElementValue(elementName) == null) {
-                if (i < commonColumns.size() - 1) insertCommonDataString = insertCommonDataString
-                        + " NULL,";
-                else
+                if (i < commonColumns.size() - 1) {
+                    insertCommonDataString = insertCommonDataString + " NULL,";
+                }
+                else {
                     insertCommonDataString = insertCommonDataString + " NULL);";
+                }
             }
             /**
              * else insert the data from the event for this column
@@ -123,11 +119,14 @@ public class CreateSQL {
             else {
                 String documentValueForElement = eventProxy
                         .getElementValue(elementName);
-                if (i < commonColumns.size() - 1) insertCommonDataString = insertCommonDataString
-                        + "'" + documentValueForElement + "',";
-                else
+                if (i < commonColumns.size() - 1) {
+                    insertCommonDataString = insertCommonDataString + "'"
+                            + documentValueForElement + "',";
+                }
+                else {
                     insertCommonDataString = insertCommonDataString + "'"
                             + documentValueForElement + "');";
+                }
             }
         }
         // the logger exiting the method
@@ -173,7 +172,8 @@ public class CreateSQL {
      *         event
      */
     public static Vector createMSDTInsertStmts(
-            ValidEventPacketProxy eventProxy, int linkId, DBCommunicator dbCommunicator) {
+            final ValidEventPacketProxy eventProxy, final int linkId,
+            final DBCommunicator dbCommunicator) {
 
         // the logger entering the method
         logger.entering(CreateSQL.class.getName(), "createMSDTInsertStmt",
@@ -190,10 +190,11 @@ public class CreateSQL {
          * holding the Information of this msdt Type in the Database
          */
 
-//        XMLSchemaProxy proxy = new XMLSchemaProxy(eventProxy.getMSDTDefFile(),dbCommunicator);
-//        proxy.getSchemaProperties();
         Vector tableNamesInDatabase = TableInformation.Instance()
                 .getTableNamesForMSDT(eventProxy.getMsdt());
+        if(tableNamesInDatabase.size()<= 0){
+            logger.warning("No Table Information found for msdt Type "+eventProxy.getMsdt());
+        }
 
         /**
          * for each table which is involved in storing the msdt data
@@ -201,12 +202,11 @@ public class CreateSQL {
         for (int k = 0; k < tableNamesInDatabase.size(); k++) {
 
             String currentTable = (String) tableNamesInDatabase.get(k);
-            Vector currentTableColumns = new Vector();
 
             /**
              * get the column names and their datatypes from the database
              */
-            currentTableColumns = DBTablesMetadataPool.Instance()
+            Vector currentTableColumns = DBTablesMetadataPool.Instance()
                     .getMetadataVector(currentTable, dbCommunicator);
 
             String insertDataString = "INSERT INTO " + currentTable;
@@ -237,14 +237,11 @@ public class CreateSQL {
                     if (i < currentTableColumns.size() - 1) {
                         insertDataString = insertDataString + " NULL,";
                     }
-
                     else {
                         insertDataString = insertDataString + " NULL);";
                     }
-
                     continue;
                 }
-
                 // otherwise add the value of the corresponding element to the
                 // string
                 else {
@@ -262,7 +259,6 @@ public class CreateSQL {
             }
             logger.info("Insert Statement: " + insertDataString);
             insertStmtsForAllTables.add(insertDataString);
-
         }
         // the logger exiting the method
         logger.exiting(CreateSQL.class.getName(), "createMSDTInsertStmt",
@@ -282,7 +278,7 @@ public class CreateSQL {
      * 
      * @return the String with the "CREATE TABLE ..." Statement
      */
-    public static String createTableStmt(Table tableToCreate) {
+    public static String createTableStmt(final Table tableToCreate) {
 
         // the logger entering the method
         logger.entering(CreateSQL.class.getName(), "createTableStmt",
@@ -328,36 +324,34 @@ public class CreateSQL {
      * 
      * @return the String which represents the createCommonData Table Statement
      */
-    public static String createCommonDataTable(Table commondataTable) {
-//    	 the logger entering the method
+    public static String createCommonDataTable(final Table commondataTable) {
+        // the logger entering the method
         logger.entering(CreateSQL.class.getName(), "createCommonDataTable",
                 new Object[] { commondataTable });
-        
+
         logger.info("CREATE TABLE " + commondataTable.getTableName());
         // set the sql types or the given xml types in the table's elements
-        
+
         SqlDatatypes sqlDT = new SqlDatatypes();
         sqlDT.setSqlTypes4Elements(commondataTable.getElements());
         Vector columns = commondataTable.getElements();
-    	
-    	
-    	String createCommonData = "CREATE TABLE commondata (";
+
+        String createCommonData = "CREATE TABLE commondata (";
         createCommonData = createCommonData
                 + "linkid INTEGER NOT NULL AUTO_INCREMENT,";
         createCommonData = createCommonData + "timestamp TIMESTAMP NOT NULL,";
         createCommonData = createCommonData + "msdt VARCHAR(30),";
-        
+
         for (int i = 0; i < columns.size(); i++) {
             ColumnElement temp = (ColumnElement) columns.get(i);
             String columnName = temp.getName();
             String SqlDatatype = temp.getSqlType();
             createCommonData = createCommonData + columnName + " ";
             if (i < columns.size() - 1) {
-            	createCommonData = createCommonData + SqlDatatype + ", ";
+                createCommonData = createCommonData + SqlDatatype + ", ";
             }
             else
-            	createCommonData = createCommonData
-                        + SqlDatatype
+                createCommonData = createCommonData + SqlDatatype
                         + ", PRIMARY KEY(linkid))ENGINE=INNODB; ";
         }
         return createCommonData;
@@ -375,8 +369,8 @@ public class CreateSQL {
      *            the column which has to be added to the table
      * @return the string which represents the ALTER TABLE ADD COLUMN statement
      */
-    public static String alterTableNewColumn(Table schemaTable,
-            ColumnElement columnToAdd) {
+    public static String alterTableNewColumn(final Table schemaTable,
+            final ColumnElement columnToAdd) {
 
         // the logger entering the method
         logger.entering(CreateSQL.class.getName(), "alterTableNewColumn",
@@ -413,8 +407,8 @@ public class CreateSQL {
      *            the column with the type to change
      * @return the string which represents the ALTER TABLE MODIFY... statement
      */
-    public static String alterTableSqlType(Table schemaTable,
-            ColumnElement columnToChange) {
+    public static String alterTableSqlType(final Table schemaTable,
+            final ColumnElement columnToChange) {
 
         // the logger entering the method
         logger.entering(CreateSQL.class.getName(), "alterTableSqlType",
@@ -435,5 +429,4 @@ public class CreateSQL {
         return modifyColumnType;
     }
 
-    
 }

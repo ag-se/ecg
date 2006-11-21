@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.electrocodeogram.module.target.implementation;
 
 import java.util.HashMap;
@@ -19,11 +16,21 @@ import java.util.Vector;
  * created
  */
 public class TableInformation {
+    /**
+     * The HashMap where the key of each element is the name of a msdt and the
+     * value is a Vector containing the names of the tables which are involved
+     * in storing events of this msdt type
+     */
+    private HashMap<String, Vector> msdtTables;
 
-    private static HashMap<String, Vector> msdtTables;
-
+    /**
+     * the singleton instance
+     */
     private static TableInformation uniqueInstance = null;
 
+    /**
+     * The constructor
+     */
     private TableInformation() {
         msdtTables = new HashMap<String, Vector>();
     }
@@ -40,9 +47,13 @@ public class TableInformation {
     }
 
     /**
+     * Add the information of about a msdt and its table names to the HashMap
+     * which hold the information about all msdts
      * 
      * @param msdtType
+     *            the msdt
      * @param v
+     *            the Names of the tables
      */
     public void addTableInformation(String msdtType, Vector v) {
         Vector<String> tables = new Vector<String>();
@@ -55,6 +66,7 @@ public class TableInformation {
     }
 
     /**
+     * Get the names of the tables which are involved in storing the given msdt
      * 
      * @param msdtType
      * @return the HashSet with the Table Names
@@ -65,10 +77,6 @@ public class TableInformation {
         }
         else {
             return null;
-            /**
-             * @TODO Fehlermeldung wenn nicht vorhanden
-             */
         }
     }
-
 }

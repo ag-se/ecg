@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.electrocodeogram.module.target.implementation;
 
 import java.util.HashMap;
@@ -8,12 +5,16 @@ import java.util.Vector;
 
 /**
  * This class is responsible for mapping the xml schema types to sql types
+ * 
  * @author jule
  * @version 1.0
  */
 public class SqlDatatypes {
-
-    private HashMap <String,String>xml_sql_dt = new HashMap <String,String>();
+    /**
+     * The HashMap holds Tupels of the xml Types and the corresponding sql
+     * datatypes.
+     */
+    private HashMap<String, String> xml_sql_dt = new HashMap<String, String>();
 
     /**
      * empty constructor
@@ -22,8 +23,7 @@ public class SqlDatatypes {
         addDatatypes();
     }
 
-    private void addDatatypes(){
-
+    private void addDatatypes() {
         xml_sql_dt.put("XmlID", "VARCHAR(255)");
         xml_sql_dt.put("SimpleValue", "VARCHAR(255)");
         xml_sql_dt.put("XmlAnySimpleType", "TEXT");
@@ -72,14 +72,14 @@ public class SqlDatatypes {
         xml_sql_dt.put("XmlUnsignedShort", "SMALLINT");
         xml_sql_dt.put("BLOB", "BLOB");
         xml_sql_dt.put("Tinytext", "TINYTEXT");
-
-    }    
-
-
+    }
 
     /**
-     * This Method sets in ColumnElement the sql Type for a given xml schema type
-     * @param e the ColumnElement
+     * This Method sets in ColumnElement the sql Type for a given xml schema
+     * type
+     * 
+     * @param e
+     *            the ColumnElement
      * @return the ColumnElement with the mapped sql Type
      */
     public ColumnElement setSqlType4XmlType(ColumnElement e) {
@@ -95,8 +95,10 @@ public class SqlDatatypes {
     }
 
     /**
-     * This method sets for all ColumnElements of a Table the sql Types 
-     * @param v the Vector with the ColumnElements of a Table
+     * This method sets for all ColumnElements of a Table the sql Types
+     * 
+     * @param v
+     *            the Vector with the ColumnElements of a Table
      */
     public void setSqlTypes4Elements(Vector v) {
         Vector elementVector = v;
@@ -104,7 +106,5 @@ public class SqlDatatypes {
             ColumnElement e = (ColumnElement) elementVector.get(i);
             setSqlType4XmlType(e);
         }
-       
     }
-
 }

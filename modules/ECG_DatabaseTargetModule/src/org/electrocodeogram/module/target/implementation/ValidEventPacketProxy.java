@@ -12,18 +12,24 @@ import org.electrocodeogram.misc.xml.NodeException;
 import org.w3c.dom.Document;
 
 /**
- * Proxy for getting the Elements from a ValidEventPacket
- * 
+ * This class provides some kind of proxy for a ValidEventPacket. 
+ * It offers better access to the attributes of an Event.
  * @author jule
- *
+ * @version 1.0
+ * 
  */
 public class ValidEventPacketProxy {
-
+    /**
+     * The Event which is given with the contructor and for which the Proxy has
+     * to be created.
+     */
     private ValidEventPacket event;
 
     /**
-     * the constructor
-     * @param vPacket the validEventPacket
+     * The constructor.
+     * 
+     * @param vPacket
+     *            the validEventPacket
      */
     public ValidEventPacketProxy(final ValidEventPacket vPacket) {
         this.event = vPacket;
@@ -32,12 +38,12 @@ public class ValidEventPacketProxy {
     /**
      * labels the username tag in the XML Document
      */
-    private static final  String ATTR_USER = "username";
+    private static final String ATTR_USER = "username";
 
     /**
      * labels the projectname tag in the XML Dokument
      */
-    private static final  String ATTR_PROJECT = "projectname";
+    private static final String ATTR_PROJECT = "projectname";
 
     /**
      * This is the logger.
@@ -57,7 +63,7 @@ public class ValidEventPacketProxy {
 
     /**
      * returns the Timestamp of the event
-     *
+     * 
      * @return the timestamp of the event
      */
     public Date getTimestamp() {
@@ -88,15 +94,11 @@ public class ValidEventPacketProxy {
      */
     public String getMsdt() {
         return this.event.getMicroSensorDataType().getName();
-        
     }
-    
-    public File getMSDTDefFile(){
-    	return this.event.getMicroSensorDataType().getDefFile();
+
+    public File getMSDTDefFile() {
+        return this.event.getMicroSensorDataType().getDefFile();
     }
-    
-    
-    
 
     /**
      * this method returns core the Name of a MSDT Type, without "msdt" before
@@ -129,8 +131,10 @@ public class ValidEventPacketProxy {
         try {
             elementValue = ECGParser.getSingleNodeValue(elementName, this.event
                     .getDocument());
-        } catch (NodeException e) {
-            logger.warning("There is no such Node '" + elementName + "' in the event: \n" + this.event);
+        }
+        catch (NodeException e) {
+            logger.warning("There is no such Node '" + elementName
+                    + "' in the event: \n" + this.event);
             return null;
         }
         return elementValue;
@@ -138,10 +142,10 @@ public class ValidEventPacketProxy {
 
     /**
      * the ArgList which is included in the event
+     * 
      * @return the event's ArgList
      */
     public List getArgList() {
         return event.getArgList();
     }
-
 }

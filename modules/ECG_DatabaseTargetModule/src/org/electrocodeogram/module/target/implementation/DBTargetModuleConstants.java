@@ -1,10 +1,9 @@
 package org.electrocodeogram.module.target.implementation;
 
-
 public class DBTargetModuleConstants {
-	
-	//------------Constants for the DB Communicator ----------------------------
-	/**
+    // ------------Constants for the DB Communicator
+    // ----------------------------
+    /**
      * the used JDBC Driver
      */
     public static final String DB_DRIVER = "com.mysql.jdbc.Driver";
@@ -24,12 +23,9 @@ public class DBTargetModuleConstants {
      */
     public static final String DB_PWD = "ecg";
 
-    
-//  ----------------------------------------------------------------------------
-    
-// -------------------------Constants for the DBTargetModule -------------------
+    // ----------------------------------------------------------------------------
+    // -------------------------Constants for the DBTargetModule
+    // -------------------
     public static final String MSDT_FOLDER = "../ECG_Lab/msdt/";
-// -----------------------------------------------------------------------------
-	
-
+    // -----------------------------------------------------------------------------
 }
