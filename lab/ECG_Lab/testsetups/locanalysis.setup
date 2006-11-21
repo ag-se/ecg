@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<modulesetup>
+	<module id="1" active="true">
+		<name>
+		File Reader
+		</name>
+		<fromClassId>org.electrocodeogram.module.source.implementation.FileSystemSourceModule</fromClassId>
+		<connectedTo>
+			<id>2</id>
+		</connectedTo>
+		<properties>
+			<property>
+				<name>Input File</name>
+				<value>D:\\Forschung\\Kodierszenen\\codelocations.log</value>
+				<type>java.io.File</type>
+			</property>
+			<property>
+				<name>Enable Burst Mode</name>
+				<value>true</value>
+				<type>java.lang.Boolean</type>
+			</property>
+			<property>
+				<name>Send End Event</name>
+				<value>true</value>
+				<type>java.lang.Boolean</type>
+			</property>
+		</properties>
+	</module>
+	<module id="2" active="true">
+		<name>Code location analysis</name>
+		<fromClassId>org.electrocodeogram.module.intermediate.implementation.CodeLocationAnalysisIntermediateModule</fromClassId>
+		<connectedTo>
+			<id>3</id>
+			<!-- <id>4</id> -->
+		</connectedTo>
+		<properties>
+		</properties>
+	</module>
+<!--
+	<module id="4" active="true">
+		<name>
+		AdHoc Statistics
+		</name>
+		<fromClassId>
+		org.electrocodeogram.module.target.implementation.StatisticsTargetModule
+		</fromClassId>
+		<connectedTo>
+		</connectedTo>
+		<properties>
+		</properties>
+	</module>
+-->
+	<module id="3" active="true">
+		<name>
+		File Writer
+		</name>
+		<fromClassId>
+		org.electrocodeogram.module.target.implementation.FileSystemTargetModule
+		</fromClassId>
+		<connectedTo>
+		</connectedTo>
+		<properties>
+			<property>
+				<name>Output File</name>
+				<value>D:\\Forschung\\Kodierszenen\\eventviewer_events.log</value>
+				<type>java.io.File</type>
+			</property>
+			<property>
+				<name>Stamp File Name</name>
+				<value>false</value>
+				<type>java.lang.Boolean</type>
+			</property>
+			<property>
+				<name>Append Data</name>
+				<value>false</value>
+				<type>java.lang.Boolean</type>
+			</property>
+		</properties>
+	</module>
+</modulesetup>
