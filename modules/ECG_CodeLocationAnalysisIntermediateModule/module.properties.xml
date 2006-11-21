@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<module>
+	<id>
+		org.electrocodeogram.module.intermediate.implementation.CodeLocationAnalysisIntermediateModule
+	</id>
+	<provider-name>
+		FU Berlin
+	</provider-name>
+	<version>
+		0.1
+	</version>
+	<name>
+		Code location analysis module
+	</name>
+	<class>
+		org.electrocodeogram.module.intermediate.implementation.CodeLocationAnalysisIntermediateModule
+	</class>
+	<description>
+		This module performs various analysis steps on msdt.codelocation events.
+	</description>
+	<type>
+		INTERMEDIATE
+	</type>
+	<microsensordatatypes>
+		<microsensordatatype>
+			<msdtName>
+				msdt.codelocation.xsd
+			</msdtName>
+			<msdtFile>
+				msdt.codelocation.xsd
+			</msdtFile>
+		</microsensordatatype>
+	</microsensordatatypes>
+</module>
