@@ -34,8 +34,9 @@
 			<propertyType>
 				java.lang.String
 			</propertyType>
-				jdbc:mysql://127.0.0.1:3306/ecg_test
 			<propertyValue>
+				jdbc:mysql://127.0.0.1:3306/ecg_test
+			</propertyValue>
 		</property>
 		
 		<property>

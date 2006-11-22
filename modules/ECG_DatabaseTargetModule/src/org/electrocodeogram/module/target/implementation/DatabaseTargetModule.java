@@ -66,28 +66,11 @@ public class DatabaseTargetModule extends TargetModule {
 
         /**
          * @TODO remove this
-         */
         this.username = DBTargetModuleConstants.DB_USER;
         this.password = DBTargetModuleConstants.DB_PWD;
         this.jdbcConnection = DBTargetModuleConstants.DB_URL;
         this.jdbcDriver = DBTargetModuleConstants.DB_DRIVER;
-
-        /**
-         * TODO remove the block comment
          */
-        /*
-         * try { this.username = this.getModuleProperty("Username").getValue();
-         * this.password = this.getModuleProperty("Password").getValue();
-         * this.jdbcConnection = this.getModuleProperty("JDBC
-         * Connection").getValue(); this.jdbcDriver =
-         * this.getModuleProperty("JDBC Driver").getValue(); } catch
-         * (ModulePropertyException e) { // TODO Auto-generated catch block
-         * e.printStackTrace(); }
-         * 
-         */
-
-        this.dbCommunicator = new DBCommunicator(username, password,
-                jdbcConnection, jdbcDriver);
 
         logger.exiting(this.getClass().getName(), "DatabaseTargetModule");
 
@@ -140,10 +123,7 @@ public class DatabaseTargetModule extends TargetModule {
 
             this.jdbcConnection = moduleProperty.getValue();
 
-            // reconnect to database here
-            dbCommunicator.closeDBConnection();
-            dbCommunicator = new DBCommunicator(username, password,
-                    jdbcConnection, jdbcDriver);
+            // TODO reconnect to database here
 
             logger.log(Level.INFO, "Set the property: "
                     + moduleProperty.getName() + " to " + this.jdbcConnection);
@@ -165,10 +145,7 @@ public class DatabaseTargetModule extends TargetModule {
                         moduleProperty.getValue());
             }
 
-            // reconnect to database here
-            dbCommunicator.closeDBConnection();
-            dbCommunicator = new DBCommunicator(username, password,
-                    jdbcConnection, jdbcDriver);
+            // TODO reconnect to database here
 
             this.username = moduleProperty.getValue();
 
@@ -189,10 +166,7 @@ public class DatabaseTargetModule extends TargetModule {
                         moduleProperty.getValue());
             }
 
-            // reconnect to database here
-            dbCommunicator.closeDBConnection();
-            dbCommunicator = new DBCommunicator(username, password,
-                    jdbcConnection, jdbcDriver);
+            // TODO reconnect to database here
 
             this.password = moduleProperty.getValue();
 
@@ -213,10 +187,7 @@ public class DatabaseTargetModule extends TargetModule {
                         moduleProperty.getValue());
             }
 
-            // reconnect to database here
-            dbCommunicator.closeDBConnection();
-            dbCommunicator = new DBCommunicator(username, password,
-                    jdbcConnection, jdbcDriver);
+            // TODO reconnect to database here
 
             this.jdbcDriver = moduleProperty.getValue();
         }
@@ -252,6 +223,7 @@ public class DatabaseTargetModule extends TargetModule {
      * @see org.electrocodeogram.module.Module#initialize()
      */
     public final void initialize() {
+        int i = 1;
         // not implemented
     }
 
@@ -263,6 +235,8 @@ public class DatabaseTargetModule extends TargetModule {
         logger.entering(this.getClass().getName(), "startWriter");
 
         // connect to database here
+        this.dbCommunicator = new DBCommunicator(username, password,
+                jdbcConnection, jdbcDriver);
 
         syncWithDatabase();
 
@@ -280,7 +254,6 @@ public class DatabaseTargetModule extends TargetModule {
         logger.entering(this.getClass().getName(), "stopWriter");
 
         // disconnect to database here
-
         disconnectDatabase();
 
         logger.exiting(this.getClass().getName(), "stopWriter");
