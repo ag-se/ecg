@@ -1,0 +1,90 @@
+<?xml version="1.0"?>
+<module>
+	<id>
+		org.electrocodeogram.module.source.implementation.DatabaseSourceModule
+	</id>
+	<provider-name>
+		FU Berlin
+	</provider-name>
+	<version>
+		1.0
+	</version>
+	<name>
+		Database Reader
+	</name>
+	<class>
+		org.electrocodeogram.module.target.implementation.DatabaseSourceModule
+	</class>
+	<description>
+		This module gets event data from the database. The properties are:
+		* JDBC Connection - A JDBC connection string
+		* JDBC Driver  - The Driver for the Database Connection
+		* Username - The name of the database user. the user should have sufficient privileges
+		  for the database to write event data
+		* Password - Password for the user
+	</description>
+	<type>
+		TARGET
+	</type>
+	<properties>
+		<property>
+			<propertyName>
+				JDBC Connection
+			</propertyName>
+			<propertyType>
+				java.lang.String
+			</propertyType>
+				jdbc:mysql://127.0.0.1:3306/ecg_test
+			<propertyValue>
+		</property>
+		
+		<property>
+			<propertyName>
+				JDBC Driver
+			</propertyName>
+			<propertyType>
+				java.lang.String
+			</propertyType>
+			<propertyValue>
+				com.mysql.jdbc.Driver
+			</propertyValue>
+		</property>
+		
+		<property>
+			<propertyName>
+				Username
+			</propertyName>
+			<propertyType>
+				java.lang.String
+			</propertyType>
+			<propertyValue>
+				ecg
+			</propertyValue>
+		</property>
+		
+		<property>
+			<propertyName>
+				Password
+			</propertyName>
+			<propertyType>
+				java.lang.String
+			</propertyType>
+			<propertyValue>
+				ecg
+			</propertyValue>
+		</property>
+		
+		<property>
+			<propertyName>
+				SQL Query
+			</propertyName>
+			<propertyType>
+				java.lang.String
+			</propertyType>
+			<propertyValue>
+				"SELECT * from commondata"
+			</propertyValue>
+			
+		</property>
+	</properties>
+</module>
