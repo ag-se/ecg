@@ -522,7 +522,7 @@ public class DBCommunicator {
         try {
             stmt = (Statement) c.createStatement();
             // select the right database from which to retrieve the tablenames
-            stmt.execute("USE ecg_test;"); // TODO
+            stmt.execute("USE ecgtest;"); // TODO
             // get Metadata from the selected database
             DatabaseMetaData dbmd = (DatabaseMetaData) c.getMetaData();
             String[] names = { "TABLE" };

@@ -27,11 +27,11 @@
 	<!-- Classpath setting -->
 	<path id="classpath">
 
-		<!-- include special jars, if available 
+		<!-- include special jars, if available -->
 		<fileset dir="${lib.dir}">
 			<include name="**/*.jar/"/>			
 		</fileset>
-		-->
+		
 		
 		<fileset dir="${support.dir}/dist/lib">
 			<include name="**/ecg_support.jar/"/>			

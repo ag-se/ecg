@@ -377,9 +377,24 @@ public class XMLSchemaProxy {
         /*
          * get all child Elements of the given SchemaType
          */
+        if(schemaType.getName()!=null){
+            logger.info("SchemaType "+schemaType.getName().toString());
+            logger.info("######################");
+        }
+        
         SchemaProperty[] properties = null;
         if (schemaType.getElementProperties() != null) {
+            if(schemaType.getName()!= null){
+                logger.info("SchemaType "+schemaType.getName().toString()+"has Subelements:");
+            }
             properties = schemaType.getElementProperties();
+                logger.info("---------");
+                for (int j = 0; j < properties.length; j++) {
+                    if (properties[j].getName() != null){
+                        logger.info("Child element: "+properties[j].getName().toString());
+                    }
+                }
+                logger.info("---------");
         }
         /**
          * for each global element of the given schemaType it has to be disposed
@@ -389,6 +404,7 @@ public class XMLSchemaProxy {
          * and so on until all atomic elements of the schema are found
          */
         for (int i = 0; i < properties.length; i++) {
+
             ColumnElement tableColumn = null;
             /*
              * exploring each of the child elements of the schema Type
@@ -413,10 +429,20 @@ public class XMLSchemaProxy {
              * if the current element is a simple type
              */
             if (currentSchemaType.isSimpleType()) {
-                if (property.getMaxOccurs().compareTo((BigInteger.ONE)) == 1) {
+                
+                logger.info("Element "+currentElementName+" is a simple type");
+                
+                if(property.getMaxOccurs() ==null){
+                    logger.info("Element "+currentElementName+" has maxOccurs > 1");
                     maxOccursTable(currentElementName, fatherElementName,
                             currentSchemaType);
-                    return;
+                    continue;
+                }
+                if (property.getMaxOccurs().compareTo((BigInteger.ONE)) == 1) {
+                    logger.info("Element "+currentElementName+" has maxOccurs > 1");
+                    maxOccursTable(currentElementName, fatherElementName,
+                            currentSchemaType);
+                    continue;
                 }
                 /*
                  * if the maxOccurs value of the element is > 1 a new table for
@@ -426,6 +452,7 @@ public class XMLSchemaProxy {
                  */
                 switch (currentSchemaType.getSimpleVariety()) {
                     case org.apache.xmlbeans.SchemaType.ATOMIC:
+                        
                         tableColumn = createElement(currentElementName,
                                 currentSchemaType);
                         table.addVectorElement(tableColumn);

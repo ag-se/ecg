@@ -82,12 +82,9 @@ public class ColumnElement {
     public static int compareWithDbColumn(final ColumnElement e1,
             final ColumnElement e2) {
         if (equalName(e1, e2)) {
-            logger.info("The Names are Equal: " + e1.getName());
             return NAME_EQUAL;
         }
         else
-            logger.info("Names " + e1.getName() + " and " + e2.getName()
-                    + " are not equal");
         return NOT_EQUAL;
     }
 
