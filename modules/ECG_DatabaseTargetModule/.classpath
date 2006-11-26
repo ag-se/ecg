@@ -9,6 +9,6 @@
 	<classpathentry kind="lib" path="/ECG_Lab/dist/lib/ecg_support.jar"/>
 	<classpathentry kind="lib" path="/ECG_Lab/lib/misc/jsr173_1.0_api.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ECG_Lab"/>
-	<classpathentry kind="lib" path="D:/workspace/ECG_Lab/dist/lib/misc/mysql-connector-java-5.0.3-bin.jar"/>
+	<classpathentry kind="lib" path="/ECG_Lab/dist/lib/misc/mysql-connector-java-5.0.3-bin.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
