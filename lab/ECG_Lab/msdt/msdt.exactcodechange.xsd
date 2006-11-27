@@ -38,7 +38,7 @@
 				 	   								<xs:enumeration value="DELETED"/>
 				 	   								<xs:enumeration value="CHANGED"/>
 				 	   								<xs:enumeration value="IDENTIFIER_CHANGED"/>
-				 	   								<xs:enumeration value="INTIATED"/>
+				 	   								<xs:enumeration value="INITIATED"/>
 				 	   								<xs:enumeration value="MERGED_DEL_AT_START"/>
 				 	   								<xs:enumeration value="MERGED_DEL_AT_END"/>
 				 	   								<xs:enumeration value="MERGED_ADD_AT_START"/>
