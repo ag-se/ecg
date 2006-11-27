@@ -1,7 +1,10 @@
 package org.electrocodeogram.module.intermediate.implementation.location.change;
 
 import org.electrocodeogram.event.CommonData;
+import org.electrocodeogram.event.EventObject;
 import org.electrocodeogram.event.MicroActivity;
+import org.electrocodeogram.misc.xml.ECGParser;
+import org.electrocodeogram.misc.xml.NodeException;
 import org.electrocodeogram.module.intermediate.implementation.location.state.Location;
 import org.w3c.dom.CDATASection;
 import org.w3c.dom.Document;
@@ -9,10 +12,10 @@ import org.w3c.dom.Element;
 
 
 
-public class LocationChange {
+public class LocationChange implements EventObject {
 
     public enum LocationChangeType {
-        INTIATED, // initial computation from a TextStatus not from a Diff, implies a creation of location 
+        INITIATED, // initial computation from a TextStatus not from a Diff, implies a creation of location 
         ADDED, // due to inserted lines, implies a creation of location
         CHANGED, // due to changed lines
         MERGED_DEL_AT_START, // due to merge, implies deletion of location
