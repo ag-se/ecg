@@ -92,7 +92,7 @@ public class CodeLocationTrackerIntermediateModule extends IntermediateModule {
 
 //System.out.println(eventPacket);
         ccc++;
-System.out.println("Event No. " + ccc + " of type " + eventPacket.getSensorDataType() + " from " + eventPacket.getTimeStamp());        
+//System.out.println("Event No. " + ccc + " of type " + eventPacket.getSensorDataType() + " from " + eventPacket.getTimeStamp());        
         // a list of location changes which will be sent as event packets
         List<LocationChange> locChanges = new ArrayList<LocationChange>();
 
@@ -148,7 +148,7 @@ System.out.println("Event No. " + ccc + " of type " + eventPacket.getSensorDataT
             for (Location newLoc : newLocs) {
                 text.addLocation(newLoc);
                 LocationChange lc = new LocationChange(newLoc, 
-                        LocationChangeType.INTIATED, -1);
+                        LocationChangeType.INITIATED, -1);
                 history.addLocationChange(lc, blockChange);
                 locChanges.add(lc);
             }

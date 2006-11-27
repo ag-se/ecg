@@ -58,7 +58,7 @@ public class LocationChange implements EventObject {
     }
     
     public boolean isFresh() {
-        return (type == LocationChangeType.INTIATED || 
+        return (type == LocationChangeType.INITIATED || 
                 type == LocationChangeType.ADDED ||
                 type == LocationChangeType.SPLIT_ADD_AT_START ||
                 type == LocationChangeType.SPLIT_ADD_AT_END);        
