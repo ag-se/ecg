@@ -30,15 +30,30 @@ public class CodeLocationAnalysisIntermediateModule extends IntermediateModule {
 
     public class Loc {
         public String id;
-        public String file;
         public boolean alive = true;
+        public Date start = null;
+        public Date end = null;
+        public int sizemin = 100000;
+        public int sizemax = 0;
         public Map<String, Integer> types = new HashMap<String, Integer>();
         public String toString() {
-            String res = id + " (" + file + ") " + (alive ? "alive" : "dead") + " [";
+            String res = id + " with " + sizemin + " <= size <= " + sizemax + " [";
             for (Map.Entry<String, Integer> entry : types.entrySet())
-                res += entry.getValue() + " " + entry.getKey();
-            return res + "]";
+                res += entry.getValue() + " " + entry.getKey() + " - ";
+            return res + "] " + (alive ? "is" : "was") + " alive for " + duration();
         }
+        
+		private String duration() {
+			long ms = end.getTime() - start.getTime();
+			long s = ms / 1000;
+			long d = s/(24*60*60);
+			s -= d*(24*60*60);
+			long h = s/(60*60);
+			s -= h*(60*60);
+			long m = s/60;
+			s -= m*60;
+			return d + "d" + h + "h" + m + "m" + s + "s";
+		}
     }
 
     private static final String CREATOR_STRING = "CodeLocationAnalysisIntermediateModule1.1.4";
@@ -99,18 +114,20 @@ public class CodeLocationAnalysisIntermediateModule extends IntermediateModule {
                 String contents = ECGParser.getSingleNodeValue("contents", doc);
                 if (contents == null)
                     contents = "";
+                String file = locParts[0].substring(locParts[0].lastIndexOf("/")+1);
+                String locIdFull = locId + " in " + file;
                 
                 count(projects, projectName);
                 count(users, userName);
                 count(types, type);
-                count(files, locParts[0]);
-                Loc loc = locMap.get(locId);
+                count(files, file);
+                Loc loc = locMap.get(locIdFull);
                 if (loc == null) {
                     loc = new Loc();
                     loc.alive = true;
-                    loc.file = locParts[0];
-                    loc.id = locId;
-                    locMap.put(locId, loc);
+                    loc.id = locIdFull;
+                    loc.start = eventPacket.getTimeStamp();
+                    locMap.put(locIdFull, loc);
                 }
                 Integer tc = loc.types.get(type);
                 if (tc == null) {
@@ -118,9 +135,20 @@ public class CodeLocationAnalysisIntermediateModule extends IntermediateModule {
                 }
                 tc += 1;
                 loc.types.put(type, tc);
+    			loc.end = eventPacket.getTimeStamp();
                 if ("SHORTENED_AT_ALL,MERGED_DEL_AT_START,MERGED_DEL_AT_END".contains(type))
                     loc.alive = false;
-                count(locations, locId);
+                int size = Integer.parseInt(locParts[2]);
+            	if (loc.sizemin > size)
+            		loc.sizemin = size;
+            	if (loc.sizemax < size)
+            		loc.sizemax = size;
+                
+            	count(locations, locIdFull);
+                
+            	for (Loc l : locMap.values())
+            		if (l.alive)
+            			l.end = eventPacket.getTimeStamp();
 
                 // write exactcodechange
                 data = "<?xml version=\"1.0\"?><microActivity><commonData><username>"
@@ -128,10 +156,10 @@ public class CodeLocationAnalysisIntermediateModule extends IntermediateModule {
                         + "</username><projectname>"
                         + projectName
                         + "</projectname></commonData><exactCodeChange>"+"<path>"
-                        + locParts[0]+"</path>"
+                        + file+"</path>"
                         + "<change><typeOfChange>" + type + "</typeOfChange>"
                         + "<elementName>"+ locId +"</elementName>"
-                        + "<identifier><![CDATA[" + id + "]]></identifier>"
+                        + "<identifier><![CDATA[" + locIdFull + "]]></identifier>"
                         + "<codeOrIdentifier><![CDATA["+ contents + "]]>"
                         + "</codeOrIdentifier></change>"
                         + "</exactCodeChange></microActivity>";
