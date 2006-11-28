@@ -1,7 +1,6 @@
 package org.electrocodeogram.module.intermediate.implementation.location.change;
 
 import org.electrocodeogram.event.CommonData;
-import org.electrocodeogram.event.EventObject;
 import org.electrocodeogram.event.MicroActivity;
 import org.electrocodeogram.misc.xml.ECGParser;
 import org.electrocodeogram.misc.xml.NodeException;
@@ -12,7 +11,7 @@ import org.w3c.dom.Element;
 
 
 
-public class LocationChange implements EventObject {
+public class LocationChange {
 
     public enum LocationChangeType {
         INITIATED, // initial computation from a TextStatus not from a Diff, implies a creation of location 
@@ -175,7 +174,7 @@ public class LocationChange implements EventObject {
         Element locchange = microactivity_doc.createElement("codelocation");
         locchange_path = microactivity_doc.createElement("path");
         locchange_type = microactivity_doc.createElement("type");
-        locchange_id = microactivity_doc.createElement("id");
+        locchange_id = microactivity_doc.createElement("locid");
         locchange_related = microactivity_doc.createElement("related");
         locchange_location = microactivity_doc.createElement("location");
         locchange_contents = microactivity_doc.createElement("contents");
