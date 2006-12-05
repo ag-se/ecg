@@ -42,7 +42,7 @@ public class ECGMainPreferencePage
 		super(GRID);
 		setPreferenceStore(EclipseSensorPlugin.getInstance().getPreferenceStore());
 		setDescription("You may redefine the sensor.properties settings specific to this workbench.\n" +
-                "Restart the workbench for any changes to take effect.");
+                "Reopen the workbench for any changes to take effect.");
 	}
 	
 	/**

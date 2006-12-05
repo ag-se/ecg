@@ -12,6 +12,7 @@ import java.util.logging.Level;
 
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.texteditor.ITextEditor;
 import org.electrocodeogram.event.CommonData;
 import org.electrocodeogram.event.MicroActivity;
 import org.electrocodeogram.logging.LogHelper.ECGLevel;
@@ -26,9 +27,10 @@ import org.w3c.dom.Element;
 public class ECGDocumentListener implements IDocumentListener {
 
     /**
-     * 
+     * Holds global sensor object for active editor object 
      */
     private final ECGEclipseSensor sensor;
+    
     /**
      * This is used to wait a moment after a
      * <em>DocumentChanged</em> event has been recorded. Only
@@ -37,6 +39,13 @@ public class ECGDocumentListener implements IDocumentListener {
      * time, a <em>Codechange</em> event is sent.
      */
     private Timer timer = null;
+    
+    /**
+     * Holds the Task of the timer
+     */
+    private CodeChangeTimerTask currentTimerTask = null;
+
+    public boolean documentChanged;
 
     /**
      * Creates the <em>DocumentListenerAdapter</em> and the
@@ -56,8 +65,7 @@ public class ECGDocumentListener implements IDocumentListener {
     /**
      * @see org.eclipse.jface.text.IDocumentListener#documentAboutToBeChanged(org.eclipse.jface.text.DocumentEvent)
      */
-    public void documentAboutToBeChanged(
-    final DocumentEvent event) {
+    public void documentAboutToBeChanged(final DocumentEvent event) {
         ECGEclipseSensor.logger.entering(this.getClass().getName(),
             "documentAboutToBeChanged", new Object[] {event});
 
@@ -83,17 +91,29 @@ public class ECGDocumentListener implements IDocumentListener {
             return;
         }
 
-        this.timer.cancel();
-
-        this.timer = new Timer(); // TODO: Is it a good idea to create a  new timer every now and then (= on each key stroke!)?
-
-        this.timer.schedule(new CodeChangeTimerTask(event.getDocument(),
-            this.sensor.activeTextEditor),
-            ECGEclipseSensor.CODECHANGE_INTERVAL);
-
+        this.documentChanged = true;
+        rescheduleTimer(event.getDocument(), this.sensor.activeTextEditor);
+        
         ECGEclipseSensor.logger.exiting(this.getClass().getName(), "documentChanged");
     }
 
+    public void fireTimer() {
+        if (this.currentTimerTask != null && this.timer != null && this.documentChanged) {
+            this.currentTimerTask.run();
+            this.timer.cancel();
+            this.currentTimerTask = null;
+        }
+    }
+    
+    public void rescheduleTimer(IDocument doc, ITextEditor editor) {
+        if (this.timer != null) {
+            this.timer.cancel();
+            this.timer = new Timer(); // TODO: Is it a good idea to create a  new timer every now and then (= on each key stroke!)?
+            this.currentTimerTask = new CodeChangeTimerTask(doc, editor);
+            this.timer.schedule(this.currentTimerTask, ECGEclipseSensor.CODECHANGE_INTERVAL);
+        }
+    }
+    
     /**
      * This <em>TimerTask</em> is used in creating
      * <em>Codechange</em> events. In <em>Eclipse</em> every time
@@ -178,7 +198,9 @@ public class ECGDocumentListener implements IDocumentListener {
             codechange_contents.setNodeValue(this.doc.get());
             codechange_documentname.setTextContent(ECGEclipseSensor.getFilenameFromPart(textEditor));
 
-            sensor.processActivity("msdt.codechange.xsd", microActivity.getSerializedMicroActivity());                    
+            sensor.processActivity("msdt.codechange.xsd", microActivity.getSerializedMicroActivity());
+
+            ECGDocumentListener.this.documentChanged = false;
             
             ECGEclipseSensor.logger.exiting(this.getClass().getName(), "run");
 

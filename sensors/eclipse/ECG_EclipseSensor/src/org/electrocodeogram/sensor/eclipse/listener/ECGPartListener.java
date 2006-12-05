@@ -20,7 +20,6 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.texteditor.ITextEditorActionConstants;
 import org.electrocodeogram.logging.LogHelper.ECGLevel;
 import org.electrocodeogram.sensor.eclipse.ECGEclipseSensor;
-import org.electrocodeogram.sensor.eclipse.editor.ECGTextOperationAction;
 import org.w3c.dom.CDATASection;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -408,18 +407,39 @@ public class ECGPartListener implements IPartListener {
             
             if (part instanceof ITextEditor) {
                 final ITextEditor textEditor = (ITextEditor) part;
+
+                // register document listener on opened Editors
+                IDocumentProvider provider = textEditor.getDocumentProvider();
+                IDocument document = provider.getDocument(textEditor.getEditorInput());
+                document.addDocumentListener(this.docListener);
+
                 // Register new CCP actions on this editor
                 PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable() {
                     public void run() {
-                    	Action action = new ECGTextOperationAction(ECGPartListener.this.sensor, ResourceBundle.getBundle("org.eclipse.ui.texteditor.ConstructedEditorMessages"), "Editor.Cut.", textEditor, ITextOperationTarget.CUT); //$NON-NLS-1$
+                    	Action action = new ECGTextOperationAction(
+                                ECGPartListener.this.sensor, 
+                                ResourceBundle.getBundle("org.eclipse.ui.texteditor.ConstructedEditorMessages"), 
+                                "Editor.Cut.", 
+                                textEditor, 
+                                ITextOperationTarget.CUT); //$NON-NLS-1$
                 		textEditor.getEditorSite().getActionBars().setGlobalActionHandler(ActionFactory.CUT.getId(), action);
                 		textEditor.setAction(ITextEditorActionConstants.CUT, action);
                 		
-                		action = new ECGTextOperationAction(ECGPartListener.this.sensor, ResourceBundle.getBundle("org.eclipse.ui.texteditor.ConstructedEditorMessages"), "Editor.Copy.", textEditor, ITextOperationTarget.COPY); //$NON-NLS-1$
+                		action = new ECGTextOperationAction(
+                                ECGPartListener.this.sensor, 
+                                ResourceBundle.getBundle("org.eclipse.ui.texteditor.ConstructedEditorMessages"), 
+                                "Editor.Copy.", 
+                                textEditor, 
+                                ITextOperationTarget.COPY); //$NON-NLS-1$
                 		textEditor.getEditorSite().getActionBars().setGlobalActionHandler(ActionFactory.COPY.getId(), action);
                 		textEditor.setAction(ITextEditorActionConstants.COPY, action);
                 		
-                		action = new ECGTextOperationAction(ECGPartListener.this.sensor, ResourceBundle.getBundle("org.eclipse.ui.texteditor.ConstructedEditorMessages"), "Editor.Paste.", textEditor, ITextOperationTarget.PASTE); //$NON-NLS-1$
+                		action = new ECGTextOperationAction(
+                                ECGPartListener.this.sensor, 
+                                ResourceBundle.getBundle("org.eclipse.ui.texteditor.ConstructedEditorMessages"), 
+                                "Editor.Paste.", 
+                                textEditor, 
+                                ITextOperationTarget.PASTE); //$NON-NLS-1$
                 		textEditor.getEditorSite().getActionBars().setGlobalActionHandler(ActionFactory.PASTE.getId(), action);
                 		textEditor.setAction(ITextEditorActionConstants.PASTE, action);                        	
 
@@ -427,10 +447,6 @@ public class ECGPartListener implements IPartListener {
                     }
                 });
 
-                // register document listener on opened Editors
-                IDocumentProvider provider = textEditor.getDocumentProvider();
-                IDocument document = provider.getDocument(textEditor.getEditorInput());
-                document.addDocumentListener(this.docListener);
                 // TODO The next line is only for exploration (dirty bit flagged)
 //                    textEditor.addPropertyListener(new ECGPropertyListener());
                 // TODO next line is just for exploration (dirty bit flagged, as well)

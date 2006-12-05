@@ -1,4 +1,4 @@
-package org.electrocodeogram.sensor.eclipse.editor;
+package org.electrocodeogram.sensor.eclipse.listener;
 
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -152,8 +152,6 @@ import org.w3c.dom.Element;
             textop_endline.setTextContent(Integer.toString(endline));
             textop_offset.setTextContent(Integer.toString(offset));
             
-    		fOperationTarget.doOperation(fOperationCode);
-    		
             if (fOperationCode == ITextOperationTarget.CUT) {
     			ECGEclipseSensor.logger.log(ECGLevel.PACKET, "A Cut operation has been recorded");
 
@@ -178,12 +176,24 @@ import org.w3c.dom.Element;
                 textop_clipboard.appendChild(textop_clipboard_contents);
                 textop_clipboard_contents.setNodeValue(
                         (clipboardContents != null ? clipboardContents.toString() : ""));
-
+                // artificially trigger a codechange event right before the paste
+                this.sensor.getDocListener().fireTimer();
     		}
 
             this.sensor.processActivity("msdt.textoperation.xsd", 
                     microActivity.getSerializedMicroActivity());
             
+            // perform text operation
+            fOperationTarget.doOperation(fOperationCode);
+            
+            if (fOperationCode == ITextOperationTarget.PASTE) {
+                // in case of paste, immediately report codechange
+                this.sensor.getDocListener().rescheduleTimer(
+                        editor.getDocumentProvider().getDocument(editor.getEditorInput()), 
+                        editor);
+                this.sensor.getDocListener().fireTimer();
+            }
+
             if (textop_clipboard.hasChildNodes())
                 textop_clipboard.removeChild(textop_clipboard_contents);
 

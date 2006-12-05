@@ -419,7 +419,6 @@ public final class ECGEclipseSensor {
 			partListener.partActivated(activePart);
 		}
 
-/* commented for 1.1.4 release
         // create ElementChangedListenerAdapter
         ECGElementChangedListener javacodechange = null;
         IWorkbenchPage page = windows[0].getActivePage();
@@ -441,7 +440,6 @@ public final class ECGEclipseSensor {
             // add javacodechange also as a partlistener
             page.addPartListener(javacodechange);
         }
-*/        
 
         logger.log(Level.FINE, "The SensorShell's listeners have been initialized.");
 	}
@@ -604,6 +602,13 @@ public final class ECGEclipseSensor {
      */
     public SensorProperties getShellProperties() {
         return shellProperties;
+    }
+
+    /**
+     * @return the docListener
+     */
+    public ECGDocumentListener getDocListener() {
+        return docListener;
     }
 }
   
