@@ -108,7 +108,6 @@ public class ValidEventPacketProxy {
      */
     public String getMSDTName() {
         String temp = this.event.getMicroSensorDataType().getName();
-        System.out.println(temp);
         StringTokenizer tokenizer = new StringTokenizer(temp, ".");
         while (tokenizer.hasMoreTokens()) {
             String current = tokenizer.nextToken();

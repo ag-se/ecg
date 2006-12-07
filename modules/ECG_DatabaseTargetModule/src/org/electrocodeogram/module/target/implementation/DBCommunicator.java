@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.electrocodeogram.module.target.implementation;
 
 import java.io.File;
@@ -9,6 +6,7 @@ import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.Vector;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.logging.LogHelper;
 import org.electrocodeogram.msdt.MicroSensorDataType;
@@ -18,6 +16,7 @@ import com.mysql.jdbc.DatabaseMetaData;
 import com.mysql.jdbc.ResultSet;
 import com.mysql.jdbc.ResultSetMetaData;
 import com.mysql.jdbc.Statement;
+import org.electrocodeogram.module.target.implementation.EventBuffer;
 
 /**
  * @author jule
@@ -276,7 +275,7 @@ public class DBCommunicator {
         }
         catch (SQLException e) {
             logger.info("The statement could not be executed on the Database");
-            System.out.println("Statement: " + sqlString);
+
             e.printStackTrace();
             return false;
         }
@@ -318,6 +317,7 @@ public class DBCommunicator {
         catch (SQLException e1) {
             logger
                     .severe("not able to execute the Query because an SQL Exception occured while connection the database");
+            
             e1.printStackTrace();
         }
         /**

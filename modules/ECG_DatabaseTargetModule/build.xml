@@ -23,6 +23,8 @@
 	<property name="lab.dir" value="../ECG_Lab"/>
 
 	<property name="test.dir" value="../ECG_TestHelper"/>
+	
+	<property name="sourceModule.dir" value="../ECG_DatabaseSourceModule"/>
 
 	<!-- Classpath setting -->
 	<path id="classpath">
@@ -127,14 +129,27 @@
 			<fileset dir="${basedir}" file="module.properties.xml" />
 
 		</copy>
+		
+		<!-- Create the distribution directories -->
+		<mkdir dir="${dist.dir}"/>
+		<mkdir dir="${dist.dir}/lib"/>
+		<mkdir dir="${dist.dir}/doc"/>
 
-		<!-- Copy the MicroSensorDataTypes, if available
-		<copy todir="${dist.dir}/${ant.project.name}/msdt/">
+	
+		<!-- Package classes into jar. -->
+		<jar
+				compress="true"
+				duplicate="fail"
+				jarfile="${dist.dir}/lib/ecg_targetModule.jar"
+				basedir="${build.dir}" />
 
-			<fileset dir="${msdt.dir}"/>
+						
+		<!-- Copy the JAR to the other projects -->
+		<copy todir="${sourceModule.dir}/lib/">
+
+				<fileset dir="${dist.dir}/lib" includes="ecg_targetModule.jar" />
 
 		</copy>
-		-->
 		
 		<!-- Copy module into ECG_Lab module directory -->
 		<mkdir dir="${lab.dir}/modules/${ant.project.name}/"/>
@@ -144,6 +159,8 @@
 			<fileset dir="${dist.dir}/${ant.project.name}/"/>
 
 		</copy>
+		
+		
 	</target>
 
 </project>
