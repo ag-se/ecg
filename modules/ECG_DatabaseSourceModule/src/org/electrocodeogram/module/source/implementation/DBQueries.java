@@ -7,10 +7,9 @@ import java.util.Vector;
 import java.util.logging.Logger;
 import javax.sql.rowset.CachedRowSet;
 import org.electrocodeogram.logging.LogHelper;
-import org.electrocodeogram.module.target.TargetModuleException;
 import org.electrocodeogram.module.target.implementation.DBCommunicator;
-import org.electrocodeogram.module.target.implementation.DatabaseTargetModule;
 import org.electrocodeogram.module.target.implementation.TableInformation;
+import org.electrocodeogram.module.source.implementation.Event;
 import com.mysql.jdbc.ResultSet;
 import com.sun.rowset.CachedRowSetImpl;
 
@@ -28,7 +27,7 @@ public class DBQueries {
      *            the primary key of the event in the commondata table
      * @return the event data turned into an Event object
      */
-    public static Event getEventByID(String id, DBCommunicator dbCom) {
+    public static Event getEventByID(final String id, final DBCommunicator dbCom) {
         // get the commondata record from the event with the given primary key
         String query = SqlQueryStrings.getDataByID(id, "commondata");
         CachedRowSet commonData = returnCachedResult(query, dbCom);

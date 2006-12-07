@@ -84,7 +84,6 @@ public class SchemaTree {
                     .newDocumentBuilder()).newDocument();
         }
         catch (ParserConfigurationException pce) {
-            System.out.println("Cannot create DOM tree");
             pce.printStackTrace();
         }
         XMLSchemaProxy proxy = new XMLSchemaProxy(defFile, dbCom);
@@ -157,7 +156,6 @@ public class SchemaTree {
                 }
             }
             else {
-                System.out.println("no Value for Node " + elementName);
                 Element element = myDocument.createElement(elementName);
                 // in the case there are some attributes
                 if (subNodes[i].getType().getAttributeProperties() != null) {

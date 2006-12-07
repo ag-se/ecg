@@ -13,7 +13,7 @@
 		Database Reader
 	</name>
 	<class>
-		org.electrocodeogram.module.target.implementation.DatabaseSourceModule
+		org.electrocodeogram.module.source.implementation.DatabaseSourceModule
 	</class>
 	<description>
 		This module gets event data from the database. The properties are:
@@ -24,7 +24,7 @@
 		* Password - Password for the user
 	</description>
 	<type>
-		TARGET
+		SOURCE
 	</type>
 	<properties>
 		<property>
@@ -34,8 +34,9 @@
 			<propertyType>
 				java.lang.String
 			</propertyType>
-				jdbc:mysql://127.0.0.1:3306/ecg_test
 			<propertyValue>
+				jdbc:mysql://127.0.0.1:3306/ecgtest
+			</propertyValue>
 		</property>
 		
 		<property>
@@ -82,7 +83,6 @@
 				java.lang.String
 			</propertyType>
 			<propertyValue>
-				"SELECT * from commondata"
 			</propertyValue>
 			
 		</property>

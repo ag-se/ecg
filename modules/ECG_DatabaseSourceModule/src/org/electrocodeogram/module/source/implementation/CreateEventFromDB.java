@@ -4,10 +4,12 @@ import java.sql.Timestamp;
 import java.util.Date;
 import java.util.logging.Logger;
 import org.electrocodeogram.event.ValidEventPacket;
+import org.electrocodeogram.event.WellFormedEventPacket;
 import org.electrocodeogram.logging.LogHelper;
 import org.electrocodeogram.misc.xml.ECGWriter;
 import org.electrocodeogram.module.target.implementation.DBCommunicator;
-import org.electrocodeogram.module.target.implementation.DatabaseTargetModule;
+import org.electrocodeogram.module.source.implementation.Event;
+import org.electrocodeogram.module.source.implementation.SchemaTree;
 import org.w3c.dom.Document;
 
 /**
@@ -20,37 +22,34 @@ import org.w3c.dom.Document;
  * 
  */
 public class CreateEventFromDB {
-    
     /**
      * This is the logger.
      */
     private static Logger logger = LogHelper
             .createLogger(CreateEventFromDB.class.getName());
 
-    
     /**
      * This Method gets an Event from the database an creates a ValidEventPacket
      * from the event stored in the database.
      * 
-     * @param eventData
+     * @param event
      *            the event's data
+     * @param dbCom
+     *            the DBCommunicator
      * @return true if a ValidEventPAcket could be created, otherwise false
      */
-    public static boolean createEventPacket(Event event, DBCommunicator dbCom) {
-        
-        // the logger logs entering this method
-        logger.entering(
-                "org.electrocodeogram.module.source.implementation."
-                        + "CreateEventFromDB", "createEventPacket()");
-        
-       
+    public static WellFormedEventPacket createEventPacket(final Event event,
+            final DBCommunicator dbCom) {
+        // the logger entering the method
+        logger.entering("org.electrocodeogram.module.source.implementation."
+                + "CreateEventFromDB", "createEventPacket()");
         /**
          * build up a tree model of the Schema
          */
         SchemaTree tree = new SchemaTree(event, dbCom);
         /**
-         * get the comomn data attributes which are stored separately in the
-         * event
+         * get the standardattributes which are stored separately from the XML
+         * Document in the event
          */
         String msdt = event.getMSDT();
         Timestamp timestamp = event.getTimestamp();
@@ -66,11 +65,10 @@ public class CreateEventFromDB {
          */
         ValidEventPacket packet = ECGWriter.createValidEventPacket(msdt, date,
                 eventXmlPart);
-        logger.info("created ValidEventPacket: "+packet.toString());
-        logger.exiting(
-                "org.electrocodeogram.module.source.implementation."
-                        + "CreateEventFromDB", "createEventPacket()");
-        return true;
+        logger.info("created ValidEventPacket: " + packet.toString());
+        logger.exiting("org.electrocodeogram.module.source.implementation."
+                + "CreateEventFromDB", "createEventPacket()");
+        return packet;
     }
 
     /**
@@ -82,10 +80,11 @@ public class CreateEventFromDB {
      * @param eventID
      *            the primary key of the event in the commondata table
      * @param dbCom
-     *            the DBCommunicator which communicaes with the database
+     *            the DBCommunicator to communicate with the database
      */
-    public static void createEvent(String eventID, DBCommunicator dbCom) {
+    public static WellFormedEventPacket createEvent(final String eventID,
+            final DBCommunicator dbCom) {
         Event event = DBQueries.getEventByID(eventID, dbCom);
-        createEventPacket(event, dbCom);
+        return createEventPacket(event, dbCom);
     }
 }

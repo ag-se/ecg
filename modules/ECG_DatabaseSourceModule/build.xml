@@ -16,6 +16,8 @@
 	<property name="build.dir" value="bin"/>
 
 	<property name="lib.dir" value="lib"/>
+	
+	
 
 	<!-- Dependend project directories -->
 	<property name="support.dir" value="../ECG_Support"/>
@@ -23,15 +25,17 @@
 	<property name="lab.dir" value="../ECG_Lab"/>
 
 	<property name="test.dir" value="../ECG_TestHelper"/>
+	
+	<property name="targetModule.dir" value="../ECG_DatabaseTargetModule"/>
 
 	<!-- Classpath setting -->
 	<path id="classpath">
 
-		<!-- include special jars, if available 
+		<!-- include special jars, if available -->
 		<fileset dir="${lib.dir}">
 			<include name="**/*.jar/"/>			
 		</fileset>
-		-->
+		
 		
 		<fileset dir="${support.dir}/dist/lib">
 			<include name="**/ecg_support.jar/"/>			
@@ -41,6 +45,10 @@
 		</fileset>
 		<fileset dir="${lab.dir}/dist/lib">
 			<include name="**/ecg_moduleapi.jar/"/>			
+		</fileset>
+		
+		<fileset dir="${targetModule.dir}/bin/org/electrocodeogram/module/target/implementation">
+					<include name="**/*.class/"/>			
 		</fileset>
 
 	</path>
@@ -60,7 +68,7 @@
 	<target name="build" depends="prepare" description="compile source files">
 
 		<echo message="Building ${ant.project.name}"/>
-
+		
 		<javac
 			destdir="${build.dir}"
 			srcdir="${src.dir}"

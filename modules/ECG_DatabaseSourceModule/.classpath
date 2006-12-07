@@ -2,13 +2,12 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="D:/uni/Studienarbeit/tools/xmlbeans-2.2.0/lib/xbean.jar"/>
-	<classpathentry kind="lib" path="D:/uni/Studienarbeit/ECG_Lab/ecg/lib/ecg_moduleapi.jar"/>
-	<classpathentry kind="lib" path="D:/workspace/ECG_DatabaseSourceModule/lib/pswing.jar"/>
+	<classpathentry kind="lib" path="D:/workspace/ECG_Lab/lib/misc/xbean.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ECG_DatabaseTargetModule"/>
 	<classpathentry kind="con" path="com.omondo.uml.CONTAINER"/>
-	<classpathentry kind="lib" path="D:/uni/Studienarbeit/ECG_Lab/ecg/lib/misc/mysql-connector-java-5.0.3-bin.jar"/>
-	<classpathentry kind="lib" path="D:/uni/Studienarbeit/ECG_Lab/ecg/lib/ecg_support.jar"/>
-	<classpathentry kind="lib" path="D:/uni/Studienarbeit/ECG_Lab/ecg/ecg_lab.jar"/>
+	<classpathentry kind="lib" path="/ECG_Lab/lib/misc/mysql-connector-java-5.0.3-bin.jar"/>
+	<classpathentry kind="lib" path="/ECG_Lab/dist/lib/ecg_lab.jar"/>
+	<classpathentry kind="lib" path="/ECG_Lab/dist/lib/ecg_moduleapi.jar"/>
+	<classpathentry kind="lib" path="/ECG_Lab/dist/lib/ecg_support.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

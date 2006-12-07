@@ -2,7 +2,6 @@ package org.electrocodeogram.module.source.implementation;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
@@ -11,14 +10,12 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.sql.SQLException;
-import java.util.Date;
 import java.util.Vector;
 import java.util.logging.Logger;
 import javax.sql.rowset.CachedRowSet;
 import javax.swing.ComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -26,16 +23,17 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import org.electrocodeogram.logging.LogHelper;
-import org.electrocodeogram.module.source.SourceModuleException;
+import org.electrocodeogram.module.source.SourceModule;
 import org.electrocodeogram.module.target.implementation.DBCommunicator;
-
-import com.pallas.swing.date.DateComboBox;
 
 /**
  * @author jule
- * @version 1.0
+ * @version 1.0 This class is JPanel to integrate in the Lab-GUI for
+ *          selecting/entering and execute queries to the database
  */
-public class QueriesWindow extends JFrame {
+public class QueriesWindow extends JPanel {
+    private final String name = "Queries Window";
+
     /**
      * This is the logger.
      */
@@ -46,11 +44,6 @@ public class QueriesWindow extends JFrame {
      * 
      */
     private static final long serialVersionUID = 1L;
-
-    /**
-     * the Content Pane of this JFrame
-     */
-    private Container container;
 
     /**
      * the vector which holds the queries for the pull-down Menue (JComboBox) in
@@ -128,7 +121,11 @@ public class QueriesWindow extends JFrame {
     /**
      * a box for selecting a date from a given calendar
      */
-    private DateComboBox dateBox;
+    // private DateComboBox dateBox;
+    /**
+     * the textfield in that the user enters the desired username for his query
+     */
+    private JTextField dateBox = new JTextField("JJJJ-MM-DD");
 
     /**
      * the number of the selected item in the pull-down menue
@@ -140,24 +137,23 @@ public class QueriesWindow extends JFrame {
      */
     private DBCommunicator dbCommunicator;
 
+    private SourceModule sourceModule;
+
     /**
      * constructor
      */
-    public QueriesWindow(DBCommunicator dbCom) {
+    public QueriesWindow(DBCommunicator dbCom, SourceModule mySourceModule) {
         this.dbCommunicator = dbCom;
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        // set the size for the this (Result Window) JFrame
-        setSize(500, 400);
+        this.sourceModule = mySourceModule;
+        // set the size for the this (Queries Window) JPanel
+        this.setSize(600, 800);
         setVisible(true);
-        this.setTitle("Event Queries");
-        container = this.getContentPane();
-        this.setSize(700, 300);
-        this.setMinimumSize(new Dimension(700, 400));
         /**
          * add the String tho the Vector for the Pull-Down Menue
          */
         addQueriesToPullDownMenue();
         init();
+        repaint();
     }
 
     /**
@@ -229,7 +225,7 @@ public class QueriesWindow extends JFrame {
         firstChoicePanel.setLayout(new FlowLayout());
         usernameLabel = new JLabel("username");
         usernameTextField = new JTextField("testUserName");
-        dateBox = new DateComboBox(new Date(), "yyyy-MM-dd");
+        // dateBox = new DateComboBox(new Date(), "yyyy-MM-dd");
         // add components to the Panel for choice 1
         firstChoicePanel.add(usernameLabel);
         firstChoicePanel.add(usernameTextField);
@@ -321,9 +317,9 @@ public class QueriesWindow extends JFrame {
         closeButton.addActionListener(this.closeListener);
         // add the panels with their components to the container of this
         // ResultWindow JFrame
-        container.add(comboPanel, BorderLayout.NORTH);
-        container.add(queryPanel, BorderLayout.CENTER);
-        container.add(buttonPanel, BorderLayout.SOUTH);
+        this.add(comboPanel, BorderLayout.NORTH);
+        this.add(queryPanel, BorderLayout.CENTER);
+        this.add(buttonPanel, BorderLayout.SOUTH);
         // this Listenerreceives an Event if the go button was pressed, which
         // means tat a query has to be executed and the result has to be
         // displayed for the user
@@ -334,6 +330,10 @@ public class QueriesWindow extends JFrame {
         };
         goButton.addActionListener(goButtonListener);
     }// END init()
+
+    public String getName() {
+        return this.name;
+    }
 
     private void showResults() {
         String username = "";
@@ -351,11 +351,11 @@ public class QueriesWindow extends JFrame {
                             "please enter a username");
                 }
                 try {
-                    date = dateBox.getSelectedItem().toString();
+                    date = dateBox.getText();
                 }
                 catch (NullPointerException npe) {
                     JOptionPane.showMessageDialog(QueriesWindow.this,
-                            "please select a valid date");
+                            "please enter a valid date");
                 }
                 /**
                  * get the ResultSet containing the comomndata part of the
@@ -421,7 +421,8 @@ public class QueriesWindow extends JFrame {
                     // to obtain a TableModel object for the query results
                     // and display that model in the JTable component.
                     table.setModel(new TableModelFromResultSet(event));
-                    new ResultWindow(table, window, dbCommunicator);
+                    new ResultWindow(table, window, dbCommunicator,
+                            sourceModule);
                     // We're done, so clear the feedback message
                     msgLabel.setText(" ");
                 }
@@ -436,16 +437,4 @@ public class QueriesWindow extends JFrame {
             }
         });
     }
-
-//    public static void main(String[] args) {
-//        DatabaseSourceModule module = new DatabaseSourceModule("12",
-//        "moduleName");
-//        try {
-//            module.preStart();
-//        }
-//        catch (SourceModuleException e) {
-//            // TODO Auto-generated catch block
-//            e.printStackTrace();
-//        }
-//    }
 }

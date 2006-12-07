@@ -2,23 +2,25 @@ package org.electrocodeogram.module.source.implementation;
 
 import java.sql.SQLException;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sql.rowset.CachedRowSet;
+import javax.swing.JPanel;
 import org.electrocodeogram.logging.LogHelper;
+import org.electrocodeogram.module.UIModule;
 import org.electrocodeogram.module.source.EventReader;
 import org.electrocodeogram.module.source.SourceModule;
 import org.electrocodeogram.module.source.SourceModuleException;
 import org.electrocodeogram.module.target.implementation.DBCommunicator;
-import org.electrocodeogram.module.target.implementation.DBTargetModuleConstants;
 import org.electrocodeogram.modulepackage.ModuleProperty;
 import org.electrocodeogram.modulepackage.ModulePropertyException;
 
 /**
- * @author Lilly Cool
+ * @author jule
+ * @TODO exception handling
+ * The functions of the DatabaseSourceModule are implemented rudimentarily.
  */
-public class DatabaseSourceModule extends SourceModule {
+public class DatabaseSourceModule extends SourceModule implements UIModule {
     /**
      * This is the logger.
      */
@@ -52,9 +54,27 @@ public class DatabaseSourceModule extends SourceModule {
     private String SQLQuery;
 
     /**
-     * The DBCommunicator which communicates with the database.
+     * The DBCommunicator to communicate with the database.
      */
     private DBCommunicator dbCommunicator;
+
+    /**
+     * the window to query the database
+     */
+    private QueriesWindow GUI;
+
+    /**
+     * This is a reference to this module's <em>EventReader</em>, which is
+     * implementing the read method.
+     */
+    private DatabaseReaderThread readerThread;
+
+    /**
+     * This is a reference to this module's <em>EventReader</em>, which reads
+     * the Events from the database which are in the ResultSet of the SQL Query
+     * giben in the Property SQL Query.
+     */
+    private DatabaseReaderThread readerThreadPropChanged;
 
     /**
      * This creates the module instance. It is called by the ECG
@@ -70,33 +90,6 @@ public class DatabaseSourceModule extends SourceModule {
         super(id, name);
         logger.entering(this.getClass().getName(), "DatabaseTargetModule",
                 new Object[] { id, name });
-        /**
-         * @TODO remove this
-         */
-        this.username = DBTargetModuleConstants.DB_USER;
-        this.password = DBTargetModuleConstants.DB_PWD;
-        this.jdbcConnection = DBTargetModuleConstants.DB_URL;
-        this.jdbcDriver = DBTargetModuleConstants.DB_DRIVER;
-        try {
-            this.SQLQuery = this.getModuleProperty("SQL Query").getValue();
-        }
-        catch (ModulePropertyException e) {
-            e.printStackTrace();
-        }
-        /**
-         * TODO remove the block comment
-         */
-        /*
-         * try { this.username = this.getModuleProperty("Username").getValue();
-         * this.password = this.getModuleProperty("Password").getValue();
-         * this.jdbcConnection = this.getModuleProperty("JDBC
-         * Connection").getValue(); this.jdbcDriver =
-         * this.getModuleProperty("JDBC Driver").getValue(); } catch
-         * (ModulePropertyException e) { e.printStackTrace(); }
-         * 
-         */
-        this.dbCommunicator = new DBCommunicator(username, password,
-                jdbcConnection, jdbcDriver);
         logger.exiting(this.getClass().getName(), "DatabaseTargetModule");
     }
 
@@ -108,13 +101,14 @@ public class DatabaseSourceModule extends SourceModule {
     }
 
     /**
-     * This is to be implemented by all actual <code>SourceModule</code>
-     * implementations. It returns the module's {@link EventReader} as an array.
-     * 
-     * @return The module's {@link EventReader}
+     * @see org.electrocodeogram.module.source.SourceModule#getEventReader()
      */
-    public EventReader[] getEventReader() {
-        return null;
+    @Override
+    public final EventReader[] getEventReader() {
+        logger.entering(this.getClass().getName(), "getEventReader");
+        logger.exiting(this.getClass().getName(), "getEventReader",
+                this.readerThread);
+        return new EventReader[] {this.readerThread};
     }
 
     /**
@@ -126,41 +120,10 @@ public class DatabaseSourceModule extends SourceModule {
      *             If an exception occurs while starting the module
      */
     public void preStart() throws SourceModuleException {
-        CachedRowSet commonData;
-        dbCommunicator.getInformationAndSyncTables();
-        /**
-         * if the SQL Query Property String is given, then execute the statement
-         * and create ValidEventPackets from the Events in the ResultSet
-         * 
-         * There has to be the column linkid for the Events in the Result Set,
-         * otherwise the ValidEventPackets cannot be created
-         */
-        if (this.SQLQuery != null) {
-            commonData = DBQueries.executeUserQuery(this.SQLQuery,
-                    dbCommunicator);
-            Collection eventIDs = null;
-            
-            try {
-                /**
-                 * select all the linkid valuies for the events
-                 */
-                eventIDs = commonData.toCollection("linkID");
-            }
-            catch (SQLException e) {
-               logger
-                        .severe("was not able to fetch the linkid values " +
-                                        "for the events");
-                e.printStackTrace();
-            }
-            /**
-             * create the ValidEventPacket for each given linkid value
-             */
-            for (Iterator iter = eventIDs.iterator(); iter.hasNext();) {
-                String eventID = iter.next().toString();
-                CreateEventFromDB.createEvent(eventID, dbCommunicator);
-            }
-        }
-        new QueriesWindow(dbCommunicator);
+        this.dbCommunicator = new DBCommunicator(username, password,
+                jdbcConnection, jdbcDriver);
+        dbCommunicator.getInformationAndSyncTables(); 
+        readerThread = new DatabaseReaderThread(this, this.dbCommunicator);
     }
 
     /**
@@ -179,6 +142,13 @@ public class DatabaseSourceModule extends SourceModule {
             throws ModulePropertyException {
         logger.entering(this.getClass().getName(), "propertyChanged",
                 new Object[] { moduleProperty });
+        /**
+         * if the SQL Query Property String is given, then execute the statement
+         * and create ValidEventPackets from the Events in the ResultSet
+         * 
+         * There has to be the column linkid for the Events in the Result Set,
+         * otherwise the ValidEventPackets cannot be created
+         */
         if (moduleProperty.getName().equals("SQL Query")) {
             logger.log(Level.INFO, "Request to set the property: "
                     + moduleProperty.getName());
@@ -188,8 +158,32 @@ public class DatabaseSourceModule extends SourceModule {
                 logger.exiting(this.getClass().getName(), "propertyChanged");
                 // ToDo
             }
+            System.out.println("vor set Property");
             this.SQLQuery = moduleProperty.getValue();
+            CachedRowSet commonData;
+            commonData = DBQueries.executeUserQuery(this.SQLQuery,
+                    dbCommunicator);
+            Collection eventIDs = null;
+            try {
+                /**
+                 * select all the linkid values for the events
+                 */
+                eventIDs = commonData.toCollection("linkid");
+            }
+            catch (SQLException e) {
+                logger.severe("was not able to fetch the linkid values "
+                        + "for the events");
+                e.printStackTrace();
+            }
+            /**
+             * create the ValidEventPacket for each given linkid value
+             */
+            Object[] eventIDArray = eventIDs.toArray();
+            readerThreadPropChanged = new DatabaseReaderThread(this,
+                    this.dbCommunicator);
+            readerThreadPropChanged.setEventIDs(eventIDArray);
         }
+        
         else if (moduleProperty.getName().equals("JDBC Connection")) {
             logger.log(Level.INFO, "Request to set the property: "
                     + moduleProperty.getName());
@@ -204,9 +198,9 @@ public class DatabaseSourceModule extends SourceModule {
             }
             this.jdbcConnection = moduleProperty.getValue();
             // reconnect to database here
-            dbCommunicator.closeDBConnection();
-            dbCommunicator = new DBCommunicator(username, password,
-                    jdbcConnection, jdbcDriver);
+            // dbCommunicator.closeDBConnection();
+            // dbCommunicator = new DBCommunicator(username, password,
+            // jdbcConnection, jdbcDriver);
             logger.log(Level.INFO, "Set the property: "
                     + moduleProperty.getName() + " to " + this.jdbcConnection);
         }
@@ -223,9 +217,9 @@ public class DatabaseSourceModule extends SourceModule {
                         moduleProperty.getValue());
             }
             // reconnect to database here
-            dbCommunicator.closeDBConnection();
-            dbCommunicator = new DBCommunicator(username, password,
-                    jdbcConnection, jdbcDriver);
+            // dbCommunicator.closeDBConnection();
+            // dbCommunicator = new DBCommunicator(username, password,
+            // jdbcConnection, jdbcDriver);
             this.username = moduleProperty.getValue();
         }
         else if (moduleProperty.getName().equals("Password")) {
@@ -241,9 +235,9 @@ public class DatabaseSourceModule extends SourceModule {
                         moduleProperty.getValue());
             }
             // reconnect to database here
-            dbCommunicator.closeDBConnection();
-            dbCommunicator = new DBCommunicator(username, password,
-                    jdbcConnection, jdbcDriver);
+            // dbCommunicator.closeDBConnection();
+            // dbCommunicator = new DBCommunicator(username, password,
+            // jdbcConnection, jdbcDriver);
             this.password = moduleProperty.getValue();
         }
         else if (moduleProperty.getName().equals("JDBC Driver")) {
@@ -259,9 +253,9 @@ public class DatabaseSourceModule extends SourceModule {
                         moduleProperty.getValue());
             }
             // reconnect to database here
-            dbCommunicator.closeDBConnection();
-            dbCommunicator = new DBCommunicator(username, password,
-                    jdbcConnection, jdbcDriver);
+            // dbCommunicator.closeDBConnection();
+            // dbCommunicator = new DBCommunicator(username, password,
+            // jdbcConnection, jdbcDriver);
             this.jdbcDriver = moduleProperty.getValue();
         }
         else {
@@ -284,5 +278,29 @@ public class DatabaseSourceModule extends SourceModule {
      */
     public void update() {
         // not implemented
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.electrocodeogram.module.UIModule#getPanel()
+     */
+    public JPanel getPanel() {
+        if (GUI == null) {
+            GUI = new QueriesWindow(dbCommunicator, this);
+        }
+        return GUI;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.electrocodeogram.module.UIModule#getPanelName()
+     */
+    public String getPanelName() {
+        if (GUI == null) {
+            GUI = new QueriesWindow(dbCommunicator, this);
+        }
+        return GUI.getName();
     }
 }
