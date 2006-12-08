@@ -1,0 +1,50 @@
+How XML Types are mapped ito SQL Datatypes:
+
+XML Type: SQL Type
+--------------------------
+XmlID: VARCHAR(255)
+SimpleValue: VARCHAR(255)
+XmlAnySimpleType: TEXT
+XmlAnyURI: VARCHAR(255)
+XmlBase64Binary: BLOB(255)
+XmlBoolean: TINYINT(1)
+XmlByte: TINYINT
+XmlDate: DATE
+XmlDateTime: DATETIME
+XmlDecimal: DECIMAL
+XmlDouble: DOUBLE
+XmlDuration: TIMESTAMP
+XmlENTITIES: TEXT
+XmlENTITY: TEXT
+XmlFloat: FLOAT
+XmlGDay: TIMESTAMP(8)
+XmlGMonth: TIMESTAMP(8)
+XmlGMonthDay: TIMESTAMP(8)
+XmlGYear: YEAR(4)
+XmlGYearMonth: TIMESTAMP(8)
+XmlHexBinary: BLOB(255)
+XmlIDREF: VARCHAR(255)
+XmlIDREFS: TEXT
+XmlInt: INT
+XmlInteger: INTEGER
+XmlLanguage: VARCHAR(255)
+XmlLong: BIGINT
+XmlName: VARCHAR(255)
+XmlNCName: VARCHAR(255)
+XmlNegativeInteger: INTEGER
+XmlNMTOKEN: VARCHAR(255)
+XmlNMTOKENS: TEXT
+XmlNonNegativeInteger: INTEGER
+XmlNonPositiveInteger: INTEGER
+XmlNormalizedString: TEXT
+XmlNOTATION: TEXT
+XmlPositiveInteger: INTEGER
+XmlQName: VARCHAR(255)
+XmlShort: SMALLINT
+XmlString: TEXT
+XmlTime: TIME
+XmlToken: VARCHAR(255)
+XmlUnsignedByte: TINYINT
+XmlUnsignedInt: INT
+XmlUnsignedLong: BIGINT
+XmlUnsignedShort: SMALLINT

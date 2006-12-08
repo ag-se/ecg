@@ -1,0 +1,11 @@
+Requirements for schemes to be mapped automatically:
+* the microActivity Element has to be the root Element in a scheme.
+* the  microActivity has two dircect child elements:  commonData ant the eventspecific element, whose child-elements are the attributes of the event 
+*the microActivity element does not contain any simple type direct child elements 
+* the datatype of a simple type element must be specified either by 
+ <xs: element name="xxx "type=“xs: …“ >	or  
+ <xs: element name="xxx"><xs: simpleType><xs: restriction base="xs: string"> 
+* elements without a denoted datatype are interpreted as complex type elements with mixed content 
+* elements which contain CDATA fields must have the datatype xs: string
+* childelements of commondata must have maxOccurs <= 1
+* UNION datatypes are not supported

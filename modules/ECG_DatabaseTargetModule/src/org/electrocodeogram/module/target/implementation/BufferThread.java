@@ -1,7 +1,5 @@
 package org.electrocodeogram.module.target.implementation;
 
-import java.sql.SQLException;
-
 import org.electrocodeogram.event.ValidEventPacket;
 
 /**
@@ -17,7 +15,6 @@ import org.electrocodeogram.event.ValidEventPacket;
  *          events in the database.
  */
 public class BufferThread extends Thread {
-
     /**
      * The DBCommunicator to communicate with the database.
      */
@@ -25,6 +22,7 @@ public class BufferThread extends Thread {
 
     /**
      * The constructor.
+     * 
      * @param dbCommunicator
      *            the
      */
@@ -41,9 +39,7 @@ public class BufferThread extends Thread {
         while (true) {
             // get the eventBuffer from the DBCommunicator
             EventBuffer eventBuffer = dbCommunicator.getEventBuffer();
-
             ValidEventPacket currentPacket = eventBuffer.get();
-
             // insert this event
             if (dbCommunicator.insertEvent(currentPacket)) {
                 continue;
@@ -53,7 +49,6 @@ public class BufferThread extends Thread {
             else {
                 dbCommunicator.getEventBuffer().put(currentPacket);
             }
-
-         } // END WHILE(true)
+        } // END WHILE(true)
     }
 }
