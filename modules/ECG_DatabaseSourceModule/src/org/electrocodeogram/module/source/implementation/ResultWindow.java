@@ -1,6 +1,7 @@
 package org.electrocodeogram.module.source.implementation;
 
 import java.awt.BorderLayout;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -22,9 +23,8 @@ import org.electrocodeogram.module.target.implementation.DBCommunicator;
 import org.electrocodeogram.module.source.implementation.Event;
 
 /**
- * @author jule
- * This window displays the ResultSet of an Query in a JTable
- * @TODO: the window has to be resized to display the Results
+ * @author jule This window displays the ResultSet of an Query in a Table
+ * 
  */
 public class ResultWindow extends JFrame {
     /**
@@ -83,6 +83,13 @@ public class ResultWindow extends JFrame {
      * the source Module
      */
     SourceModule mysourceModule;
+    
+    /**
+     * the Components are placed on the Content Panel of the JFrame  
+     */
+    Container contentPane;
+    
+    
 
     /**
      * the constructor
@@ -90,14 +97,15 @@ public class ResultWindow extends JFrame {
      */
     public ResultWindow(JTable table, int button,
             DBCommunicator dbCommunicator, SourceModule sourceModule) {
+        this.setTitle("Result window");
         this.dbCom = dbCommunicator;
         this.mysourceModule = sourceModule;
         this.buttonOrNot = button;
-        setVisible(true);
-        this.setSize(800, 400);
+        contentPane = this.getContentPane();
         this.resultTable = table;
+        setSize(750, 500);
         init();
-        repaint();
+        setVisible(true);
     }
 
     private void init() {
@@ -108,7 +116,7 @@ public class ResultWindow extends JFrame {
         // properies for the result Table
         resultTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         resultTable.setAutoscrolls(true);
-        resultTable.setPreferredScrollableViewportSize(new Dimension(700, 200));
+        resultTable.setPreferredScrollableViewportSize(new Dimension(700, 400));
         // the Button for the create Packet function. with this button you can
         // create new ValidEventPackets from the selected Events in the result
         // Table
@@ -125,9 +133,10 @@ public class ResultWindow extends JFrame {
         }
         buttonPanel.add(msgLabel);
         tablePanel.add(scrollpane);
-        this.setLayout(new BorderLayout());
-        this.add(tablePanel, BorderLayout.NORTH);
-        this.add(buttonPanel, BorderLayout.SOUTH);
+        
+        contentPane.setLayout(new BorderLayout());
+        contentPane.add(tablePanel, BorderLayout.NORTH);
+        contentPane.add(buttonPanel, BorderLayout.SOUTH);
         // Action Listener for the create Packet Button
         ActionListener createPacketListener = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -206,11 +215,10 @@ public class ResultWindow extends JFrame {
             String eventData = eventMap.eventDataToString();
             JTextArea ta = new JTextArea(eventData, 20, 30);
             panel.add(ta);
-            // TODO open new Window with events
+            
         }
-        JFrame showResults = new JFrame();
-        showResults.getContentPane().add(panel);
-        showResults.setVisible(true);
+        new ShowEventDetails(panel);
+        
     }
 
     private void createEventPackets() {

@@ -2,9 +2,13 @@ package org.electrocodeogram.module.source.implementation;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.ScrollPane;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -16,9 +20,11 @@ import javax.sql.rowset.CachedRowSet;
 import javax.swing.ComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -85,11 +91,6 @@ public class QueriesWindow extends JPanel {
     private JButton goButton;
 
     /**
-     * the button to close the QueriesWindow
-     */
-    private JButton closeButton;
-
-    /**
      * the textfield in that the user enters the desired username for his query
      */
     private JTextField usernameTextField = new JTextField("username");
@@ -144,16 +145,15 @@ public class QueriesWindow extends JPanel {
      */
     public QueriesWindow(DBCommunicator dbCom, SourceModule mySourceModule) {
         this.dbCommunicator = dbCom;
-        this.sourceModule = mySourceModule;
-        // set the size for the this (Queries Window) JPanel
-        this.setSize(600, 800);
-        setVisible(true);
+        this.sourceModule = mySourceModule; 
+        this.setPreferredSize(new Dimension(600,400));
+        this.setLayout(new FlowLayout());
         /**
          * add the String tho the Vector for the Pull-Down Menue
          */
         addQueriesToPullDownMenue();
         init();
-        repaint();
+        setVisible(true);
     }
 
     /**
@@ -174,15 +174,7 @@ public class QueriesWindow extends JPanel {
         queries.add(4, "5 - eigene Abfrage eingeben");
     }
 
-    /**
-     * the Action Listener for the close Button
-     */
-    ActionListener closeListener = new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-            System.exit(0);
-        }
-    };
-
+  
     /**
      * in this
      * 
@@ -194,15 +186,13 @@ public class QueriesWindow extends JPanel {
         buttonPanel = new JPanel();
         goButton = new JButton("GO");
         goButton.setToolTipText("get the result from the selected query");
-        closeButton = new JButton("close");
-        closeButton.setToolTipText("close this Window");
         queryPanel = new JPanel();
         queryPanel.setLayout(new BorderLayout(40, 40));
-        queryPanel.setSize(700, 400);
+        queryPanel.setSize(10,40);
         // add the vector with the strings for the selection to the pull-down
         // menue
         combo = new JComboBox(queries);
-        combo.setSize(600, 40);
+        combo.setSize(500, 40);
         combo
                 .setToolTipText("you can select your query with the corresponding number key");
         // this keySelectionmanager gives the ability to select an item in the
@@ -219,7 +209,6 @@ public class QueriesWindow extends JPanel {
         // add the buttons to the button panel
         buttonPanel.add(msgLabel);
         buttonPanel.add(goButton);
-        buttonPanel.add(closeButton);
         // --------------- fields for the first selection -----------
         final JPanel firstChoicePanel = new JPanel();
         firstChoicePanel.setLayout(new FlowLayout());
@@ -314,12 +303,14 @@ public class QueriesWindow extends JPanel {
                 }
             }
         });
-        closeButton.addActionListener(this.closeListener);
+
         // add the panels with their components to the container of this
         // ResultWindow JFrame
-        this.add(comboPanel, BorderLayout.NORTH);
-        this.add(queryPanel, BorderLayout.CENTER);
-        this.add(buttonPanel, BorderLayout.SOUTH);
+        this.add(comboPanel);
+        this.add(buttonPanel);
+        this.add(queryPanel);
+      
+        
         // this Listenerreceives an Event if the go button was pressed, which
         // means tat a query has to be executed and the result has to be
         // displayed for the user
