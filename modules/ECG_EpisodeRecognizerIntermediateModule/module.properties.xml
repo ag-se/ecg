@@ -90,5 +90,13 @@
 				msdt.antactive.xsd
 			</msdtFile>
 		</microsensordatatype>
+		<microsensordatatype>
+			<msdtName>
+				msdt.cpcwarning.xsd
+			</msdtName>
+			<msdtFile>
+				msdt.cpcwarning.xsd
+			</msdtFile>
+		</microsensordatatype>
 	</microsensordatatypes>
 </module>

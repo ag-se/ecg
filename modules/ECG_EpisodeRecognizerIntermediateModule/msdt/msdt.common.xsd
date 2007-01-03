@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+	<xs:annotation>
+		<xs:documentation>
+			This XML schema defines the structure of the "Common" complexType
+			which is used in every MicroSensorDataType XML Schmema definition:
+			* version - (optional) denotes the version of the msdt datatype starting with 1 on 1.1.3 release of ECG
+			* creator - (optional) a short string identifying the name and version of the event's creator, i.e. a sensor or module
+			* username - name of the programmer, derived from the operating system for example
+			* projectname - (optional) name of the project which the programmer has been working on
+			* id - (optional) an identificator based on the resource (e.g. file, window) for which this event has been sent.
+			       should be used in corresponding events as well, e.g. open of id3 and close of id3 
+		</xs:documentation>
+	</xs:annotation>
+	
+
+	<xs:complexType name="commonDataType">
+	    <xs:sequence>
+			<xs:element name="version" type="xs:int" minOccurs="0"/>
+			<xs:element name="creator" type="xs:token" minOccurs="0"/>
+			<xs:element name="username" type="xs:token"/>
+			<xs:element name="projectname" type="xs:token" minOccurs="0"/>
+			<xs:element name="id" type="xs:token" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>
