@@ -16,7 +16,7 @@ import org.electrocodeogram.logging.LogHelper;
 import org.electrocodeogram.misc.xml.ECGParser;
 import org.electrocodeogram.misc.xml.ECGWriter;
 import org.electrocodeogram.misc.xml.NodeException;
-import org.electrocodeogram.module.intermediate.implementation.EpisodeRecognizer;
+import org.electrocodeogram.module.intermediate.implementation.AbstractSingleEpisodeRecognizer;
 import org.electrocodeogram.module.intermediate.implementation.EpisodeRecognizerIntermediateModule;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -24,7 +24,7 @@ import org.w3c.dom.Element;
 /**
  * Recognizes episodes of individual activity durations (start, end) of the main window
  */
-public class WindowActiveEpisodeRecognizer implements EpisodeRecognizer {
+public class WindowActiveEpisodeRecognizer  extends AbstractSingleEpisodeRecognizer {
 
     /**
      * State types for this recognizer 
@@ -123,7 +123,7 @@ public class WindowActiveEpisodeRecognizer implements EpisodeRecognizer {
     /**
      * @see org.electrocodeogram.module.intermediate.implementation.EpisodeRecognizer#analyse(org.electrocodeogram.event.ValidEventPacket, int, long)
      */
-    public ValidEventPacket analyse(ValidEventPacket packet, long minDuration) {
+    public ValidEventPacket analyseSingle(ValidEventPacket packet, long minDuration) {
 
 		ValidEventPacket event = null;
 

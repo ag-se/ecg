@@ -16,7 +16,7 @@ import org.electrocodeogram.logging.LogHelper;
 import org.electrocodeogram.misc.xml.ECGParser;
 import org.electrocodeogram.misc.xml.ECGWriter;
 import org.electrocodeogram.misc.xml.NodeException;
-import org.electrocodeogram.module.intermediate.implementation.EpisodeRecognizer;
+import org.electrocodeogram.module.intermediate.implementation.AbstractSingleEpisodeRecognizer;
 import org.electrocodeogram.module.intermediate.implementation.EpisodeRecognizerIntermediateModule;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -24,7 +24,7 @@ import org.w3c.dom.Element;
 /**
  * Recognizes episodes of individual activity durations (start, end) of a text file
  */
-public class FileActiveEpisodeRecognizer implements EpisodeRecognizer {
+public class FileActiveEpisodeRecognizer  extends AbstractSingleEpisodeRecognizer {
 
     /**
      * Types of states for this episode recognize
@@ -141,7 +141,7 @@ public class FileActiveEpisodeRecognizer implements EpisodeRecognizer {
     /**
      * @see org.electrocodeogram.module.intermediate.implementation.EpisodeRecognizer#analyse(org.electrocodeogram.event.ValidEventPacket, int, long)
      */
-    public ValidEventPacket analyse(ValidEventPacket packet, long minDuration) {
+    public ValidEventPacket analyseSingle(ValidEventPacket packet, long minDuration) {
 
 		ValidEventPacket event = null;
 
@@ -385,13 +385,5 @@ public class FileActiveEpisodeRecognizer implements EpisodeRecognizer {
     private String getFileName() {
         return activeFileName;
     }
-
-    /**
-     * @return State of episode recognizer
-     */
-    private FileActiveEpisodeState getState() {
-        return state;
-    }
-
 
 }

@@ -16,7 +16,7 @@ import org.electrocodeogram.logging.LogHelper;
 import org.electrocodeogram.misc.xml.ECGParser;
 import org.electrocodeogram.misc.xml.ECGWriter;
 import org.electrocodeogram.misc.xml.NodeException;
-import org.electrocodeogram.module.intermediate.implementation.EpisodeRecognizer;
+import org.electrocodeogram.module.intermediate.implementation.AbstractSingleEpisodeRecognizer;
 import org.electrocodeogram.module.intermediate.implementation.EpisodeRecognizerIntermediateModule;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -24,7 +24,7 @@ import org.w3c.dom.Element;
 /**
  * Recognizes episodes of individual start/termination durations (start, end) of ant tasks
  */
-public class AntActiveEpisodeRecognizer implements EpisodeRecognizer {
+public class AntActiveEpisodeRecognizer extends AbstractSingleEpisodeRecognizer {
 
     /**
      * State types for this recognizer 
@@ -136,7 +136,7 @@ public class AntActiveEpisodeRecognizer implements EpisodeRecognizer {
     /**
      * @see org.electrocodeogram.module.intermediate.implementation.EpisodeRecognizer#analyse(org.electrocodeogram.event.ValidEventPacket, int, long)
      */
-    public ValidEventPacket analyse(ValidEventPacket packet, long minDuration) {
+    public ValidEventPacket analyseSingle(ValidEventPacket packet, long minDuration) {
 
 		ValidEventPacket event = null;
 

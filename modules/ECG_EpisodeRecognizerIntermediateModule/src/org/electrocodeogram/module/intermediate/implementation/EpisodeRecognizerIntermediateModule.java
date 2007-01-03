@@ -5,9 +5,7 @@
 package org.electrocodeogram.module.intermediate.implementation;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -42,7 +40,7 @@ public class EpisodeRecognizerIntermediateModule extends IntermediateModule {
     /**
      * Generally useful time format used in ECG.
      */
-    private static SimpleDateFormat dateFormat = new SimpleDateFormat(
+    public static SimpleDateFormat dateFormat = new SimpleDateFormat(
             WellFormedEventPacket.DATE_FORMAT_PATTERN);
 
     /**
@@ -71,7 +69,7 @@ public class EpisodeRecognizerIntermediateModule extends IntermediateModule {
     @Override
     public Collection<ValidEventPacket> analyse(ValidEventPacket packet) {
 
-        return Collections.singleton(manager.analyse(packet));
+        return manager.analyse(packet);
 
     }
 

@@ -4,6 +4,8 @@
 
 package org.electrocodeogram.module.intermediate.implementation;
 
+import java.util.Collection;
+
 import org.electrocodeogram.event.ValidEventPacket;
 
 /**
@@ -49,18 +51,18 @@ public interface EpisodeRecognizer {
      * <li> ignore it if event is of no interest to this recognizer, return null
      * <li> react internally by changing state (i.e. altering internal
      * attributes) but do not emit a new episode, return null
-     * <li> react to this event by emitting a newly recognized episode, return
-     * this episode as a special event. 
+     * <li> react to this event by emitting one or more newly recognized episode, 
+     * and return these episodes as a special event. 
      *
-     * An episode should not be emitted if its duration would be less than 
+     * Episodes should not be emitted if its duration would be less than 
      * minDuration. Emitting an episode event often but not always results in 
      * a final state.
      * 
      * @param packet an event packet just like in class IntermediateModule
      * @param minDuration minimal duration of an emitted episode, in ms 
-     * @return a new episode-like event, if one has been detected, null
+     * @return new episode-like events, if at least one has been detected, null
      *         otherwise
      */
-    ValidEventPacket analyse(ValidEventPacket packet, long minDuration);
+    Collection<ValidEventPacket> analyse(ValidEventPacket packet, long minDuration);
 
 }

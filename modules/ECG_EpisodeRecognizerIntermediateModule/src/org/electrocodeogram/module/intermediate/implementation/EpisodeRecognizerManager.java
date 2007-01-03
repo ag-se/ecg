@@ -4,6 +4,7 @@
 package org.electrocodeogram.module.intermediate.implementation;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.ListIterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -75,11 +76,10 @@ public class EpisodeRecognizerManager {
 	 * @param packet
 	 * @return
 	 */
-	public ValidEventPacket analyse(ValidEventPacket packet) {
+	public Collection<ValidEventPacket> analyse(ValidEventPacket packet) {
 
-		ValidEventPacket event = null;
-
-		ValidEventPacket recognizerEvent = null;
+        Collection<ValidEventPacket> events = null;
+		Collection<ValidEventPacket> recognizerEvents = null;
 		
 		if (freeRecognizer == null && recognizerClass != null) {
 			try {
@@ -100,51 +100,48 @@ public class EpisodeRecognizerManager {
 			EpisodeRecognizer recognizer = i.next();
 			
 			// Do it for active recognizers!
-			recognizerEvent = recognizer.analyse(packet, this.module.getMinDuration());
+			recognizerEvents = recognizer.analyse(packet, this.module.getMinDuration());
 			
-			if (event != null && recognizerEvent != null) {
-		        logger.log(Level.WARNING, "double episode in EpisodeRecognizer (used!) at time " + recognizerEvent.getTimeStamp());
-                logger.log(Level.WARNING, "   old: " + event.toString());                
-                logger.log(Level.WARNING, "   new: " + recognizerEvent.toString());                
-            }
-
-			if (recognizerEvent != null) {
-				event = recognizerEvent;
+			// Add new events to list of events
+            if (recognizerEvents != null) {
+                if (events == null)
+                    events = recognizerEvents;
+                else
+                    events.addAll(recognizerEvents);
             }
 			
+            // Remove any recognizer in final state
 			if (recognizer.isInFinalState()) {
 				i.remove();
             }
 		}
-
+        
 		// Do it for the free recognizer
-		recognizerEvent = freeRecognizer.analyse(packet, this.module.getMinDuration());
+        // TODO Why do I precess this first?
+		recognizerEvents = freeRecognizer.analyse(packet, this.module.getMinDuration());
 
         // Look for existing recognizer with equal state. If, forget the free
         // one. "equal" depends on type of recognizer. It should be true if both
-        // would react equally on the next events so one of them is
+        // would react equally on the next events so one of them is sufficient
         for (ListIterator<EpisodeRecognizer> i = recognizers.listIterator(); i.hasNext(); ) {
                 EpisodeRecognizer recognizer = i.next();
                 if (freeRecognizer.equals(recognizer)) {
                     freeRecognizer = null;
-                    recognizerEvent = null;
+                    recognizerEvents = null;
                     break;
                 }
         }
         
-		if (event != null && recognizerEvent != null) {
-            // This warning indicates that there should be a way to emit
-            // more than one episode from a single event coming in
-	        logger.log(Level.WARNING, "double episode in EpisodeRecognizer (free!) at time " + recognizerEvent.getTimeStamp());
-            logger.log(Level.WARNING, "   old: " + event.toString());                
-            logger.log(Level.WARNING, "   new: " + recognizerEvent.toString());                
+        // Add new events to list of events
+		if (recognizerEvents != null) {
+            if (events == null)
+                events = recognizerEvents;
+            else
+                events.addAll(recognizerEvents);
         }
 
-		if (recognizerEvent != null) {
-			event = recognizerEvent;
-        }
-
-		if (freeRecognizer != null && !freeRecognizer.isInInitialState()) {
+		// If free recognizer reacted, add it to the list of live recognizers
+        if (freeRecognizer != null && !freeRecognizer.isInInitialState()) {
 			if (!freeRecognizer.isInFinalState())
 				recognizers.add(freeRecognizer);
 			freeRecognizer = null;
@@ -153,7 +150,7 @@ public class EpisodeRecognizerManager {
 		logger.log(Level.FINE, "number of recogs: " + recognizers.size() + " at time " + packet.getTimeStamp());
 		logger.log(Level.FINE, "  they are: " + recognizers.toString());			
 		
-        return event;
+        return events;
 
     }
 	
