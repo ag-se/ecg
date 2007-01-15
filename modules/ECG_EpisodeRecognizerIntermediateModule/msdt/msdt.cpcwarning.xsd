@@ -8,8 +8,6 @@
 			Therefor the startline and the endline are representing the location of codesnippets.
 			These codesnippets are codeclones and are observed.
 			The XML schema contains elemnts of the form:
-			* version - (optional) denotes the version of the msdt datatype starting with 1 on 1.1.5 release of ECG.
-			* creator - (optional) a short string identifying the name and version of the event's creator, i.e. a sensor or module.
 			* username - name of the programmer, derived from the operating system for example.
 			* projectname - name of the eclipse project.
 			* cpcwarning - informs the programmer that he made changes to a codesnippet that is an observed clone and lists all the clones in this clonefamily. 
@@ -23,11 +21,7 @@
 	<xs:element name="microActivity">
 		<xs:complexType>
 			<xs:sequence>
-				<!-- <xs:element name="commonData" type="commonDataType"/> -->
-				<!-- <xs:element name="cpcwarning"> -->
-				<!--	<xs:element name="version" type="xs:int" minOccurs="0"/> -->
-				<!--	<xs:element name="creator" type="xs:token" minOccurs="0"/> -->
-				<xs:element name="username" type="xs:token"/>
+			    <xs:element name="username" type="xs:token"/>
 				<xs:element name="projectname" type="xs:token"/>
 				<xs:element name="documentname" type="xs:token"/>
 				<xs:element name="startline" type="xs:token"/>
