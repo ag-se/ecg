@@ -1,3 +1,14 @@
+/*
+ * (c) Freie Universität Berlin - AG SoftwareEngineering - 2007
+ *
+ *
+ *  Diplomarbeit: Verfolgen von Kodekopien in Eclipse
+ *  @author Sofoklis Papadopoulos
+ *
+ *
+ */
+
+
 package org.electrocodeogram.module.intermediate.implementation.recognizers;
 
 import java.util.ArrayList;
@@ -42,59 +53,81 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
- * Generelles Modell:
- * 1. Alle Aktionen beim Codieren werden mit zwei Konzepten beschrieben.
- * 		a) Generelle Textoperationen: CUT, COPY, PASTE
- * 		b) Tatsächliche Zeilenoperationen: linediffs
- * 		   linediffs repräsentieren eine Change-Aktion eines beliebigen Codeabschnitts.
- * 2. Ein Recognizer muss prüfen, ob eine generelle Textoperation ausgewertet werden muss.
- * 3. Ein Recognizer muss prüfen, ob die Änderung eines beliebigen Codeabschnitts ihn btrifft.
+ * Generell View:
+ * 1. All actions while programming are described with 2 concepts
+ * 		a) textoperations: CUT, COPY, PASTE
+ * 		b) program code change: linediff
+ * 		   Linediffs are representing a change activitiy upon program code.
+ * 2.  A Recognizer has to proof if a textoperation has to be evaluated.
+ * 3.  A Recognizer has to proof if a change of program code concerns one of his clonein the CloneFamliVector.
  */
 
 public class CopyPasteChangeEpisodeRecognizer implements EpisodeRecognizer {
-	// STATIC for all Recognizers
-	private static Integer ConsCounter = 0;
-	private static final double STRING_MEASURE = 100.0;
-	// NOT STATIC for each Recognizer
+	/**
+	 * The measure of the code difference between 2 clones.
+	 */
+	private static final double STRING_MEASURE = 30;
+	/**
+	 * The minimum length of the clones that will be observed. 
+	 */
+	private static final int STRING_LENGTH = 100;
+	
+	/**
+	 * 
+	 * State types for this recognizer 
+	 *
+	 */
 	private enum CopyPasteChangeEpisodeState {
         /**
-         * Ínitial state, no textoperation recognized yet
+         * Ínitial state, no textoperation recognized yet.
          */
         START, /* 0 */
         /**
-         * 
+         * A textoperation-copy is recognized. 
          */
         COPY, /* 1 */
         /**
-         * 
+         * A textoperation-cut is recognized.
          */
         CUT, /* 2 */
         /**
-         * 
+         * After cut and first paste. The clone of the cut-activity is replaced with the paste-clone.
          */
         CUTPASTE, /* 3 */
         /**
-         * 
+         * A textoperation-paste is recognized after COPY or CUTPASTE. 
          */
         PASTE, /* 4 */
         /**
-         * 
+         * A linediff is recognized and a clones code has been changed.
          */
         CHANGE, /* 5 */
         /**
-         * 
+         * Final state after !(countNotDeletedClones() > 1) or 
          */
         STOP /* 6 */
     }
 	
+	/**
+	 * Current state of episode recognizer
+	 */
 	private CopyPasteChangeEpisodeState STATE;
-	private Vector<Clone> CloneFamilyVector;
-	public ArrayList<ValidEventPacket> validEventPacketList; 
-	private int nr = 0;
+	/**
+	 * The Container for the clones
+	 */
+	private Vector<Clone> CloneFamilyVector; 
+    /**
+     * The username 
+     */
 	private String user = null;
+	/**
+	 * The project name
+	 */
 	private String project = null;
+	/**
+	 *  The filename
+	 */
 	private String docuname = null;
-	//private Date paste_timestamp = null;
 	
 	private static Logger logger = LogHelper
     .createLogger(EpisodeRecognizerIntermediateModule.class.getName());
@@ -104,25 +137,18 @@ public class CopyPasteChangeEpisodeRecognizer implements EpisodeRecognizer {
     private static Element cpcwarning_username = null;
     private static Element cpcwarning_projectname = null;
     private static Element cpcwarning_documentnames = null;
-    private static Element cpcwarning_version = null;
-    private static Element cpcwarning_creator = null;
     private static Element cpcwarning_startline = null;
     private static Element cpcwarning_endline = null;
 	
 	public CopyPasteChangeEpisodeRecognizer() {
 		//Start in start STATE
 		STATE = CopyPasteChangeEpisodeState.START;
-		synchronized (ConsCounter) {
-        	ConsCounter++;
-        	this.nr = ConsCounter.intValue();
-        }
-        CloneFamilyVector = new Vector();
-        
+		CloneFamilyVector = new Vector();
         // initialize static DOM skeleton for msdt.cpcwarning.xsd
         if (msdt_cpcwarning_doc == null)
              try {
                  msdt_cpcwarning_doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-                 Element cpcwarning_microactivity = msdt_cpcwarning_doc.createElement("microActivity");                
+                 Element cpcwarning_microactivity = msdt_cpcwarning_doc.createElement("microActivity");
                  cpcwarning_projectname = msdt_cpcwarning_doc.createElement("projectname");
                  cpcwarning_username = msdt_cpcwarning_doc.createElement("username");
                  cpcwarning_documentnames = msdt_cpcwarning_doc.createElement("documentname");
@@ -142,58 +168,130 @@ public class CopyPasteChangeEpisodeRecognizer implements EpisodeRecognizer {
              }
 	}
 	
+	/**
+	 * @see org.electrocodeogram.module.intermediate.implementation.EpisodeRecognizer#isInInitialState()
+	 */
 	public boolean isInInitialState() {
 		return (STATE == CopyPasteChangeEpisodeState.START);
 	}
+	
+	/**
+	 * @see org.electrocodeogram.module.intermediate.implementation.EpisodeRecognizer#isInFinalState()
+	 */
 	public boolean isInFinalState() {
 		return (STATE == CopyPasteChangeEpisodeState.STOP);
 	}
 	
-	public void evaluateStringDiff(Clone event){
+	/**
+	 * Computes if CloneFamilyVector.get(i) has to CloneFamilyVector.get(i) a code difference of 50%
+	 * @param i index of a clone in the CloneFamilyVector
+	 * @param j index of a clone
+	 * @return true, if difference is 50%, otherwise false
+	 */
+	public boolean isOverStringMeasure(int i, int j){
 		double percentResult = 0.0;
-		ListIterator<Clone> diffevallist = CloneFamilyVector.listIterator();
-		while(diffevallist.hasNext()){
-			Clone diffevalevent = diffevallist.next();
-			if(!event.equals(diffevalevent) && diffevalevent.isValid()){
-				String eventCode = event.getEventCode();
-				System.out.println("eventCode:" + eventCode);
-				String diffevaleventCode = diffevalevent.getEventCode();
-				System.out.println("diffevaleventCode: " + diffevaleventCode);
-				StringDifferMeasurement stringdiff = new StringDifferMeasurement(event.getEventCode(), diffevalevent.getEventCode()); 
-				percentResult = stringdiff.LevenshteinDistance(stringdiff.firstString, stringdiff.secondString);
-				System.out.println("verschiedenheit: " + percentResult);
+		boolean isOver = false;
+		if (CloneFamilyVector != null && i >= 0 && j >= 0 && i < CloneFamilyVector.size() && j < CloneFamilyVector.size() && CloneFamilyVector.get(i) != null && CloneFamilyVector.get(j) != null) {
+			String cloneCode = CloneFamilyVector.get(i).getCloneCode();
+			String diffEvalCloneCode = CloneFamilyVector.get(j).getCloneCode();
+			StringDifferMeasurement stringdiff = new StringDifferMeasurement(cloneCode, diffEvalCloneCode); 
+			percentResult = stringdiff.LevenshteinDistance(stringdiff.firstString, stringdiff.secondString);
+			if(percentResult >= STRING_MEASURE) {
+				return true;
 			}
-			if((event.isValid() == true) && (percentResult >= STRING_MEASURE)){
-				event.setValid(false);
+		}
+		return isOver;
+	}
+	/**
+	 * Validates the clones in the CloneFamilyVector. 
+	 * 
+	 */
+	private void validateCloneFamily() {
+		boolean valid = false;
+		int size = CloneFamilyVector.size();
+		int j = 0;
+		// iterate all clones once
+		for (int i = 0; i<size; i++) {
+			valid = false;
+			j = 0;
+			// validate all clones j except i  
+			while (j<size & !valid) {
+				if (j!=i) {
+					if (!isOverStringMeasure(i,j)) {
+						CloneFamilyVector.get(i).setValid(valid=true);
+					}
+				}
+				j++;
 			}
-			if((event.isValid() == false) && (percentResult < STRING_MEASURE)){
-				event.setValid(true);
+			if(valid==false){
+				CloneFamilyVector.get(i).setValid(false);
 			}
 		}
 	}
-	
-	public boolean countDeletedEvents(){
-		boolean stopRecognizer = false;
-		int deletedCounter = 0;
+	/**
+	 * Count not deleted clones in the CloneFamilyVector.
+	 * @return The number of not deleted clones in the CloneFamilyVector.  
+	 */	
+	private int countNotDeletedClones() {
+		int notDeletedCounter = 0;
 		int vectorSize = CloneFamilyVector.size();
 		for(int i = 0; i < vectorSize; i++){
-			if(CloneFamilyVector.get(i).isDeleted()){
-				deletedCounter++;
+			if(!CloneFamilyVector.get(i).isDeleted()){
+				notDeletedCounter++;
 			}	
 		}
-		if(vectorSize - deletedCounter <= 1){
-			stopRecognizer = true;
-			return stopRecognizer;
-		}
-		else return stopRecognizer;
+		return notDeletedCounter;
 	}
-		
-    public Collection<ValidEventPacket> analyse(ValidEventPacket packet, long minDuration) {
-    	/*if(packet.getMicroSensorDataType().getName().equalsIgnoreCase("msdt.linediff.xsd")) 
-    		System.out.println(packet);*/
+	/**
+	 * Count valid and not deleted clones in the CloneFamilyVector
+	 * @return int
+	 */
+	private int countValidAndNotDeletedClones() {
+		int count = 0;
+		int vectorSize = CloneFamilyVector.size();
+		for(int i = 0; i < vectorSize; i++){
+			if(!CloneFamilyVector.get(i).isDeleted() & CloneFamilyVector.get(i).isValid()){
+				count++;
+			}	
+		}
+		return count;
+	}
+	
+	 /**
+     * Helper method to create a new episode clone
+     * 
+     * @param msdt type of event
+	 * @param username name of user
+	 * @param projectname name of project
+	 * @param documnetname name of java class
+	 * @param startline startline of clone 
+	 * @param endline endline of clone
+	 * @param time stamp
+	 * @return
+	 */
+	private ValidEventPacket generateEpisode(String msdt, String username, String projectname, 
+			                                 String documentname, Date changetimestamp,String startline, String endline) {
+		ValidEventPacket event = null;
+		String timeStamp = changetimestamp.toString();
+		cpcwarning_username.setTextContent(username);
+        cpcwarning_projectname.setTextContent(projectname);
+        cpcwarning_documentnames.setTextContent(documentname);
+        cpcwarning_startline.setTextContent(startline);
+        cpcwarning_endline.setTextContent(endline);
+        event = ECGWriter.createValidEventPacket("msdt.cpcwarning.xsd", changetimestamp, msdt_cpcwarning_doc);
+		return event;
+	}
+	
+	/**
+     * @see org.electrocodeogram.module.intermediate.implementation.IntermediateModule#analyse(org.electrocodeogram.event.ValidEventPacket)
+     * 
+	 * @param packet
+	 * @return A Collection of ValidEventPackets
+	 */
+	public Collection<ValidEventPacket> analyse(ValidEventPacket packet, long minDuration) {
+    	ArrayList<ValidEventPacket> validEventPacketList = null;
     	ValidEventPacket validEvent = null;
-    	boolean event_inside_change = false;
-    	Clone event = null;
+    	Clone clone = null;
     	Document document = null;
     	Date timestamp = null;
     	String msdt = packet.getMicroSensorDataType().getName();
@@ -201,12 +299,8 @@ public class CopyPasteChangeEpisodeRecognizer implements EpisodeRecognizer {
     		try {
     			document = packet.getDocument();
     			timestamp = packet.getTimeStamp();
-                if(msdt.equals("msdt.textoperation.xsd")){
-        			System.out.println("event is a textoperation");
-        		}
         		if(msdt.equals("msdt.linediff.xsd")){
         			docuname = ECGParser.getSingleNodeValue("documentname", document);
-        			System.out.println("event is a linediff");
         		}
     	    	try{
 	    			user = ECGParser.getSingleNodeValue("username", document);
@@ -215,35 +309,9 @@ public class CopyPasteChangeEpisodeRecognizer implements EpisodeRecognizer {
     			} catch (NodeException e) {
     				logger.log(Level.SEVERE, "Could not read XML string in CopyPasteChangeEpisodeRecognizer.");
     				logger.log(Level.SEVERE, e.getMessage());
-
     			}
-    			System.out.println("**************************  packet-Infos  ************************************************");
-				System.out.println("nr: " + this.nr);
-				System.out.println("zustand: " + this.STATE);
-				System.out.println("clonefamilyvector vor bearbeitung: " + CloneFamilyVector);
-				System.out.println("msdt-typ: " + packet.getMicroSensorDataType().getName());
-				if(packet.getMicroSensorDataType().getName().equalsIgnoreCase("msdt.linediff.xsd")){
-					System.out.println("pakettyp: linediff");
-					System.out.println("linedifftyp: " + ECGParser.getSingleNodeValue("type", packet.getDocument()));
-					System.out.println("datei: " + ECGParser.getSingleNodeValue("documentname", packet.getDocument()));
-					System.out.println("zeitstempel: " + packet.getTimeStamp());
-				}
-				if(packet.getMicroSensorDataType().getName().equalsIgnoreCase("msdt.textoperation.xsd")){
-					System.out.println("pakettyp: textoperation");
-					System.out.println("aktivität: " + ECGParser.getSingleNodeValue("activity",packet.getDocument()));
-					System.out.println("datei: " + ECGParser.getSingleNodeValue("editorname", packet.getDocument()));
-					if(ECGParser.getSingleNodeValue("activity",packet.getDocument()).equalsIgnoreCase("cut") || ECGParser.getSingleNodeValue("activity",packet.getDocument()).equalsIgnoreCase("copy")){
-						System.out.println("code: " + ECGParser.getSingleNodeValue("selection", packet.getDocument()));
-					}
-					if(ECGParser.getSingleNodeValue("activity",packet.getDocument()).equalsIgnoreCase("paste")){
-						System.out.println("code: " + ECGParser.getSingleNodeValue("clipboard", packet.getDocument()));
-					}
-					System.out.println("startzeile: " + Integer.parseInt(ECGParser.getSingleNodeValue("startline",packet.getDocument())));
-					System.out.println("endzeile: " + Integer.parseInt(ECGParser.getSingleNodeValue("endline",packet.getDocument())));
-					System.out.println("zeitstempel: " + packet.getTimeStamp());
-				}
 				switch (STATE.ordinal()) {
-			    	//if (STATE == CopyPasteChangeEpisodeState.START) {
+			    	//(STATE == CopyPasteChangeEpisodeState.START) {
 					case 0:
 			    		if (packet.getMicroSensorDataType().getName().equalsIgnoreCase("msdt.linediff.xsd")) STATE = CopyPasteChangeEpisodeState.STOP;
 			    		if (packet.getMicroSensorDataType().getName().equalsIgnoreCase("msdt.textoperation.xsd")) {
@@ -253,7 +321,7 @@ public class CopyPasteChangeEpisodeRecognizer implements EpisodeRecognizer {
 			    			if (ECGParser.getSingleNodeValue("activity",packet.getDocument()).equalsIgnoreCase("cut")) {
 			    				String selection = ECGParser.getSingleNodeValue("selection",packet.getDocument());
 			    				if(selection != null){
-			    					if(selection.length() > 50){
+			    					if(selection.length() > STRING_LENGTH){
 					    				CloneFamilyVector.add(new Clone(false,true,false,false,ECGParser.getSingleNodeValue("editorname", packet.getDocument()), 
 					    						Integer.parseInt(ECGParser.getSingleNodeValue("startline",packet.getDocument())), 
 					    						Integer.parseInt(ECGParser.getSingleNodeValue("endline",packet.getDocument())), 
@@ -267,7 +335,7 @@ public class CopyPasteChangeEpisodeRecognizer implements EpisodeRecognizer {
 			    			if (ECGParser.getSingleNodeValue("activity",packet.getDocument()).equalsIgnoreCase("copy")) {
 			    				String selection = ECGParser.getSingleNodeValue("selection",packet.getDocument());
 			    				if(selection != null){
-			    					if(selection.length() > 50){
+			    					if(selection.length() > STRING_LENGTH){
 					    				CloneFamilyVector.add(new Clone(true,false,false,false,ECGParser.getSingleNodeValue("editorname", packet.getDocument()), 
 					    						Integer.parseInt(ECGParser.getSingleNodeValue("startline",packet.getDocument())), 
 					    						Integer.parseInt(ECGParser.getSingleNodeValue("endline",packet.getDocument())), 
@@ -280,17 +348,15 @@ public class CopyPasteChangeEpisodeRecognizer implements EpisodeRecognizer {
 			    			}
 			    		}
 			    		break;
-			    	//}
-			    	//if (STATE == CopyPasteChangeEpisodeState.COPY) {
+			    	//(STATE == CopyPasteChangeEpisodeState.COPY) {
 					case 1:
 			    		if (packet.getMicroSensorDataType().getName().equalsIgnoreCase("msdt.textoperation.xsd")) {
 			    			if (ECGParser.getSingleNodeValue("activity",packet.getDocument()).equalsIgnoreCase("paste")) {
-			    				if (CloneFamilyVector.firstElement().getEventCode().equalsIgnoreCase(ECGParser.getSingleNodeValue("clipboard",packet.getDocument()))) {
+			    				if (CloneFamilyVector.firstElement().getCloneCode().equalsIgnoreCase(ECGParser.getSingleNodeValue("clipboard",packet.getDocument()))) {
 			    					CloneFamilyVector.add(new Clone(false,false,false,true,ECGParser.getSingleNodeValue("editorname", packet.getDocument()), 
 			    							Integer.parseInt(ECGParser.getSingleNodeValue("startline",packet.getDocument())), 
 			    							Integer.parseInt(ECGParser.getSingleNodeValue("endline",packet.getDocument())), 
 			    							ECGParser.getSingleNodeValue("clipboard",packet.getDocument()),timestamp));
-			    					//paste_timestamp = packet.getTimeStamp();
 			    					STATE = CopyPasteChangeEpisodeState.PASTE;
 			    				}
 			    			}
@@ -302,11 +368,9 @@ public class CopyPasteChangeEpisodeRecognizer implements EpisodeRecognizer {
 			    			}
 			    		}
 			    		if (packet.getMicroSensorDataType().getName().equalsIgnoreCase("msdt.linediff.xsd")) {
-			    			/*
-			    			 * Wir müssen für jedes Clone im CloneFamilyVector immer den Dateinamen mit dem Dateinamen des Microsensortyps linediff vergleichen.
-			    			 * Im COPY Zustand ex. nur ein Clone. Daher muss die Eventliste im CloneFamilyVector nicht iteriert werden.
-			    			 */
-			    			if (ECGParser.getSingleNodeValue("documentname", packet.getDocument()).equalsIgnoreCase(CloneFamilyVector.firstElement().getEventFilename())) {
+			    			//linediffs have to be considered becaus they could change the clone
+			    			if (ECGParser.getSingleNodeValue("documentname", packet.getDocument()).equalsIgnoreCase(CloneFamilyVector.firstElement().getCloneFilename())) {
+			    				//get blockchanges for this programcode change
 			    				java.util.List<BlockChange> blockChanges = BlockChange.parseLineDiffsEvent(new DummyText(),packet);
 								int blockchanges = 0;
 								int linenumber = 0;
@@ -314,6 +378,7 @@ public class CopyPasteChangeEpisodeRecognizer implements EpisodeRecognizer {
 								for (BlockChange bc: blockChanges) {
 									blockchanges++;
 									linenumber = bc.getBlockStart();
+									//for each linechange get the type and do the operations relevant to the type of linechange
 									for (LineChange lc: bc.getLineChanges()) {
 										if (!inside) {
 											if (lc.isChange()) {inside = CloneFamilyVector.firstElement().changeLine(linenumber,lc.getContents());}
@@ -324,33 +389,26 @@ public class CopyPasteChangeEpisodeRecognizer implements EpisodeRecognizer {
 					    			}
 								}
 								CloneFamilyVector.firstElement().clearDeletedLines();
-								if(CloneFamilyVector.firstElement().getEventCodeStartline() > CloneFamilyVector.firstElement().getEventCodeEndline()){
-									System.out.println("#############  filename: " + CloneFamilyVector.firstElement().getEventFilename());
-									System.out.println("#############  code: " + CloneFamilyVector.firstElement().getEventCode() + " ###########");
-									System.out.println();
-									CloneFamilyVector.firstElement().setDeleted(true);
+								//if copied clone was changed set stop this recognizer
+								if (CloneFamilyVector.firstElement().isDeleted() || inside) {
 									STATE = CopyPasteChangeEpisodeState.STOP;
 								}
-								if (inside) STATE = CopyPasteChangeEpisodeState.STOP;
-			    			}
+							}
 			    		}
 			    		break;
-			    	//}
-			    	//if (STATE == CopyPasteChangeEpisodeState.CUT) {
+			    	//(STATE == CopyPasteChangeEpisodeState.CUT) {
 					case 2:
 			    		/*
-			    		 * ACHTUNG: Ist ein Recognizer im CUT-Zustand, ex. der Textblock nicht mehr in der zugehörigen Datei, sondern
-			    		 * nur noch im Clipboard. Folglich muss ein Recognizer im CUT-Zustand keine linediffs beachten.
-			    		 * Alle anderen Recognizer müssen linediffs beachten, da deren beobachtete Textblöcke noch in Datein vorhanden sind.
+			    		 * if a recognizer is in CUT-STATE following linediffs after cut-activity are not of interest, because the code was cutted off.
+			    		 * all other recognizers have to check the linediffs
 			    		 */
 			    		if (packet.getMicroSensorDataType().getName().equalsIgnoreCase("msdt.textoperation.xsd")) {
 			    			if (ECGParser.getSingleNodeValue("activity",packet.getDocument()).equalsIgnoreCase("paste")) {
-			    				if (CloneFamilyVector.firstElement().getEventCode().equalsIgnoreCase(ECGParser.getSingleNodeValue("clipboard",packet.getDocument()))) {
+			    				if (CloneFamilyVector.firstElement().getCloneCode().equalsIgnoreCase(ECGParser.getSingleNodeValue("clipboard",packet.getDocument()))) {
 			    					CloneFamilyVector.setElementAt(new Clone(false,false,false,true,ECGParser.getSingleNodeValue("editorname", packet.getDocument()), 
 			    							Integer.parseInt(ECGParser.getSingleNodeValue("startline",packet.getDocument())), 
 			    							Integer.parseInt(ECGParser.getSingleNodeValue("endline",packet.getDocument())), 
 			    							ECGParser.getSingleNodeValue("clipboard",packet.getDocument()),timestamp),0);
-			    					//paste_timestamp = packet.getTimeStamp();
 			    					STATE = CopyPasteChangeEpisodeState.CUTPASTE;
 			    				}
 			    			}
@@ -362,24 +420,15 @@ public class CopyPasteChangeEpisodeRecognizer implements EpisodeRecognizer {
 			    			}
 			    		}
 			    		break;
-			    	//}
-			    	//if (STATE == CopyPasteChangeEpisodeState.CUTPASTE) {
+			    	//(STATE == CopyPasteChangeEpisodeState.CUTPASTE) {
 					case 3:
-			    		/*
-			    		 * ACHTUNG lindediffs:
-			    		 * 0) Das direkt auf den Pastevorgang folgende linediff entspricht diesem Pastevorgang und drückt ihn lediglich in Zeileninserts aus.
-			    		 *    Das einzige Clone im CloneFamilyVector ist in diesem Zustand das CUTPASTE-Clone.
-			    		 * 1) Wir wecheln also lediglich in den nächsten Zustand bei Erhalt des ersten linediffs, um dieses hier nicht abzuarbeiten.
-			    		 * 2) Für das Clone im CloneFamilyVector die Datei vergleichen
-			    		*/
 			    		if (packet.getMicroSensorDataType().getName().equalsIgnoreCase("msdt.textoperation.xsd")) {
 			    			if (ECGParser.getSingleNodeValue("activity",packet.getDocument()).equalsIgnoreCase("paste")) {
-			    				if (CloneFamilyVector.firstElement().getEventCode().equalsIgnoreCase(ECGParser.getSingleNodeValue("clipboard",packet.getDocument()))) {
+			    				if (CloneFamilyVector.firstElement().getCloneCode().equalsIgnoreCase(ECGParser.getSingleNodeValue("clipboard",packet.getDocument()))) {
 			    					CloneFamilyVector.add(new Clone(false,false,false,true,ECGParser.getSingleNodeValue("editorname", packet.getDocument()), 
 			    							Integer.parseInt(ECGParser.getSingleNodeValue("startline",packet.getDocument())), 
 			    							Integer.parseInt(ECGParser.getSingleNodeValue("endline",packet.getDocument())), 
 			    							ECGParser.getSingleNodeValue("clipboard",packet.getDocument()),timestamp));
-			    					//paste_timestamp = packet.getTimeStamp();
 			    					STATE = CopyPasteChangeEpisodeState.PASTE;
 			    				}
 			    			}
@@ -392,12 +441,9 @@ public class CopyPasteChangeEpisodeRecognizer implements EpisodeRecognizer {
 			    		}
 			    		// We get a linediff
 						if (packet.getMicroSensorDataType().getName().equalsIgnoreCase("msdt.linediff.xsd")) {
-			    			/*
-			    			 * Wir müssen für jedes Clone im CloneFamilyVector immer den Dateinamen mit dem Dateinamen des Microsensortyps linediff vergleichen.
-			    			 * Im SECOND_LINEDIFF_AFTER_CUTPASTE Zustand ex. nur ein Clone. Daher muss die Eventliste im CloneFamilyVector nicht iteriert werden.
-			    			 */
-			    			if (ECGParser.getSingleNodeValue("documentname", packet.getDocument()).equalsIgnoreCase(CloneFamilyVector.firstElement().getEventFilename())
-			    					& !CloneFamilyVector.firstElement().getEventStartDate().equals(timestamp)) {
+			    			//if the timestamp of the linediff equals the timestamp of the previous textoperation ignore linediff
+			    			if (ECGParser.getSingleNodeValue("documentname", packet.getDocument()).equalsIgnoreCase(CloneFamilyVector.firstElement().getCloneFilename())
+			    					& !CloneFamilyVector.firstElement().getCloneStartDate().equals(timestamp)) {
 			    				java.util.List<BlockChange> blockChanges = BlockChange.parseLineDiffsEvent(new DummyText(),packet);
 								int blockchanges = 0;
 								int linenumber = 0;
@@ -415,31 +461,18 @@ public class CopyPasteChangeEpisodeRecognizer implements EpisodeRecognizer {
 					    			}
 								}
 								CloneFamilyVector.firstElement().clearDeletedLines();
-								/*if(CloneFamilyVector.firstElement().getEventCodeStartline() > CloneFamilyVector.firstElement().getEventCodeEndline()){
-									System.out.println("#############  filename: " + CloneFamilyVector.firstElement().getEventFilename());
-									System.out.println("#############  code: " + CloneFamilyVector.firstElement().getEventCode() + " ###########");
-									System.out.println();
-									CloneFamilyVector.firstElement().setDeleted(true);
+								//if pasted clone after cut is changed so stop recognizer
+								if (CloneFamilyVector.firstElement().isDeleted() || inside) {
 									STATE = CopyPasteChangeEpisodeState.STOP;
-								}*/
-								if (inside) STATE = CopyPasteChangeEpisodeState.STOP;
-			    			}
+								}
+							}
 			    		}
-			    	//}
-			    	//if (STATE == CopyPasteChangeEpisodeState.PASTE) {
+						break;
+			    	//(STATE == CopyPasteChangeEpisodeState.PASTE) {
 					case 4:
-			    		//boolean event_inside_change = false;
-			    		//Clone event = null;
-			    		/*
-		    			 * 1. Das erste linediff nach dem Paste betrifft immer genau die Paste Aktion, die diesen Automaten in diesen Paste-Zustand
-		    			 * überführt hat. Dieses linediff in diesem Zustand kann alle Events bis auf das letzte Paste-Clone betreffen (Codeänderung, Zeilenverschoben).
-		    			 * Wir wechseln nach dem einen linediff sofort in den SECOND_LINDEDIFF_AFTER_PASTE-Zustand, der dann für alle Events alle Signale bearbeiten darf.
-		    			 * 2. textoperations können in diesem Zustand nicht auftreten, da nach der PASTE - Aktion, die in diesen Zustand führte, sofort
-		    			 * das zugehörige linediff folgt.
-		    			 */
 						if (packet.getMicroSensorDataType().getName().equalsIgnoreCase("msdt.textoperation.xsd")) {
 			    			if (ECGParser.getSingleNodeValue("activity",packet.getDocument()).equalsIgnoreCase("paste")) {
-			    				if (CloneFamilyVector.firstElement().getEventCode().equalsIgnoreCase(ECGParser.getSingleNodeValue("clipboard",packet.getDocument()))) {
+			    				if (CloneFamilyVector.firstElement().getCloneCode().equalsIgnoreCase(ECGParser.getSingleNodeValue("clipboard",packet.getDocument()))) {
 			    					CloneFamilyVector.add(new Clone(false,false,false,true,ECGParser.getSingleNodeValue("editorname", packet.getDocument()), 
 			    							Integer.parseInt(ECGParser.getSingleNodeValue("startline",packet.getDocument())), 
 			    							Integer.parseInt(ECGParser.getSingleNodeValue("endline",packet.getDocument())), 
@@ -448,13 +481,14 @@ public class CopyPasteChangeEpisodeRecognizer implements EpisodeRecognizer {
 			    			}
 			    		}
 			    		if (packet.getMicroSensorDataType().getName().equalsIgnoreCase("msdt.linediff.xsd")) {
-			    			validEventPacketList = null;
+			    			boolean valid_clone = false;
 			    			ListIterator<Clone> eventlist = CloneFamilyVector.listIterator();
 			    			while (eventlist.hasNext()) {
-			    				event = eventlist.next();
-		    					if (!event.getEventStartDate().equals(timestamp)) {
-			    					event_inside_change = false;
-				    				if (ECGParser.getSingleNodeValue("documentname", packet.getDocument()).equalsIgnoreCase(event.getEventFilename())) {
+			    				clone = eventlist.next();
+			    				valid_clone = clone.isValid();
+			    				//if the timestamp of the linediff equals the timestamp of the previous textoperation ignore linediff
+		    					if (!clone.getCloneStartDate().equals(timestamp) & !clone.isDeleted()) {
+			    					if (ECGParser.getSingleNodeValue("documentname", packet.getDocument()).equalsIgnoreCase(clone.getCloneFilename())) {
 					    				java.util.List<BlockChange> blockChanges = BlockChange.parseLineDiffsEvent(new DummyText(),packet);
 										int blockchanges = 0;
 										int linenumber = 0;
@@ -463,91 +497,59 @@ public class CopyPasteChangeEpisodeRecognizer implements EpisodeRecognizer {
 											blockchanges++;
 											linenumber = bc.getBlockStart();
 											for (LineChange lc: bc.getLineChanges()) {
-												if (lc.isChange()) {inside = event.changeLine(linenumber,lc.getContents());}
-												if (lc.isDeletion()) {inside = event.deleteLine(linenumber);}
-												if (lc.isInsertion()) {inside = event.insertLine(linenumber,lc.getContents());}
-												if (inside) event_inside_change = true;
+												if (lc.isChange()) {inside = clone.changeLine(linenumber,lc.getContents());}
+												if (lc.isDeletion()) {inside = clone.deleteLine(linenumber);}
+												if (lc.isInsertion()) {inside = clone.insertLine(linenumber,lc.getContents());}
+												if (inside) STATE = CopyPasteChangeEpisodeState.CHANGE;
 												linenumber++;
 											}
 										}
-										event.clearDeletedLines();
-										if(event.getEventCodeStartline() > event.getEventCodeEndline()){
-											System.out.println("#############  filename: " + event.getEventFilename());
-											System.out.println("#############  code: " + event.getEventCode() + " ###########");
-											System.out.println();
-											event.setDeleted(true);
-										}
-										/*****************************************************************
-										* In den Change-Zustand wechseln und eine EPISODE schmeissen, da
-										* mindestens ein Clone-Code geändert wurde !!!
-										*****************************************************************/
-										if(/*CloneFamilyVector.size() >= 2*/!countDeletedEvents()){
-											//generateEpsiode
-											if (event_inside_change) {
-												evaluateStringDiff(event);
-												System.out.println("aktueller event wird beobachtet: " + event.isValid());
-												STATE = CopyPasteChangeEpisodeState.CHANGE;
-												System.out.println("cpcwarning time: " + packet.getTimeStamp());
-												if(CloneFamilyVector != null){
-													validEventPacketList = new ArrayList();
-													for(int i = 0; i < CloneFamilyVector.size(); i++){
-														Clone episodeEvent = CloneFamilyVector.get(i);
-														System.out.println("cpcwarning time: " + packet.getTimeStamp());
-														if(episodeEvent != null){
-															String file = "";
-															int startline = 0;
-															int endline = 0;
-															if(user != null && project != null && timestamp != null && docuname != null){
-																if(episodeEvent.isDeleted()== false && episodeEvent.isValid() == true){
-																	file = episodeEvent.getEventFilename();
-																	startline = episodeEvent.getEventCodeStartline()+1;
-																	String startLine = Integer.toString(startline);
-																	endline = episodeEvent.getEventCodeEndline()+1;
-																	String endLine = Integer.toString(endline);
-																	validEvent = generateEpisode("msdt.cpcwarning.xsd", user, project, docuname, timestamp, startLine,endLine);
-																	validEventPacketList.add(validEvent);
-																	System.out.println("event not deleted and valid");
-																	System.out.println("file: " + file);
-																	System.out.println("startline: " + startline + " endline: " + endline);
-																}
+										clone.clearDeletedLines();
+										if (valid_clone & inside & !clone.isDeleted() & countValidAndNotDeletedClones() > 1) {
+											//generateEpisode because change was inside of a clone
+											if(CloneFamilyVector != null){
+												validEventPacketList = new ArrayList();
+												for(int i = 0; i < CloneFamilyVector.size(); i++){
+													Clone iclone = CloneFamilyVector.get(i);
+													if(iclone != null){
+														String file = "";
+														int startline = 0;
+														int endline = 0;
+														if(user != null && project != null && timestamp != null && docuname != null){
+															if (!iclone.isDeleted() & iclone.isValid() & iclone != clone){
+																file = iclone.getCloneFilename();
+																startline = iclone.getCloneCodeStartline()+1;
+																String startLine = Integer.toString(startline);
+																endline = iclone.getCloneCodeEndline()+1;
+																String endLine = Integer.toString(endline);
+																validEvent = generateEpisode("msdt.cpcwarning.xsd", user, project, file, timestamp, startLine,endLine);
+																validEventPacketList.add(validEvent);
 															}
 														}
 													}
 												}
 											}
-				    					}
-										else STATE = CopyPasteChangeEpisodeState.STOP;
+										}
 					    			}
 			    				}
 			    			}
-			    			/* Wurden nur Zeilen verschoben, ohne einen EventCode (inside) zu verändern, wechselt der Automat in den nächsten Paste-Zustand
-			    			 * 'SECOND_LINDEDIFF_AFTER_PASTE', der linediffs für alle Events beachtet. Das linediff für die letzte Paste-Aktion wurde dann
-			    			 * ohne Änderung vorhandener EventCodes abgearbeitet.
-			    			 * Wurde jedoch ein EventCode (inside) durch das die letzte Paste-Aktion beschreibende linediff geändert, muss der Automat
-			    			 * sofort in den Change-Zustand wechseln und eine CPCWarning auslösen.
-			    			 */
+			    			// validate the clonefamily after changes
+			    			validateCloneFamily();
+			    			//if the number of not deleted clone is < 1 stop recognizer 
+			    			if	(!(countNotDeletedClones() > 1)) STATE = CopyPasteChangeEpisodeState.STOP;
+			    			//if only lines are actualized remain in PASTE-STATE
 			    		}
 			    		break;
-			    	//}
 			    	//if (STATE == CopyPasteChangeEpisodeState.CHANGE) {
 					case 5:
-			    		/**
-			    		 * 1. Ein Clone kann wie in der Klasse Clone.java beschrieben seinen Zustand auf gelöscht (deleted) setzen.
-			    		 * 2. Ein Clone ist gelöscht, falls sein gesamter EventCode gelöscht wurde.
-			    		 * 3. Ein Automat reagiert im Change-Zustand nicht mehr auf Textoperationen (textoperation).
-			    		 * 4. Ein Automat reagiert jedoch auf ein linediff, das einen Clone in seiner Liste beobachteter Codecs betrifft.
-			    		 * n. Nur ein gelöschter Clone (beobachtetes Codefragment) darf vom Recognizer nicht mehr beachtet werden.
-			    		 */
-			    		//Clone event = null;
-			    		//boolean event_inside_change = false;
-			    		if (packet.getMicroSensorDataType().getName().equalsIgnoreCase("msdt.linediff.xsd")) {
-			    			validEventPacketList = null;
+						boolean valid_clone = false;
+						if (packet.getMicroSensorDataType().getName().equalsIgnoreCase("msdt.linediff.xsd")) {
 			    			ListIterator<Clone> eventlist = CloneFamilyVector.listIterator();
 			    			while (eventlist.hasNext()) {
-			    				event_inside_change = false;
-			    				event = eventlist.next();
-			    				if (!event.isDeleted()) {
-			    					if (ECGParser.getSingleNodeValue("documentname", packet.getDocument()).equalsIgnoreCase(event.getEventFilename())) {
+			    				clone = eventlist.next();
+			    				valid_clone = clone.isValid();
+			    				if (!clone.isDeleted()) {
+			    					if (ECGParser.getSingleNodeValue("documentname", packet.getDocument()).equalsIgnoreCase(clone.getCloneFilename())) {
 					    				java.util.List<BlockChange> blockChanges = BlockChange.parseLineDiffsEvent(new DummyText(),packet);
 										int blockchanges = 0;
 										int linenumber = 0;
@@ -555,81 +557,51 @@ public class CopyPasteChangeEpisodeRecognizer implements EpisodeRecognizer {
 										for (BlockChange bc: blockChanges) {
 											blockchanges++;
 											linenumber = bc.getBlockStart();
-											BlockChangeType blockType = bc.getBlockType(); 
-											if(blockType == BlockChangeType.DELETED){
-												System.out.println("BlockChangeType.DELETED");
-											}
-											if(blockType == BlockChangeType.CHANGED){
-												System.out.println("BlockChangeType.CHANGED");
-											}
-											if(blockType == BlockChangeType.INSERTED){
-												System.out.println("BlockChangeType.INSERTED");
-											}
+											BlockChangeType blockType = bc.getBlockType();
 											for (LineChange lc: bc.getLineChanges()) {
-												if (lc.isChange()) {inside = event.changeLine(linenumber,lc.getContents());}
-												if (lc.isDeletion()) {inside = event.deleteLine(linenumber);}
-												if (lc.isInsertion()) {inside = event.insertLine(linenumber,lc.getContents());}
-												if (inside) event_inside_change = true;
+												if (lc.isChange()) {inside = clone.changeLine(linenumber,lc.getContents());}
+												if (lc.isDeletion()) {inside = clone.deleteLine(linenumber);}
+												if (lc.isInsertion()) {inside = clone.insertLine(linenumber,lc.getContents());}
 												linenumber++;
 											}
 										}
-										event.clearDeletedLines();
-										if(event.getEventCodeStartline() > event.getEventCodeEndline()){
-											System.out.println("#############  filename: " + event.getEventFilename());
-											System.out.println("#############  code: " + event.getEventCode() + " ###########");
-											System.out.println();
-											event.setDeleted(true);
-										}
-										/*****************************************************************
-										* In den Change-Zustand wechseln und eine EPISODE schmeissen, da
-										* mindestens ein Clone-Code geändert wurde !!!
-										*****************************************************************/
-										//generateEpsiode
-										if(/*CloneFamilyVector.size() >= 2*/!countDeletedEvents()){
-											if (event_inside_change) {
-												evaluateStringDiff(event);
-												System.out.println("aktueller event wird beobachtet: " + event.isValid());
-												STATE = CopyPasteChangeEpisodeState.CHANGE;
-												if(CloneFamilyVector != null){
-													validEventPacketList = new ArrayList();
-													System.out.println("cpcwarning time: " + packet.getTimeStamp());
-													for(int i = 0; i < CloneFamilyVector.size(); i++){
-														Clone episodeEvent = CloneFamilyVector.get(i);
-														if(episodeEvent != null){
-															String file = "";
-															int startline = 0;
-															int endline = 0;
-															if(user != null && project != null && timestamp != null && docuname != null){
-																if(episodeEvent.isDeleted()== false && episodeEvent.isValid() == true){
-																	file = episodeEvent.getEventFilename();
-																	startline = episodeEvent.getEventCodeStartline()+1;
-																	String startLine = Integer.toString(startline);
-																	endline = episodeEvent.getEventCodeEndline()+1;
-																	String endLine = Integer.toString(endline);
-																	validEvent = generateEpisode("msdt.cpcwarning.xsd", user, project, docuname, timestamp,startLine,endLine);
-																	validEventPacketList.add(validEvent);
-																	System.out.println("event not deleted and valid");
-																	System.out.println("file: " + file);
-																	System.out.println("startline: " + startline + " endline: " + endline);												
-																}
+										clone.clearDeletedLines();
+										//generateEpsiode because change was inside of a clone
+										if(valid_clone & inside & !clone.isDeleted() & countValidAndNotDeletedClones() > 1){
+											if(CloneFamilyVector != null){
+												validEventPacketList = new ArrayList();
+												for(int i = 0; i < CloneFamilyVector.size(); i++){
+													Clone iclone = CloneFamilyVector.get(i);
+													if(iclone != null){
+														String file = "";
+														int startline = 0;
+														int endline = 0;
+														if(user != null && project != null && timestamp != null && docuname != null){
+															if (!iclone.isDeleted() & iclone.isValid() & iclone != clone){
+																file = iclone.getCloneFilename();
+																startline = iclone.getCloneCodeStartline()+1;
+																String startLine = Integer.toString(startline);
+																endline = iclone.getCloneCodeEndline()+1;
+																String endLine = Integer.toString(endline);
+																validEvent = generateEpisode("msdt.cpcwarning.xsd", user, project, file, timestamp, startLine,endLine);
+																validEventPacketList.add(validEvent);
 															}
 														}
 													}
 												}
 											}
 										}
-										else STATE = CopyPasteChangeEpisodeState.STOP;
-					    			}
+									}
 			    				}
 			    			}
+//			    			//validation of the clones after changing activities
+			    			validateCloneFamily();
+			    			if	(!(countNotDeletedClones() > 1)) STATE = CopyPasteChangeEpisodeState.STOP; 
 			    		}
 			    		break;
 			    	default:
 			    		break;
 				} // switch
-		    	System.out.println("nr: " + this.nr);
-				System.out.println("zustand: " + this.STATE);
-				System.out.println("clonefamilyvector nach bearbeitung: " + CloneFamilyVector);
 		 	} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -638,58 +610,24 @@ public class CopyPasteChangeEpisodeRecognizer implements EpisodeRecognizer {
     	return validEventPacketList;
     }
     
-    /**
-     * Helper method to create a new episode event
-     * 
-     * @param msdt type of event
-     * @param version
-     * @param creator
-	 * @param username name of user
-	 * @param projectname name of project
-	 * @param documnetname name of java class
-	 * @param startline startline of clone 
-	 * @param endline endline of clone
-	 * @param time stamp
-	 * @return
-	 */
-	private ValidEventPacket generateEpisode(String msdt, String username, String projectname, String documentname, Date changetimestamp, 
-																											String startline, String endline) {
-
-		ValidEventPacket event = null;
-		String timeStamp = changetimestamp.toString();
-        cpcwarning_projectname.setTextContent(projectname);
-        cpcwarning_username.setTextContent(username);
-        cpcwarning_documentnames.setTextContent(documentname);
-        cpcwarning_startline.setTextContent(startline);
-        cpcwarning_endline.setTextContent(endline);
-        event = ECGWriter.createValidEventPacket("msdt.cpcwarning.xsd", changetimestamp, msdt_cpcwarning_doc);
-		return event;
-
-	}
-    
-    
+       
     class DummyText implements IText {}
     
+    // Class for string-differ management. Computes the percentage of the difference bewteen 2 strings.
+    // First compute the edit-distance with Levenstheins edit-distance algorithm. Then compute the percentage-difference.
     private class StringDifferMeasurement {
-
   	  private String firstString = null;
   	  private String secondString = null;
-  	  private static final double STRING_DIFFER_MEASUREMENT = 100.0;
-  	  
-  	  
+  	  private static final double STRING_DIFFER_MEASUREMENT = STRING_MEASURE;
+  
   	  public StringDifferMeasurement(String first, String second){
   	  	this.firstString = first;
   		this.secondString = second;
   	  }
-  	  
-  	  
-  	  //****************************
-  	  // Get minimum of three values
-  	  //****************************
-
+  	  	  
+  	  //Get minimum of three values
   	  private int Minimum (int a, int b, int c) {
   		  int mi;
-
   		  mi = a;
   		  if (b < mi) {
   	     	 mi = b;
@@ -700,10 +638,7 @@ public class CopyPasteChangeEpisodeRecognizer implements EpisodeRecognizer {
   		  return mi;
   	  }
 
-  	  //*****************************
-  	  // Compute Levenshtein distance
-  	  //*****************************
-
+  	  //Compute Levenshtein distance
   	  private double LevenshteinDistance (String s, String t) {
   		  int d[][]; // matrix
   		  int n; // length of s
@@ -717,27 +652,18 @@ public class CopyPasteChangeEpisodeRecognizer implements EpisodeRecognizer {
   	  	  // Step 1
   	  	  n = s.length ();
   	  	  m = t.length ();
-  		 System.out.println("The length of the first string is : " + n);
-  		 System.out.println("--------=-------- second string is: " + m);
-  	  	  	  	  
   	  	  if (n == 0) { return m; }
   	  	  if (m == 0) { return n; }
-  	  	  
   	  	  d = new int[n+1][m+1];
-
   	  	  // Step 2
   	  	  for (i = 0; i <= n; i++) { d[i][0] = i; }
-
   	  	  for (j = 0; j <= m; j++) { d[0][j] = j; }
-
   	  	  // Step 3
   	  	  for (i = 1; i <= n; i++) { 
   	  		  s_i = s.charAt (i - 1); 
-  	  		  //System.out.println("Das " + i + ". Zeichen im erten String: " + s_i);
-  	  	  	// Step 4
+  	  		 // Step 4
   	    	for (j = 1; j <= m; j++) { 
   	    		t_j = t.charAt (j - 1); 
-  	    		//System.out.println("Das " + i + ". Zeichen im zweiten String: " + t_j);	      
   	    		// Step 5
   	    		if (s_i == t_j) { 
   	    			cost = 0;
@@ -745,44 +671,26 @@ public class CopyPasteChangeEpisodeRecognizer implements EpisodeRecognizer {
   	    		else { 
   	    			cost = 1; 
   	    		}
-  	    		/**else if(Character.isWhitespace(s_i)|| Character.isWhitespace(t_j)){
-  	    			cost = 0;
-  	    		}*/
-  				//System.out.println("cost: " + cost);
-  				//System.out.println("i = " + i + "  j = " + j);
-  				//System.out.println();
-  				int first = d[i-1][j]+1;
+  	    		int first = d[i-1][j]+1;
   				int second = d[i][j-1]+1;
   				int third = d[i-1][j-1] + cost;
   	    		// Step 6
   	    		d[i][j] = Minimum (d[i-1][j]+1, d[i][j-1]+1, d[i-1][j-1] + cost);
-  				//System.out.println("Minimum: d[i-1][j]+1: " + first + ", d[i][j-1]+1: " + second + ", d[i-1][j-1]+ cost: " + third);
-  				//System.out.println("gesetzter Wert in Matrix:" + d[i][j]);
-  				//System.out.println("The length of the first string is : " + n);
-  				//System.out.println("--------=-------- second string is: " + m);
-  	    	}
+  			}
   	    }
   	  	int percentValue = d[n][m];
   	  	double myDouble  = stringDifferMeasurement(n,percentValue);
-  	  	System.out.println("editieroperationen: " + percentValue);
-  	  	if(myDouble > STRING_DIFFER_MEASUREMENT){
-  	  		  System.out.println("STRING_DIFFER_MEASUREMENT > 100.0 %: " + myDouble);
-  	    }
-  	    else{
-  	  		System.out.println("STRING_DIFFER_MEASUREMENT < 100.0%: " + myDouble);
-  	    }
   	    // Step 7
   	    return myDouble;
   	  }
-
+  	  
+      //compute percentage of the difference with the length of the first string and the edit-distance result
   	  private double stringDifferMeasurement(int lengthFirst, int percentVal){
-  		  
   		  double percentage = 0.0;
   		  String doubleValueFirst = "" + lengthFirst;
   		  double basicPercentValue = (double)Double.valueOf(doubleValueFirst);
   		  String doubleValueSecond = "" + percentVal;
   		  double  percentValue = (double)Double.valueOf(doubleValueSecond);
-  		  
   		  return percentage = ((percentValue / basicPercentValue) * 100.0);
   	  }
     }
