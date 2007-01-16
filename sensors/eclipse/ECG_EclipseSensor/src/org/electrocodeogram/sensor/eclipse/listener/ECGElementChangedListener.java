@@ -55,7 +55,7 @@ public class ECGElementChangedListener implements IElementChangedListener, IPart
 		
 		// update the 'methodtable'
 		private synchronized void updateMethodTable(IWorkbenchPart page){
-			System.out.println(page);
+			//System.out.println(page);
 			if(page instanceof IEditorPart){
 				IEditorPart editor = (IEditorPart)page;
 				IEditorInput input = editor.getEditorInput();
@@ -123,7 +123,7 @@ public class ECGElementChangedListener implements IElementChangedListener, IPart
 			 // we are only interested in changes to compilation units(equals .java files), because they
 	    	 // indicate a source code change.
 	         if(event.getDelta().getElement().getElementType() == IJavaElement.COMPILATION_UNIT){
-	        	 System.out.println("event.getdelta.getelement is a compilation unit.");
+	        	 //System.out.println("event.getdelta.getelement is a compilation unit.");
 	        	 
 	        	 // if there are no children, this indicates that there was a change to a method body.
 	        	 // since the ElementChangedEvent in this case only keeps track of the changes to the 
@@ -133,7 +133,7 @@ public class ECGElementChangedListener implements IElementChangedListener, IPart
 	        	 if((event.getDelta().getChangedChildren().length + event.getDelta().getAddedChildren().length +
 	        			 event.getDelta().getAffectedChildren().length + event.getDelta().getRemovedChildren().length == 0) 
 	        			 && (event.getDelta().getFlags() == IJavaElementDelta.F_FINE_GRAINED + IJavaElementDelta.F_CONTENT)){
-	        		 System.out.println("event.getdelta.getflags is : F_CONTENT + F_FINE_GRAINED");
+	        		 //System.out.println("event.getdelta.getflags is : F_CONTENT + F_FINE_GRAINED");
 	        		 //	try to get all methods of all classes retrieved from the compilation unit
 	        		 ICompilationUnit compunit = (ICompilationUnit)event.getDelta().getElement();
 	        		 findModifiedMethod(compunit);
@@ -159,10 +159,10 @@ public class ECGElementChangedListener implements IElementChangedListener, IPart
 	        try{
 	        	// iterate over all types(classes in this case)
 	        	for(int i = 0; i < types.length ; i++){
-	        		System.out.println("----- type no. "+i+" ----");
+	        		//System.out.println("----- type no. "+i+" ----");
 		        	 
 	        		methods = types[i].getMethods();
-	        		System.out.println("type ["+i+"] is class: "+ types[i].getElementName());
+	        		//System.out.println("type ["+i+"] is class: "+ types[i].getElementName());
 	        		// iterate over all methods
 		        	for(int j=0 ;j < methods.length ; j++){
 		        		 
@@ -200,7 +200,7 @@ public class ECGElementChangedListener implements IElementChangedListener, IPart
 		// in case of a signature change(e.g. public void foo() became private void foo(int i))
 		// or a removed or added method, this method is called.
 		private void findModifiedChildren(IJavaElementDelta delta) {
-			System.out.println("--- start findModifiedChildren ---");
+			//System.out.println("--- start findModifiedChildren ---");
 			IJavaElementDelta children[] = delta.getAffectedChildren();
 			// temporarily holds event notifications for all changes until verification
 			// needed to ensure 'change' events in case of declaration change instead of 'add' + 'delete' events
@@ -293,7 +293,7 @@ public class ECGElementChangedListener implements IElementChangedListener, IPart
 					    			all_events.remove(identifier);
 					    			// ... and add 'identifier changed' events.
 					    			all_events.put(method.getHandleIdentifier(), ecg_event);
-					    			System.out.println("method "+method.getHandleIdentifier()+" has been changed to "+identifier+".");
+					    			//System.out.println("method "+method.getHandleIdentifier()+" has been changed to "+identifier+".");
 					    			methodtable.remove(method.getHandleIdentifier());
 					    			changed = true;
 					    			break;
@@ -314,7 +314,7 @@ public class ECGElementChangedListener implements IElementChangedListener, IPart
 				    				+ "</codeOrIdentifier></change>"
 			                        + "</exactCodeChange></microActivity>";
 					    		all_events.put(method.getHandleIdentifier(), ecg_event);
-					    		System.out.println("the following method has been REMOVED: "+method.getHandleIdentifier());
+					    		//System.out.println("the following method has been REMOVED: "+method.getHandleIdentifier());
 					    		changed = false;
 					    	}
 					    	
@@ -336,7 +336,7 @@ public class ECGElementChangedListener implements IElementChangedListener, IPart
 		    					+ "</codeOrIdentifier></change>"
 		                        + "</exactCodeChange></microActivity>";
 					    	all_events.put(method.getHandleIdentifier(), ecg_event);
-					    	System.out.println("the following method has been CHANGED: "+method.getHandleIdentifier());
+					    	//System.out.println("the following method has been CHANGED: "+method.getHandleIdentifier());
 					    	}catch(Exception e){}
 					    } 
 					}	
@@ -347,7 +347,7 @@ public class ECGElementChangedListener implements IElementChangedListener, IPart
 			// send the events
 			while(keys.hasMoreElements()){
 				nextelement = (String)all_events.get(keys.nextElement());
-				System.out.println(nextelement);
+				//System.out.println(nextelement);
 				sensor.processActivity("msdt.exactcodechange.xsd",
 						nextelement);
 			}

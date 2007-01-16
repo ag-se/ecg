@@ -37,6 +37,7 @@ public class ECGDocumentListener implements IDocumentListener {
      * when the user has not changed the document for
      * {@link ECGEclipseSensor#CODECHANGE_INTERVALL} amount of
      * time, a <em>Codechange</em> event is sent.
+     * TODO Actually, we need a timer for each open editor
      */
     private Timer timer = null;
     
@@ -44,8 +45,13 @@ public class ECGDocumentListener implements IDocumentListener {
      * Holds the Task of the timer
      */
     private CodeChangeTimerTask currentTimerTask = null;
-
-    public boolean documentChanged;
+    
+    /**
+     * Flag set to true if a document change has been detected. It's used globally, so it
+     * doesn't really reflect the actual state of all the documents.
+     * TODO Actually, we need a flag for each open editor
+     */
+    public boolean documentChanged = false;
 
     /**
      * Creates the <em>DocumentListenerAdapter</em> and the

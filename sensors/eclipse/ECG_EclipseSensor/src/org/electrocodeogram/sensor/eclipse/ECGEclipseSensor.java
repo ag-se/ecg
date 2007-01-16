@@ -8,7 +8,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -17,7 +16,6 @@ import org.eclipse.core.filebuffers.FileBuffers;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.jdt.core.ElementChangedEvent;
-import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.internal.junit.ui.JUnitPlugin;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
@@ -195,7 +193,7 @@ public final class ECGEclipseSensor {
         
         // Try to get the username from the operating system
         // environment
-        this.username = System.getenv("USERNAME");
+        this.username = System.getProperty("user.name");
         if (this.username == null || this.username.equals("")) {
             this.username = "unknown";
         }
@@ -419,6 +417,7 @@ public final class ECGEclipseSensor {
 			partListener.partActivated(activePart);
 		}
 
+        /* Has been used for Marco's Replayer. msdt.exactcodechanges not interesting anymore
         // create ElementChangedListenerAdapter
         ECGElementChangedListener javacodechange = null;
         IWorkbenchPage page = windows[0].getActivePage();
@@ -432,7 +431,7 @@ public final class ECGEclipseSensor {
         // we only want to know about changes to the working copy of the documents,
         // so we only need POST_RECONCILE events
         JavaCore.addElementChangedListener(javacodechange, ElementChangedEvent.POST_RECONCILE);
-
+        
         page = null;
 
         for (int i = 0; i < windows.length; i++) {
@@ -440,6 +439,7 @@ public final class ECGEclipseSensor {
             // add javacodechange also as a partlistener
             page.addPartListener(javacodechange);
         }
+        */
 
         logger.log(Level.FINE, "The SensorShell's listeners have been initialized.");
 	}
