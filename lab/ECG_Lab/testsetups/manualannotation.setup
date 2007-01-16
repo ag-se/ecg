@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<modulesetup>
+	<module id="1" active="true">
+		<name>
+		Manual Annotator
+		</name>
+		<fromClassId>
+		org.electrocodeogram.module.source.implementation.ManualAnnotatorSourceModule
+		</fromClassId>
+		<connectedTo>
+			<id>2</id>
+		</connectedTo>
+		<properties>
+			<property>
+				<name>Show Dialog</name>
+				<value>True</value>
+				<type>java.lang.Boolean</type>
+			</property>
+			<property>
+				<name>Events</name>
+				<value>Versagen entdeckt, Defekt entdeckt, Defekt behoben, Problem begonnen, Problem gelöst, Umbau nötig, Schwierigkeiten, Unzufriedenheit, Ratlosigkeit, Flow, Bericht</value>
+				<type>org.electrocodeogram.module.source.implementation.ManualAnnotatorEvents</type>
+			</property>
+			<property>
+				<name>Episodes</name>
+				<value>Start, Kodieren, Entwerfen, Suchen, Testen, Defektsuche, Defektbehebung, Pause, Unterbrechung außen, Unterbrechung innen, Konfiguration</value>
+				<type>org.electrocodeogram.module.source.implementation.ManualAnnotatorEpisodes</type>
+			</property>
+		</properties>
+	</module>
+	<module id="2" active="true">
+		<name>
+		AdHoc Statistics
+		</name>
+		<fromClassId>
+		org.electrocodeogram.module.target.implementation.StatisticsTargetModule
+		</fromClassId>
+		<connectedTo>
+		</connectedTo>
+		<properties>
+		</properties>
+	</module>
+</modulesetup>

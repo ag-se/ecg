@@ -1,0 +1,190 @@
+<?xml version="1.0"?>
+<modulesetup>
+	<module id="2" active="true">
+		<name>
+		File Reader
+		</name>
+		<fromClassId>
+		org.electrocodeogram.module.source.implementation.FileSystemSourceModule
+		</fromClassId>
+		<connectedTo>
+			<id>3</id>
+		</connectedTo>
+		<properties>
+			<property>
+				<name>Input File</name>
+				<value>D:\Forschung\Kodierszenen\ACM2006\ACM060704_acm4_events.log</value>
+				<type>java.io.File</type>
+			</property>
+			<property>
+				<name>Enable Burst Mode</name>
+				<value>true</value>
+				<type>java.lang.Boolean</type>
+			</property>
+			<property>
+				<name>Send End Event</name>
+				<value>true</value>
+				<type>java.lang.Boolean</type>
+			</property>
+			<property>
+				<name>Ignored Event Types</name>
+				<value>
+					msdt.focustracker.xsd
+					msdt.focustrackersystem.xsd
+				</value>
+				<type>java.lang.String</type>
+			</property>
+		</properties>
+	</module>
+	<module id="4" active="true">
+		<name>
+		AdHoc Statistics
+		</name>
+		<fromClassId>
+		org.electrocodeogram.module.target.implementation.StatisticsTargetModule
+		</fromClassId>
+		<connectedTo>
+		</connectedTo>
+		<properties>
+		</properties>
+	</module>
+	<module id="1" active="true">
+		<name>
+		Code location tracker
+		</name>
+		<fromClassId>
+		org.electrocodeogram.module.intermediate.implementation.CodeLocationTrackerIntermediateModule
+		</fromClassId>
+		<connectedTo>
+		<id>
+		4
+		</id>
+		<id>
+		5
+		</id>
+		</connectedTo>
+		<properties>
+		</properties>
+	</module>
+	<module id="3" active="true">
+		<name>
+		Codechange Diff-Generator
+		</name>
+		<fromClassId>
+		org.electrocodeogram.module.intermediate.implementation.CodechangeDifferIntermediateModule
+		</fromClassId>
+		<connectedTo>
+		<id>
+		1
+		</id>
+		</connectedTo>
+		<properties>
+		</properties>
+	</module>
+	<module id="5" active="true">
+		<name>
+			Betterment episode recognizer
+		</name>
+		<fromClassId>
+			org.electrocodeogram.module.intermediate.implementation.EpisodeRecognizerIntermediateModule
+		</fromClassId>
+		<connectedTo>
+			<id>9</id>
+		</connectedTo>
+		<properties>
+			<property>
+				<name>Recognizer</name>
+				<value>
+					BettermentEpisodeRecognizer
+				</value>
+				<type>java.lang.String</type>
+			</property>
+		</properties>
+	</module>
+	<module id="9" active="true">
+		<name>
+			MicroActivity Filter2
+		</name>
+		<fromClassId>
+			org.electrocodeogram.module.intermediate.implementation.MSDTFilterIntermediateModule
+		</fromClassId>
+		<connectedTo>
+			<id>6</id>
+			<id>7</id>
+		</connectedTo>
+		<properties>
+			<property>
+				<name>Passer</name>
+				<value>
+					msdt.codelocation.xsd
+					msdt.run.xsd
+					msdt.system.xsd
+				</value>
+				<type>java.lang.String</type>
+			</property>
+		</properties>
+	</module>
+	<module id="6" active="true">
+		<name>
+		File Writer
+		</name>
+		<fromClassId>
+		org.electrocodeogram.module.target.implementation.FileSystemTargetModule
+		</fromClassId>
+		<connectedTo>
+		</connectedTo>
+		<properties>
+			<property>
+				<name>Output File</name>
+				<value>locations.log</value>
+				<type>java.io.File</type>
+			</property>
+			<property>
+				<name>Stamp File Name</name>
+				<value>false</value>
+				<type>java.lang.Boolean</type>
+			</property>
+			<property>
+				<name>Append Data</name>
+				<value>false</value>
+				<type>java.lang.Boolean</type>
+			</property>
+		</properties>
+	</module>
+	<module id="7" active="true">
+		<name>Code location analysis</name>
+		<fromClassId>org.electrocodeogram.module.intermediate.implementation.CodeLocationAnalysisIntermediateModule</fromClassId>
+		<connectedTo>
+			<id>8</id>
+		</connectedTo>
+		<properties>
+		</properties>
+	</module>
+	<module id="8" active="true">
+		<name>
+		File Writer 2
+		</name>
+		<fromClassId>
+		org.electrocodeogram.module.target.implementation.FileSystemTargetModule
+		</fromClassId>
+		<connectedTo>
+		</connectedTo>
+		<properties>
+			<property>
+				<name>Output File</name>
+				<value>exactcodechanges.log</value>
+				<type>java.io.File</type>
+			</property>
+			<property>
+				<name>Stamp File Name</name>
+				<value>false</value>
+				<type>java.lang.Boolean</type>
+			</property>
+			<property>
+				<name>Append Data</name>
+				<value>false</value>
+				<type>java.lang.Boolean</type>
+			</property>
+		</properties>
+	</module>
+</modulesetup>

@@ -1,0 +1,96 @@
+<?xml version="1.0"?>
+<modulesetup>
+	<module id="4" active="true">
+		<name>
+		Database Writer
+		</name>
+		<fromClassId>
+		org.electrocodeogram.module.target.implementation.DatabaseTargetModule
+		</fromClassId>
+		<connectedTo>
+		</connectedTo>
+		<properties>
+			<property>
+			<name>
+			JDBC Connection
+			</name>
+			<value>
+			jdbc:mysql://localhost:3306/ecgtest
+			</value>
+			<type>
+			java.lang.String
+			</type>
+			</property>
+			<property>
+			<name>
+			Username
+			</name>
+			<value>
+			ecg
+			</value>
+			<type>
+			java.lang.String
+			</type>
+			</property>
+			<property>
+			<name>
+			Password
+			</name>
+			<value>
+			ecg
+			</value>
+			<type>
+			java.lang.String
+			</type>
+			</property>
+		</properties>
+	</module>
+	<module id="3" active="true">
+		<name>
+		File Reader
+		</name>
+		<fromClassId>
+		org.electrocodeogram.module.source.implementation.FileSystemSourceModule
+		</fromClassId>
+		<connectedTo>
+		<id>
+		4
+		</id>
+		</connectedTo>
+		<properties>
+			<property>
+			<name>
+			Input File
+			</name>
+			<value>
+			testeventlogs/small.log
+			</value>
+			<type>
+			java.io.File
+			</type>
+			</property>
+			<property>
+			<name>
+			Enable Burst Mode
+			</name>
+			<value>
+			true
+			</value>
+			<type>
+			java.lang.Boolean
+			</type>
+			</property>
+			<property>
+			<name>
+			Send End Event
+			</name>
+			<value>
+			true
+			</value>
+			<type>
+			java.lang.Boolean
+			</type>
+			</property>
+		</properties>
+	</module>
+</modulesetup>
