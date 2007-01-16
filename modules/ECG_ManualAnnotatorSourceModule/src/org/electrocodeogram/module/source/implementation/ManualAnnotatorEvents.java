@@ -15,8 +15,7 @@ public class ManualAnnotatorEvents {
     /**
      * This is the logger.
      */
-    private static Logger logger = LogHelper.createLogger(ManualAnnotatorEvents.class
-        .getName());
+    private static Logger logger = LogHelper.createLogger(ManualAnnotatorEvents.class.getName());
     
     /**
      * The event names.
@@ -32,9 +31,7 @@ public class ManualAnnotatorEvents {
         logger.entering(this.getClass().getName(),"ManualAnnotatorEvents", new Object[] {value});
         
         if (value == null || value.equals("")) {
-            
             logger.exiting(this.getClass().getName(),"ManualAnnotatorEvents");
-            
             return;
         }
 
@@ -62,4 +59,5 @@ public class ManualAnnotatorEvents {
         
         return this.events;
     }
+
 }

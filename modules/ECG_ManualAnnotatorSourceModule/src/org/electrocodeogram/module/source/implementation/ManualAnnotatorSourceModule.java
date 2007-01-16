@@ -68,27 +68,21 @@ public class ManualAnnotatorSourceModule extends SourceModule {
     /**
      * @see org.electrocodeogram.module.Module#propertyChanged(org.electrocodeogram.module.ModuleProperty)
      */
-    @Override
     public void propertyChanged(ModuleProperty moduleProperty)
         throws ModulePropertyException {
 
         logger.entering(this.getClass().getName(), "propertyChanged",
             new Object[] {moduleProperty});
 
-        if (moduleProperty.getName().equals("Show Dialog")) {
-            if (!this.isActive()) {
-
-                logger.exiting(this.getClass().getName(), "propertyChanged");
-
-                throw new ModulePropertyException(
-                    "The module has not been started yet.", this.getName(),
-                    this.getId(), moduleProperty.getName(), moduleProperty
-                        .getValue());
+        if (eventReader != null) {
+            if (moduleProperty.getName().equals("Events")) {
+                this.eventReader.setEvents(moduleProperty.getValue());
             }
-
-            this.eventReader.showDialog();
+            if (moduleProperty.getName().equals("Episodes")) {
+                this.eventReader.setEpisodes(moduleProperty.getValue());
+            }
         }
-
+        
         logger.exiting(this.getClass().getName(), "propertyChanged");
     }
 
@@ -98,7 +92,6 @@ public class ManualAnnotatorSourceModule extends SourceModule {
      *      this module does not need to be informed about
      *      ECG Lab subsystem's state changes.
      */
-    @Override
     public void update() {
         // not implemented
     }
@@ -107,7 +100,6 @@ public class ManualAnnotatorSourceModule extends SourceModule {
      * @see org.electrocodeogram.module.Module#initialize() This
      *      method is not implemented in this module.
      */
-    @Override
     public void initialize() {
     // not implemented
     }
@@ -115,7 +107,6 @@ public class ManualAnnotatorSourceModule extends SourceModule {
     /**
      * @see org.electrocodeogram.module.source.SourceModule#getEventReader()
      */
-    @Override
     public EventReader[] getEventReader() {
 
         logger.entering(this.getClass().getName(), "getEventReader");
@@ -135,7 +126,6 @@ public class ManualAnnotatorSourceModule extends SourceModule {
      * This
      *      method is not implemented in this module.
      */
-    @Override
     public void preStart() {
     // not implemented
     }
@@ -143,7 +133,6 @@ public class ManualAnnotatorSourceModule extends SourceModule {
     /**
      * @see org.electrocodeogram.module.source.SourceModule#postStop()
      */
-    @Override
     public void postStop() {
 
         logger.entering(this.getClass().getName(), "postStop");

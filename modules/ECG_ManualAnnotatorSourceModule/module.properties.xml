@@ -28,10 +28,10 @@
 				Show Dialog
 			</propertyName>
 			<propertyType>
-				java.lang.reflect.Method
+				java.lang.Boolean
 			</propertyType>
 			<propertyValue>
-				Show Dialog
+				True
 			</propertyValue>
 		</property>
 		<property>
@@ -42,17 +42,36 @@
 				org.electrocodeogram.module.source.implementation.ManualAnnotatorEvents
 			</propertyType>
 			<propertyValue>
-				Unterbrechung beobachtet,Beginn einer Pause, Ende einer Pause
+				Defekt erkannt
+			</propertyValue>
+		</property>
+		<property>
+			<propertyName>
+				Episodes
+			</propertyName>
+			<propertyType>
+				org.electrocodeogram.module.source.implementation.ManualAnnotatorEpisodes
+			</propertyType>
+			<propertyValue>
+				Pause
 			</propertyValue>
 		</property>
 	</properties>
 	<microsensordatatypes>
 		<microsensordatatype>
 			<msdtName>
-				msdt.manual.xsd
+				msdt.manualevent.xsd
 			</msdtName>
 			<msdtFile>
-				msdt.manual.xsd
+				msdt.manualevent.xsd
+			</msdtFile>
+		</microsensordatatype>
+		<microsensordatatype>
+			<msdtName>
+				msdt.manualepisode.xsd
+			</msdtName>
+			<msdtFile>
+				msdt.manualepisode.xsd
 			</msdtFile>
 		</microsensordatatype>
 	</microsensordatatypes>

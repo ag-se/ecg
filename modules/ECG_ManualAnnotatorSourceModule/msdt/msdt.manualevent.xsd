@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	
+	<!--
+		TODO Comment
+	-->
+
+	<xs:include schemaLocation="msdt.common.xsd"/>	
+	
+	<xs:element name="microActivity">
+		<xs:complexType>
+	    	<xs:sequence>
+				<xs:element name="commonData" type="commonDataType"/>
+				<xs:element name="manualevent">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="type" type="xs:token" />
+							<xs:element name="remark" type="xs:string" />
+						</xs:sequence>
+					</xs:complexType>			
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>
