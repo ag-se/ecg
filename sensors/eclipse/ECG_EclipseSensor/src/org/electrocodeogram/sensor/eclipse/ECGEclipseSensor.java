@@ -82,7 +82,7 @@ public final class ECGEclipseSensor {
     /**
      * This constant specifies the name of the Sensor.
      */
-    static public final String CREATOR = "ECGEclipseSensor1.1.4";
+    static public final String CREATOR = "ECGEclipseSensor1.2";
 
     /**
      * This is the name of the user, who is running <em>Eclipse</em>.
