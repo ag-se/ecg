@@ -148,7 +148,7 @@ public class ECGTestListener implements ITestRunListener {
                 + testName
                 + "</name><id>"
                 + testId
-                + "</id><status>OK</status></test></microActivity>");
+                + "</id><status>ok</status></test></microActivity>");
 
         ECGEclipseSensor.logger.exiting(this.getClass().getName(), "testStarted");
 
@@ -175,7 +175,7 @@ public class ECGTestListener implements ITestRunListener {
                 + testName
                 + "</name><id>"
                 + testId
-                + "</id><status>OK</status></test></microActivity>");
+                + "</id><status>ok</status></test></microActivity>");
 
         ECGEclipseSensor.logger.exiting(this.getClass().getName(), "testEnded");
 
@@ -195,19 +195,19 @@ public class ECGTestListener implements ITestRunListener {
         switch (status) {
             case ITestRunListener.STATUS_OK:
 
-                statusString = "OK";
+                statusString = "ok";
 
                 break;
 
             case ITestRunListener.STATUS_ERROR:
 
-                statusString = "ERROR";
+                statusString = "error";
 
                 break;
 
             case ITestRunListener.STATUS_FAILURE:
 
-                statusString = "FAILURE";
+                statusString = "failure";
 
                 break;
 
@@ -252,19 +252,19 @@ public class ECGTestListener implements ITestRunListener {
         switch (status) {
             case ITestRunListener.STATUS_OK:
 
-                statusString = "OK";
+                statusString = "ok";
 
                 break;
 
             case ITestRunListener.STATUS_ERROR:
 
-                statusString = "ERROR";
+                statusString = "error";
 
                 break;
 
             case ITestRunListener.STATUS_FAILURE:
 
-                statusString = "FAILURE";
+                statusString = "failure";
 
                 break;
 
