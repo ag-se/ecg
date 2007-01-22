@@ -39,17 +39,23 @@ public class ECGPartListener implements IPartListener {
     private Document msdt_part_doc;
     private Document msdt_codestatus_doc;
     
+    private Element editor_version;
+    private Element editor_creator;
     private Element editor_username;
     private Element editor_projectname;
     private Element editor_id;        
     private Element editor_activity;
     private Element editor_editorname;
     
+    private Element part_version;
+    private Element part_creator;
     private Element part_username;
     private Element part_id;        
     private Element part_activity;
     private Element part_partname;
 
+    private Element codestatus_version;
+    private Element codestatus_creator;
     private Element codestatus_username;
     private Element codestatus_projectname;
     private Element codestatus_id;        
@@ -69,6 +75,8 @@ public class ECGPartListener implements IPartListener {
             Element editor_microactivity = msdt_editor_doc.createElement("microActivity");                
             Element editor_commondata = msdt_editor_doc.createElement("commonData");
             Element editor_editor = msdt_editor_doc.createElement("editor");
+            editor_version = msdt_editor_doc.createElement("version");
+            editor_creator = msdt_editor_doc.createElement("creator");
             editor_username = msdt_editor_doc.createElement("username");
             editor_projectname = msdt_editor_doc.createElement("projectname");
             editor_id = msdt_editor_doc.createElement("id");
@@ -77,6 +85,8 @@ public class ECGPartListener implements IPartListener {
 
             msdt_editor_doc.appendChild(editor_microactivity);
               editor_microactivity.appendChild(editor_commondata);
+                editor_commondata.appendChild(editor_version);
+                editor_commondata.appendChild(editor_creator);
                 editor_commondata.appendChild(editor_username);
                 editor_commondata.appendChild(editor_projectname);
                 editor_commondata.appendChild(editor_id);
@@ -89,6 +99,8 @@ public class ECGPartListener implements IPartListener {
             Element part_microactivity = msdt_part_doc.createElement("microActivity");                
             Element part_commondata = msdt_part_doc.createElement("commonData");
             Element part_part = msdt_part_doc.createElement("part");
+            part_version = msdt_part_doc.createElement("version");
+            part_creator = msdt_part_doc.createElement("creator");
             part_username = msdt_part_doc.createElement("username");
             part_id = msdt_part_doc.createElement("id");
             part_activity = msdt_part_doc.createElement("activity");
@@ -96,6 +108,8 @@ public class ECGPartListener implements IPartListener {
 
             msdt_part_doc.appendChild(part_microactivity);
               part_microactivity.appendChild(part_commondata);
+                part_commondata.appendChild(part_version);
+                part_commondata.appendChild(part_creator);
                 part_commondata.appendChild(part_username);
                 part_commondata.appendChild(part_id);
               part_microactivity.appendChild(part_part);
@@ -107,6 +121,8 @@ public class ECGPartListener implements IPartListener {
             Element codestatus_microactivity = msdt_codestatus_doc.createElement("microActivity");                
             Element codestatus_commondata = msdt_codestatus_doc.createElement("commonData");
             Element codestatus_codestatus = msdt_codestatus_doc.createElement("codestatus");
+            codestatus_version = msdt_codestatus_doc.createElement("version");
+            codestatus_creator = msdt_codestatus_doc.createElement("creator");
             codestatus_username = msdt_codestatus_doc.createElement("username");
             codestatus_projectname = msdt_codestatus_doc.createElement("projectname");
             codestatus_id = msdt_codestatus_doc.createElement("id");
@@ -116,6 +132,8 @@ public class ECGPartListener implements IPartListener {
 
             msdt_codestatus_doc.appendChild(codestatus_microactivity);
               codestatus_microactivity.appendChild(codestatus_commondata);
+                codestatus_commondata.appendChild(codestatus_version);
+                codestatus_commondata.appendChild(codestatus_creator);
                 codestatus_commondata.appendChild(codestatus_username);
                 codestatus_commondata.appendChild(codestatus_projectname);
                 codestatus_commondata.appendChild(codestatus_id);
@@ -167,6 +185,8 @@ public class ECGPartListener implements IPartListener {
 
             editor_id.setTextContent(String.valueOf(part.hashCode()));
             editor_projectname.setTextContent(ECGEclipseSensor.getProjectnameFromPart(part));
+            editor_version.setTextContent("1");
+            editor_creator.setTextContent(ECGEclipseSensor.CREATOR);
             editor_username.setTextContent(this.sensor.username);
             editor_activity.setTextContent("activated");
             editor_editorname.setTextContent(ECGEclipseSensor.getFilenameFromPart(part));
@@ -174,24 +194,13 @@ public class ECGPartListener implements IPartListener {
             this.sensor.processActivity("msdt.editor.xsd", 
                     this.sensor.xmlDocumentSerializer.writeToString(msdt_editor_doc));
 
-            /* TODO old code, remove if obsolete
-            processActivity(
-                "msdt.editor.xsd",
-                "<?xml version=\"1.0\"?><microActivity><commonData><username>"
-                    + ECGEclipseSensor.this.username
-                    + "</username><projectname>"
-                    + getProjectnameFromLocation(part.getTitleToolTip())
-                    + "</projectname><id>"
-                    + part.hashCode()
-                    + "</id></commonData><editor><activity>activated</activity><editorname>"
-                    + getFilenameFromLocation(part.getTitleToolTip())
-                    + "</editorname></editor></microActivity>");
-             */
         } else if (part instanceof IViewPart) {
             ECGEclipseSensor.logger.log(ECGLevel.PACKET,
                 "A partActivated event has been recorded.");
 
             part_id.setTextContent(String.valueOf(part.hashCode()));
+            part_version.setTextContent("1");
+            part_creator.setTextContent(ECGEclipseSensor.CREATOR);
             part_username.setTextContent(this.sensor.username);
             part_activity.setTextContent("activated");
             part_partname.setTextContent(part.getTitle());
@@ -199,17 +208,6 @@ public class ECGPartListener implements IPartListener {
             this.sensor.processActivity("msdt.part.xsd", 
                     this.sensor.xmlDocumentSerializer.writeToString(msdt_part_doc));
 
-            /* TODO old code, remove if obsolete
-            processActivity(
-                "msdt.part.xsd",
-                "<?xml version=\"1.0\"?><microActivity><commonData><username>"
-                    + ECGEclipseSensor.this.username
-                    + "</username><id>"
-                    + part.hashCode()
-                    + "</id></commonData><part><activity>activated</activity><partname>"
-                    + part.getTitle()
-                    + "</partname></part></microActivity>");
-             */
         } 
 
         ECGEclipseSensor.logger.exiting(this.getClass().getName(), "partActivated");
@@ -238,6 +236,8 @@ public class ECGPartListener implements IPartListener {
 
             editor_id.setTextContent(String.valueOf(part.hashCode()));
             editor_projectname.setTextContent(ECGEclipseSensor.getProjectnameFromPart(part));
+            editor_version.setTextContent("1");
+            editor_creator.setTextContent(ECGEclipseSensor.CREATOR);
             editor_username.setTextContent(this.sensor.username);
             editor_activity.setTextContent("closed");
             editor_editorname.setTextContent(ECGEclipseSensor.getFilenameFromPart(part));
@@ -245,24 +245,13 @@ public class ECGPartListener implements IPartListener {
             this.sensor.processActivity("msdt.editor.xsd",  
                     this.sensor.xmlDocumentSerializer.writeToString(msdt_editor_doc));
 
-            /* TODO old code, remove if obsolete
-            processActivity(
-                "msdt.editor.xsd",
-                "<?xml version=\"1.0\"?><microActivity><commonData><username>"
-                    + ECGEclipseSensor.this.username
-                    + "</username><projectname>"
-                    + getProjectnameFromLocation(part.getTitleToolTip())
-                    + "</projectname><id>"
-                    + part.hashCode()
-                    + "</id></commonData><editor><activity>closed</activity><editorname>"
-                    + getFilenameFromLocation(part.getTitleToolTip())
-                    + "</editorname></editor></microActivity>");
-             */
         } else if (part instanceof IViewPart) {
             ECGEclipseSensor.logger.log(ECGLevel.PACKET,
                 "A partClosed event has been recorded.");
 
             part_id.setTextContent(String.valueOf(part.hashCode()));
+            part_version.setTextContent("1");
+            part_creator.setTextContent(ECGEclipseSensor.CREATOR);
             part_username.setTextContent(this.sensor.username);
             part_activity.setTextContent("closed");
             part_partname.setTextContent(part.getTitle());
@@ -270,17 +259,6 @@ public class ECGPartListener implements IPartListener {
             this.sensor.processActivity("msdt.part.xsd", 
                     this.sensor.xmlDocumentSerializer.writeToString(msdt_part_doc));
 
-            /* TODO old code, remove if obsolete
-            processActivity(
-                "msdt.part.xsd",
-                "<?xml version=\"1.0\"?><microActivity><commonData><username>"
-                    + ECGEclipseSensor.this.username
-                    + "</username><id>"
-                    + part.hashCode()
-                    + "</id></commonData><part><activity>closed</activity><partname>"
-                    + part.getTitle()
-                    + "</partname></part></microActivity>");
-             */
         }
 
         ECGEclipseSensor.logger.exiting(this.getClass().getName(), "partClosed");
@@ -309,6 +287,8 @@ public class ECGPartListener implements IPartListener {
 
             editor_id.setTextContent(String.valueOf(part.hashCode()));
             editor_projectname.setTextContent(ECGEclipseSensor.getProjectnameFromPart(part));
+            editor_version.setTextContent("1");
+            editor_creator.setTextContent(ECGEclipseSensor.CREATOR);
             editor_username.setTextContent(this.sensor.username);
             editor_activity.setTextContent("deactivated");
             editor_editorname.setTextContent(ECGEclipseSensor.getFilenameFromPart(part));
@@ -316,24 +296,13 @@ public class ECGPartListener implements IPartListener {
             this.sensor.processActivity("msdt.editor.xsd", 
                     this.sensor.xmlDocumentSerializer.writeToString(msdt_editor_doc));
 
-            /* TODO old code, remove if obsolete
-            processActivity(
-                "msdt.editor.xsd",
-                "<?xml version=\"1.0\"?><microActivity><commonData><username>"
-                    + ECGEclipseSensor.this.username
-                    + "</username><projectname>"
-                    + getProjectnameFromLocation(part.getTitleToolTip())
-                    + "</projectname><id>"
-                    + part.hashCode()
-                    + "</id></commonData><editor><activity>deactivated</activity><editorname>"
-                    + getFilenameFromLocation(part.getTitleToolTip())
-                    + "</editorname></editor></microActivity>");
-             */
         } else if (part instanceof IViewPart) {
             ECGEclipseSensor.logger.log(ECGLevel.PACKET,
                 "A partDeactivated event has been recorded.");
 
             part_id.setTextContent(String.valueOf(part.hashCode()));
+            part_version.setTextContent("1");
+            part_creator.setTextContent(ECGEclipseSensor.CREATOR);
             part_username.setTextContent(this.sensor.username);
             part_activity.setTextContent("deactivated");
             part_partname.setTextContent(part.getTitle());
@@ -341,17 +310,6 @@ public class ECGPartListener implements IPartListener {
             this.sensor.processActivity("msdt.part.xsd", 
                     this.sensor.xmlDocumentSerializer.writeToString(msdt_part_doc));
 
-            /* TODO old code, remove if obsolete
-            processActivity(
-                "msdt.part.xsd",
-                "<?xml version=\"1.0\"?><microActivity><commonData><username>"
-                    + ECGEclipseSensor.this.username
-                    + "</username><id>"
-                    + part.hashCode()
-                    + "</id></commonData><part><activity>deactivated</activity><partname>"
-                    + part.getTitle()
-                    + "</partname></part></microActivity>");
-             */
         }
 
         ECGEclipseSensor.logger.exiting(this.getClass().getName(), "partDeactivated");
@@ -381,26 +339,14 @@ public class ECGPartListener implements IPartListener {
             
             editor_id.setTextContent(String.valueOf(part.hashCode()));
             editor_projectname.setTextContent(ECGEclipseSensor.getProjectnameFromPart(part));
+            editor_version.setTextContent("1");
+            editor_creator.setTextContent(ECGEclipseSensor.CREATOR);
             editor_username.setTextContent(this.sensor.username);
             editor_activity.setTextContent("opened");
             editor_editorname.setTextContent(ECGEclipseSensor.getFilenameFromPart(part));
 
             this.sensor.processActivity("msdt.editor.xsd", 
                     this.sensor.xmlDocumentSerializer.writeToString(msdt_editor_doc));
-
-            /* TODO old code, remove if obsolete
-            processActivity(
-                "msdt.editor.xsd",
-                "<?xml version=\"1.0\"?><microActivity><commonData><username>"
-                    + ECGEclipseSensor.this.username
-                    + "</username><projectname>"
-                    + getProjectnameFromLocation(part.getTitleToolTip())
-                    + "</projectname><id>"
-                    + part.hashCode()
-                    + "</id></commonData><editor><activity>opened</activity><editorname>"
-                    + getFilenameFromLocation(part.getTitleToolTip())
-                    + "</editorname></editor></microActivity>");
-             */                
 
             // TODO The following line is just for exploration
 //            	part.getSite().getSelectionProvider().addSelectionChangedListener(new ECGSelectionChangedListener());
@@ -454,6 +400,8 @@ public class ECGPartListener implements IPartListener {
                 
                 ECGEclipseSensor.logger.log(ECGLevel.PACKET, "A code status event has been recorded.");                    
 
+                codestatus_version.setTextContent("1");
+                codestatus_creator.setTextContent(ECGEclipseSensor.CREATOR);
                 codestatus_username.setTextContent(this.sensor.getUsername());
                 codestatus_projectname.setTextContent(ECGEclipseSensor.getProjectnameFromPart(textEditor));
                 codestatus_id.setTextContent(String.valueOf(part.hashCode()));
@@ -463,21 +411,6 @@ public class ECGPartListener implements IPartListener {
                 this.sensor.processActivity("msdt.codestatus.xsd", 
                     this.sensor.xmlDocumentSerializer.writeToString(msdt_codestatus_doc));                    
 
-                /* TODO old code, remove if obsolete
-                processActivity(
-                        "msdt.codestatus.xsd",
-                        "<?xml version=\"1.0\"?><microActivity><commonData><username>"
-                            + getUsername()
-                            + "</username><projectname>"
-                            + getProjectnameFromLocation(textEditor.getTitleToolTip())
-                            + "</projectname><id>"
-                            + part.hashCode()
-                            + "</id></commonData><codestatus><document><![CDATA["
-                            + document.get()
-                            + "]" + "]" + "></document><documentname>"
-                            + getFilenameFromLocation(textEditor.getTitleToolTip())
-                            + "</documentname></codestatus></microActivity>");                    
-                 */                
             }
 
 
@@ -487,6 +420,8 @@ public class ECGPartListener implements IPartListener {
                 "A partOpened event has been recorded.");
 
             part_id.setTextContent(String.valueOf(part.hashCode()));
+            part_version.setTextContent("1");
+            part_creator.setTextContent(ECGEclipseSensor.CREATOR);
             part_username.setTextContent(this.sensor.username);
             part_activity.setTextContent("opened");
             part_partname.setTextContent(part.getTitle());
@@ -494,17 +429,6 @@ public class ECGPartListener implements IPartListener {
             this.sensor.processActivity("msdt.part.xsd", 
                     this.sensor.xmlDocumentSerializer.writeToString(msdt_part_doc));
 
-            /* TODO old code, remove if obsolete
-            processActivity(
-                "msdt.part.xsd",
-                "<?xml version=\"1.0\"?><microActivity><commonData><username>"
-                    + ECGEclipseSensor.this.username
-                    + "</username><id>"
-                    + part.hashCode()
-                    + "</id></commonData><part><activity>opened</activity><partname>"
-                    + part.getTitle()
-                    + "</partname></part></microActivity>");
-             */                
             this.sensor.activeView = (IViewPart)part;
         }
 

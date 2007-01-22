@@ -94,7 +94,7 @@ public class ECGElementChangedListener implements IElementChangedListener, IPart
 										methodtable.put(methodhandle, methods[j].getSource());
 										// ... and send an event.
 										sensor.processActivity("msdt.exactcodechange.xsd",
-				    						"<?xml version=\"1.0\"?><microActivity><commonData><username>"
+                                            "<?xml version=\"1.0\"?><microActivity><commonData><version>1</version><creator>" + ECGEclipseSensor.CREATOR + "</creator><username>"
 				    	                    + sensor.getUsername()
 				    	                    + "</username><projectname>"
 				    	                    + sensor.getProjectname()
@@ -178,7 +178,7 @@ public class ECGElementChangedListener implements IElementChangedListener, IPart
 		        			methodtable.put(methodhandle,methods[j].getSource());
 		        			//System.out.println("method ["+j+"] has been changed: "+ methods[j].getHandleIdentifier());
 		        			sensor.processActivity("msdt.exactcodechange.xsd",
-		        					"<?xml version=\"1.0\"?><microActivity><commonData><username>"
+                                    "<?xml version=\"1.0\"?><microActivity><commonData><version>1</version><creator>" + ECGEclipseSensor.CREATOR + "</creator><username>"
 		        	                + sensor.getUsername()
 		        	                + "</username><projectname>"
 		        	                + sensor.getProjectname()
@@ -221,7 +221,7 @@ public class ECGElementChangedListener implements IElementChangedListener, IPart
 		    		 	
 		    		 	if(children_2[i].getKind() == IJavaElementDelta.ADDED){ // if method was added
 		    		 		try{
-		    		 		ecg_event = "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+		    		 		ecg_event =                                                                 "<?xml version=\"1.0\"?><microActivity><commonData><version>1</version><creator>" + ECGEclipseSensor.CREATOR + "</creator><username>"
 		                        + sensor.getUsername()
 		                        + "</username><projectname>"
 		                        + sensor.getProjectname()
@@ -264,7 +264,7 @@ public class ECGElementChangedListener implements IElementChangedListener, IPart
 					    				new_elementname = clone.getElementName();
 					    			
 					    			// first, the identifier change
-					    			ecg_event = "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+					    			ecg_event =                                                                                 "<?xml version=\"1.0\"?><microActivity><commonData><version>1</version><creator>" + ECGEclipseSensor.CREATOR + "</creator><username>"
 				                        + sensor.getUsername()
 				                        + "</username><projectname>"
 				                        + sensor.getProjectname()
@@ -277,7 +277,7 @@ public class ECGElementChangedListener implements IElementChangedListener, IPart
 				    					+ "</codeOrIdentifier></change>"
 				                        + "</exactCodeChange></microActivity>";
 					    			// second, actual code change
-					    			ecg_event += "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+					    			ecg_event +=                                                                                 "<?xml version=\"1.0\"?><microActivity><commonData><version>1</version><creator>" + ECGEclipseSensor.CREATOR + "</creator><username>"
 				                        + sensor.getUsername()
 				                        + "</username><projectname>"
 				                        + sensor.getProjectname()
@@ -301,7 +301,7 @@ public class ECGElementChangedListener implements IElementChangedListener, IPart
 					    	}
 					    	if(!changed){ // if the method was not changed but removed...
 					    		methodtable.remove(method.getHandleIdentifier());
-					    		ecg_event = "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+					    		ecg_event =                                                                         "<?xml version=\"1.0\"?><microActivity><commonData><version>1</version><creator>" + ECGEclipseSensor.CREATOR + "</creator><username>"
 			                        + sensor.getUsername()
 			                        + "</username><projectname>"
 			                        + sensor.getProjectname()
@@ -323,7 +323,7 @@ public class ECGElementChangedListener implements IElementChangedListener, IPart
 					    	methodtable.remove(method.getHandleIdentifier());
 					    	try{
 					    	methodtable.put(method.getHandleIdentifier(), method.getSource());
-					    	ecg_event = "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+					    	ecg_event =                                                                 "<?xml version=\"1.0\"?><microActivity><commonData><version>1</version><creator>" + ECGEclipseSensor.CREATOR + "</creator><username>"
 		                        + sensor.getUsername()
 		                        + "</username><projectname>"
 		                        + sensor.getProjectname()

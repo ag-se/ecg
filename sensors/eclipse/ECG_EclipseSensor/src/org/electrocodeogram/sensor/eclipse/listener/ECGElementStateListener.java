@@ -32,7 +32,7 @@ public class ECGElementStateListener implements IElementStateListener {
 	 * @see org.eclipse.ui.texteditor.IElementStateListener#elementDeleted(java.lang.Object)
 	 */
 	public void elementDeleted(Object element) {
-		ECGEclipseSensor.logger.log(ECGLevel.INFO, "docDeleted: " + element);
+//		ECGEclipseSensor.logger.log(ECGLevel.INFO, "docDeleted: " + element);
 
 	}
 
@@ -40,7 +40,7 @@ public class ECGElementStateListener implements IElementStateListener {
 	 * @see org.eclipse.ui.texteditor.IElementStateListener#elementDirtyStateChanged(java.lang.Object, boolean)
 	 */
 	public void elementDirtyStateChanged(Object element, boolean isDirty) {
-		ECGEclipseSensor.logger.log(ECGLevel.INFO, "docDirtyStateChanged: " + element);
+//		ECGEclipseSensor.logger.log(ECGLevel.INFO, "docDirtyStateChanged: " + element);
 
 	}
 
@@ -48,7 +48,7 @@ public class ECGElementStateListener implements IElementStateListener {
 	 * @see org.eclipse.ui.texteditor.IElementStateListener#elementMoved(java.lang.Object, java.lang.Object)
 	 */
 	public void elementMoved(Object originalElement, Object movedElement) {
-		ECGEclipseSensor.logger.log(ECGLevel.INFO, "docMoved: " + originalElement + "->" + movedElement);
+//		ECGEclipseSensor.logger.log(ECGLevel.INFO, "docMoved: " + originalElement + "->" + movedElement);
 
 	}
 

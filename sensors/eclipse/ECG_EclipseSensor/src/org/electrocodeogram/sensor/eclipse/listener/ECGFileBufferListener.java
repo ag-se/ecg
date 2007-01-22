@@ -92,7 +92,7 @@ public class ECGFileBufferListener implements IFileBufferListener {
 
             this.sensor.processActivity(
                 "msdt.resource.xsd",
-                "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+                "<?xml version=\"1.0\"?><microActivity><commonData><version>1</version><creator>" + ECGEclipseSensor.CREATOR + "</creator><username>"
                     + this.sensor.username
                     + "</username><projectname>"
                     + ECGEclipseSensor.getProjectnameFromLocation(buffer.getLocation().toString())
@@ -119,7 +119,7 @@ public class ECGFileBufferListener implements IFileBufferListener {
 
         this.sensor.processActivity(
             "msdt.resource.xsd",
-            "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+            "<?xml version=\"1.0\"?><microActivity><commonData><version>1</version><creator>" + ECGEclipseSensor.CREATOR + "</creator><username>"
                 + this.sensor.username
                 + "</username><projectname>"
                 + ECGEclipseSensor.getProjectnameFromLocation(buffer.getLocation().toString())
@@ -144,7 +144,7 @@ public class ECGFileBufferListener implements IFileBufferListener {
 
         this.sensor.processActivity(
             "msdt.resource.xsd",
-            "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+            "<?xml version=\"1.0\"?><microActivity><commonData><version>1</version><creator>" + ECGEclipseSensor.CREATOR + "</creator><username>"
                 + this.sensor.username
                 + "</username><projectname>" 
                 + ECGEclipseSensor.getProjectnameFromLocation(buffer.getLocation().toString())

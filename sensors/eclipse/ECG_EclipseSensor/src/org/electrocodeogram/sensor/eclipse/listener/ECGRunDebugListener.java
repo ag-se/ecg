@@ -139,7 +139,7 @@ public class ECGRunDebugListener implements IDebugEventSetListener {
             
             this.sensor.processActivity(
                 "msdt.antrun.xsd",
-                "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+                "<?xml version=\"1.0\"?><microActivity><commonData><version>1</version><creator>" + ECGEclipseSensor.CREATOR + "</creator><username>"
                     + this.sensor.username
                     + "</username><id>"
                     + launch.hashCode()
@@ -161,7 +161,7 @@ public class ECGRunDebugListener implements IDebugEventSetListener {
             
             this.sensor.processActivity(
                 "msdt.run.xsd",
-                "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+                "<?xml version=\"1.0\"?><microActivity><commonData><version>1</version><creator>" + ECGEclipseSensor.CREATOR + "</creator><username>"
                     + this.sensor.username
                     + "</username><id>"
                     + launch.hashCode()
@@ -200,7 +200,7 @@ public class ECGRunDebugListener implements IDebugEventSetListener {
 
             this.sensor.processActivity(
                 "msdt.antrun.xsd",
-                "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+                "<?xml version=\"1.0\"?><microActivity><commonData><version>1</version><creator>" + ECGEclipseSensor.CREATOR + "</creator><username>"
                     + this.sensor.username
                     + "</username><id>"
                     + launch.hashCode()
@@ -222,7 +222,7 @@ public class ECGRunDebugListener implements IDebugEventSetListener {
             
             this.sensor.processActivity(
                 "msdt.run.xsd",
-                "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+                "<?xml version=\"1.0\"?><microActivity><commonData><version>1</version><creator>" + ECGEclipseSensor.CREATOR + "</creator><username>"
                     + this.sensor.username
                     + "</username><id>"
                     + launch.hashCode()

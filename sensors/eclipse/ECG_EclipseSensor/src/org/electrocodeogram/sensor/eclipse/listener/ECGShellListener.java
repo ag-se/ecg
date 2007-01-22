@@ -26,6 +26,8 @@ public class ECGShellListener implements ShellListener {
 
     private Document msdt_window_doc;
     
+    private Element window_version;
+    private Element window_creator;
     private Element window_username;
     private Element window_id;        
     private Element window_activity;
@@ -41,6 +43,8 @@ public class ECGShellListener implements ShellListener {
             Element window_microactivity = msdt_window_doc.createElement("microActivity");                
             Element window_commondata = msdt_window_doc.createElement("commonData");
             Element window_window = msdt_window_doc.createElement("window");
+            window_version = msdt_window_doc.createElement("version");
+            window_creator = msdt_window_doc.createElement("creator");
             window_username = msdt_window_doc.createElement("username");
             window_id = msdt_window_doc.createElement("id");
             window_activity = msdt_window_doc.createElement("activity");
@@ -48,6 +52,8 @@ public class ECGShellListener implements ShellListener {
 
             msdt_window_doc.appendChild(window_microactivity);
             window_microactivity.appendChild(window_commondata);
+            window_commondata.appendChild(window_version);
+            window_commondata.appendChild(window_creator);
             window_commondata.appendChild(window_username);
             window_commondata.appendChild(window_id);
             window_microactivity.appendChild(window_window);
@@ -81,6 +87,8 @@ public class ECGShellListener implements ShellListener {
         ECGEclipseSensor.logger.log(ECGLevel.PACKET,
             "A windowActivated event has been recorded.");
 
+        window_version.setTextContent("1");
+        window_creator.setTextContent(ECGEclipseSensor.CREATOR);
         window_username.setTextContent(this.sensor.username);
         window_id.setTextContent(String.valueOf(shell.hashCode()));
         window_activity.setTextContent("activated");
@@ -121,6 +129,8 @@ public class ECGShellListener implements ShellListener {
         ECGEclipseSensor.logger.log(ECGLevel.PACKET,
             "A windowClosed event has been recorded.");
 
+        window_version.setTextContent("1");
+        window_creator.setTextContent(ECGEclipseSensor.CREATOR);
         window_username.setTextContent(this.sensor.username);
         window_id.setTextContent(String.valueOf(shell.hashCode()));
         window_activity.setTextContent("closed");
@@ -161,6 +171,8 @@ public class ECGShellListener implements ShellListener {
         ECGEclipseSensor.logger.log(ECGLevel.PACKET,
             "A windowDeactivated event has been recorded.");
 
+        window_version.setTextContent("1");
+        window_creator.setTextContent(ECGEclipseSensor.CREATOR);
         window_username.setTextContent(this.sensor.username);
         window_id.setTextContent(String.valueOf(shell.hashCode()));
         window_activity.setTextContent("deactivated");
@@ -213,6 +225,8 @@ public class ECGShellListener implements ShellListener {
         ECGEclipseSensor.logger.log(ECGLevel.PACKET,
             "A windowOpened event has been recorded.");
 
+        window_version.setTextContent("1");
+        window_creator.setTextContent(ECGEclipseSensor.CREATOR);
         window_username.setTextContent(this.sensor.username);
         window_id.setTextContent(String.valueOf(shell.hashCode()));
         window_activity.setTextContent("opened");

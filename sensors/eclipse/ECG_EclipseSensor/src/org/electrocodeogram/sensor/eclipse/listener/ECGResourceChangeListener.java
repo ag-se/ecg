@@ -163,7 +163,7 @@ class ECGResourceChangeListener implements IResourceChangeListener {
 
                             processActivity(
                                 "msdt.resource.xsd",
-                                "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+                                "<?xml version=\"1.0\"?><microActivity><commonData><version>1</version><creator>" + ECGEclipseSensor.CREATOR + "</creator><username>"
                                                 + ECGEclipseSensor.this.username
                                                 + "</username><projectname>"
                                                 + ECGEclipseSensor.this.projectname
@@ -182,7 +182,7 @@ class ECGResourceChangeListener implements IResourceChangeListener {
 
                             processActivity(
                                 "msdt.resource.xsd",
-                                "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+                                "<?xml version=\"1.0\"?><microActivity><commonData><version>1</version><creator>" + ECGEclipseSensor.CREATOR + "</creator><username>"
                                                 + ECGEclipseSensor.this.username
                                                 + "</username><projectname>"
                                                 + ECGEclipseSensor.this.projectname
@@ -209,7 +209,7 @@ class ECGResourceChangeListener implements IResourceChangeListener {
 
                                 processActivity(
                                     "msdt.resource.xsd",
-                                    "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+                                    "<?xml version=\"1.0\"?><microActivity><commonData><version>1</version><creator>" + ECGEclipseSensor.CREATOR + "</creator><username>"
                                                     + ECGEclipseSensor.this.username
                                                     + "</username><projectname>"
                                                     + ECGEclipseSensor.this.projectname

@@ -62,7 +62,7 @@ public class ECGDisplayListener implements Listener {
                         "A dialogOpened event has been recorded.");
                     this.sensor.processActivity(
                         "msdt.dialog.xsd",
-                        "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+                        "<?xml version=\"1.0\"?><microActivity><commonData><version>1</version><creator>" + ECGEclipseSensor.CREATOR + "</creator><username>"
                             + this.sensor.username
                             + "</username><id>"
                             + shell.hashCode()
@@ -75,7 +75,7 @@ public class ECGDisplayListener implements Listener {
                     "A dialogActivated event has been recorded.");
                 this.sensor.processActivity(
                     "msdt.dialog.xsd",
-                    "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+                    "<?xml version=\"1.0\"?><microActivity><commonData><version>1</version><creator>" + ECGEclipseSensor.CREATOR + "</creator><username>"
                         + this.sensor.username
                         + "</username><id>"
                         + shell.hashCode()
@@ -88,7 +88,7 @@ public class ECGDisplayListener implements Listener {
                     "A dialogDeactivated event has been recorded.");
                 this.sensor.processActivity(
                     "msdt.dialog.xsd",
-                    "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+                    "<?xml version=\"1.0\"?><microActivity><commonData><version>1</version><creator>" + ECGEclipseSensor.CREATOR + "</creator><username>"
                         + this.sensor.username
                         + "</username><id>"
                         + shell.hashCode()
@@ -104,7 +104,7 @@ public class ECGDisplayListener implements Listener {
                         "A dialogDeactivated event has been recorded.");
                     this.sensor.processActivity(
                         "msdt.dialog.xsd",
-                        "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+                        "<?xml version=\"1.0\"?><microActivity><commonData><version>1</version><creator>" + ECGEclipseSensor.CREATOR + "</creator><username>"
                             + this.sensor.username
                             + "</username><id>"
                             + shell.hashCode()
@@ -116,7 +116,7 @@ public class ECGDisplayListener implements Listener {
                         "A dialogClosed event has been recorded.");
                     this.sensor.processActivity(
                         "msdt.dialog.xsd",
-                        "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+                        "<?xml version=\"1.0\"?><microActivity><commonData><version>1</version><creator>" + ECGEclipseSensor.CREATOR + "</creator><username>"
                             + this.sensor.username
                             + "</username><id>"
                             + shell.hashCode()
