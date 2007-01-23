@@ -6,8 +6,8 @@
 	<classpathentry kind="lib" path="/ECG_Lab/dist/lib/ecg_lab.jar"/>
 	<classpathentry kind="lib" path="/ECG_Lab/dist/lib/ecg_moduleapi.jar"/>
 	<classpathentry kind="lib" path="/ECG_Lab/dist/lib/ecg_support.jar"/>
-	<classpathentry kind="var" path="MYSQL_DRIVER"/>
-	<classpathentry kind="lib" path="lib/xbean.jar"/>
 	<classpathentry kind="lib" path="lib/ecgDatabaseTargetModule.jar"/>
+	<classpathentry kind="var" path="JDBC_DRIVER"/>
+	<classpathentry kind="var" path="XMLBEANS/lib/xbean.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
