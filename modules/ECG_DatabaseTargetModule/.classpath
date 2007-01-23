@@ -2,13 +2,13 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="lib/resolver.jar"/>
-	<classpathentry kind="lib" path="lib/xbean.jar"/>
 	<classpathentry kind="lib" path="/ECG_Lab/dist/lib/ecg_lab.jar"/>
 	<classpathentry kind="lib" path="/ECG_Lab/dist/lib/ecg_moduleapi.jar"/>
 	<classpathentry kind="lib" path="/ECG_Lab/dist/lib/ecg_support.jar"/>
-	<classpathentry kind="lib" path="/ECG_Lab/lib/misc/jsr173_1.0_api.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ECG_Lab"/>
-	<classpathentry kind="lib" path="/ECG_Lab/dist/lib/misc/mysql-connector-java-5.0.3-bin.jar"/>
+	<classpathentry kind="var" path="XMLBEANS/lib/jsr173_1.0_api.jar"/>
+	<classpathentry kind="var" path="XMLBEANS/lib/resolver.jar"/>
+	<classpathentry kind="var" path="XMLBEANS/lib/xbean.jar"/>
+	<classpathentry kind="var" path="JDBC_DRIVER"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

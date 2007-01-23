@@ -26,6 +26,12 @@
 	
 	<property name="sourceModule.dir" value="../ECG_DatabaseSourceModule"/>
 
+	<!-- include local jdbc driver -->
+	<property name="jdbc.driver.dir" value="C:/Program Files/Java/mysql-connector-java-5.0.3/"/>
+
+	<!-- include apache xmlbeans library -->
+	<property name="xmlbeans.dir" value="C:/Program Files/Java/xmlbeans-2.2.0/"/>
+
 	<!-- Classpath setting -->
 	<path id="classpath">
 
@@ -34,6 +40,15 @@
 			<include name="**/*.jar/"/>			
 		</fileset>
 		
+		<!-- include local jdbc driver -->
+		<fileset dir="${jdbc.driver.dir}">
+			<include name="*.jar"/>
+		</fileset>
+		
+		<!-- include apache xmlbeans library -->
+		<fileset dir="${xmlbeans.dir}">
+			<include name="*.jar"/>
+		</fileset>
 		
 		<fileset dir="${support.dir}/dist/lib">
 			<include name="**/ecg_support.jar/"/>			
@@ -117,9 +132,10 @@
 
 		<echo message="Deploying ${ant.project.name}"/>
 
-		<!-- Create the distribuition directories -->
+		<!-- Create the distribution directories -->
 		<mkdir dir="${dist.dir}"/>
 		<mkdir dir="${dist.dir}/${ant.project.name}"/>
+		<mkdir dir="${dist.dir}/lib"/>
 		<mkdir dir="${dist.dir}/doc"/>
 
 		<!-- Copy the libraries -->
@@ -130,24 +146,18 @@
 
 		</copy>
 		
-		<!-- Create the distribution directories -->
-		<mkdir dir="${dist.dir}"/>
-		<mkdir dir="${dist.dir}/lib"/>
-		<mkdir dir="${dist.dir}/doc"/>
-
-	
 		<!-- Package classes into jar. -->
 		<jar
 				compress="true"
 				duplicate="fail"
-				jarfile="${dist.dir}/lib/ecg_targetModule.jar"
+				jarfile="${dist.dir}/lib/ecgDatabaseTargetModule.jar"
 				basedir="${build.dir}" />
 
 						
 		<!-- Copy the JAR to the other projects -->
 		<copy todir="${sourceModule.dir}/lib/">
 
-				<fileset dir="${dist.dir}/lib" includes="ecg_targetModule.jar" />
+				<fileset dir="${dist.dir}/lib" includes="ecgDatabaseTargetModule.jar" />
 
 		</copy>
 		
