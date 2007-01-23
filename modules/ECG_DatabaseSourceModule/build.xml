@@ -16,8 +16,6 @@
 	<property name="build.dir" value="bin"/>
 
 	<property name="lib.dir" value="lib"/>
-	
-	
 
 	<!-- Dependend project directories -->
 	<property name="support.dir" value="../ECG_Support"/>
@@ -28,6 +26,9 @@
 	
 	<property name="targetModule.dir" value="../ECG_DatabaseTargetModule"/>
 
+	<!-- include local mysql driver -->
+	<property name="mysql.driver.dir" value="C:/Program Files/Java/mysql-connector-java-5.0.3/"/>
+
 	<!-- Classpath setting -->
 	<path id="classpath">
 
@@ -36,6 +37,10 @@
 			<include name="**/*.jar/"/>			
 		</fileset>
 		
+		<!-- include local mysql driver -->
+		<fileset dir="${mysql.driver.dir}">
+			<include name="*.jar"/>
+		</fileset>
 		
 		<fileset dir="${support.dir}/dist/lib">
 			<include name="**/ecg_support.jar/"/>			
