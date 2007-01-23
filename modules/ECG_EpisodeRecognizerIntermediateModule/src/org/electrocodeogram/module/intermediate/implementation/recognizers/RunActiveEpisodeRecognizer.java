@@ -239,11 +239,18 @@ public class RunActiveEpisodeRecognizer extends AbstractSingleEpisodeRecognizer 
     /**
      * @see java.lang.Object#equals(java.lang.Object)
      */
-    @Override
     public boolean equals(Object obj) {
-        // TODO currently only allow ONE SINGLE recognizer of this type!
-        return true;
+        if((obj == null) || (obj.getClass() != this.getClass())) return false;
+        if(obj == this) return true;
+        RunActiveEpisodeRecognizer runActiveRecog = (RunActiveEpisodeRecognizer)obj;
+        if (runActiveRecog.getId() != null && this.activeRunId != null &&
+                runActiveRecog.getId().equals(this.activeRunId))
+            return true;
+        return false;
+    }
+
+    public Object getId() {
+        return this.activeRunId;
     }
 	
-
 }

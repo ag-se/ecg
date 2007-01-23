@@ -242,11 +242,19 @@ public class AntActiveEpisodeRecognizer extends AbstractSingleEpisodeRecognizer 
     /**
      * @see java.lang.Object#equals(java.lang.Object)
      */
-    @Override
     public boolean equals(Object obj) {
-        // TODO currently only allow ONE SINGLE recognizer of this type!
-        return true;
+        if((obj == null) || (obj.getClass() != this.getClass())) return false;
+        if(obj == this) return true;
+        AntActiveEpisodeRecognizer antActiveRecog = (AntActiveEpisodeRecognizer)obj;
+        if (antActiveRecog.getId() != null && this.activeAntId != null &&
+                antActiveRecog.getId().equals(this.activeAntId))
+            return true;
+        return false;
     }
-	
+
+    public Object getId() {
+        return this.activeAntId;
+    }
+    
 
 }
