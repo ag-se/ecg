@@ -82,7 +82,7 @@ public final class ECGEclipseSensor {
     /**
      * This constant specifies the name of the Sensor.
      */
-    static public final String CREATOR = "ECGEclipseSensor1.2";
+    static public final String CREATOR = "ECGEclipseSensor1.1.5";
 
     /**
      * This is the name of the user, who is running <em>Eclipse</em>.
@@ -493,14 +493,24 @@ public final class ECGEclipseSensor {
         return theInstance;
     }
 
-    static public String getFilenameFromPart(IWorkbenchPart part) {
+    static public String getLocationFromPart(IWorkbenchPart part) {
         String location = part.getTitleToolTip();
+        String title = part.getTitle();
         if (location == null || location.length() == 0)
-            location = part.getTitle();
-        if (location == null) {
+            location = title;
+        if (location == null)
             return "{null}";
+        if (title != null) {
+            String[] suffixes = {".class"};
+            for (int i = 0; i < suffixes.length; i++)
+                if (!location.endsWith(suffixes[i]) && title.endsWith(suffixes[i]))
+                    location = location + suffixes[i];
         }
-        return getFilenameFromLocation(location);
+        return location;
+    }
+    
+    static public String getFilenameFromPart(IWorkbenchPart part) {
+        return getFilenameFromLocation(getLocationFromPart(part));
     }
 
     static public String getFilenameFromLocation(String location) {
@@ -513,18 +523,14 @@ public final class ECGEclipseSensor {
         		String res = location.substring(sepIndex+1);
         		return res;
         	}
+            else
+                return location;
         }
     	return "";
 	}
 
 	static public String getProjectnameFromPart(IWorkbenchPart part) {
-        String location = part.getTitleToolTip();
-        if (location == null || location.length() == 0)
-            location = part.getTitle();
-        if (location == null) {
-            return "{null}";
-        }
-        return getProjectnameFromLocation(location);
+        return getProjectnameFromLocation(getLocationFromPart(part));
     }
     
     static public String getProjectnameFromLocation(String location) {
