@@ -136,6 +136,8 @@ public class ECGRunDebugListener implements IDebugEventSetListener {
             		target = args[i];
             	}
             }
+            if ("".equals(target))
+                target = "{default}";
             
             this.sensor.processActivity(
                 "msdt.antrun.xsd",
