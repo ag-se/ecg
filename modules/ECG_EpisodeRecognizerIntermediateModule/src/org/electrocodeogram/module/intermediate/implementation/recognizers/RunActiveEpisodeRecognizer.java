@@ -103,7 +103,7 @@ public class RunActiveEpisodeRecognizer extends AbstractSingleEpisodeRecognizer 
                 runactive_projectname = msdt_runactive_doc.createElement("projectname");
                 runactive_endtime = msdt_runactive_doc.createElement("endtime");
                 runactive_duration = msdt_runactive_doc.createElement("duration");
-                runactive_launchname = msdt_runactive_doc.createElement("launchname");
+                runactive_launchname = msdt_runactive_doc.createElement("launch");
                 runactive_launchtype = msdt_runactive_doc.createElement("mode");
         
                 msdt_runactive_doc.appendChild(runactive_microactivity);

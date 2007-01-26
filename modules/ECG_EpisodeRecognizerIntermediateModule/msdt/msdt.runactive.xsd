@@ -16,7 +16,7 @@
 				<xs:element name="projectname" type="xs:token"/>
 				<xs:element name="endtime" type="xs:string"/>
 				<xs:element name="duration" type="xs:long"/>
-				<xs:element name="launchname" type="xs:normalizedString"/>
+				<xs:element name="launch" type="xs:normalizedString"/>
 				<xs:element name="mode" type="xs:normalizedString"/>
 			</xs:sequence>
 		</xs:complexType>

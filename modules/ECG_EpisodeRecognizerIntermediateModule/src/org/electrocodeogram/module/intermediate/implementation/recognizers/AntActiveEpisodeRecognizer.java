@@ -225,6 +225,8 @@ public class AntActiveEpisodeRecognizer extends AbstractSingleEpisodeRecognizer 
 		
 		if (duration < minDur)
 			return null;
+        if (target == null || target.length() == 0)
+            target = "{default}";
         
         antactive_projectname.setTextContent(projectname);
         antactive_username.setTextContent(username);
