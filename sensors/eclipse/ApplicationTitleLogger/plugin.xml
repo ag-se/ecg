@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.startup">
+   </extension>
+
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            name="ApplicationTitleLogger"
+            class="de.fu_berlin.inf.atl.preferences.ATLPreferencePage"
+            id="de.fu_berlin.inf.atl.preferences.ATLPreferencePage">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="de.fu_berlin.inf.atl.preferences.PreferenceInitializer">
+      </initializer>
+   </extension>
+
+</plugin>

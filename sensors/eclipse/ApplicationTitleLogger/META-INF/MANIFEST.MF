@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: ApplicationTitleSensor Plug-in
+Bundle-SymbolicName: de.fu_berlin.inf.atl;singleton:=true
+Bundle-Version: 1.0.0
+Bundle-Activator: de.fu_berlin.inf.atl.ATLPlugin
+Bundle-Vendor: FU Berlin
+Bundle-Localization: plugin
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.electrocodeogram.sensor.eclipse
+Eclipse-LazyStart: true

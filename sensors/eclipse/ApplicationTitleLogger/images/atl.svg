@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://web.resource.org/cc/"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://inkscape.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="744.09448819"
+   height="1052.3622047"
+   id="svg2"
+   sodipodi:version="0.32"
+   inkscape:version="0.43"
+   sodipodi:docbase="D:\Workspaces\3.2M6\ATLSWT\images"
+   sodipodi:docname="atl.svg"
+   inkscape:export-filename="d:\atl-128.png"
+   inkscape:export-xdpi="29.959999"
+   inkscape:export-ydpi="29.959999">
+  <defs
+     id="defs4">
+    <linearGradient
+       id="linearGradient2192">
+      <stop
+         style="stop-color:#641621;stop-opacity:1;"
+         offset="0"
+         id="stop2194" />
+      <stop
+         style="stop-color:#2c1621;stop-opacity:1;"
+         offset="1"
+         id="stop2196" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient2184">
+      <stop
+         style="stop-color:#6495ed;stop-opacity:1;"
+         offset="0"
+         id="stop2186" />
+      <stop
+         style="stop-color:#ffffff;stop-opacity:1;"
+         offset="1"
+         id="stop2188" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient2184"
+       id="linearGradient2190"
+       x1="114.13708"
+       y1="83.625893"
+       x2="60.59901"
+       y2="48.280704"
+       gradientUnits="userSpaceOnUse"
+       spreadMethod="pad" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient2192"
+       id="linearGradient2198"
+       x1="146.34662"
+       y1="-26.649157"
+       x2="177.2596"
+       y2="-31.669306"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(6.061104,0,3.886422e-17,6.061104,-497.6267,175.3673)" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="15.839192"
+     inkscape:cx="119.34681"
+     inkscape:cy="950.96873"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     inkscape:window-width="1280"
+     inkscape:window-height="927"
+     inkscape:window-x="-4"
+     inkscape:window-y="-4" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <rect
+       style="fill:url(#linearGradient2198);fill-opacity:1;stroke:none;stroke-width:2.00000763;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect1309"
+       width="316.27756"
+       height="98.726364"
+       x="254.42802"
+       y="-65.947746"
+       rx="17.172678"
+       ry="0"
+       transform="matrix(0.707107,0.707107,-0.707107,0.707107,0,0)" />
+    <path
+       sodipodi:type="arc"
+       style="fill:url(#linearGradient2190);fill-opacity:1;stroke:#454545;stroke-width:2;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path1307"
+       sodipodi:cx="89.90358"
+       sodipodi:cy="65.443146"
+       sodipodi:rx="23.233509"
+       sodipodi:ry="23.233509"
+       d="M 113.13709 65.443146 A 23.233509 23.233509 0 1 1  66.670071,65.443146 A 23.233509 23.233509 0 1 1  113.13709 65.443146 z"
+       transform="matrix(6.061101,0,0,6.061101,-332.3629,-208.5661)" />
+    <text
+       xml:space="preserve"
+       style="font-size:162.78132629px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Impact"
+       x="103.93816"
+       y="252.43297"
+       id="text2218"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan2220"
+         x="103.93816"
+         y="252.43297">ATL</tspan></text>
+  </g>
+</svg>

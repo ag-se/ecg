@@ -1,0 +1,53 @@
+# nmakefile 05/28/1999
+# nmakefile makefile for the example demonstrating NT Process enumaration with 
+# JNI.
+
+#
+# Change next line to reflect your setting or pass this in the command line argumment:
+JDK		= D:\Dev\Java\jdk
+#
+SUFFIX		=
+#
+# Variables.
+#
+CLASSES	   	=de\fu_berlin\inf\atl\ntps\Main.class de\fu_berlin\inf\atl\ntps\NTProcess.class de\fu_berlin\inf\atl\ntps\MemoryInfo.class
+OBJS	   	=Process.obj
+CFLAGS	   	=-nologo -Zi -DWIN32 -I$(JDK)\include -I$(JDK)\include\win32
+.SUFFIXES: 	.java .class
+
+run: build FORCE
+	$(JDK)\bin\java.exe Main
+
+build: checkjdk $(CLASSES) NTPS$(SUFFIX).dll FORCE
+
+#
+# Build .class files.
+#
+.java.class:
+	$(JDK)\bin\javac de\fu_berlin\inf\atl\ntps\*.java
+
+#
+# Run javah.
+#
+.class.h:
+	$(JDK)\bin\javah -classpath d:\dev\ntps\x\ -jni de.fu_berlin.inf.atl.ntps.NTProcess
+
+#
+# Build .c files.
+#
+NTPS$(SUFFIX).dll: $(OBJS)
+	link -nologo -debug -dll -out:$@ $?
+
+#
+# check jdk instalation
+# 
+checkjdk: $(JDK)\bin\java.exe
+
+FORCE: ;
+
+#
+# delete files
+#
+clean:
+	-del *.class *.dll *.obj *.pdb *.exp *.lib *.exp *.ilk
+	-del NTProcess.h

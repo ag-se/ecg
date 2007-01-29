@@ -1,0 +1,4 @@
+
+Various resources from the net were used to develop this application:
+
+  * NT Process Service JNI Example code: Iulian Tarhon
