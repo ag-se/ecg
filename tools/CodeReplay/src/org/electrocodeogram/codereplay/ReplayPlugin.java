@@ -1,4 +1,4 @@
-package org.electrocodeogram.codereplay.replayPlugin;
+package org.electrocodeogram.codereplay;
 
 import org.eclipse.ui.plugin.*;
 import org.eclipse.jface.resource.ImageDescriptor;

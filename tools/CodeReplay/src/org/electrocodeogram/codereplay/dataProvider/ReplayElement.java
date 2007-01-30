@@ -18,7 +18,7 @@ import org.xml.sax.*;
  * 
  * @author marco kranz
  */
-public class ReplayElement {
+public class ReplayElement implements Comparable{
 
 	// TODO: add finals for type of change
 	// replay name the element belongs to
@@ -29,6 +29,8 @@ public class ReplayElement {
 	private String exact_change;
 	// timestamp
 	private Date timestamp;
+    // ordinal - the number of the event
+    private int ordinal;
 	// unique identifier of the replay this element belongs to
 	private String identifier;
 	// complete source of that element
@@ -46,8 +48,11 @@ public class ReplayElement {
 	 * @param identifier internal identifier
 	 * @param source the complete source(text)
 	 */
-	public ReplayElement(Date ts, String[] path, String change, String name, String identifier, String source) {
-		timestamp = ts;
+	public ReplayElement(Date ts, int ordinal, String[] path, 
+                         String change, String name, 
+                         String identifier, String source) {
+		this.timestamp = ts;
+        this.ordinal = ordinal;
 		this.path = path;
 		this.exact_change = change;
 		this.identifier = identifier;
@@ -134,6 +139,14 @@ public class ReplayElement {
 	}
 	
 	
+    /**
+     * @return timestamp of creation
+     */
+    public int getOrdinal() {
+        return ordinal;
+    }
+    
+    
 	/**
 	 * @return the internal identifier
 	 */
@@ -149,7 +162,19 @@ public class ReplayElement {
 		for(int i =0; i<path.length; i++){
 			p = p+"/"+path[i];
 		}
-		return "Replay Element: Name: "+name+" Path: "+p+" Change: "+exact_change+" Timestamp: "+timestamp+" Identifier: "+identifier+" Source: "+source+" "+diff;
+		return "Replay Element: Name: "+name+" Path: "+p+" Change: "+exact_change+" Timestamp: "+timestamp+" (Ordinal:"+ordinal+") Identifier: "+identifier+" Source: "+source+" "+diff;
 	}
+
+
+    public int compareTo(Object o) {
+        if (!this.getClass().isInstance(o))
+            return 0;
+        ReplayElement ro = (ReplayElement)o;
+        int datecomp = this.getTimestamp().compareTo(ro.getTimestamp());
+        if (datecomp == 0)
+            return this.ordinal - ro.getOrdinal();
+        else
+            return datecomp;
+    }
 
 }

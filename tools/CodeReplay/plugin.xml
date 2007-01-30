@@ -6,8 +6,7 @@
 	<extension
          point="org.eclipse.ui.views">
       <view
-            name="Replay View"
-            icon="icons/sample.gif"
+            name="Code Replay View"
             class="org.electrocodeogram.codereplay.userInterface.ReplayView"
             id="org.electrocodeogram.codereplay.userInterface.ReplayView">
       </view>
@@ -15,8 +14,7 @@
    <extension
          point="org.eclipse.ui.views">
       <view
-            name="Replay Tree View"
-            icon="icons/sample.gif"
+            name="Code Replay Tree View"
             class="org.electrocodeogram.codereplay.userInterface.ReplayTreeView"
             id="org.electrocodeogram.codereplay.userInterface.ReplayTreeView">
       </view>
@@ -25,7 +23,7 @@
          point="org.eclipse.ui.perspectives">
          <perspective 
             id="org.electrocodeogram.codereplay.userInterface.ReplayPerspective" 
-            name="Replay Plugin" 
+            name="CodeReplay Plugin" 
             class="org.electrocodeogram.codereplay.userInterface.ReplayPerspective">  
         </perspective> 
    </extension>

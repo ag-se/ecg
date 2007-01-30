@@ -84,9 +84,11 @@ public class ElementListContentProvider extends LabelProvider implements IStruct
 	 */
 	public String getText(Object obj) {
 		if(obj instanceof ReplayElement){
-			Date date = ((ReplayElement)obj).getTimestamp();
+            ReplayElement elem = ((ReplayElement)obj); 
+			Date date = elem.getTimestamp();
 			String timestamp = new SimpleDateFormat("dd.MM.yy, HH:mm:ss").format(date);
-			return timestamp;
+            String changetype = elem.getExactChange();
+			return timestamp + " - " + changetype;
 		}
 		else
 			return "";

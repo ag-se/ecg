@@ -38,7 +38,7 @@ public class EventReader extends AbstractReader{
 	private Date timestamp;
 	
 	private static EventReader reader = null;
-
+    
 	int counter;
 	
 	private EventReader(){
@@ -67,7 +67,7 @@ public class EventReader extends AbstractReader{
 	 * @see org.electrocodeogram.codereplay.eventIO.AbstractReader#openFile(java.io.File)
 	 */
 	public void openFile(File file) {
-		System.out.println("enter openfile: "+DateFormat.getInstance().format(Calendar.getInstance().getTime()));
+		//System.out.println("enter openfile: "+DateFormat.getInstance().format(Calendar.getInstance().getTime()));
 		String line = null;
 		counter = 0;
 		BufferedReader reader = null;
@@ -191,7 +191,7 @@ public class EventReader extends AbstractReader{
 				e.printStackTrace();
 			}
 		}
-		System.out.println("noOfElements: "+counter+" "+DateFormat.getInstance().format(Calendar.getInstance().getTime()));
+		//System.out.println("noOfElements: "+counter+" "+DateFormat.getInstance().format(Calendar.getInstance().getTime()));
 	}
 	
 	
@@ -226,7 +226,7 @@ public class EventReader extends AbstractReader{
 			// get type of change
 			list = doc.getElementsByTagName("typeOfChange");
 			String change = list.item(0).getTextContent();
-			// get element name
+            // get element name
 			list = doc.getElementsByTagName("elementName");
 			String name = list.item(0).getTextContent();
 			name.replace("]]&gt;","]]>");
@@ -239,7 +239,7 @@ public class EventReader extends AbstractReader{
 			String identifier = list.item(0).getTextContent();
 			identifier.replace("]]&gt;","]]>");
 			ReplayElement repelem;
-			repelem = new ReplayElement(timestamp, path, change, name, identifier, code);
+			repelem = new ReplayElement(timestamp, counter, path, change, name, identifier, code);
 			DataProvider.getInstance().insertReplayElement(repelem);
 		}	
 	}

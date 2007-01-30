@@ -14,18 +14,18 @@ import java.util.*;
 public class Replay {
 
 	// the list contains all replay elements in chronological order
-	private TreeMap map;
+	private TreeSet<ReplayElement> set;
 	// pointer storing the current replay position 
-	private Date current_date;
+	private ReplayElement current;
 	
 	
 	/**
 	 * @param element the initial ReplayElement
 	 */
 	public Replay(ReplayElement element) {
-		map = new TreeMap();
+		set = new TreeSet<ReplayElement>();
 		addReplayElement(element);
-		current_date = element.getTimestamp();
+		current = element;
 	}
 	
 	
@@ -38,8 +38,8 @@ public class Replay {
 	synchronized void addReplayElement(ReplayElement element){
 		/*if("removed".equals(element.getChange()) && element.getTimestamp().before(getLastElement().getTimestamp()))
 			return;*/
-		map.put(element.getTimestamp(), element);
-		ReplayElement previous = getPreviousElement(element.getTimestamp());
+		set.add(element);
+		ReplayElement previous = getPreviousElement(element);
 		Diff diff = new Diff(0, 0, "");
 		if(previous != null){
 			String oldcode = previous.getSource();
@@ -50,7 +50,7 @@ public class Replay {
 			}catch(Exception e){e.printStackTrace();}
 		}
 		element.setDiff(diff);
-		current_date = (Date)map.firstKey();
+		current = set.first();
 	}
 	
 	
@@ -58,7 +58,7 @@ public class Replay {
 	 * @return a Collection of all {@link ReplayElement}s of this Replay
 	 */
 	public synchronized Collection getElements(){
-		return map.values();
+		return set;
 	}
 	
 	
@@ -67,7 +67,7 @@ public class Replay {
 	 */
 	// not possible??
 	private synchronized boolean isEmpty(){
-		if(map.isEmpty())
+		if(set.isEmpty())
 			return true;
 		return false;
 	}
@@ -79,7 +79,7 @@ public class Replay {
 	public synchronized ReplayElement getLastElement(){
 		if(isEmpty())
 			return null;
-		return (ReplayElement)map.get(map.lastKey());
+		return set.last();
 	}
 	
 	/**
@@ -88,7 +88,7 @@ public class Replay {
 	public synchronized ReplayElement getFirstElement(){
 		if(isEmpty())
 			return null;
-		return (ReplayElement)map.get(map.firstKey());
+		return set.first();
 	}
 	
 	/**
@@ -97,7 +97,7 @@ public class Replay {
 	public synchronized ReplayElement getNextElement(){
 		if(isEmpty())
 			return null;
-		return getNextElement(current_date);
+		return getNextElement(current);
 	}
 	
 	/**
@@ -106,7 +106,7 @@ public class Replay {
 	public synchronized ReplayElement getPreviousElement(){
 		if(isEmpty())
 			return null;
-		return getPreviousElement(current_date);
+		return getPreviousElement(current);
 	}
 
 	
@@ -114,7 +114,7 @@ public class Replay {
 	 * @return the currently active ReplayElement
 	 */
 	public synchronized ReplayElement getCurrentElement(){
-		return (ReplayElement)map.get(current_date);
+		return current;
 	}
 
 	
@@ -122,14 +122,14 @@ public class Replay {
 	 * @return the internal unique identifier of this Replay
 	 */
 	public synchronized String getIdentifier() {
-		return ((ReplayElement)map.get(current_date)).getIdentifier();
+		return current.getIdentifier();
 	}
 
 	/**
 	 * @return true if there are enough elements for a replay(no. elements > 1), false otherwise
 	 */
 	public synchronized boolean hasEnoughElements(){
-		if(map.size() > 1) 
+		if(set.size() > 1) 
 			return true;
 		else 
 			return false;
@@ -142,7 +142,7 @@ public class Replay {
 	 * @return the name of this Replay
 	 */
 	public synchronized String getName(){
-		return ((ReplayElement)map.get(current_date)).getName();
+		return current.getName();
 	}
 	
 	/**
@@ -150,9 +150,9 @@ public class Replay {
 	 * In case the pointer is already at the last position nothing will be done.
 	 */
 	synchronized void incrementPosition(){
-		ReplayElement temp = getNextElement(current_date);
+		ReplayElement temp = getNextElement(current);
 		if(temp != null){
-			current_date = temp.getTimestamp();
+			current = temp;
 			//DataProvider.getDataProvider().modelChanged(ModelChangeEvent.REPLAY_CHANGED, this);
 		}
 	}
@@ -162,9 +162,9 @@ public class Replay {
 	 * In case the pointer is already at the first position nothing will be done.
 	 */
 	synchronized void decrementPosition(){
-		ReplayElement temp = getPreviousElement(current_date);
+		ReplayElement temp = getPreviousElement(current);
 		if(temp != null){
-			current_date = temp.getTimestamp();
+			current = temp;
 			//DataProvider.getDataProvider().modelChanged(ModelChangeEvent.REPLAY_CHANGED, this);
 		}
 	}
@@ -174,7 +174,7 @@ public class Replay {
 	 * Moves internal pointer to last position(if possible).
 	 */
 	synchronized void jumpToLastPosition(){
-		current_date = getLastElement().getTimestamp();
+		current = getLastElement();
 		//DataProvider.getDataProvider().modelChanged(ModelChangeEvent.REPLAY_CHANGED, this);
 	}
 	
@@ -182,7 +182,7 @@ public class Replay {
 	 * Moves internal pointer to first position(if possible).
 	 */
 	synchronized void jumpToFirstPosition(){
-		current_date = getFirstElement().getTimestamp();
+		current = getFirstElement();
 		//DataProvider.getDataProvider().modelChanged(ModelChangeEvent.REPLAY_CHANGED, this);
 	}
 	
@@ -192,7 +192,7 @@ public class Replay {
 	 * @return true if pointer points on first element, false otherwise
 	 */
 	public synchronized boolean isStartOfReplay(){
-		if(current_date.equals(map.get(map.firstKey())))
+		if(current.equals(set.first()))
 			return true;
 		return false;
 	}
@@ -201,7 +201,7 @@ public class Replay {
 	 * @return true if pointer points on last element, false otherwise
 	 */
 	public synchronized boolean isEndOfReplay(){
-		if(current_date.equals(map.lastKey()))
+		if(current.equals(set.last()))
 			return true;
 		return false;
 	}
@@ -211,7 +211,7 @@ public class Replay {
 	 * @return a String representation of this Replay
 	 */
 	public synchronized String toString(){
-		return ((ReplayElement)map.get(current_date)).getName();
+		return current.getName();
 	}
 	
 	/**
@@ -221,7 +221,7 @@ public class Replay {
 	 * @return the path of this Replay as a String array. Can be of length 0!
 	 */
 	public synchronized String[] getPath(){
-		return ((ReplayElement)map.get(current_date)).getPath();
+		return current.getPath();
 	}
 	
 	
@@ -229,7 +229,7 @@ public class Replay {
 	 * @return the number of ReplayElements in this Replay
 	 */
 	public synchronized int getSize(){
-		return map.size();
+		return set.size();
 	}
 	
 	/**
@@ -238,7 +238,7 @@ public class Replay {
 	 * @return the path as a String instead of a String array
 	 */
 	public synchronized String getFullPathAsString(){
-		String[] temp = ((ReplayElement)map.get(current_date)).getPath();
+		String[] temp = current.getPath();
 		String result = "";
 		for(int i = 0; i < temp.length; i++){
 			result = result +"/"+ temp[i];
@@ -254,7 +254,7 @@ public class Replay {
 	/*public synchronized ReplayElement getElementAt(int pos){
 		SortedMap submap;
 		if(pos >= 0){
-			submap = map.headMap(current_date);
+			submap = set.headMap(current);
 			if(submap.size() >= pos){
 				for(int i = 0; i < pos-1; i++){
 					submap = submap.headMap(submap.lastKey());
@@ -269,24 +269,24 @@ public class Replay {
 	}*/
 	
 	// get next element by timestamp
-	private ReplayElement getNextElement(Date pos){
+	private ReplayElement getNextElement(ReplayElement pos){
 		ReplayElement result = getCurrentElement();
-		SortedMap tail = map.tailMap(pos); // includes all elems with keys >= pos!
-		Iterator it = tail.keySet().iterator();
+		SortedSet<ReplayElement> tail = set.tailSet(pos); // includes all elems with keys >= pos!
+		Iterator<ReplayElement> it = tail.iterator();
 		if(tail.size() > 1){
-			it.next();						// move iterator to first element(current_position)
-			result = (ReplayElement)tail.get(it.next());
+            it.next(); // skip current
+			result = it.next(); // move iterator to element after current
 		}
 		return result;
 	}
 	
 	// get previous element by timestamp
-	private ReplayElement getPreviousElement(Date pos){
+	private ReplayElement getPreviousElement(ReplayElement pos){
 		ReplayElement result = null;
-		SortedMap head = map.headMap(pos);
+		SortedSet<ReplayElement> head = set.headSet(pos);
 		//System.out.println("head: "+head+" size "+head.size());
 		if(head.size() > 0)
-			result = (ReplayElement)head.get(head.lastKey());
+			result = head.last();
 		return result;
 	}
 
@@ -298,7 +298,7 @@ public class Replay {
 	 */
 	public synchronized void setActiveElement(ReplayElement element) {
 		if(element.getIdentifier() == this.getIdentifier()){
-			current_date = element.getTimestamp();
+			current = element;
 		}
 	}
 }

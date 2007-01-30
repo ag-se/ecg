@@ -127,14 +127,14 @@ public class ReplayView extends ViewPart implements IModelChangeListener{
 		gridData = new GridData();
 		gridData.horizontalAlignment = SWT.FILL;
 		gridData.verticalAlignment = SWT.FILL;
-		gridData.widthHint = 135;
+		gridData.widthHint = 300;
 		
 		elementSelector = new TreeViewer(group1, SWT.H_SCROLL | SWT.V_SCROLL);
 		Tree treeWidget = elementSelector.getTree();
 		treeWidget.setLayoutData(gridData);
 		elementSelector.setContentProvider(elemlist_contentprov);
 		elementSelector.setLabelProvider(elemlist_contentprov);
-		elementSelector.setSorter(new ViewerSorter());
+		//elementSelector.setSorter(new ViewerSorter());
 		elementSelector.setInput(getViewSite());
 		elementSelector.addDoubleClickListener(new IDoubleClickListener() {
 			public void doubleClick(DoubleClickEvent event) {
@@ -357,7 +357,7 @@ public class ReplayView extends ViewPart implements IModelChangeListener{
 		changeTypeText.setText(" Change cause : ");
 		
 		// ---------------------
-		// Timestamp label
+		// Change type label
 		// ---------------------
 		final Label changeTypeLabel = new Label(labels, SWT.HORIZONTAL | SWT.CENTER | SWT.BORDER);
 		changeTypeLabel.setFont(new Font(parent.getDisplay(), new FontData(parent.getFont().getFontData().toString(), 12, SWT.NORMAL)));
@@ -368,10 +368,12 @@ public class ReplayView extends ViewPart implements IModelChangeListener{
 			public void modelChange(ModelChangeEvent event) {
 				if(event.getCause() == ModelChangeEvent.ELEMENT_CHANGED){
 					changeTypeLabel.setText(" "+ReplayControl.getInstance().getExactCause()+" ");
-					changeTypeLabel.setSize(timestamplabel.computeSize(SWT.DEFAULT, SWT.DEFAULT, true));
+					changeTypeLabel.setSize(changeTypeLabel.computeSize(SWT.DEFAULT, SWT.DEFAULT, true));
 				}
-				else if(event.getCause() == ModelChangeEvent.NEW_ELEMENT)
-					changeTypeLabel.setText("                 ");
+				else if(event.getCause() == ModelChangeEvent.NEW_ELEMENT) {
+					changeTypeLabel.setText(" {NEW ELEMENT} ");
+					changeTypeLabel.setSize(changeTypeLabel.computeSize(SWT.DEFAULT, SWT.DEFAULT, true));
+                }
 			}
 		});
 	}				// end of createPartControl
