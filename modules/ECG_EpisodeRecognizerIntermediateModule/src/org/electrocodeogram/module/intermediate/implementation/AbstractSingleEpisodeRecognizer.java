@@ -3,8 +3,8 @@
  */
 package org.electrocodeogram.module.intermediate.implementation;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 
 import org.electrocodeogram.event.ValidEventPacket;
 
@@ -25,7 +25,9 @@ public abstract class AbstractSingleEpisodeRecognizer implements
         ValidEventPacket e = analyseSingle(packet, minDuration);
         if (e == null)
             return null;
-        return Collections.singleton(e);
+        ArrayList<ValidEventPacket> result = new ArrayList<ValidEventPacket>();
+        result.add(e);
+        return result;
     }
     
     /**

@@ -185,7 +185,7 @@ public class RunActiveEpisodeRecognizer extends AbstractSingleEpisodeRecognizer 
 			}
 
 		} catch (NodeException e) {
-            logger.log(Level.SEVERE, "Could not read XML string in WindowActiveEpisodeRecognizer.");
+            logger.log(Level.SEVERE, "Could not read XML string in RunActiveEpisodeRecognizer.");
             logger.log(Level.FINE, e.getMessage());
 		}
 

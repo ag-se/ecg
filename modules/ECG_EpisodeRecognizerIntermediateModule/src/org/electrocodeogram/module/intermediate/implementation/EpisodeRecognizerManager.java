@@ -107,7 +107,8 @@ public class EpisodeRecognizerManager {
                 if (events == null)
                     events = recognizerEvents;
                 else
-                    events.addAll(recognizerEvents);
+                    for (ValidEventPacket e : recognizerEvents)
+                        events.add(e);
             }
 			
             // Remove any recognizer in final state
@@ -137,7 +138,8 @@ public class EpisodeRecognizerManager {
             if (events == null)
                 events = recognizerEvents;
             else
-                events.addAll(recognizerEvents);
+                for (ValidEventPacket e : recognizerEvents)
+                    events.add(e);
         }
 
 		// If free recognizer reacted, add it to the list of live recognizers

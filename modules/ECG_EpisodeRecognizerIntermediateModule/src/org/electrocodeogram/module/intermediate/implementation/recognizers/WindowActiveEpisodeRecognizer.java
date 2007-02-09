@@ -71,7 +71,7 @@ public class WindowActiveEpisodeRecognizer  extends AbstractSingleEpisodeRecogni
 	private String activeWindow = null;
 	
 	/**
-	 * Time stamp of getting into WINDOWACTIVE state 
+	 * Time stamp of getting into APPLACTIVE state 
 	 */
 	private Date startDate = null;
 	
@@ -155,7 +155,7 @@ public class WindowActiveEpisodeRecognizer  extends AbstractSingleEpisodeRecogni
 				}
                 /* doesn't seem be happen: window activate/open after part activate/open
                 else if (msdt.equals("msdt.window.xsd") && 
-                         state == WindowActiveEpisodeState.windowactive && 
+                         state == ApplicationActiveEpisodeState.windowactive && 
                          (activity.equals("activated") || activity.equals("opened"))) {
                     // Preserve windowname
                     if (activeWindow == null) {
