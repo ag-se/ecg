@@ -7,7 +7,7 @@
 		FU Berlin
 	</provider-name>
 	<version>
-		1.0
+		1.2
 	</version>
 	<name>
 		CSV File Writer
@@ -23,12 +23,16 @@
 		* Columns - Comma-seperated list of column names to be printed per event.
 		  The column names are taken from the MSDT schemas and must correspond to the
 		  non-complex entities' names. Two special column names are supported as well:
-		  * 'type' for the event's type, e.g. msdt.editor.sxd
+		  * 'type' for the event's type, e.g. msdt.editor.xsd
 		  * 'timestamp' for the event's time stamp
 		  Seperated by '/' column names may also consist groupes of columns. In case with
 		  'c1/c2' the column c1 doesn't have a value for the current event to print, c2
 		  will be taken. 'type' and 'timestamp' are allowed in groups as well.
 		  Example: "type, activity, resourcename/documentname"
+		  Additionally, each column name (possibly in a group) may consist of concatenations
+		  of actual names: 'c1#c2' will print the value of c1 + # + value of c2, if both c1
+		  and c2 are available for this event.
+		  Example: "processName#windowTitle"
 		* Delimiter - Character to seperate the printed columns. Default is TAB. Note:
 		  No \x characters may be used, the value is taken literally
 	</description>

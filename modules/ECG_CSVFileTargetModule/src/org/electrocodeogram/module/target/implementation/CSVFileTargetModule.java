@@ -178,22 +178,39 @@ public class CSVFileTargetModule extends TargetModule {
      */
     private String getValueOfColumn(ValidEventPacket packet, String column) {
 
-        String columns[] = column.split("/");
+        String[] columns = column.split("/");
         for (int i = 0; i < columns.length; i++) {
-            if (columns[i].equals(TYPE_COLUMN)) {
-                return packet.getMicroSensorDataType().getName();
-            } else if (columns[i].equals(TIMESTAMP_COLUMN)) {
-                return dateFormat.format(packet.getTimeStamp());
-            } 
+
+            String[] concats = columns[i].split("#");
+            String results[] = new String[concats.length];
+            boolean hasNoValue = false;
+            for (int j = 0; !hasNoValue && j < concats.length; j++) {
+
+                if (concats[j].equals(TYPE_COLUMN)) {
+                    results[j] = packet.getMicroSensorDataType().getName();
+                } else if (concats[j].equals(TIMESTAMP_COLUMN)) {
+                    results[j] = dateFormat.format(packet.getTimeStamp());
+                } else { 
+                    Document document = packet.getDocument();
+                    try {
+                        results[j] = ECGParser.getSingleNodeValue(concats[j], document);
+                        if (results[j] == null)
+                            results[j] = "";
+                    } catch (NodeException e) {
+                        results[j] = null;
+                        hasNoValue = true;
+                    }
+                }                
+            }
             
-            String value = "";
-            Document document = packet.getDocument();
-            
-            try {
-                value = ECGParser.getSingleNodeValue(columns[i], document);
-                return value;
-            } catch (NodeException e) {
-                // Just try the next column from the group
+            if (!hasNoValue) {
+                String result = "";
+                for (int j = 0; j < concats.length; j++) {
+                    result += (results[j] != null ? results[j] : "");
+                    if (j < concats.length-1)
+                        result += "#";
+                }
+                return result;
             }
             
         }
