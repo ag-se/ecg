@@ -53,12 +53,12 @@ public class ECGStorer implements Storer {
 
         Document microactivity_doc = microActivity.getMicroActivityDoc();
         Element application = microactivity_doc.createElement("application");
-        application_processHandle = microactivity_doc.createElement("processhandle");
-        application_threadHandle = microactivity_doc.createElement("threadhandle");
-        application_windowHandle = microactivity_doc.createElement("windowhandle");
-        application_type = microactivity_doc.createElement("activity");
-        application_windowTitle = microactivity_doc.createElement("windowtitle");
-        application_processName = microactivity_doc.createElement("processname");
+        application_processHandle = microactivity_doc.createElement("processHandle");
+        application_threadHandle = microactivity_doc.createElement("threadHandle");
+        application_windowHandle = microactivity_doc.createElement("windowHandle");
+        application_type = microactivity_doc.createElement("type");
+        application_windowTitle = microactivity_doc.createElement("windowTitle");
+        application_processName = microactivity_doc.createElement("processName");
 
         application.appendChild(application_processHandle);
         application.appendChild(application_threadHandle);
@@ -70,8 +70,8 @@ public class ECGStorer implements Storer {
         microActivity.setCustomElement(application);            
                                                 
         CommonData commonData = microActivity.getCommonData();
-        commonData.setVersion(2);
-        commonData.setCreator("ApplicationTitleLogger1.1.0"); 
+        commonData.setVersion(1); // 1 is default
+        commonData.setCreator("ApplicationTitleLogger1.0.0"); 
 
 		enabled = true;
 	}
