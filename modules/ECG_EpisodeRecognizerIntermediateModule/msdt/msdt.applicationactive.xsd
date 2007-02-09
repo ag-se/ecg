@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+	<xs:annotation>
+		<xs:documentation>
+			This XML schema defines the structure of an "Appliation active episode" 
+			MicroSensorDataType. It groups two msdt.application.xsd events to represent
+			that this application's window was active with constant window title. Each 
+			title change ends this episode but immediately starts a new one.
+		</xs:documentation>
+	</xs:annotation>
+
+	<xs:element name="microActivity">
+		<xs:complexType>
+	    	<xs:sequence>
+				<xs:element name="username" type="xs:token"/>
+				<xs:element name="projectname" type="xs:token"/>
+				<xs:element name="endtime" type="xs:string"/>
+				<xs:element name="duration" type="xs:long"/>
+				<xs:element name="windowtitle" type="xs:string"/>
+				<xs:element name="windowhandle" type="xs:string"/>
+				<xs:element name="processname" type="xs:string"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

@@ -98,5 +98,13 @@
 				msdt.cpcwarning.xsd
 			</msdtFile>
 		</microsensordatatype>
+		<microsensordatatype>
+			<msdtName>
+				msdt.applicationactive.xsd
+			</msdtName>
+			<msdtFile>
+				msdt.applicationactive.xsd
+			</msdtFile>
+		</microsensordatatype>
 	</microsensordatatypes>
 </module>
