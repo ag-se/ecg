@@ -11,8 +11,6 @@
 			* type: kind of event regarding the window
 			* windowTitle: current title of window
 			* processName: name of the applications process
-			
-			Version 2: Renamed some elements
 		</xs:documentation>
 	</xs:annotation>
 
@@ -25,20 +23,20 @@
 				<xs:element name="application">
 					<xs:complexType>
 						<xs:sequence>
-						 <xs:element name="processhandle" type="xs:int"/>
-						 <xs:element name="threadhandle" type="xs:int"/>
-						 <xs:element name="windowhandle" type="xs:int"/>
-						 <xs:element name="activity">
+						 <xs:element name="processHandle" type="xs:int"/>
+						 <xs:element name="threadHandle" type="xs:int"/>
+						 <xs:element name="windowHandle" type="xs:int"/>
+						 <xs:element name="type">
 						  <xs:simpleType>
 						   <xs:restriction base="xs:string">
-                            <xs:enumeration value="activated"/>
-                            <xs:enumeration value="renamed"/>
-                            <xs:enumeration value="deactivated"/>
+                            <xs:enumeration value="ACTIVATE"/>
+                            <xs:enumeration value="RENAME"/>
+                            <xs:enumeration value="DEACTIVATE"/>
 						   </xs:restriction>
 						  </xs:simpleType>
 						 </xs:element>
-						 <xs:element name="windowtitle" type="xs:string"/>
-						 <xs:element name="processname" type="xs:string"/>
+						 <xs:element name="windowTitle" type="xs:string"/>
+						 <xs:element name="processName" type="xs:string"/>
 						</xs:sequence>
 					</xs:complexType>			
 				</xs:element>
