@@ -3,9 +3,7 @@
    <description url="http://www.inf.fu-berlin.de/ecg/update">
       This is the ElectroCodeoGram project homepage and the update site for the ECG Eclipse sensor.
    </description>
-   <feature url="features/org.electrocodeogram.sensor.eclipse_1.1.4.jar" id="org.electrocodeogram.sensor.eclipse" version="1.1.4">
-      <category name="ECG SensorAndLab"/>
-   </feature>
+   <feature url="features/org.electrocodeogram.sensor.eclipse_1.1.6.jar" id="org.electrocodeogram.sensor.eclipse" version="1.1.6"/>
    <category-def name="ECG SensorAndLab" label="ECG EclipseSensor with ECG Lab">
       <description>
          ElectroCodeoGram Eclipse Sensor to log programming sessions. It comes with an ECG Lab and is preconfigured to run in Inlineserver mode.
