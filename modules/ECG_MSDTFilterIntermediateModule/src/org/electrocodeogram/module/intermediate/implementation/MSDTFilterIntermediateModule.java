@@ -269,7 +269,7 @@ public class MSDTFilterIntermediateModule extends IntermediateModule implements 
 		if (value != null && value.length() > 0) {
 			int sep = value.indexOf('=');
 			if (sep > 0) {
-				msdts[index] = new String(value.substring(0, sep));
+				msdts[index] = value.substring(0, sep);
 				String pattern = value.substring(sep+1);
 				filters[index] = Pattern.compile(pattern);
 				return;
