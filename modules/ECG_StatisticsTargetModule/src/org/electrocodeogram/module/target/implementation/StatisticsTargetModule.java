@@ -13,12 +13,7 @@ import java.awt.GridLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
@@ -38,14 +33,15 @@ import javax.swing.table.TableColumnModel;
 import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.logging.LogHelper;
 import org.electrocodeogram.misc.constants.UIConstants;
-import org.electrocodeogram.misc.xml.ECGParser;
-import org.electrocodeogram.misc.xml.NodeException;
 import org.electrocodeogram.module.UIModule;
 import org.electrocodeogram.module.target.TargetModule;
+import org.electrocodeogram.module.target.implementation.stats.SDay;
+import org.electrocodeogram.module.target.implementation.stats.SGlobal;
+import org.electrocodeogram.module.target.implementation.stats.SProject;
+import org.electrocodeogram.module.target.implementation.stats.SResource;
+import org.electrocodeogram.module.target.implementation.stats.SUser;
 import org.electrocodeogram.modulepackage.ModuleProperty;
-import org.electrocodeogram.msdt.MicroSensorDataType;
 import org.electrocodeogram.system.ModuleSystem;
-import org.w3c.dom.Document;
 
 /**
  * This module makes some statistics of incoming events like the total
@@ -57,7 +53,7 @@ public class StatisticsTargetModule extends TargetModule implements UIModule {
     /**
      * This is the logger.
      */
-    private static Logger logger = LogHelper
+    static Logger logger = LogHelper
         .createLogger(StatisticsTargetModule.class.getName());
 
     /**
@@ -72,10 +68,14 @@ public class StatisticsTargetModule extends TargetModule implements UIModule {
     private StatsFrame pnlStats;
 
     /**
-     * A list of {@link Day} objects, each representing a day of the
+     * A list of {@link SDay} objects, each representing a day of the
      * timestamp of incoming events.
      */
-    private ArrayList < Day > dayList;
+    private ArrayList < SDay > dayList;
+    private ArrayList < SProject > projectList;
+    private ArrayList < SUser > userList;
+    private ArrayList < SResource > resourceList;
+    private SGlobal global;
 
     /**
      * This creates the module instance. It is not to be called by
@@ -174,21 +174,21 @@ public class StatisticsTargetModule extends TargetModule implements UIModule {
 
         logger.entering(this.getClass().getName(), "initialize");
 
-        this.dayList = new ArrayList < Day >();
+        this.dayList = new ArrayList < SDay >();
 
         logger.exiting(this.getClass().getName(), "initialize");
 
     }
 
     /**
-     * Returns the <em>Day</em> with the given index from the
+     * Returns the <em>SDay</em> with the given index from the
      * {@link #dayList}.
      * @param index
      *            Is the index
-     * @return IThe <em>Day</em> with the given index or
+     * @return IThe <em>SDay</em> with the given index or
      *         <code>null</code> if the index id not found
      */
-    protected final Day getDay(final int index) {
+    protected final SDay getDay(final int index) {
 
         logger.entering(this.getClass().getName(), "getDay");
 
@@ -223,7 +223,7 @@ public class StatisticsTargetModule extends TargetModule implements UIModule {
 
         this.totalEventCount++;
 
-        Day dayOfPacket = new Day(arg0.getTimeStamp());
+        SDay dayOfPacket = new SDay(arg0.getTimeStamp());
 
         if (this.dayList.size() == 0) {
 
@@ -242,15 +242,15 @@ public class StatisticsTargetModule extends TargetModule implements UIModule {
             if (this.dayList.contains(dayOfPacket)) {
                 int index = this.dayList.indexOf(dayOfPacket);
 
-                Day day = this.dayList.get(index);
+                SDay sDay = this.dayList.get(index);
 
-                day.addEvents();
+                sDay.addEvents();
 
-                day.setBegin(arg0.getTimeStamp());
+                sDay.setBegin(arg0.getTimeStamp());
 
-                day.setEnd(arg0.getTimeStamp());
+                sDay.setEnd(arg0.getTimeStamp());
 
-                day.addEvent(arg0);
+                sDay.addEvent(arg0);
 
             } else {
                 dayOfPacket.addEvents();
@@ -379,401 +379,6 @@ public class StatisticsTargetModule extends TargetModule implements UIModule {
             statsFrameLogger.exiting(this.getClass().getName(),
                 "updateTableModel");
 
-        }
-
-    }
-
-    /**
-     * The <em>StatisticsTargetModule</em> consolidates incoming
-     * events on a per day basis. The days are determined from the
-     * events timestamp fields. For every day, on which an events have
-     * been recorded, they are counted and sorted by their
-     * <em>MicroSensorDataType</em>.
-     */
-    private static class Day {
-
-        /**
-         * This is the logger.
-         */
-        private static Logger dayLogger = LogHelper.createLogger(Day.class
-            .getName());
-
-        /**
-         * This is how the event's recording time is written.
-         */
-        private static final String TIME_FORMAT_PATTERN = "HH:mm:ss";
-
-        /**
-         * This is how the event's recording day is written.
-         */
-
-        private static final String DATE_FORMAT_PATTERN = "dd.MM.yyyy";
-
-        /**
-         * A reference to the date formatter.
-         */
-        private SimpleDateFormat timeFormat;
-
-        /**
-         * A reference to the date formatter.
-         */
-
-        private SimpleDateFormat dateFormat;
-
-        /**
-         * The <code>Date</code> of the <em>Day</em>.
-         */
-        private Date myDate;
-
-        /**
-         * The <code>Date</code> of the first recorded event for
-         * this <em>Day</em>.
-         */
-        private Date begin;
-
-        /**
-         * The <code>Date</code> of the last recorded event for this
-         * <em>Day</em>.
-         */
-
-        private Date end;
-
-        /**
-         * This map is used to count the <em>MicroSensordataTypes</em>
-         * of the incoming events.
-         */
-        private HashMap < MicroSensorDataType, Integer > msdtMap;
-
-        /**
-         * A map of changed files.
-         */
-        private HashMap < String, Integer > filenameMap;
-
-        /**
-         * A map of changed projects.
-         */
-        private HashMap < String, Integer > projects;
-
-        /**
-         * Used to calculate the date and time values.
-         */
-        private Calendar calendar;
-
-        /**
-         * The total number of evebts for this day.
-         */
-        private int eventsTotal;
-
-        /**
-         * Creates a <em>Day</em> with the given <code>Date</code>.
-         * @param date
-         *            Is the <code>Date</code> of the <em>Day</em>
-         */
-        public Day(final Date date) {
-
-            dayLogger.entering(this.getClass().getName(), "Day",
-                new Object[] {date});
-
-            this.myDate = date;
-
-            this.calendar = Calendar.getInstance();
-
-            this.calendar.setTime(this.myDate);
-
-            this.timeFormat = new SimpleDateFormat(TIME_FORMAT_PATTERN);
-
-            this.dateFormat = new SimpleDateFormat(DATE_FORMAT_PATTERN);
-
-            //this.changedFiles = new ArrayList < String >();
-
-            this.msdtMap = new HashMap < MicroSensorDataType, Integer >();
-
-            this.filenameMap = new HashMap < String, Integer >();
-
-            this.projects = new HashMap < String, Integer >();
-
-            dayLogger.exiting(this.getClass().getName(), "Day");
-        }
-
-        /**
-         * Adds the <em>MicroSensorDataType</em> of an received
-         * event to the <em>Day</em>.
-         * @param event
-         *            Is the received event.
-         */
-        @SuppressWarnings("synthetic-access")
-        public final void addEvent(final ValidEventPacket event) {
-
-            dayLogger.entering(this.getClass().getName(), "addEvent",
-                new Object[] {event});
-
-            if (this.msdtMap.containsKey(event.getMicroSensorDataType())) {
-                Integer count = this.msdtMap
-                    .get(event.getMicroSensorDataType());
-
-                count = new Integer(count.intValue() + 1);
-
-                this.msdtMap.remove(event.getMicroSensorDataType());
-
-                this.msdtMap.put(event.getMicroSensorDataType(), count);
-            } else {
-                this.msdtMap
-                    .put(event.getMicroSensorDataType(), new Integer(1));
-            }
-
-            Document document = event.getDocument();
-
-            try {
-                String projectName = ECGParser.getSingleNodeValue(
-                    "projectname", document);
-
-                if (this.projects.containsKey(projectName)) {
-                    Integer count = this.projects.get(projectName);
-
-                    count = new Integer(count.intValue() + 1);
-
-                    this.projects.remove(projectName);
-
-                    this.projects.put(projectName, count);
-                } else {
-                    this.projects.put(projectName, new Integer(1));
-                }
-
-            } catch (NodeException e1) {
-                logger.log(Level.INFO, "NodeException: " + e1.getMessage());
-
-            }
-
-            if (event.getMicroSensorDataType().getName().equals(
-                "msdt.codechange.xsd")) {
-
-                try {
-                    String filename = ECGParser.getSingleNodeValue(
-                        "documentname", document);
-
-                    if (this.filenameMap.containsKey(filename)) {
-                        Integer count = this.filenameMap.get(filename);
-
-                        count = new Integer(count.intValue() + 1);
-
-                        this.filenameMap.remove(filename);
-
-                        this.filenameMap.put(filename, count);
-                    } else {
-                        this.filenameMap.put(filename, new Integer(1));
-                    }
-
-                } catch (NodeException e) {
-
-                    logger.log(Level.INFO, "NodeException: " + e.getMessage());
-                }
-            }
-
-            dayLogger.exiting(this.getClass().getName(), "addEvent");
-        }
-
-
-
-        /**
-         * Returns the number of events for this day.
-         * @return The number of events for this day
-         */
-        public final int getEventsTotal() {
-
-            dayLogger.entering(this.getClass().getName(), "getEventsTotal");
-
-            dayLogger.exiting(this.getClass().getName(), "getEventsTotal",
-                new Integer(this.eventsTotal));
-
-            return this.eventsTotal;
-        }
-
-        /**
-         * Returns the number of this day in the year.
-         * @return The number of this day in the year
-         */
-        public final int getDayOfYear() {
-
-            dayLogger.entering(this.getClass().getName(), "getDayOfYear");
-
-            dayLogger.exiting(this.getClass().getName(), "getDayOfYear",
-                new Integer(this.calendar.get(Calendar.DAY_OF_YEAR)));
-
-            return this.calendar.get(Calendar.DAY_OF_YEAR);
-        }
-
-        /**
-         * Returns the year of this day.
-         * @return The year of this day
-         */
-        public final int getYear() {
-
-            dayLogger.entering(this.getClass().getName(), "getYear");
-
-            dayLogger.exiting(this.getClass().getName(), "getYear",
-                new Integer(this.calendar.get(Calendar.YEAR)));
-
-            return this.calendar.get(Calendar.YEAR);
-        }
-
-        /**
-         * Increases the event counter by one.
-         */
-        public void addEvents() {
-
-            dayLogger.entering(this.getClass().getName(), "addEvents");
-
-            this.eventsTotal++;
-
-            dayLogger.exiting(this.getClass().getName(), "addEvents");
-
-        }
-
-        /**
-         * Returns the time-string of the first recorded event of this
-         * day.
-         * @return The time-string of the first recorded event
-         */
-        public String getBegin() {
-
-            dayLogger.entering(this.getClass().getName(), "getBegin");
-
-            dayLogger.exiting(this.getClass().getName(), "getBegin",
-                this.timeFormat.format(this.begin));
-
-            return this.timeFormat.format(this.begin);
-        }
-
-        /**
-         * Returns the date-string of this day.
-         * @return The date-string of this day
-         */
-        public String getDate() {
-
-            dayLogger.entering(this.getClass().getName(), "getDate");
-
-            dayLogger.exiting(this.getClass().getName(), "getDate",
-                this.dateFormat.format(this.myDate));
-
-            return this.dateFormat.format(this.myDate);
-        }
-
-        /**
-         * Returns the time-string of the last recorded event of this
-         * day.
-         * @return The time-string of the last recorded event
-         */
-        public String getEnd() {
-
-            dayLogger.entering(this.getClass().getName(), "getEnd");
-
-            dayLogger.exiting(this.getClass().getName(), "getEnd",
-                this.timeFormat.format(this.end));
-
-            return this.timeFormat.format(this.end);
-        }
-
-        /**
-         * Sets the time-string of the first recorded event of this
-         * day.
-         * @param beginDate
-         *            The time-string of the first recorded event
-         */
-        public final void setBegin(final Date beginDate) {
-
-            dayLogger.entering(this.getClass().getName(), "setBegin",
-                new Object[] {beginDate});
-
-            if (this.begin == null) {
-                this.begin = beginDate;
-            } else if (this.begin.compareTo(beginDate) > 0) {
-                this.begin = beginDate;
-            }
-
-            dayLogger.exiting(this.getClass().getName(), "setBegin");
-        }
-
-        /**
-         * Sets the time-string of the last recorded event of this
-         * day.
-         * @param endDate
-         *            The time-string of the last recorded event
-         */
-        public final void setEnd(final Date endDate) {
-
-            dayLogger.entering(this.getClass().getName(), "setEnd",
-                new Object[] {endDate});
-
-            if (this.end == null) {
-                this.end = endDate;
-            } else if (this.end.compareTo(endDate) < 0) {
-                this.end = endDate;
-            }
-
-            dayLogger.exiting(this.getClass().getName(), "setEnd");
-        }
-
-        /**
-         * @see java.lang.Object#equals(java.lang.Object)
-         */
-        @Override
-        public final boolean equals(final Object obj) {
-
-            dayLogger.entering(this.getClass().getName(), "equals",
-                new Object[] {obj});
-
-            if (obj instanceof Day) {
-                Day day = (Day) obj;
-
-                if ((day.getDayOfYear() == this.getDayOfYear())
-                    && (day.getYear() == this.getYear())) {
-
-                    dayLogger.exiting(this.getClass().getName(), "equals",
-                        new Boolean(true));
-
-                    return true;
-                }
-
-            }
-
-            dayLogger.exiting(this.getClass().getName(), "equals", new Boolean(
-                false));
-
-            return false;
-        }
-
-        /**
-         * @see java.lang.Object#hashCode()
-         */
-        @Override
-        public int hashCode() {
-            String concat = "" + this.getDayOfYear() + this.getYear();
-
-            int code = Integer.parseInt(concat);
-
-            return code;
-        }
-
-        /**
-         * Returns the names of changed files in one
-         * <code>String</code> separated by newlines.
-         * @return The names of changed files
-         */
-        public String[] getChangedFiles() {
-
-            dayLogger.entering(this.getClass().getName(), "getChangedFiles");
-
-            return this.filenameMap.keySet().toArray(
-                new String[this.filenameMap.size()]);
-        }
-
-        /**
-         * Returns the names of changed projects in this day.
-         * @return The names of changed projects
-         */
-        public String[] getProjects() {
-            return this.projects.keySet().toArray(
-                new String[this.projects.size()]);
         }
 
     }
@@ -918,9 +523,9 @@ public class StatisticsTargetModule extends TargetModule implements UIModule {
          * Creates the button.
          * @param title The name of the button
          * @param module A reference to the module
-         * @param day Is the day of the column where this button is placed
+         * @param sDay Is the day of the column where this button is placed
          */
-        public StatsButton(final String title, final StatisticsTargetModule module, final Day day) {
+        public StatsButton(final String title, final StatisticsTargetModule module, final SDay sDay) {
 
             super(title);
 
@@ -934,9 +539,9 @@ public class StatisticsTargetModule extends TargetModule implements UIModule {
                 @Override
                 public void mouseClicked(@SuppressWarnings("unused") MouseEvent e) {
 
-                    String[] files = day.getChangedFiles();
+                    String[] files = sDay.getChangedFiles();
 
-                    String[] projects = day.getProjects();
+                    String[] projects = sDay.getProjects();
 
                     String fileString = "";
 
@@ -962,7 +567,7 @@ public class StatisticsTargetModule extends TargetModule implements UIModule {
                     JDialog dlg = new JDialog(
                         (JFrame) StatsButton.this.statsModule.pnlStats
                             .getRootPane().getParent(),
-                        "Codechange details for " + day.getDate());
+                        "Codechange details for " + sDay.getDate());
 
                     dlg.getContentPane().setLayout(new GridLayout(1, 2));
 
@@ -1027,7 +632,7 @@ public class StatisticsTargetModule extends TargetModule implements UIModule {
          * This is the logger.
          */
         private static Logger statsTableModelLogger = LogHelper
-            .createLogger(Day.class.getName());
+            .createLogger(SDay.class.getName());
 
         /**
          * The <em>serialization</em> id.
@@ -1100,9 +705,9 @@ public class StatisticsTargetModule extends TargetModule implements UIModule {
                 return " ";
             }
 
-            Day day = this.statsModule.getDay(columnIndex - 1);
+            SDay sDay = this.statsModule.getDay(columnIndex - 1);
 
-            if (day == null) {
+            if (sDay == null) {
 
                 statsTableModelLogger.exiting(this.getClass().getName(),
                     "getColumnName", "");
@@ -1111,9 +716,9 @@ public class StatisticsTargetModule extends TargetModule implements UIModule {
             }
 
             statsTableModelLogger.exiting(this.getClass().getName(),
-                "getColumnName", day.getDate());
+                "getColumnName", sDay.getDate());
 
-            return day.getDate();
+            return sDay.getDate();
 
         }
 
@@ -1149,9 +754,9 @@ public class StatisticsTargetModule extends TargetModule implements UIModule {
                 return getRowHeadline(rowIndex);
             }
 
-            Day day = this.statsModule.getDay(columnIndex - 1);
+            SDay sDay = this.statsModule.getDay(columnIndex - 1);
 
-            if (day == null) {
+            if (sDay == null) {
 
                 statsTableModelLogger.exiting(this.getClass().getName(),
                     "getValueAt", "");
@@ -1160,9 +765,9 @@ public class StatisticsTargetModule extends TargetModule implements UIModule {
             }
 
             statsTableModelLogger.exiting(this.getClass().getName(),
-                "getValueAt", getRowContent(day, rowIndex));
+                "getValueAt", getRowContent(sDay, rowIndex));
 
-            Object o = getRowContent(day, rowIndex);
+            Object o = getRowContent(sDay, rowIndex);
 
             return o;
 
@@ -1172,36 +777,36 @@ public class StatisticsTargetModule extends TargetModule implements UIModule {
          * Returns the content of a table cell.
          * @param rowIndex
          *            Is the index of the table row
-         * @param day
+         * @param sDay
          *            Is the day or column index
          * @return The content of the table cell
          */
         @SuppressWarnings("synthetic-access")
-        private Object getRowContent(final Day day, final int rowIndex) {
+        private Object getRowContent(final SDay sDay, final int rowIndex) {
 
             statsTableModelLogger.entering(this.getClass().getName(),
-                "getRowContent", new Object[] {day, new Integer(rowIndex)});
+                "getRowContent", new Object[] {sDay, new Integer(rowIndex)});
 
             if (rowIndex == 0) {
 
                 statsTableModelLogger.exiting(this.getClass().getName(),
-                    "getRowContent", day.getDate());
+                    "getRowContent", sDay.getDate());
 
-                return day.getDate();
+                return sDay.getDate();
             } else if (rowIndex == 1) {
 
                 statsTableModelLogger.exiting(this.getClass().getName(),
-                    "getRowContent", day.getBegin());
+                    "getRowContent", sDay.getBegin());
 
-                return day.getBegin();
+                return sDay.getBegin();
             } else if (rowIndex == 2) {
 
                 statsTableModelLogger.exiting(this.getClass().getName(),
-                    "getRowContent", day.getEnd());
+                    "getRowContent", sDay.getEnd());
 
-                return day.getEnd();
+                return sDay.getEnd();
             } else if (rowIndex > 2 && rowIndex < this.msdtCount + 3) {
-                Integer count = day.msdtMap.get(ModuleSystem.getInstance()
+                Integer count = sDay.getMsdtMap().get(ModuleSystem.getInstance()
                     .getMicroSensorDataTypes()[rowIndex - 3]);
 
                 if (count == null) {
@@ -1217,7 +822,7 @@ public class StatisticsTargetModule extends TargetModule implements UIModule {
 
                 if (getRowHeadline(rowIndex).equals("msdt.codechange.xsd")) {
                     return new StatsButton(count.toString(),
-                        this.statsModule, day);
+                        this.statsModule, sDay);
                 }
 
                 return count.toString();
@@ -1226,9 +831,9 @@ public class StatisticsTargetModule extends TargetModule implements UIModule {
             } else {
 
                 statsTableModelLogger.exiting(this.getClass().getName(),
-                    "getRowContent", new Integer(day.eventsTotal));
+                    "getRowContent", new Integer(sDay.getEventsTotal()));
 
-                return new Integer(day.eventsTotal);
+                return new Integer(sDay.getEventsTotal());
             }
 
         }
