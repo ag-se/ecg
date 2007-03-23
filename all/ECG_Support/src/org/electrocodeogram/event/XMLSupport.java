@@ -37,24 +37,27 @@ public class XMLSupport {
         return docBuilder;
     }
     
+    static private void init() {
+        try {
+            // get DOM Implementation using DOM Registry
+            // TODO Use Xerxes instead? This one is only available in JDK 5
+            System.setProperty(DOMImplementationRegistry.PROPERTY, "com.sun.org.apache.xerces.internal.dom.DOMXSImplementationSourceImpl");
+            DOMImplementationRegistry registry;
+            registry = DOMImplementationRegistry.newInstance();
+            // Retrieve load/save features
+            DOMImplementationLS impl = 
+                (DOMImplementationLS)registry.getDOMImplementation("LS");
+            // create DOMWriter
+            xmlSerializer = impl.createLSSerializer();   
+            xmlSerializer.getDomConfig().setParameter("xml-declaration", Boolean.FALSE);
+        } catch (Exception e) { // TODO Ok, that's really bad...
+            // TODO
+        }        
+    }
+    
     static private LSSerializer getXmlSerializer() {
-        if (xmlSerializer == null) {
-            try {
-                // get DOM Implementation using DOM Registry
-                // TODO Use Xerxes instead? This one is only available in JDK 5
-                System.setProperty(DOMImplementationRegistry.PROPERTY, "com.sun.org.apache.xerces.internal.dom.DOMXSImplementationSourceImpl");
-                DOMImplementationRegistry registry;
-                registry = DOMImplementationRegistry.newInstance();
-                // Retrieve load/save features
-                DOMImplementationLS impl = 
-                    (DOMImplementationLS)registry.getDOMImplementation("LS");
-                // create DOMWriter
-                xmlSerializer = impl.createLSSerializer();   
-                xmlSerializer.getDomConfig().setParameter("xml-declaration", Boolean.FALSE);
-            } catch (Exception e) { // TODO Ok, that's really bad...
-                return null;
-            }
-        }
+        if (xmlSerializer == null)
+            init();
         return xmlSerializer;
     }
     
