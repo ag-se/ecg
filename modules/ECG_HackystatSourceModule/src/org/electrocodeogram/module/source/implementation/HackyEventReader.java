@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.event.WellFormedEventPacket;
 import org.electrocodeogram.logging.LogHelper;
 import org.electrocodeogram.module.source.*;
@@ -143,7 +142,7 @@ public class HackyEventReader extends EventReader
             sourceModule
         });
         eventBuffer = new EventQueue();
-        org.electrocodeogram.modulepackage.ModuleProperty runtimeProperties[] = sourceModule.getRuntimeProperties();
+        // org.electrocodeogram.modulepackage.ModuleProperty runtimeProperties[] = sourceModule.getRuntimeProperties();
         logger.exiting(getClass().getName(), "ManualReader");
     }
 

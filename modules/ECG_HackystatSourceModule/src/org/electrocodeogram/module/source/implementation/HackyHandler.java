@@ -11,13 +11,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.electrocodeogram.event.IllegalEventParameterException;
-import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.event.WellFormedEventPacket;
 import org.electrocodeogram.logging.LogHelper;
 import org.electrocodeogram.logging.LogHelper.ECGLevel;
 import org.electrocodeogram.misc.xml.ECGParser;
 import org.electrocodeogram.misc.xml.NodeException;
-import org.hackystat.kernel.util.StringListCodec;
 import org.hackystat.kernel.util.StringListCodecException;
 import org.mortbay.http.*;
 import org.mortbay.http.handler.AbstractHttpHandler;
@@ -30,6 +28,11 @@ import org.xml.sax.SAXException;
 //            HackyEventReader
 
 public class HackyHandler extends AbstractHttpHandler {
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
 
     private static Logger logger = LogHelper.createLogger(HackyHandler.class.getName());
     
@@ -135,10 +138,7 @@ public class HackyHandler extends AbstractHttpHandler {
             
             logger.log(Level.FINE,"The incoming request from" + request.getRemoteAddr() + "was not a SOAP message.");
             
-            if(buffer != null)
-            {
-                logger.log(ECGLevel.PACKET,buffer.toString());
-            }
+            logger.log(ECGLevel.PACKET,buffer.toString());
                         
             logger.log(Level.FINE,e.getMessage());
             
@@ -271,12 +271,8 @@ public class HackyHandler extends AbstractHttpHandler {
     
     public static ArrayList decode(String encodedString) throws StringListCodecException {
         
-        int size = encodedString.length();
-        
         //replace all occurences of "\r", "\r\n" with "\n"
         encodedString = encodedString.replaceAll("\r\n", "\n").replace('\r', '\n');
-        
-        size = encodedString.length();
         
         // Get the number of fields to be decoded.
         int numFields;
