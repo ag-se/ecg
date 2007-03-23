@@ -7,7 +7,6 @@
 
 package org.electrocodeogram.module.source.implementation;
 
-import java.awt.FlowLayout;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.logging.Logger;

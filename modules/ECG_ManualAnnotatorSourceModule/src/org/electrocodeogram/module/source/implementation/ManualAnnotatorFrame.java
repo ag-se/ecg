@@ -64,6 +64,8 @@ public class ManualAnnotatorFrame extends JFrame {
         createEventControls(events);
         
         this.txtRemark = new JTextArea(10,10);
+        txtRemark.setLineWrap(true);
+        txtRemark.setWrapStyleWord(true);
         this.getContentPane().add(txtRemark);
         
         this.pack();
