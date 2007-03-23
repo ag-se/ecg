@@ -142,14 +142,14 @@ public class SDay {
             Integer count = this.msdtMap
                 .get(event.getMicroSensorDataType());
 
-            count = new Integer(count.intValue() + 1);
+            count = Integer.valueOf(count.intValue() + 1);
 
             this.msdtMap.remove(event.getMicroSensorDataType());
 
             this.msdtMap.put(event.getMicroSensorDataType(), count);
         } else {
             this.msdtMap
-                .put(event.getMicroSensorDataType(), new Integer(1));
+                .put(event.getMicroSensorDataType(), Integer.valueOf(1));
         }
 
         Document document = event.getDocument();
@@ -161,13 +161,13 @@ public class SDay {
             if (this.projects.containsKey(projectName)) {
                 Integer count = this.projects.get(projectName);
 
-                count = new Integer(count.intValue() + 1);
+                count = Integer.valueOf(count.intValue() + 1);
 
                 this.projects.remove(projectName);
 
                 this.projects.put(projectName, count);
             } else {
-                this.projects.put(projectName, new Integer(1));
+                this.projects.put(projectName, Integer.valueOf(1));
             }
 
         } catch (NodeException e1) {
@@ -185,13 +185,13 @@ public class SDay {
                 if (this.filenameMap.containsKey(filename)) {
                     Integer count = this.filenameMap.get(filename);
 
-                    count = new Integer(count.intValue() + 1);
+                    count = Integer.valueOf(count.intValue() + 1);
 
                     this.filenameMap.remove(filename);
 
                     this.filenameMap.put(filename, count);
                 } else {
-                    this.filenameMap.put(filename, new Integer(1));
+                    this.filenameMap.put(filename, Integer.valueOf(1));
                 }
 
             } catch (NodeException e) {
@@ -214,7 +214,7 @@ public class SDay {
         logger.entering(this.getClass().getName(), "getEventsTotal");
 
         logger.exiting(this.getClass().getName(), "getEventsTotal",
-            new Integer(this.eventsTotal));
+            Integer.valueOf(this.eventsTotal));
 
         return this.eventsTotal;
     }
@@ -228,7 +228,7 @@ public class SDay {
         logger.entering(this.getClass().getName(), "getDayOfYear");
 
         logger.exiting(this.getClass().getName(), "getDayOfYear",
-            new Integer(this.calendar.get(Calendar.DAY_OF_YEAR)));
+            Integer.valueOf(this.calendar.get(Calendar.DAY_OF_YEAR)));
 
         return this.calendar.get(Calendar.DAY_OF_YEAR);
     }
@@ -242,7 +242,7 @@ public class SDay {
         logger.entering(this.getClass().getName(), "getYear");
 
         logger.exiting(this.getClass().getName(), "getYear",
-            new Integer(this.calendar.get(Calendar.YEAR)));
+            Integer.valueOf(this.calendar.get(Calendar.YEAR)));
 
         return this.calendar.get(Calendar.YEAR);
     }
@@ -360,7 +360,7 @@ public class SDay {
                 && (sDay.getYear() == this.getYear())) {
 
                 logger.exiting(this.getClass().getName(), "equals",
-                    new Boolean(true));
+                    Boolean.TRUE);
 
                 return true;
             }

@@ -72,10 +72,12 @@ public class StatisticsTargetModule extends TargetModule implements UIModule {
      * timestamp of incoming events.
      */
     private ArrayList < SDay > dayList;
-    private ArrayList < SProject > projectList;
-    private ArrayList < SUser > userList;
-    private ArrayList < SResource > resourceList;
-    private SGlobal global;
+    
+    // For further extension of the statistics
+    //private ArrayList < SProject > projectList;
+    //private ArrayList < SUser > userList;
+    //private ArrayList < SResource > resourceList;
+    //private SGlobal global;
 
     /**
      * This creates the module instance. It is not to be called by
@@ -119,7 +121,7 @@ public class StatisticsTargetModule extends TargetModule implements UIModule {
         logger.entering(this.getClass().getName(), "getTotalEventCount");
 
         logger.exiting(this.getClass().getName(), "getTotalEventCount",
-            new Integer(this.totalEventCount));
+            Integer.valueOf(this.totalEventCount));
 
         return this.totalEventCount;
     }
@@ -133,7 +135,7 @@ public class StatisticsTargetModule extends TargetModule implements UIModule {
 
         logger.entering(this.getClass().getName(), "getDayCount");
 
-        logger.exiting(this.getClass().getName(), "getDayCount", new Integer(
+        logger.exiting(this.getClass().getName(), "getDayCount", Integer.valueOf(
             this.dayList.size()));
 
         return this.dayList.size();
@@ -535,9 +537,7 @@ public class StatisticsTargetModule extends TargetModule implements UIModule {
 
             this.addMouseListener(new MouseAdapter() {
 
-                @SuppressWarnings("synthetic-access")
-                @Override
-                public void mouseClicked(@SuppressWarnings("unused") MouseEvent e) {
+                public void mouseClicked(MouseEvent e) {
 
                     String[] files = sDay.getChangedFiles();
 
@@ -683,7 +683,7 @@ public class StatisticsTargetModule extends TargetModule implements UIModule {
                 "getRowCount");
 
             statsTableModelLogger.exiting(this.getClass().getName(),
-                "getRowCount", new Integer(this.rowCount));
+                "getRowCount", Integer.valueOf(this.rowCount));
 
             return this.rowCount;
         }
@@ -695,7 +695,7 @@ public class StatisticsTargetModule extends TargetModule implements UIModule {
         public final String getColumnName(final int columnIndex) {
 
             statsTableModelLogger.entering(this.getClass().getName(),
-                "getColumnName", new Object[] {new Integer(columnIndex)});
+                "getColumnName", new Object[] {Integer.valueOf(columnIndex)});
 
             if (columnIndex == 0) {
 
@@ -731,7 +731,7 @@ public class StatisticsTargetModule extends TargetModule implements UIModule {
                 "getColumnCount");
 
             statsTableModelLogger.exiting(this.getClass().getName(),
-                "getColumnCount", new Integer(
+                "getColumnCount", Integer.valueOf(
                     this.statsModule.getDayCount() + 1));
 
             return this.statsModule.getDayCount() + 1;
@@ -744,12 +744,12 @@ public class StatisticsTargetModule extends TargetModule implements UIModule {
         public final Object getValueAt(final int rowIndex, final int columnIndex) {
 
             statsTableModelLogger.entering(this.getClass().getName(),
-                "getValueAt", new Object[] {new Integer(columnIndex)});
+                "getValueAt", new Object[] {Integer.valueOf(columnIndex)});
 
             if (columnIndex == 0) {
 
                 statsTableModelLogger.exiting(this.getClass().getName(),
-                    "getValueAt", new Integer(rowIndex));
+                    "getValueAt", Integer.valueOf(rowIndex));
 
                 return getRowHeadline(rowIndex);
             }
@@ -785,7 +785,7 @@ public class StatisticsTargetModule extends TargetModule implements UIModule {
         private Object getRowContent(final SDay sDay, final int rowIndex) {
 
             statsTableModelLogger.entering(this.getClass().getName(),
-                "getRowContent", new Object[] {sDay, new Integer(rowIndex)});
+                "getRowContent", new Object[] {sDay, Integer.valueOf(rowIndex)});
 
             if (rowIndex == 0) {
 
@@ -831,9 +831,9 @@ public class StatisticsTargetModule extends TargetModule implements UIModule {
             } else {
 
                 statsTableModelLogger.exiting(this.getClass().getName(),
-                    "getRowContent", new Integer(sDay.getEventsTotal()));
+                    "getRowContent", Integer.valueOf(sDay.getEventsTotal()));
 
-                return new Integer(sDay.getEventsTotal());
+                return Integer.valueOf(sDay.getEventsTotal());
             }
 
         }
@@ -847,7 +847,7 @@ public class StatisticsTargetModule extends TargetModule implements UIModule {
         private String getRowHeadline(final int rowIndex) {
 
             statsTableModelLogger.entering(this.getClass().getName(),
-                "getRowHeadline", new Object[] {new Integer(rowIndex)});
+                "getRowHeadline", new Object[] {Integer.valueOf(rowIndex)});
 
             if (rowIndex == 0) {
 
