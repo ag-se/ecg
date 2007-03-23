@@ -1054,7 +1054,7 @@ public class EventGenerator {
         List < Integer > linkedList = new LinkedList < Integer >();
 
         for (int i = 0; i < listSize; i++) {
-            Integer integer = new Integer(i);
+            Integer integer = Integer.valueOf(i);
 
             linkedList.add(integer);
         }

@@ -1,6 +1,5 @@
 package utmj.threaded;
 
-import java.util.*;
 import junit.framework.*;
 
 /** 

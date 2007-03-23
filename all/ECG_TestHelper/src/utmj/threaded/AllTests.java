@@ -1,6 +1,5 @@
 package utmj.threaded;
 
-import junit.textui.*;
 import junit.framework.*;
 
 public class AllTests {

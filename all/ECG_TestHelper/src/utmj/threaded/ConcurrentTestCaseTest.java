@@ -4,7 +4,6 @@ import java.util.*;
 import junit.framework.*;
 
 public class ConcurrentTestCaseTest extends ConcurrentTestCase {
-	private ConcurrentTestCase concurrentTest;
 
 public ConcurrentTestCaseTest(String name) {
 	super(name);
