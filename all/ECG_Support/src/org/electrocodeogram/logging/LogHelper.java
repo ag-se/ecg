@@ -252,38 +252,39 @@ public final class LogHelper {
 
             Object[] parameters = record.getParameters();
 
-            String logEntry = "[" + record.getLevel() + "]  "
+            StringBuffer logEntry = new StringBuffer(); 
+            logEntry.append("[" + record.getLevel() + "]  "
                               + new Date(record.getMillis()).toString() + " : "
                               + record.getSourceClassName() + "#"
-                              + record.getSourceMethodName();
+                              + record.getSourceMethodName());
 
             if (parameters == null) {
-                logEntry += " : " + record.getMessage() + "\r\n";
+                logEntry.append(" : " + record.getMessage() + "\r\n");
             } else {
-                logEntry += "(";
+                logEntry.append("(");
 
                 for (int i = 0; i < parameters.length; i++) {
                     if (parameters[i] == null) {
-                        logEntry += "null";
+                        logEntry.append("null");
                     } else {
                         Class clazz = parameters[i].getClass();
 
                         Object o = clazz.cast(parameters[i]);
 
-                        logEntry += clazz.getSimpleName() + " " + o.toString();
+                        logEntry.append(clazz.getSimpleName() + " " + o.toString());
                     }
 
                     if (i < parameters.length - 1) {
-                        logEntry += ", ";
+                        logEntry.append(", ");
                     }
                 }
 
-                logEntry += ")";
+                logEntry.append(")");
 
-                logEntry += " : " + record.getMessage() + "\r\n";
+                logEntry.append(" : " + record.getMessage() + "\r\n");
             }
 
-            return logEntry;
+            return logEntry.toString();
         }
 
     }

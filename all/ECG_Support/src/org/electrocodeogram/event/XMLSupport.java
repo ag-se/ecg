@@ -1,9 +1,13 @@
 package org.electrocodeogram.event;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.electrocodeogram.logging.LogHelper;
 import org.w3c.dom.Document;
 import org.w3c.dom.bootstrap.DOMImplementationRegistry;
 import org.w3c.dom.ls.DOMImplementationLS;
@@ -11,6 +15,12 @@ import org.w3c.dom.ls.LSSerializer;
 
 public class XMLSupport {
     
+    /**
+     * This is the logger.
+     */
+    private static Logger logger = LogHelper
+        .createLogger(XMLSupport.class.getName());
+
     /**
      * A general XML Document Builder
      */
@@ -43,16 +53,22 @@ public class XMLSupport {
             // TODO Use Xerxes instead? This one is only available in JDK 5
             System.setProperty(DOMImplementationRegistry.PROPERTY, "com.sun.org.apache.xerces.internal.dom.DOMXSImplementationSourceImpl");
             DOMImplementationRegistry registry;
-            registry = DOMImplementationRegistry.newInstance();
+                registry = DOMImplementationRegistry.newInstance();
             // Retrieve load/save features
             DOMImplementationLS impl = 
                 (DOMImplementationLS)registry.getDOMImplementation("LS");
             // create DOMWriter
             xmlSerializer = impl.createLSSerializer();   
             xmlSerializer.getDomConfig().setParameter("xml-declaration", Boolean.FALSE);
-        } catch (Exception e) { // TODO Ok, that's really bad...
-            // TODO
-        }        
+        } catch (ClassCastException e) {
+            logger.log(Level.SEVERE, "Unable to instantiate Xerxes XML parser.");
+        } catch (ClassNotFoundException e) {
+            logger.log(Level.SEVERE, "Unable to instantiate Xerxes XML parser.");
+        } catch (InstantiationException e) {
+            logger.log(Level.SEVERE, "Unable to instantiate Xerxes XML parser.");
+        } catch (IllegalAccessException e) {
+            logger.log(Level.SEVERE, "Unable to instantiate Xerxes XML parser.");
+        }
     }
     
     static private LSSerializer getXmlSerializer() {

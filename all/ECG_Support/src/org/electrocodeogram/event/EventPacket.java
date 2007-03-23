@@ -208,8 +208,7 @@ public class EventPacket implements Serializable {
             logger.log(Level.WARNING,
                 "The parameter \"packet\" is not an EventPacket");
 
-            logger.exiting(this.getClass().getName(), "isEqual", new Boolean(
-                false));
+            logger.exiting(this.getClass().getName(), "isEqual", Boolean.FALSE);
 
             return false;
         }
@@ -238,7 +237,7 @@ public class EventPacket implements Serializable {
         }
 
         logger.exiting(this.getClass().getName(), "isEqual",
-            new Boolean(equals));
+            Boolean.valueOf(equals));
 
         return equals;
 

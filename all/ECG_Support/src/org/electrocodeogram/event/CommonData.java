@@ -136,6 +136,13 @@ public class CommonData {
         this.creator = creator;
         creator_elem.setTextContent(creator);
     }
+
+    /**
+     * @return the creator
+     */
+    public String getCreator() {
+        return creator;
+    }
     
     
   
