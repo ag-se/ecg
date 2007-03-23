@@ -4,7 +4,8 @@
 	<xs:annotation>
 		<xs:documentation>
 			This XML schema defines the structure of the "AntRun" MicroSensorDataType.
-			This event type denotes a call to ant with a specific ant target
+			This event type denotes a call to ant with a specific ant target. If the target remains
+			unspecified, the default target was called.
 		</xs:documentation>
 	</xs:annotation>
 
