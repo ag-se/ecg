@@ -73,38 +73,6 @@ public class SocketServerThread extends EventReader {
     private WellFormedEventPacket packet;
 
     /**
-     * This method returns the name of the connected ECG
-     * sensor.
-     * @return The name of the currently connected ECG sensor
-     */
-    public final String getSensorName() {
-        logger.entering(this.getClass().getName(), "getSensorName");
-
-        logger.exiting(this.getClass().getName(), "getSensorName",
-            this.sensorName);
-
-        return this.sensorName;
-    }
-
-    /**
-     * This method returns the IP-Address of the currently connected
-     * ECG sensor.
-     * @return The IP-Address of the currently connected ECG sensor
-     */
-    public final InetAddress getSensorAddress() {
-        logger.entering(this.getClass().getName(), "getSensorAddress");
-
-        if (this.socketToSensor != null) {
-            return this.socketToSensor.getInetAddress();
-        }
-
-        logger.exiting(this.getClass().getName(), "getSensorAddress", null);
-
-        return null;
-
-    }
-
-    /**
      * This creates a new <em>SocketServerThread</em> and is called from {@link SocketServer}
      * for every new incomming connection request.
      * @param server
@@ -170,14 +138,37 @@ public class SocketServerThread extends EventReader {
     }
 
     /**
+     * This method returns the name of the connected ECG
+     * sensor.
+     * @return The name of the currently connected ECG sensor
+     */
+    public final String getSensorName() {
+        return this.sensorName;
+    }
+
+    /**
+     * This method returns the IP-Address of the currently connected
+     * ECG sensor.
+     * @return The IP-Address of the currently connected ECG sensor
+     */
+    public final InetAddress getSensorAddress() {
+        logger.entering(this.getClass().getName(), "getSensorAddress");
+
+        if (this.socketToSensor != null) {
+            return this.socketToSensor.getInetAddress();
+        }
+
+        logger.exiting(this.getClass().getName(), "getSensorAddress", null);
+
+        return null;
+
+    }
+
+    /**
      * This method returns the unique îd of the <em>SokctetServerThread</em>.
      * @return The unique id of the <em>SokctetServerThread</em>
      */
     public final int getServerThreadId() {
-        logger.entering(this.getClass().getName(), "getSensorThreadId");
-
-        logger.exiting(this.getClass().getName(), "getSensorThreadId", new Integer(this.id));
-
         return this.id;
     }
 

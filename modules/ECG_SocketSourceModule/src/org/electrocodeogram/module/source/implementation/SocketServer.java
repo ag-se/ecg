@@ -72,7 +72,7 @@ public class SocketServer extends Thread implements ISocketServer {
      */
     public SocketServer(final SourceModule module, final int port) {
         logger.entering(this.getClass().getName(), "SocketServer",
-            new Object[] {module, new Integer(port)});
+            new Object[] {module, Integer.valueOf(port)});
 
         if (module == null) {
             logger
@@ -150,7 +150,7 @@ public class SocketServer extends Thread implements ISocketServer {
         logger.entering(this.getClass().getName(), "getSensorCount");
 
         logger.exiting(this.getClass().getName(), "getSensorCount",
-            new Integer(this.threadPool.size()));
+            Integer.valueOf(this.threadPool.size()));
 
         return this.threadPool.size();
 
@@ -165,9 +165,9 @@ public class SocketServer extends Thread implements ISocketServer {
      */
     public final void removeSensorThread(final int id) {
         logger.entering(this.getClass().getName(), "removeSensorThread",
-            new Object[] {new Integer(id)});
+            new Object[] {Integer.valueOf(id)});
 
-        this.threadPool.remove(new Integer(id));
+        this.threadPool.remove(Integer.valueOf(id));
 
         logger.exiting(this.getClass().getName(), "removeSensorThread");
     }
@@ -247,7 +247,7 @@ public class SocketServer extends Thread implements ISocketServer {
                 logger.log(Level.INFO, "A new ServerThread has been created.");
 
                 // put the ServerThread in the threadpool
-                this.threadPool.put(new Integer(serverThread
+                this.threadPool.put(Integer.valueOf(serverThread
                     .getServerThreadId()), serverThread);
 
                 // start the ServerThread
