@@ -118,11 +118,6 @@ public class ValidEventPacket extends WellFormedEventPacket {
     private transient Document document;
 
     /**
-     * Tells which validation has been used to validate this event.
-     */
-    private VALIDATION_LEVEL validatedWith;
-
-    /**
      * Creates the event.
      * @param sourceId
      *            Is the id of the module that sent this event at
@@ -159,28 +154,7 @@ public class ValidEventPacket extends WellFormedEventPacket {
      * @return The current <em>VALIDATION_LEVEL</em>
      */
     public static VALIDATION_LEVEL getValidationLevel() {
-
-        logger.entering(ValidEventPacket.class.getName(), "getValidationLevel");
-
-        logger.exiting(ValidEventPacket.class.getName(), "getValidationLevel",
-            validationLevel);
-
         return validationLevel;
-    }
-
-    /**
-     * This method is used to get the <em>VALIDATION_LEVEL</em> that
-     * has been used to validate this event.
-     * @return The event's <em>VALIDATION_LEVEL</em>
-     */
-    public final VALIDATION_LEVEL getValidatedWith() {
-
-        logger.entering(this.getClass().getName(), "getValidatedWith");
-
-        logger.exiting(this.getClass().getName(), "getValidatedWith",
-            this.validatedWith);
-
-        return this.validatedWith;
     }
 
     /**

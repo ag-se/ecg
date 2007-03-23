@@ -11,16 +11,12 @@ import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.HashMap;
-import java.util.Observable;
 
 import javax.swing.JOptionPane;
 import javax.swing.border.LineBorder;
 import org.electrocodeogram.modulepackage.ModuleType;
 import org.electrocodeogram.misc.constants.UIConstants;
 import org.electrocodeogram.module.Module;
-import org.electrocodeogram.system.ISystem;
-import org.electrocodeogram.ui.Gui;
-import org.electrocodeogram.ui.IGui;
 import org.electrocodeogram.ui.MenuManager;
 import org.jgraph.JGraph;
 import org.jgraph.event.GraphSelectionEvent;

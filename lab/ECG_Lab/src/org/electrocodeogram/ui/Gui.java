@@ -653,11 +653,6 @@ public class Gui extends JFrame implements IGui {
         private static final long serialVersionUID = 987897133772256981L;
 
         /**
-         * A reference to the GUI.
-         */
-        private Gui rootFrame;
-
-        /**
          * Modules are displayed in a <em>JGraph</em>, which is
          * referenced here.
          */
@@ -674,7 +669,6 @@ public class Gui extends JFrame implements IGui {
          *            A reference to the GUI
          */
         public ModuleLabPanel(final Gui gui) {
-            this.rootFrame = gui;
 
             this.moduleGraph = new ModuleGraph();
 

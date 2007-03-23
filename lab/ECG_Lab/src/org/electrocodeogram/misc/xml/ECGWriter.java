@@ -48,7 +48,6 @@ public class ECGWriter {
         if (xmlDocumentSerializer == null)
             initWriter();
         
-        ValidEventPacket event = null;
         String docstring = xmlDocumentSerializer.writeToString(eventdoc);
         
         return createValidEventPacket(eventtype, timestamp, docstring);

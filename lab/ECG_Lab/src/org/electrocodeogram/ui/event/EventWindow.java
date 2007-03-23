@@ -30,7 +30,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.electrocodeogram.misc.constants.UIConstants;
-import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.misc.constants.StringConstants;
 import org.electrocodeogram.module.registry.ModuleInstanceNotFoundException;
 
