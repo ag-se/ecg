@@ -162,21 +162,6 @@ public class SensorShell {
     private EventSender eventSender = null;
 
     /**
-     * This is the absolute path to the ECG EclipseSensor plugin.
-     */
-    private String sensorPath;
-
-    /**
-     * This is the IP address of the ECG lab server with the SocketSourceModule.
-     */
-    private String ecgLabIp;
-
-    /**
-     * This is the port number of the ECG lab server with the SocketSourceModule.
-     */
-    private String ecgLabPort;
-
-    /**
      * A flag that indicates if the <em>SensorShell</em> is able to
      * receive recorded events.
      */
@@ -207,7 +192,7 @@ public class SensorShell {
         final boolean interactive,
         final String toolName) {
         logger.entering(this.getClass().getName(), "SensorShell", new Object[] {
-            properties, new Boolean(interactive), toolName});
+            properties, Boolean.valueOf(interactive), toolName});
 
         this.acceptEvents = true;
 
@@ -516,8 +501,7 @@ public class SensorShell {
             logger.log(Level.FINE,
                 "The SensorShell is currently not accepting new events.");
 
-            logger.exiting(this.getClass().getName(), "doCommand", new Boolean(
-                "false"));
+            logger.exiting(this.getClass().getName(), "doCommand", Boolean.FALSE);
 
             return false;
         }
@@ -541,7 +525,7 @@ public class SensorShell {
 
         result = analyseEvent(timeStamp, sensorDataType, argList);
 
-        logger.exiting(this.getClass().getName(), "doCommand", new Boolean(
+        logger.exiting(this.getClass().getName(), "doCommand", Boolean.valueOf(
             result));
 
         return result;
@@ -570,7 +554,7 @@ public class SensorShell {
             logger.log(Level.FINE,
                 "Server type is NULLSERVER, event will be ignored.");
             logger.exiting(this.getClass().getName(), "analyseEvent",
-                new Boolean(true));
+                Boolean.TRUE);
             return true;            
         }
 
@@ -640,7 +624,7 @@ public class SensorShell {
     public final boolean send() {
         logger.entering(this.getClass().getName(), "send");
 
-        logger.exiting(this.getClass().getName(), "send", new Boolean(true));
+        logger.exiting(this.getClass().getName(), "send", Boolean.TRUE);
 
         return true;
     }
@@ -670,7 +654,7 @@ public class SensorShell {
         logger.entering(this.getClass().getName(), "isServerPingable");
 
         logger.exiting(this.getClass().getName(), "isServerPingable",
-            new Boolean(true));
+            Boolean.TRUE);
 
         return true;
     }
@@ -689,7 +673,7 @@ public class SensorShell {
         logger.entering(this.getClass().getName(), "isServerPingable");
 
         logger.exiting(this.getClass().getName(), "isServerPingable",
-            new Boolean(true));
+            Boolean.TRUE);
 
         return true;
     }

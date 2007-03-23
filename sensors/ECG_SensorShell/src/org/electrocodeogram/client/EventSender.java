@@ -124,7 +124,7 @@ public class EventSender extends Thread {
         throws IllegalHostOrPortException {
 
         logger.entering(this.getClass().getName(), "EventSender", new Object[] {
-            hostname, new Integer(tcpport)});
+            hostname, Integer.valueOf(tcpport)});
 
         if (hostname == null || tcpport < MIN_PORT || tcpport > MAX_PORT) {
             logger.log(Level.SEVERE,
@@ -169,7 +169,7 @@ public class EventSender extends Thread {
             logger.log(Level.WARNING, "The parameter \"packet\" is null.");
 
             logger.exiting(this.getClass().getName(), "addEventPacket",
-                new Boolean(false));
+                Boolean.valueOf(false));
 
             return false;
         }
@@ -342,10 +342,11 @@ public class EventSender extends Thread {
      * <em>eventSender</em> causing it to wait if the buffer is
      * empty and notifying it if new events are added.
      */
-    @SuppressWarnings("serial")
     private static class EventPacketQueue extends
         ArrayList<WellFormedEventPacket> {
 
+        private static final long serialVersionUID = -4924488182383696048L;
+        
         /**
          * This is the logger.
          */
@@ -383,7 +384,7 @@ public class EventSender extends Thread {
                 this.notifyAll();
 
                 this.eventPacketQueuelogger.exiting(this.getClass().getName(),
-                    "addToTail", new Boolean(result));
+                    "addToTail", Boolean.valueOf(result));
 
                 return result;
             }
@@ -453,7 +454,7 @@ public class EventSender extends Thread {
             }
 
             this.eventPacketQueuelogger.exiting(this.getClass().getName(),
-                "getSize", new Integer(this.size()));
+                "getSize", Integer.valueOf(this.size()));
 
             return this.size();
         }
