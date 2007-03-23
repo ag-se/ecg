@@ -115,20 +115,21 @@ public final class MenuManager {
                 "Menu Initialisation", JOptionPane.ERROR_MESSAGE);
         }
 
-        moduleProperties = moduleDescriptor.getProperties();
+        if (moduleDescriptor != null) {
 
-        if (moduleProperties != null) {
-            for (ModuleProperty moduleProperty : moduleProperties) {
+            moduleProperties = moduleDescriptor.getProperties();
 
-                JMenuItem menuItem = new JMenuItem(moduleProperty.getName());
+            if (moduleProperties != null) {
+                for (ModuleProperty moduleProperty : moduleProperties) {
 
-                menuItem.addActionListener(new PropertyActionAdapter(
-                    moduleProperty));
+                    JMenuItem menuItem = new JMenuItem(moduleProperty.getName());
 
-                menu.add(menuItem);
+                    menuItem.addActionListener(new PropertyActionAdapter(
+                        moduleProperty));
 
+                    menu.add(menuItem);
+                }
             }
-
         }
 
         menu.add(mniModuleDetails);
