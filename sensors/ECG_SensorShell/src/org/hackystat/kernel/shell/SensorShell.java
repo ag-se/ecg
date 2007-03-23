@@ -1066,7 +1066,7 @@ public class SensorShell {
             PrintWriter writer = new PrintWriter(new OutputStreamWriter(os));
 
             inlineServerLogger
-                .log(Level.WARNING, "Stream to ECG Lab established.");
+                .log(Level.INFO, "Stream to ECG Lab established.");
 
             writer.println("quit");
 
