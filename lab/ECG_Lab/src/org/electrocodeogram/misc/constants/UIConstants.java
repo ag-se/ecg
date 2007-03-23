@@ -62,65 +62,65 @@ public final class UIConstants {
 
     public static final boolean BORDER_FLAT = false;
 
-    public static Color PNL_MODULE_LAB_BORDER_COLOR = ECG_LIGHT_GREEN;
+    public static final Color PNL_MODULE_LAB_BORDER_COLOR = ECG_LIGHT_GREEN;
 
-    public static int PNL_MODULE_LAB_BORDER_WIDTH = MEDIUM_BORDER_WIDTH;
+    public static final int PNL_MODULE_LAB_BORDER_WIDTH = MEDIUM_BORDER_WIDTH;
 
-    public static Color PNL_MODULE_FINDER_BORDER_COLOR = ECG_LIGHT_GREEN;
+    public static final Color PNL_MODULE_FINDER_BORDER_COLOR = ECG_LIGHT_GREEN;
 
-    public static int PNL_MODULE_FINDER_BORDER_WIDTH = MEDIUM_BORDER_WIDTH;
+    public static final int PNL_MODULE_FINDER_BORDER_WIDTH = MEDIUM_BORDER_WIDTH;
 
-    public static Color PNL_INNER_FINDER_SOURCE_BORDER_COLOR = ECG_BLUE;
+    public static final Color PNL_INNER_FINDER_SOURCE_BORDER_COLOR = ECG_BLUE;
 
-    public static int PNL_INNER_FINDER_SOURCE_BORDER_WIDTH = MEDIUM_BORDER_WIDTH;
+    public static final int PNL_INNER_FINDER_SOURCE_BORDER_WIDTH = MEDIUM_BORDER_WIDTH;
 
-    public static Color PNL_INNER_FINDER_INTERMEDIATE_BORDER_COLOR = ECG_BLUE;
+    public static final Color PNL_INNER_FINDER_INTERMEDIATE_BORDER_COLOR = ECG_BLUE;
 
-    public static int PNL_INNER_FINDER_INTERMEDIATE_BORDER_WIDTH = MEDIUM_BORDER_WIDTH;
+    public static final int PNL_INNER_FINDER_INTERMEDIATE_BORDER_WIDTH = MEDIUM_BORDER_WIDTH;
 
-    public static Color PNL_INNER_FINDER_TARGET_BORDER_COLOR = ECG_BLUE;
+    public static final Color PNL_INNER_FINDER_TARGET_BORDER_COLOR = ECG_BLUE;
 
-    public static int PNL_INNER_FINDER_TARGET_BORDER_WIDTH = MEDIUM_BORDER_WIDTH;
+    public static final int PNL_INNER_FINDER_TARGET_BORDER_WIDTH = MEDIUM_BORDER_WIDTH;
 
-    public static Color PNL_INNER_FINDER_BACKGROUND_COLOR = ECG_LIGHT_GREEN;
+    public static final Color PNL_INNER_FINDER_BACKGROUND_COLOR = ECG_LIGHT_GREEN;
 
-    public static Color LBL_MODULE_BACKGROUND_COLOR = ECG_LIGHT_GREEN;
+    public static final Color LBL_MODULE_BACKGROUND_COLOR = ECG_LIGHT_GREEN;
 
-    public static Color LBL_MODULE_MOUSEOVER_BACKGROUND_COLOR = ECG_LIGHT_SEPIA;
+    public static final Color LBL_MODULE_MOUSEOVER_BACKGROUND_COLOR = ECG_LIGHT_SEPIA;
 
-    public static Color LBL_MODULE_MOUSEOVER_BORDER_COLOR = ECG_DARK_BLUE;
+    public static final Color LBL_MODULE_MOUSEOVER_BORDER_COLOR = ECG_DARK_BLUE;
 
-    public static Color LBL_MODULE_MOUSEOUT_BACKGROUND_COLOR = ECG_LIGHT_GREEN;
+    public static final Color LBL_MODULE_MOUSEOUT_BACKGROUND_COLOR = ECG_LIGHT_GREEN;
 
-    public static Color LBL_MODULE_MOUSEPRESSED_BACKGROUND_COLOR = ECG_SEPIA;
+    public static final Color LBL_MODULE_MOUSEPRESSED_BACKGROUND_COLOR = ECG_SEPIA;
 
-    public static Color LBL_MODULE_MOUSERELEASED_BACKGROUND_COLOR = ECG_LIGHT_SEPIA;
+    public static final Color LBL_MODULE_MOUSERELEASED_BACKGROUND_COLOR = ECG_LIGHT_SEPIA;
 
-    public static Color MGR_BACKGROUND_COLOR = ECG_LIGHT_GREEN;
+    public static final Color MGR_BACKGROUND_COLOR = ECG_LIGHT_GREEN;
 
-    public static Color MGR_BORDER_COLOR = ECG_BLUE;
+    public static final Color MGR_BORDER_COLOR = ECG_BLUE;
 
-    public static int MGR_BORDER_WIDTH = SMALL_BORDER_WIDTH;
+    public static final int MGR_BORDER_WIDTH = SMALL_BORDER_WIDTH;
 
-    public static Color MCL_BACKGROUND_COLOR = ECG_LIGHT_GREEN;
+    public static final Color MCL_BACKGROUND_COLOR = ECG_LIGHT_GREEN;
 
-    public static Color MCL_BORDER_COLOR = ECG_GREEN;
+    public static final Color MCL_BORDER_COLOR = ECG_GREEN;
 
-    public static int MCL_BORDER_WIDTH = MEDIUM_BORDER_WIDTH;
+    public static final int MCL_BORDER_WIDTH = MEDIUM_BORDER_WIDTH;
 
-    public static Color MCL_ACTIVE_BORDER_TITLE_COLOR = ECG_DARK_GREEN;
+    public static final Color MCL_ACTIVE_BORDER_TITLE_COLOR = ECG_DARK_GREEN;
 
-    public static Color MCL_INACTIVE_BORDER_TITLE_COLOR = ECG_RED;
+    public static final Color MCL_INACTIVE_BORDER_TITLE_COLOR = ECG_RED;
 
-    public static Color MED_LINE_COLOR = ECG_BLUE;
+    public static final Color MED_LINE_COLOR = ECG_BLUE;
 
-    public static int MED_LINE_WIDTH = MEDIUM_BORDER_WIDTH;
+    public static final int MED_LINE_WIDTH = MEDIUM_BORDER_WIDTH;
 
-    public static Color FRM_EVENT_WINDOW_BORDER_COLOR = ECG_BLUE;
+    public static final Color FRM_EVENT_WINDOW_BORDER_COLOR = ECG_BLUE;
 
-    public static int FRM_EVENT_WINDOW_BORDER_WIDTH = MEDIUM_BORDER_WIDTH;
+    public static final int FRM_EVENT_WINDOW_BORDER_WIDTH = MEDIUM_BORDER_WIDTH;
 
-    public static Color FRM_EVENT_WINDOW_BACKGROUND_COLOR = ECG_LIGHT_GREEN;
+    public static final Color FRM_EVENT_WINDOW_BACKGROUND_COLOR = ECG_LIGHT_GREEN;
     
     public static final int MODULE_CELL_DEFAULT_HEIGHT = 25;
 

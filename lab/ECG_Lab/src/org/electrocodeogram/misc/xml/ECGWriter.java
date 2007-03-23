@@ -30,7 +30,7 @@ public class ECGWriter {
     /**
      * TODO: change to general static format 
      */
-    public static DateFormat dateFormat = DateFormat.getDateTimeInstance(
+    public static final DateFormat dateFormat = DateFormat.getDateTimeInstance(
             DateFormat.MEDIUM, DateFormat.MEDIUM);
         
 
