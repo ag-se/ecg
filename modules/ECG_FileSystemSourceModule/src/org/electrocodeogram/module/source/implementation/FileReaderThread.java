@@ -6,15 +6,11 @@ package org.electrocodeogram.module.source.implementation;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FileReader;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
@@ -40,57 +36,12 @@ import org.electrocodeogram.system.ModuleSystem;
  */
 public class FileReaderThread extends EventReader {
 
-	public class ECGFileFilter implements FileFilter {
-
-        public boolean accept(File f) {
-            if (f.isDirectory())
-                return false;
-            if (f.isHidden())
-                return false;
-
-            String extension = getExtension(f);
-            if (extension != null) {
-                if (extension.equals("log") ||
-                    extension.equals("ecg") ||
-                    extension.equals("events") ||
-                    extension.equals("out")) {
-                        return true;
-                } else {
-                    return false;
-                }
-            }
-
-            return false;
-        }
-
-        public String getExtension(File f) {
-            String ext = null;
-            String s = f.getName();
-            int i = s.lastIndexOf('.');
-
-            if (i > 0 &&  i < s.length() - 1) {
-                ext = s.substring(i+1).toLowerCase();
-            }
-            return ext;
-        }        
-    }
-
-    /**
+	/**
 	 * Holds the system dependent representation of a line separator.
      * TODO Don't use this, because it simply needs to be the seperator of the file! 
 	 */
 	private static String NEW_LINE_CHAR = System.getProperty("line.separator");
 	
-    /**
-     * This <em>EventReader</em> makes use of <em>Tokenizers</em>
-     * to cut a read line into pieces of event data. Some events like
-     * the <em>Codechange</em> event can contain the
-     * <em>Tokenizer</em> deliameters in its content. In this case
-     * the content is masked with this constant <code>String</code>
-     * and unmasked after tokenization.
-     */
-    private static final String CODE_REPLACEMENT = "CODE";
-
     /**
      * This is the logger.
      */
@@ -192,10 +143,8 @@ public class FileReaderThread extends EventReader {
 
         WellFormedEventPacket eventPacket = null;
         
-        boolean cdatafragment = false;
         int lineNumber = 0;
         String line = null;
-        String code = null;
         
         try {
 
@@ -348,38 +297,6 @@ public class FileReaderThread extends EventReader {
                 logger.log(Level.WARNING, e.getMessage());
 
                 return null;
-            }
-
-            if (cdatafragment) {
-                if (code == null || code.equals("")) {
-                    logger.log(Level.WARNING, "Error while reading line "
-                                              + lineNumber + ":");
-
-                    logger.log(Level.WARNING,
-                        "This line does not contain a valid CDATA section replacement.");
-
-                    cdatafragment = false;
-
-                    return null;
-                }
-
-                String withCodeReplacement = argListStringArray[argListStringArray.length - 1];
-
-                if (!withCodeReplacement.contains(CODE_REPLACEMENT)) {
-                    logger.log(Level.WARNING, "Error while reading line "
-                                              + lineNumber + ":");
-
-                    logger.log(Level.WARNING,
-                        "This line does not contain a valid CDATA section replacement.");
-
-                    cdatafragment = false;
-
-                    return null;
-                }
-
-                String withCode = withCodeReplacement.replace(CODE_REPLACEMENT, code);
-                
-                argListStringArray[argListStringArray.length - 1] = withCode;
             }
 
             // Create a List object from the Array now containing the
