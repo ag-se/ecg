@@ -290,12 +290,10 @@ public class FileSystemTargetModule extends TargetModule {
         
         if (this.outputFile != null && 
                 this.outputFile.length() >= this.fileSize && 
-                this.rotateFiles) 
-        {
+                this.rotateFiles) {
             logger.log(Level.INFO,
                 "The log-file has reached the maximum file size of "
                                 + this.fileSize);
-            this.writer.close();
             this.count++;
             if (this.writer != null)
                 this.writer.close();
