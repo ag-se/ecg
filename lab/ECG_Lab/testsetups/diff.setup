@@ -1,111 +1,107 @@
 <?xml version="1.0"?>
 <modulesetup>
-<module id="2" active="true">
-<name>
-File Reader
-</name>
-<fromClassId>
-org.electrocodeogram.module.source.implementation.FileSystemSourceModule
-</fromClassId>
-<connectedTo>
-<id>
-3
-</id>
-</connectedTo>
-<properties>
-<property>
-<name>
-Input File
-</name>
-<value>
-testeventlogs/ACM060530_acm3_events.log
-</value>
-<type>
-java.io.File
-</type>
-</property>
-<property>
-<name>
-Enable Burst Mode
-</name>
-<value>
-true
-</value>
-<type>
-java.lang.Boolean
-</type>
-</property>
-<property>
-<name>
-Send End Event
-</name>
-<value>
-true
-</value>
-<type>
-java.lang.Boolean
-</type>
-</property>
-</properties>
-</module>
-<module id="1" active="true">
-<name>
-File Writer
-</name>
-<fromClassId>
-org.electrocodeogram.module.target.implementation.FileSystemTargetModule
-</fromClassId>
-<connectedTo>
-</connectedTo>
-<properties>
-<property>
-<name>
-Output File
-</name>
-<value>
-out.log
-</value>
-<type>
-java.io.File
-</type>
-</property>
-<property>
-<name>
-Split Files
-</name>
-<value>
-false
-</value>
-<type>
-java.lang.Boolean
-</type>
-</property>
-<property>
-<name>
-File Size
-</name>
-<value>
-100000
-</value>
-<type>
-java.lang.Integer
-</type>
-</property>
-</properties>
-</module>
-<module id="3" active="true">
-<name>
-Codechange Diff-Generator
-</name>
-<fromClassId>
-org.electrocodeogram.module.intermediate.implementation.CodechangeDifferIntermediateModule
-</fromClassId>
-<connectedTo>
-<id>
-1
-</id>
-</connectedTo>
-<properties>
-</properties>
-</module>
+	<module id="2" active="true">
+		<name>
+		File Reader
+		</name>
+		<fromClassId>
+		org.electrocodeogram.module.source.implementation.FileSystemSourceModule
+		</fromClassId>
+		<connectedTo>
+			<id>3</id>
+		</connectedTo>
+		<properties>
+			<property>
+				<name>
+				Input File
+				</name>
+				<value>
+				testeventlogs/ACM060530_acm3_events.log
+				</value>
+				<type>
+				java.io.File
+				</type>
+			</property>
+			<property>
+				<name>
+				Enable Burst Mode
+				</name>
+				<value>
+				true
+				</value>
+				<type>
+				java.lang.Boolean
+				</type>
+				</property>
+				<property>
+				<name>
+				Send End Event
+				</name>
+				<value>
+				true
+				</value>
+				<type>
+				java.lang.Boolean
+				</type>
+			</property>
+		</properties>
+	</module>
+	<module id="1" active="true">
+		<name>
+		File Writer
+		</name>
+		<fromClassId>
+		org.electrocodeogram.module.target.implementation.FileSystemTargetModule
+		</fromClassId>
+		<connectedTo>
+		</connectedTo>
+		<properties>
+			<property>
+				<name>
+				Output File
+				</name>
+				<value>
+				out.log
+				</value>
+				<type>
+				java.io.File
+				</type>
+			</property>
+			<property>
+				<name>
+				Split Files
+				</name>
+				<value>
+				false
+				</value>
+				<type>
+				java.lang.Boolean
+				</type>
+			</property>
+			<property>
+				<name>
+				File Size
+				</name>
+				<value>
+				100000
+				</value>
+				<type>
+				java.lang.Integer
+				</type>
+			</property>
+		</properties>
+	</module>
+	<module id="3" active="true">
+		<name>
+		Codechange Diff-Generator
+		</name>
+			<fromClassId>
+			org.electrocodeogram.module.intermediate.implementation.CodechangeDifferIntermediateModule
+			</fromClassId>
+		<connectedTo>
+			<id>1</id>
+		</connectedTo>
+		<properties>
+		</properties>
+	</module>
 </modulesetup>

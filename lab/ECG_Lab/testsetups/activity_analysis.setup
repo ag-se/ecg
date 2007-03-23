@@ -1,26 +1,5 @@
 <?xml version="1.0"?>
 <modulesetup>
-	<module id="6" active="true">
-		<name>
-			WindowActive episode recognizer
-		</name>
-		<fromClassId>
-			org.electrocodeogram.module.intermediate.implementation.EpisodeRecognizerIntermediateModule
-		</fromClassId>
-		<connectedTo>
-			<id>5</id>
-		</connectedTo>
-		<properties>
-			<property>
-				<name>Recognizer</name>
-				<value>
-					WindowActiveEpisodeRecognizer
-				</value>
-				<type>java.lang.String</type>
-			</property>
-		</properties>
-	</module>
-
 	<module id="3" active="true">
 		<name>
 			File Reader
@@ -34,7 +13,7 @@
 		<properties>
 			<property>
 				<name>Input File</name>
-				<value>testeventlogs/events_with_ant.log</value>
+				<value>D:\Forschung\Kodierszenen\jekutsch\jekutsch_070206.events</value>
 				<type>java.io.File</type>
 			</property>
 			<property>
@@ -64,11 +43,33 @@
 			<property>
 				<name>Blocker</name>
 				<value>
+					msdt.exactcodechange.xsd,
 				    msdt.focus.xsd
 					msdt.testrun.xsd,
 					msdt.rundebug.xsd,
 					msdt.resource.xsd,
 					msdt.test.xsd,
+				</value>
+				<type>java.lang.String</type>
+			</property>
+		</properties>
+	</module>
+
+	<module id="6" active="true">
+		<name>
+			WindowActive episode recognizer
+		</name>
+		<fromClassId>
+			org.electrocodeogram.module.intermediate.implementation.EpisodeRecognizerIntermediateModule
+		</fromClassId>
+		<connectedTo>
+			<id>5</id>
+		</connectedTo>
+		<properties>
+			<property>
+				<name>Recognizer</name>
+				<value>
+					WindowActiveEpisodeRecognizer
 				</value>
 				<type>java.lang.String</type>
 			</property>
@@ -167,7 +168,7 @@
 			org.electrocodeogram.module.intermediate.implementation.EpisodeRecognizerIntermediateModule
 		</fromClassId>
 		<connectedTo>
-			<id>4</id>
+			<id>11</id>
 		</connectedTo>
 		<properties>
 			<property>
@@ -187,6 +188,27 @@
 		</properties>
 	</module>
 
+	<module id="11" active="true">
+		<name>
+			ApplicationActive episode recognizer
+		</name>
+		<fromClassId>
+			org.electrocodeogram.module.intermediate.implementation.EpisodeRecognizerIntermediateModule
+		</fromClassId>
+		<connectedTo>
+			<id>4</id>
+		</connectedTo>
+		<properties>
+			<property>
+				<name>Recognizer</name>
+				<value>
+					ApplicationActiveEpisodeRecognizer
+				</value>
+				<type>java.lang.String</type>
+			</property>
+		</properties>
+	</module>
+
 	<module id="4" active="true">
 		<name>
 			MicroActivity Filter2
@@ -200,22 +222,9 @@
 		</connectedTo>
 		<properties>
 			<property>
-				<name>Blocker</name>
+				<name>Passer</name>
 				<value>
-					msdt.codechange.xsd,
-					msdt.codestatus.xsd,
-					msdt.dialog.xsd
-					msdt.editor.xsd
-				    msdt.focus.xsd
-					msdt.part.xsd
-					msdt.resource.xsd,
-					msdt.rundebug.xsd
-					msdt.system.xsd,
-					msdt.test.xsd,
-					msdt.user.xsd,
-					msdt.run.xsd,
-					msdt.testrun.xsd,
-					msdt.window.xsd,
+					msdt.applicationactive.xsd
 				</value>
 				<type>java.lang.String</type>
 			</property>
@@ -253,26 +262,18 @@
 		</connectedTo>
 		<properties>
 			<property>
-				<name>
-					Output File
-				</name>
+				<name>Output File</name>
 				<value>
 					episodes.log
 				</value>
-				<type>
-					java.io.File
-				</type>
+				<type>java.io.File</type>
 			</property>
 			<property>
-				<name>
-					Columns
-				</name>
+				<name>Columns</name>
 				<value>
-					type,timestamp,endtime,resourcename/launchname/buildfile,activity/mode/target,duration,changed
+					type,timestamp,endtime,resourcename/launch/buildfile/processName#windowTitle/processname#windowtitle,activity/mode/target,duration,changed
 				</value>
-				<type>
-					java.lang.String
-				</type>
+				<type>java.lang.String</type>
 			</property>
 <!--
 			<property>

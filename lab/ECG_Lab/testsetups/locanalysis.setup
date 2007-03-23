@@ -11,7 +11,7 @@
 		<properties>
 			<property>
 				<name>Input File</name>
-				<value>D:\\Forschung\\Kodierszenen\\codelocations.log</value>
+				<value>D:\Forschung\Kodierszenen\ACM2006\ACM060606_acm2_locations.log</value>
 				<type>java.io.File</type>
 			</property>
 			<property>
@@ -62,7 +62,7 @@
 		<properties>
 			<property>
 				<name>Output File</name>
-				<value>D:\\Forschung\\Kodierszenen\\eventviewer_events.log</value>
+				<value>D:\Forschung\Kodierszenen\ACM2006\ACM060606_acm2_exactcodechanges.log</value>
 				<type>java.io.File</type>
 			</property>
 			<property>

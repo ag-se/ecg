@@ -8,44 +8,32 @@
 		org.electrocodeogram.module.source.implementation.FileSystemSourceModule
 		</fromClassId>
 		<connectedTo>
-		<id>
-		3
-		</id>
+			<id>3</id>
 		</connectedTo>
 		<properties>
-		<property>
-		<name>
-		Input File
-		</name>
-		<value> 
-		testeventlogs/ACM060606_acm3_events.log
-		</value>
-		<type>
-		java.io.File
-		</type>
-		</property>
-		<property>
-		<name>
-		Enable Burst Mode
-		</name>
-		<value>
-		true
-		</value>
-		<type>
-		java.lang.Boolean
-		</type>
-		</property>
-		<property>
-		<name>
-		Send End Event
-		</name>
-		<value>
-		true
-		</value>
-		<type>
-		java.lang.Boolean
-		</type>
-		</property>
+			<property>
+				<name>Input File</name>
+				<value>D:\Forschung\Kodierszenen\ACM2006\ACM060606_acm2_events.log</value>
+				<type>java.io.File</type>
+			</property>
+			<property>
+				<name>Enable Burst Mode</name>
+				<value>true</value>
+				<type>java.lang.Boolean</type>
+			</property>
+			<property>
+				<name>Send End Event</name>
+				<value>true</value>
+				<type>java.lang.Boolean</type>
+			</property>
+			<property>
+				<name>Ignored Event Types</name>
+				<value>
+					msdt.focustracker.xsd
+					msdt.focustrackersystem.xsd
+				</value>
+				<type>java.lang.String</type>
+			</property>
 		</properties>
 	</module>
 	<module id="4" active="true">
@@ -108,6 +96,8 @@
 				<name>Passer</name>
 				<value>
 					msdt.codelocation.xsd
+					msdt.run.xsd
+					msdt.system.xsd
 				</value>
 				<type>java.lang.String</type>
 			</property>
@@ -125,11 +115,16 @@
 		<properties>
 			<property>
 				<name>Output File</name>
-				<value>out_events.log</value>
+				<value>locations.log</value>
 				<type>java.io.File</type>
 			</property>
 			<property>
 				<name>Stamp File Name</name>
+				<value>false</value>
+				<type>java.lang.Boolean</type>
+			</property>
+			<property>
+				<name>Append Data</name>
 				<value>false</value>
 				<type>java.lang.Boolean</type>
 			</property>
