@@ -104,7 +104,7 @@ public class ModuleConfiguration {
         final ModuleProperty[] properties, final String packageId) {
 
         logger.entering(this.getClass().getName(), "ModuleConfiguration",
-            new Object[] {to, new Integer(id), name, Boolean.valueOf(active),
+            new Object[] {to, Integer.valueOf(id), name, Boolean.valueOf(active),
                 properties, packageId});
 
         this.moduleId = id;
@@ -181,7 +181,7 @@ public class ModuleConfiguration {
 
         logger.entering(this.getClass().getName(), "getModuleId");
 
-        logger.exiting(this.getClass().getName(), "getModuleId", new Integer(
+        logger.exiting(this.getClass().getName(), "getModuleId", Integer.valueOf(
             this.moduleId));
 
         return this.moduleId;

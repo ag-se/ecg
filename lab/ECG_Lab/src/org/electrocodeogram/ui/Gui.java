@@ -408,8 +408,8 @@ public class Gui extends JFrame implements IGui {
 
         int id = Gui.this.pnlModules.getSelectedModuleCell();
 
-        if (this.eventWindoMap.containsKey(new Integer(id))) {
-            window = this.eventWindoMap.get(new Integer(id));
+        if (this.eventWindoMap.containsKey(Integer.valueOf(id))) {
+            window = this.eventWindoMap.get(Integer.valueOf(id));
 
         } else {
             try {
@@ -420,7 +420,7 @@ public class Gui extends JFrame implements IGui {
                 return;
             }
 
-            this.eventWindoMap.put(new Integer(id), window);
+            this.eventWindoMap.put(Integer.valueOf(id), window);
 
         }
 
@@ -448,13 +448,13 @@ public class Gui extends JFrame implements IGui {
 
                 if (this.pnlModules.containsModuleCell(module.getId())) {
 
-                    EventWindow window = this.eventWindoMap.get(new Integer(
+                    EventWindow window = this.eventWindoMap.get(Integer.valueOf(
                         module.getId()));
 
                     if (window != null) {
                         window.dispose();
 
-                        this.eventWindoMap.remove(new Integer(module.getId()));
+                        this.eventWindoMap.remove(Integer.valueOf(module.getId()));
                     }
 
                     this.pnlModules.removeModuleCell(module.getId());
@@ -479,8 +479,8 @@ public class Gui extends JFrame implements IGui {
             ProcessedEventPacket event = (ProcessedEventPacket) arg;
 
             if (this.eventWindoMap
-                .containsKey(new Integer(event.getSourceId()))) {
-                EventWindow window = this.eventWindoMap.get(new Integer(event
+                .containsKey(Integer.valueOf(event.getSourceId()))) {
+                EventWindow window = this.eventWindoMap.get(Integer.valueOf(event
                     .getSourceId()));
 
                 window.appendEvent(event);

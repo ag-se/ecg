@@ -51,7 +51,7 @@ public class ModulePropertyException extends Exception {
         super(message);
 
         logger.entering(this.getClass().getName(), "ModulePropertyException",
-            new Object[] {moduleName, new Integer(moduleId), propertyName,
+            new Object[] {moduleName, Integer.valueOf(moduleId), propertyName,
                 propertyValue});
 
         logger.log(Level.SEVERE, "A ModulePropertyException has occured.");

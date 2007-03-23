@@ -196,7 +196,7 @@ public class ModuleGraph extends JGraph {
      * @param cell The new cell
      */
     private void addModuleCell(final ModuleCell cell) {
-        this.cellMap.put(new Integer(cell.getId()), cell);
+        this.cellMap.put(Integer.valueOf(cell.getId()), cell);
 
         this.getGraphLayoutCache().insert(cell);
     }
@@ -209,7 +209,7 @@ public class ModuleGraph extends JGraph {
     public final void updateModuleCell(final int id, final Module module) {
         if (containsModuleCell(id)) {
 
-            ModuleCell moduleCell = this.cellMap.get(new Integer(id));
+            ModuleCell moduleCell = this.cellMap.get(Integer.valueOf(id));
 
             if (module.isActive()) {
                 moduleCell.activate();
@@ -230,7 +230,7 @@ public class ModuleGraph extends JGraph {
             if (modules != null) {
                 for (Module receivingModule : modules) {
                     ModuleCell childModuleCell = this.cellMap
-                        .get(new Integer(receivingModule.getId()));
+                        .get(Integer.valueOf(receivingModule.getId()));
 
                     ModuleEdge edge = new ModuleEdge(moduleCell.getId(),
                         childModuleCell.getId());
@@ -252,7 +252,7 @@ public class ModuleGraph extends JGraph {
      * @return <code>true</code> if a cell with the given id is displayed and <code>false</code> otherwise
      */
     public final boolean containsModuleCell(final int id) {
-        boolean flag = this.cellMap.containsKey(new Integer(id));
+        boolean flag = this.cellMap.containsKey(Integer.valueOf(id));
 
         return flag;
     }
@@ -263,7 +263,7 @@ public class ModuleGraph extends JGraph {
      */
     public final void removeModuleCell(final int id) {
         if (containsModuleCell(id)) {
-            ModuleCell cell =  this.cellMap.get(new Integer(id));
+            ModuleCell cell =  this.cellMap.get(Integer.valueOf(id));
 
             Object[] o = new Object[] {cell};
 
@@ -275,7 +275,7 @@ public class ModuleGraph extends JGraph {
 
             getGraphLayoutCache().remove(o);
 
-            this.cellMap.remove(new Integer(id));
+            this.cellMap.remove(Integer.valueOf(id));
         }
     }
 

@@ -41,7 +41,7 @@ public class ModuleInstanceNotFoundException extends Exception {
         super(message);
 
         logger.entering(this.getClass().getName(),
-            "ModuleInstanceNotFoundException", new Object[] {new Integer(id)});
+            "ModuleInstanceNotFoundException", new Object[] {Integer.valueOf(id)});
 
         logger.log(Level.SEVERE,
             "An ModuleInstanceNotFoundException because the module id " + id

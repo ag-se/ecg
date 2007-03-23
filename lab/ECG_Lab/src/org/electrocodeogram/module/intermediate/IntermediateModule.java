@@ -105,7 +105,9 @@ public abstract class IntermediateModule extends Module implements
 
         this.annotationStyle = AnnotationStyle.POST_ANNOTATION;
 
+        //$ANALYSIS-IGNORE,codereview.java.rules.constructors.RuleConstructorsAbstractMethods
         initialize();
+        
 
         logger.exiting(this.getClass().getName(), "IntermediateModule");
 

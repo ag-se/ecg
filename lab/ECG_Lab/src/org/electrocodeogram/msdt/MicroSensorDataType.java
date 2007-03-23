@@ -168,7 +168,7 @@ public class MicroSensorDataType {
         logger.entering(this.getClass().getName(), "getId");
 
         logger
-            .exiting(this.getClass().getName(), "getId", new Integer(this.id));
+            .exiting(this.getClass().getName(), "getId", Integer.valueOf(this.id));
 
         return this.id;
     }

@@ -49,8 +49,8 @@ public class ModuleConnectionException extends Exception {
         super(msg);
 
         logger.entering(this.getClass().getName(), "ModuleConnectionException",
-            new Object[] {msg, fromModule, new Integer(fromModuleId), toModuleName,
-                new Integer(toModuleId)});
+            new Object[] {msg, fromModule, Integer.valueOf(fromModuleId), toModuleName,
+                Integer.valueOf(toModuleId)});
 
         logger.log(Level.SEVERE,
             "An ModuleConnectionException occured while connecting module \""

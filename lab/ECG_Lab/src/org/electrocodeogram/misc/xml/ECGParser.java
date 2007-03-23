@@ -928,7 +928,9 @@ public final class ECGParser {
             logger.exiting(ECGParser.class.getName(),
                 "getMicroSensorDataTypes", null);
 
+            //$ANALYSIS-IGNORE,codereview.java.rules.nulls.RuleNullEmptyArray
             return null;
+            
         }
 
         ArrayList < MicroSensorDataType > microSensorDataTypes = null;
@@ -1154,7 +1156,7 @@ public final class ECGParser {
      * node.
      * @param node
      *            Is the XML node
-     * @return The value of the node
+     * @return The value of the node or null
      */
     public static String getNodeValue(final Node node) {
 

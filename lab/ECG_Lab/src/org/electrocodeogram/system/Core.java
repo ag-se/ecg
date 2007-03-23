@@ -108,7 +108,7 @@ public final class Core extends Observable implements ISystem, IModuleSystem,
     /**
      * This is a reference to the <em>MsdtRegistry</em> subsystem.
      */
-    private MsdtRegistry mstdRegistry;
+    private MsdtRegistry msdtRegistry;
 
     /**
      * GuiKind denotes the kind of Gui for the Lab: GUI is full module
@@ -129,13 +129,13 @@ public final class Core extends Observable implements ISystem, IModuleSystem,
 
         logger.entering(this.getClass().getName(), "SystemRoot");
 
-        this.mstdRegistry = new MsdtRegistry();
+        this.msdtRegistry = new MsdtRegistry();
 
         this.moduleRegistry = new ModuleRegistry();
 
         theInstance = this;
 
-        this.mstdRegistry.addObserver(this);
+        this.msdtRegistry.addObserver(this);
 
         this.moduleRegistry.addObserver(this);
 
@@ -184,7 +184,7 @@ public final class Core extends Observable implements ISystem, IModuleSystem,
 
             this.moduleRegistry.addObserver(this.gui);
 
-            this.mstdRegistry.addObserver(this.gui);
+            this.msdtRegistry.addObserver(this.gui);
 
         } else if (guiKind == GuiKind.NOGUI) {
 			
@@ -301,9 +301,9 @@ public final class Core extends Observable implements ISystem, IModuleSystem,
         logger.entering(this.getClass().getName(), "getMsdtRegistry");
 
         logger.exiting(this.getClass().getName(), "getMsdtRegistry",
-            this.mstdRegistry);
+            this.msdtRegistry);
 
-        return this.mstdRegistry;
+        return this.msdtRegistry;
     }
 
     /**
@@ -404,14 +404,14 @@ public final class Core extends Observable implements ISystem, IModuleSystem,
      * @see org.electrocodeogram.system.IModuleSystem#getMicroSensorDataTypes()
      */
     public MicroSensorDataType[] getMicroSensorDataTypes() {
-        return this.mstdRegistry.getMicroSensorDataTypes();
+        return this.msdtRegistry.getMicroSensorDataTypes();
     }
 
     /**
      * @see org.electrocodeogram.system.IModuleSystem#getPredefinedMicroSensorDataTypes()
      */
     public MicroSensorDataType[] getPredefinedMicroSensorDataTypes() {
-        return this.mstdRegistry.getPredefinedMicroSensorDataTypes();
+        return this.msdtRegistry.getPredefinedMicroSensorDataTypes();
     }
 
     /**
@@ -421,7 +421,7 @@ public final class Core extends Observable implements ISystem, IModuleSystem,
     public MicroSensorDataType requestMsdtRegistration(
         final MicroSensorDataType msdt, final Module module)
         throws MicroSensorDataTypeRegistrationException {
-        return this.mstdRegistry.requestMsdtRegistration(msdt, module);
+        return this.msdtRegistry.requestMsdtRegistration(msdt, module);
     }
 
     /**

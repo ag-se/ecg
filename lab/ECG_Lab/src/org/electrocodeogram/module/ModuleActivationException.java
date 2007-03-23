@@ -45,7 +45,7 @@ public class ModuleActivationException extends Exception {
         super(message);
 
         logger.entering(this.getClass().getName(), "ModuleActivationException",
-            new Object[] {message, moduleName, new Integer(moduleId)});
+            new Object[] {message, moduleName, Integer.valueOf(moduleId)});
 
         logger.log(Level.SEVERE,
             "A ModuleActivationException has occured while activating the module \""

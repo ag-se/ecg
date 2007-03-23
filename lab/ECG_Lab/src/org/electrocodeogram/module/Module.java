@@ -335,7 +335,7 @@ public abstract class Module implements MsdtProvider {
     public final int getId() {
         logger.entering(this.getClass().getName(), "getId");
 
-        logger.exiting(this.getClass().getName(), "getId", new Integer(
+        logger.exiting(this.getClass().getName(), "getId", Integer.valueOf(
             this.moduleId));
 
         return this.moduleId;
@@ -374,7 +374,7 @@ public abstract class Module implements MsdtProvider {
         logger.entering(this.getClass().getName(), "getReceivingModuleMap");
 
         logger.exiting(this.getClass().getName(), "getReceivingModuleMap",
-            new Integer(this.receiverModuleMap.size()));
+            Integer.valueOf(this.receiverModuleMap.size()));
 
         return this.receiverModuleMap.size();
     }
@@ -785,7 +785,7 @@ public abstract class Module implements MsdtProvider {
             throw new ModuleConnectionException(
                 "You can not connect another module to this module.", this
                     .getName(), this.getId(), module.getName(), module.getId());
-        } else if (this.receiverModuleMap.containsKey(new Integer(module
+        } else if (this.receiverModuleMap.containsKey(Integer.valueOf(module
             .getId()))) {
 
             logger
@@ -798,7 +798,7 @@ public abstract class Module implements MsdtProvider {
 
             this.eventSender.addObserver(module);
 
-            this.receiverModuleMap.put(new Integer(module.moduleId), module);
+            this.receiverModuleMap.put(Integer.valueOf(module.moduleId), module);
 
             module.addParentModule(this);
 
@@ -838,7 +838,7 @@ public abstract class Module implements MsdtProvider {
             return;
         }
 
-        if (!this.receiverModuleMap.containsKey(new Integer(module.getId()))) {
+        if (!this.receiverModuleMap.containsKey(Integer.valueOf(module.getId()))) {
 
             logger.exiting(this.getClass().getName(),
                 "disconnectReceivingModules");
@@ -851,7 +851,7 @@ public abstract class Module implements MsdtProvider {
 
         this.eventSender.deleteObserver(module);
 
-        this.receiverModuleMap.remove(new Integer(module.getId()));
+        this.receiverModuleMap.remove(Integer.valueOf(module.getId()));
 
         this.guiNotificator.fireStatechangeNotification();
 
@@ -932,7 +932,7 @@ public abstract class Module implements MsdtProvider {
         logger.entering(this.getClass().getName(), "addParentModule",
             new Object[] {module});
 
-        this.senderModuleMap.put(new Integer(module.getId()), module);
+        this.senderModuleMap.put(Integer.valueOf(module.getId()), module);
 
         logger.exiting(this.getClass().getName(), "addParentModule");
     }

@@ -236,7 +236,7 @@ public class ModuleRegistry extends Observable implements IModuleRegistry {
             logger.exiting(this.getClass().getName(), "getModulePackage");
 
             throw new ModulePackageNotFoundException(
-                "The module id is unknown.", id);
+                "The module id '" + id + "' is unknown.", id);
         }
 
         ModuleDescriptor moduleDescriptor = this.modulePackageMap.availableModuleClassesMap
@@ -556,7 +556,7 @@ public class ModuleRegistry extends Observable implements IModuleRegistry {
             return;
         }
 
-        if (this.moduleInstanceMap.runningModuleMap.containsKey(new Integer(
+        if (this.moduleInstanceMap.runningModuleMap.containsKey(Integer.valueOf(
             module.getId()))) {
 
             logger.log(Level.WARNING, "This module is allready registered.");
@@ -567,7 +567,7 @@ public class ModuleRegistry extends Observable implements IModuleRegistry {
         }
 
         this.moduleInstanceMap.runningModuleMap.put(
-            new Integer(module.getId()), module);
+            Integer.valueOf(module.getId()), module);
 
         logger.log(Level.INFO, "A new module instance with name "
                                + module.getName() + " has been registered.");
@@ -596,7 +596,7 @@ public class ModuleRegistry extends Observable implements IModuleRegistry {
     public final Module getModule(final int id)
         throws ModuleInstanceNotFoundException {
         logger.entering(this.getClass().getName(), "getModule",
-            new Object[] {new Integer(id)});
+            new Object[] {Integer.valueOf(id)});
 
         if (!(id > 0)) {
 
@@ -608,7 +608,7 @@ public class ModuleRegistry extends Observable implements IModuleRegistry {
 
         assert (id > 0);
 
-        if (!(this.moduleInstanceMap.runningModuleMap.containsKey(new Integer(
+        if (!(this.moduleInstanceMap.runningModuleMap.containsKey(Integer.valueOf(
             id)))) {
 
             logger.exiting(this.getClass().getName(), "getModule");
@@ -618,9 +618,9 @@ public class ModuleRegistry extends Observable implements IModuleRegistry {
         }
 
         logger.exiting(this.getClass().getName(), "getModule",
-            this.moduleInstanceMap.runningModuleMap.get(new Integer(id)));
+            this.moduleInstanceMap.runningModuleMap.get(Integer.valueOf(id)));
 
-        return this.moduleInstanceMap.runningModuleMap.get(new Integer(id));
+        return this.moduleInstanceMap.runningModuleMap.get(Integer.valueOf(id));
     }
 
     /**
@@ -694,7 +694,7 @@ public class ModuleRegistry extends Observable implements IModuleRegistry {
         logger.entering(this.getClass().getName(), "deregisterModule",
             new Object[] {module});
 
-        this.moduleInstanceMap.runningModuleMap.remove(new Integer(module
+        this.moduleInstanceMap.runningModuleMap.remove(Integer.valueOf(module
             .getId()));
 
         logger.log(Level.INFO, "The module " + module.getName()
@@ -999,10 +999,10 @@ public class ModuleRegistry extends Observable implements IModuleRegistry {
                 }
 
                 if (moduleConfiguration.isActive()) {
-                    moduleActivationList.add(new Integer(assignedModuleId));
+                    moduleActivationList.add(Integer.valueOf(assignedModuleId));
                 }
 
-                if (moduleIdTransformationMap.containsKey(new Integer(
+                if (moduleIdTransformationMap.containsKey(Integer.valueOf(
                     moduleConfiguration.getModuleId()))) {
                     throw new ModuleSetupLoadException(
                         "Duplicate module id found "
@@ -1010,11 +1010,11 @@ public class ModuleRegistry extends Observable implements IModuleRegistry {
                         file.getAbsolutePath());
                 }
 
-                moduleIdTransformationMap.put(new Integer(moduleConfiguration
-                    .getModuleId()), new Integer(assignedModuleId));
+                moduleIdTransformationMap.put(Integer.valueOf(moduleConfiguration
+                    .getModuleId()), Integer.valueOf(assignedModuleId));
 
                 if (moduleConfiguration.getConnectedTo() != null) {
-                    moduleConnectionMap.put(new Integer(moduleConfiguration
+                    moduleConnectionMap.put(Integer.valueOf(moduleConfiguration
                         .getModuleId()), moduleConfiguration.getConnectedTo());
                 }
             }
