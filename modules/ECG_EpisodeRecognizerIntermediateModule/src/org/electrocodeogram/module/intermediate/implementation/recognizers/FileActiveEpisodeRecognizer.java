@@ -58,19 +58,14 @@ public class FileActiveEpisodeRecognizer  extends AbstractSingleEpisodeRecognize
     .createLogger(EpisodeRecognizerIntermediateModule.class.getName());
 
     // XML Document and Elements
-    private static Document msdt_fileactive_doc = null;
-    private static Element fileactive_username = null;
-    private static Element fileactive_projectname = null;
-    private static Element fileactive_endtime = null;
-    private static Element fileactive_duration = null;
-    private static Element fileactive_changecount = null;
-    private static Element fileactive_resourcename = null;
+    private Document msdt_fileactive_doc = null;
+    private Element fileactive_username = null;
+    private Element fileactive_projectname = null;
+    private Element fileactive_endtime = null;
+    private Element fileactive_duration = null;
+    private Element fileactive_changecount = null;
+    private Element fileactive_resourcename = null;
 
-    /**
-     * Stores time stamp of last change event. Resolves a bug in redundant code change events 
-     */
-    private Date lastChangeDate;
-        
 	/**
 	 * Counts the number of Code Changes during fileactive time 
 	 */
@@ -181,7 +176,6 @@ public class FileActiveEpisodeRecognizer  extends AbstractSingleEpisodeRecognize
                             state = FileActiveEpisodeState.FILEACTIVE;
                             activeFileName = editorname;
                             startDate = timestamp;
-                            lastChangeDate = timestamp;
                             changeCount = 0;
                         }
 					else if ((state == FileActiveEpisodeState.FILEACTIVE) && 
@@ -275,7 +269,6 @@ public class FileActiveEpisodeRecognizer  extends AbstractSingleEpisodeRecognize
                         changeCount = 1;
                     }
                     else if (state != FileActiveEpisodeState.START && activeFileName.equals(documentname)) {
-                        lastChangeDate = timestamp;
                         changeCount++;
                     }
 
@@ -362,28 +355,36 @@ public class FileActiveEpisodeRecognizer  extends AbstractSingleEpisodeRecognize
 
 	}
 
-    /**
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        final int PRIME = 31;
+        int result = 1;
+        result = PRIME * result + ((activeFileName == null) ? 0 : activeFileName.hashCode());
+        return result;
+    }
+
+    /* (non-Javadoc)
      * @see java.lang.Object#equals(java.lang.Object)
      */
+    @Override
     public boolean equals(Object obj) {
-
-        if((obj == null) || (obj.getClass() != this.getClass())) return false;
-        if(obj == this) return true;
-        FileActiveEpisodeRecognizer fileActiveRecog = (FileActiveEpisodeRecognizer)obj;
-//        if (fileActiveRecog.getState().equals(this.state))
-            if (fileActiveRecog.getFileName() != null && this.activeFileName != null &&
-                fileActiveRecog.getFileName().equals(this.activeFileName))
-                return true;
-        return false;
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        final FileActiveEpisodeRecognizer other = (FileActiveEpisodeRecognizer) obj;
+        if (activeFileName == null) {
+            if (other.activeFileName != null)
+                return false;
+        } else if (!activeFileName.equals(other.activeFileName))
+            return false;
+        return true;
     }
 
-    /**
-     * Returns current file name, if available 
-     * 
-     * @return file name, or null if in initial or final state
-     */
-    private String getFileName() {
-        return activeFileName;
-    }
 
 }

@@ -58,9 +58,9 @@ public class Location {
         Line line = this.text.getLine(this.startLinenumber);
         boolean check2 = (line != null);
         // first line needs low cohesion
-        boolean check3 = (line.getCohesion() < MIN_COHESION);
+        boolean check3 = check2 && (line.getCohesion() < MIN_COHESION);
         // link to location correct?
-        boolean check4 = (line.getLocation() == this);
+        boolean check4 = check2 && (line.getLocation() == this);
         assert (check1);
         assert (check2); 
         assert (check3);

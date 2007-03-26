@@ -19,7 +19,7 @@ public class LocationComputationStrategy {
         if (lineAbove == null && lineBelow != null) {
         	// has been at the begin of the text: if we have a new start line set cohesion
         	if (lineBelow.getLinenumber() == 0)
-                computeCohesionAndLevel(lineBelow, lineAbove);        		
+                computeCohesionAndLevel(lineBelow, lineAbove);
         	return;
         }
         if (lineBelow == null) {
@@ -35,8 +35,7 @@ public class LocationComputationStrategy {
                 && locationAbove != locationBelow) {
             // different locations have high cohesion now => merge them
             if (locationAbove.getLength() > locationBelow.getLength()) { // prefer the bigger one
-                if (locationBelow != null)
-                    text.removeLocation(locationBelow);
+                text.removeLocation(locationBelow);
                 locationAbove.mergeLocation(locationBelow);  // first remove, than merge!
                 history.addLocationChange(new LocationChange(locationBelow,  
                         LocationChangeType.MERGED_DEL_AT_START, locationAbove.getId()), blockChange);
@@ -44,8 +43,7 @@ public class LocationComputationStrategy {
                         LocationChangeType.MERGED_ADD_AT_END, locationBelow.getId()), blockChange);
                 return;
             } else {
-                if (locationAbove != null)
-                    text.removeLocation(locationAbove);
+                text.removeLocation(locationAbove);
                 locationBelow.mergeLocation(locationAbove);                
                 history.addLocationChange(new LocationChange(locationAbove, 
                         LocationChangeType.MERGED_DEL_AT_END, locationBelow.getId()), blockChange);

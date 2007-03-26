@@ -86,12 +86,12 @@ public class PartActiveEpisodeRecognizer  extends AbstractSingleEpisodeRecognize
 	private Date startDate = null;
 	
     // XML Document and Elements
-    private static Document msdt_partactive_doc = null;
-    private static Element partactive_username = null;
-    private static Element partactive_projectname = null;
-    private static Element partactive_endtime = null;
-    private static Element partactive_duration = null;
-    private static Element partactive_resourcename = null;
+    private Document msdt_partactive_doc = null;
+    private Element partactive_username = null;
+    private Element partactive_projectname = null;
+    private Element partactive_endtime = null;
+    private Element partactive_duration = null;
+    private Element partactive_resourcename = null;
 
     /**
 	 * Constructor to start recognizer in initial state 
@@ -342,28 +342,38 @@ public class PartActiveEpisodeRecognizer  extends AbstractSingleEpisodeRecognize
 		return event;
 
 	}
-    
-    /**
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        final int PRIME = 31;
+        int result = 1;
+        result = PRIME * result + ((activePartName == null) ? 0 : activePartName.hashCode());
+        return result;
+    }
+
+    /* (non-Javadoc)
      * @see java.lang.Object#equals(java.lang.Object)
      */
+    @Override
     public boolean equals(Object obj) {
-
-        if((obj == null) || (obj.getClass() != this.getClass())) return false;
-        if(obj == this) return true;
-        PartActiveEpisodeRecognizer partActiveRecog = (PartActiveEpisodeRecognizer)obj;
-//        if (partActiveRecog.getState().equals(this.state))
-            if (partActiveRecog.getPartName() != null && this.activePartName != null &&
-                isSamePart(partActiveRecog.getPartName(), this.activePartName))
-                return true;
-        return false;
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        final PartActiveEpisodeRecognizer other = (PartActiveEpisodeRecognizer) obj;
+        if (activePartName == null) {
+            if (other.activePartName != null)
+                return false;
+        } else if (!isSamePart(activePartName, other.activePartName))
+            return false;
+        return true;
     }
-
-    /**
-     * @return name of current activated view
-     */
-    private String getPartName() {
-        return activePartName;
-    }
+    
 
 
 }

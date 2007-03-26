@@ -53,13 +53,13 @@ public class RunActiveEpisodeRecognizer extends AbstractSingleEpisodeRecognizer 
         .createLogger(EpisodeRecognizerIntermediateModule.class.getName());
 
     // XML Document and Elements
-    private static Document msdt_runactive_doc = null;
-    private static Element runactive_username = null;
-    private static Element runactive_projectname = null;
-    private static Element runactive_endtime = null;
-    private static Element runactive_duration = null;
-    private static Element runactive_launchname = null;
-    private static Element runactive_launchtype = null;
+    private Document msdt_runactive_doc = null;
+    private Element runactive_username = null;
+    private Element runactive_projectname = null;
+    private Element runactive_endtime = null;
+    private Element runactive_duration = null;
+    private Element runactive_launchname = null;
+    private Element runactive_launchtype = null;
 
     /**
 	 * Current state of episode recognizer
@@ -236,21 +236,36 @@ public class RunActiveEpisodeRecognizer extends AbstractSingleEpisodeRecognizer 
 
 	}
 
-    /**
-     * @see java.lang.Object#equals(java.lang.Object)
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
      */
-    public boolean equals(Object obj) {
-        if((obj == null) || (obj.getClass() != this.getClass())) return false;
-        if(obj == this) return true;
-        RunActiveEpisodeRecognizer runActiveRecog = (RunActiveEpisodeRecognizer)obj;
-        if (runActiveRecog.getId() != null && this.activeRunId != null &&
-                runActiveRecog.getId().equals(this.activeRunId))
-            return true;
-        return false;
+    @Override
+    public int hashCode() {
+        final int PRIME = 31;
+        int result = 1;
+        result = PRIME * result + ((activeRunId == null) ? 0 : activeRunId.hashCode());
+        return result;
     }
 
-    public Object getId() {
-        return this.activeRunId;
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        final RunActiveEpisodeRecognizer other = (RunActiveEpisodeRecognizer) obj;
+        if (activeRunId == null) {
+            if (other.activeRunId != null)
+                return false;
+        } else if (!activeRunId.equals(other.activeRunId))
+            return false;
+        return true;
     }
+
 	
 }

@@ -53,14 +53,14 @@ public class ApplicationActiveEpisodeRecognizer  extends AbstractSingleEpisodeRe
         .createLogger(EpisodeRecognizerIntermediateModule.class.getName());
 
     // XML Document and Elements
-    private static Document msdt_applicationactive_doc = null;
-    private static Element applicationactive_username = null;
-    private static Element applicationactive_projectname = null;
-    private static Element applicationactive_endtime = null;
-    private static Element applicationactive_duration = null;
-    private static Element applicationactive_windowtitle = null;
-    private static Element applicationactive_windowhandle = null;
-    private static Element applicationactive_processname = null;
+    private Document msdt_applicationactive_doc = null;
+    private Element applicationactive_username = null;
+    private Element applicationactive_projectname = null;
+    private Element applicationactive_endtime = null;
+    private Element applicationactive_duration = null;
+    private Element applicationactive_windowtitle = null;
+    private Element applicationactive_windowhandle = null;
+    private Element applicationactive_processname = null;
 
     /**
 	 * Current state of episode recognizer
@@ -249,21 +249,36 @@ public class ApplicationActiveEpisodeRecognizer  extends AbstractSingleEpisodeRe
 
 	}
 
-    /**
-     * @see java.lang.Object#equals(java.lang.Object)
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
      */
-    public boolean equals(Object obj) {
-        if((obj == null) || (obj.getClass() != this.getClass())) return false;
-        if(obj == this) return true;
-        ApplicationActiveEpisodeRecognizer runActiveRecog = (ApplicationActiveEpisodeRecognizer)obj;
-        if (runActiveRecog.getId() != null && this.activeWindow != null &&
-                runActiveRecog.getId().equals(this.activeWindow))
-            return true;
-        return false;
+    @Override
+    public int hashCode() {
+        final int PRIME = 31;
+        int result = 1;
+        result = PRIME * result + ((activeWindow == null) ? 0 : activeWindow.hashCode());
+        return result;
     }
 
-    private Object getId() {
-        return this.activeWindow;
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        final ApplicationActiveEpisodeRecognizer other = (ApplicationActiveEpisodeRecognizer) obj;
+        if (activeWindow == null) {
+            if (other.activeWindow != null)
+                return false;
+        } else if (!activeWindow.equals(other.activeWindow))
+            return false;
+        return true;
     }
+
 
 }

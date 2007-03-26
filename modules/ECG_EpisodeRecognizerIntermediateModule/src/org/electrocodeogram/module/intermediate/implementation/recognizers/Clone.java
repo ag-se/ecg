@@ -152,7 +152,7 @@ public class Clone {
 			vLinesDeleted = new Vector<Boolean>();
           while(cloneCodeLines.hasMoreTokens()){
           	vLines.add(cloneCodeLines.nextToken());
-          	vLinesDeleted.add(new Boolean(false));
+          	vLinesDeleted.add(Boolean.FALSE);
           }
 		}
 	 }
@@ -167,8 +167,7 @@ public class Clone {
 	 
 	 public int getCloneEndLine(){
 		 if(vLines != null){
-			 int vLinesSize = 0;
-			 return vLinesSize = cloneCodeStartline + vLines.size() -1;
+			 return cloneCodeStartline + vLines.size() -1;
 		 }
 		 else return 0;
 	 }
@@ -256,7 +255,7 @@ public class Clone {
 				&& this.cloneCodeEndline >= lineNumber && vLines.size() == (this.cloneCodeEndline - this.cloneCodeStartline + 1)) {
 			try {
 				vLines.insertElementAt(codeLine,lineNumber-this.cloneCodeStartline);
-				vLinesDeleted.insertElementAt(new Boolean(false),lineNumber-this.cloneCodeStartline);
+				vLinesDeleted.insertElementAt(Boolean.FALSE,lineNumber-this.cloneCodeStartline);
 				this.cloneCodeEndline++;
 				changeCloneCode();
 			} catch (Exception e) {e.printStackTrace();}
@@ -274,7 +273,7 @@ public class Clone {
 		 if (vLines != null && vLines.size() > 0 && lineNumber >= 0 && this.cloneCodeStartline <= lineNumber && this.cloneCodeEndline >= lineNumber
 					&& vLines.size() == (this.cloneCodeEndline - this.cloneCodeStartline + 1)) {
 			 try {
-				 vLinesDeleted.setElementAt(new Boolean(true),lineNumber-this.cloneCodeStartline);
+				 vLinesDeleted.setElementAt(Boolean.TRUE,lineNumber-this.cloneCodeStartline);
 			 } catch (Exception e) {e.printStackTrace();}
 		 }
 		 else inside = false;
@@ -309,7 +308,7 @@ public class Clone {
 	 private void changeCloneCode(){
 		 if (vLines != null) {
 			 int lines = vLines.size();
-			 cloneCode = new String();
+			 cloneCode = "";
 			 for (int index = 0; index < lines; index++) {
 				 cloneCode += vLines.get(index);
 			 }

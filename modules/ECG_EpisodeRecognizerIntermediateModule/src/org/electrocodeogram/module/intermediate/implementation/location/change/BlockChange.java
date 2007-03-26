@@ -6,7 +6,6 @@ package org.electrocodeogram.module.intermediate.implementation.location.change;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Vector;
 
 import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.misc.xml.ECGParser;

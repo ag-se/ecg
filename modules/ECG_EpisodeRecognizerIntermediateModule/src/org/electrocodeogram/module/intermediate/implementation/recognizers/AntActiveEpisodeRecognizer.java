@@ -53,13 +53,13 @@ public class AntActiveEpisodeRecognizer extends AbstractSingleEpisodeRecognizer 
         .createLogger(EpisodeRecognizerIntermediateModule.class.getName());
 
     // XML Document and Elements
-    private static Document msdt_antactive_doc = null;
-    private static Element antactive_username = null;
-    private static Element antactive_projectname = null;
-    private static Element antactive_endtime = null;
-    private static Element antactive_duration = null;
-    private static Element antactive_buildfile = null;
-    private static Element antactive_target = null;
+    private Document msdt_antactive_doc = null;
+    private Element antactive_username = null;
+    private Element antactive_projectname = null;
+    private Element antactive_endtime = null;
+    private Element antactive_duration = null;
+    private Element antactive_buildfile = null;
+    private Element antactive_target = null;
 
     /**
 	 * Current state of episode recognizer
@@ -242,21 +242,33 @@ public class AntActiveEpisodeRecognizer extends AbstractSingleEpisodeRecognizer 
 	}
 
     /**
+     * @see java.lang.Object#hashCode()
+     */
+    public int hashCode() {
+        final int PRIME = 31;
+        int result = 1;
+        result = PRIME * result + ((activeAntId == null) ? 0 : activeAntId.hashCode());
+        return result;
+    }
+
+    /**
      * @see java.lang.Object#equals(java.lang.Object)
      */
     public boolean equals(Object obj) {
-        if((obj == null) || (obj.getClass() != this.getClass())) return false;
-        if(obj == this) return true;
-        AntActiveEpisodeRecognizer antActiveRecog = (AntActiveEpisodeRecognizer)obj;
-        if (antActiveRecog.getId() != null && this.activeAntId != null &&
-                antActiveRecog.getId().equals(this.activeAntId))
+        if (this == obj)
             return true;
-        return false;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        final AntActiveEpisodeRecognizer other = (AntActiveEpisodeRecognizer) obj;
+        if (activeAntId == null) {
+            if (other.activeAntId != null)
+                return false;
+        } else if (!activeAntId.equals(other.activeAntId))
+            return false;
+        return true;
     }
 
-    public Object getId() {
-        return this.activeAntId;
-    }
-    
 
 }

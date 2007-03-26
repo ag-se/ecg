@@ -53,12 +53,12 @@ public class WindowActiveEpisodeRecognizer  extends AbstractSingleEpisodeRecogni
     .createLogger(EpisodeRecognizerIntermediateModule.class.getName());
 
     // XML Document and Elements
-    private static Document msdt_windowactive_doc = null;
-    private static Element windowactive_username = null;
-    private static Element windowactive_projectname = null;
-    private static Element windowactive_endtime = null;
-    private static Element windowactive_duration = null;
-    private static Element windowactive_resourcename = null;
+    private Document msdt_windowactive_doc = null;
+    private Element windowactive_username = null;
+    private Element windowactive_projectname = null;
+    private Element windowactive_endtime = null;
+    private Element windowactive_duration = null;
+    private Element windowactive_resourcename = null;
 
     /**
 	 * Current state of episode recognizer
@@ -260,14 +260,36 @@ public class WindowActiveEpisodeRecognizer  extends AbstractSingleEpisodeRecogni
 
 	}
 
-    /**
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        final int PRIME = 31;
+        int result = 1;
+        result = PRIME * result + ((activeWindow == null) ? 0 : activeWindow.hashCode());
+        return result;
+    }
+
+    /* (non-Javadoc)
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
     public boolean equals(Object obj) {
-        // TODO currently only allow ONE SINGLE recognizer of this type!
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        final WindowActiveEpisodeRecognizer other = (WindowActiveEpisodeRecognizer) obj;
+        if (activeWindow == null) {
+            if (other.activeWindow != null)
+                return false;
+        } else if (!activeWindow.equals(other.activeWindow))
+            return false;
         return true;
     }
-	
+
 
 }

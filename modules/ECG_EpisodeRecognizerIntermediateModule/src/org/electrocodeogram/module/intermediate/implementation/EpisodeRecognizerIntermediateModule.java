@@ -40,7 +40,7 @@ public class EpisodeRecognizerIntermediateModule extends IntermediateModule {
     /**
      * Generally useful time format used in ECG.
      */
-    public static SimpleDateFormat dateFormat = new SimpleDateFormat(
+    public final static SimpleDateFormat dateFormat = new SimpleDateFormat(
             WellFormedEventPacket.DATE_FORMAT_PATTERN);
 
     /**

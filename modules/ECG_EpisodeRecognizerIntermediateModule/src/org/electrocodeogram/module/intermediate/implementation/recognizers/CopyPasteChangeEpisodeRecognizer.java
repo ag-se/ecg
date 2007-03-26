@@ -23,27 +23,15 @@ package org.electrocodeogram.module.intermediate.implementation.recognizers;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.ListIterator;
-import java.util.StringTokenizer;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.awt.List;
-import java.io.BufferedWriter;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.PrintWriter;
 
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.electrocodeogram.event.IllegalEventParameterException;
 import org.electrocodeogram.event.ValidEventPacket;
 import org.electrocodeogram.logging.LogHelper;
 import org.electrocodeogram.misc.xml.ECGParser;
@@ -53,11 +41,7 @@ import org.electrocodeogram.module.intermediate.implementation.EpisodeRecognizer
 import org.electrocodeogram.module.intermediate.implementation.EpisodeRecognizerIntermediateModule;
 import org.electrocodeogram.module.intermediate.implementation.location.change.BlockChange;
 import org.electrocodeogram.module.intermediate.implementation.location.change.LineChange;
-import org.electrocodeogram.module.intermediate.implementation.location.change.BlockChange.BlockChangeType;
 import org.electrocodeogram.module.intermediate.implementation.location.state.*;
-import org.electrocodeogram.module.source.EventReaderException;
-import org.electrocodeogram.msdt.MicroSensorDataType;
-//import org.electrocodeogram.module.intermediate.implementation.recognizers.FileActiveEpisodeRecognizer.FileActiveEpisodeState;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -142,17 +126,17 @@ public class CopyPasteChangeEpisodeRecognizer implements EpisodeRecognizer {
     .createLogger(EpisodeRecognizerIntermediateModule.class.getName());
 
     // XML Document and Elements
-    private static Document msdt_cpcwarning_doc = null;
-    private static Element cpcwarning_username = null;
-    private static Element cpcwarning_projectname = null;
-    private static Element cpcwarning_documentnames = null;
-    private static Element cpcwarning_startline = null;
-    private static Element cpcwarning_endline = null;
+    private Document msdt_cpcwarning_doc = null;
+    private Element cpcwarning_username = null;
+    private Element cpcwarning_projectname = null;
+    private Element cpcwarning_documentnames = null;
+    private Element cpcwarning_startline = null;
+    private Element cpcwarning_endline = null;
 	
 	public CopyPasteChangeEpisodeRecognizer() {
 		//Start in start STATE
 		STATE = CopyPasteChangeEpisodeState.START;
-		CloneFamilyVector = new Vector();
+		CloneFamilyVector = new Vector<Clone>();
         // initialize static DOM skeleton for msdt.cpcwarning.xsd
         if (msdt_cpcwarning_doc == null)
              try {
@@ -259,7 +243,7 @@ public class CopyPasteChangeEpisodeRecognizer implements EpisodeRecognizer {
 		int count = 0;
 		int vectorSize = CloneFamilyVector.size();
 		for(int i = 0; i < vectorSize; i++){
-			if(!CloneFamilyVector.get(i).isDeleted() & CloneFamilyVector.get(i).isValid()){
+			if(!CloneFamilyVector.get(i).isDeleted() && CloneFamilyVector.get(i).isValid()){
 				count++;
 			}	
 		}
@@ -281,7 +265,6 @@ public class CopyPasteChangeEpisodeRecognizer implements EpisodeRecognizer {
 	private ValidEventPacket generateEpisode(String msdt, String username, String projectname, 
 			                                 String documentname, Date changetimestamp,String startline, String endline) {
 		ValidEventPacket event = null;
-		String timeStamp = changetimestamp.toString();
 		cpcwarning_username.setTextContent(username);
         cpcwarning_projectname.setTextContent(projectname);
         cpcwarning_documentnames.setTextContent(documentname);
@@ -514,10 +497,10 @@ public class CopyPasteChangeEpisodeRecognizer implements EpisodeRecognizer {
 											}
 										}
 										clone.clearDeletedLines();
-										if (valid_clone & inside & !clone.isDeleted() & countValidAndNotDeletedClones() > 1) {
+										if (valid_clone && inside && !clone.isDeleted() && countValidAndNotDeletedClones() > 1) {
 											//generateEpisode because change was inside of a clone
 											if(CloneFamilyVector != null){
-												validEventPacketList = new ArrayList();
+												validEventPacketList = new ArrayList<ValidEventPacket>();
 												for(int i = 0; i < CloneFamilyVector.size(); i++){
 													Clone iclone = CloneFamilyVector.get(i);
 													if(iclone != null){
@@ -525,7 +508,7 @@ public class CopyPasteChangeEpisodeRecognizer implements EpisodeRecognizer {
 														int startline = 0;
 														int endline = 0;
 														if(user != null && project != null && timestamp != null && docuname != null){
-															if (!iclone.isDeleted() & iclone.isValid() & iclone != clone){
+															if (!iclone.isDeleted() && iclone.isValid() && iclone != clone){
 																file = iclone.getCloneFilename();
 																startline = iclone.getCloneCodeStartline()+1;
 																String startLine = Integer.toString(startline);
@@ -566,7 +549,6 @@ public class CopyPasteChangeEpisodeRecognizer implements EpisodeRecognizer {
 										for (BlockChange bc: blockChanges) {
 											blockchanges++;
 											linenumber = bc.getBlockStart();
-											BlockChangeType blockType = bc.getBlockType();
 											for (LineChange lc: bc.getLineChanges()) {
 												if (lc.isChange()) {inside = clone.changeLine(linenumber,lc.getContents());}
 												if (lc.isDeletion()) {inside = clone.deleteLine(linenumber);}
@@ -576,9 +558,9 @@ public class CopyPasteChangeEpisodeRecognizer implements EpisodeRecognizer {
 										}
 										clone.clearDeletedLines();
 										//generateEpsiode because change was inside of a clone
-										if(valid_clone & inside & !clone.isDeleted() & countValidAndNotDeletedClones() > 1){
+										if (valid_clone && inside && !clone.isDeleted() && countValidAndNotDeletedClones() > 1) {
 											if(CloneFamilyVector != null){
-												validEventPacketList = new ArrayList();
+												validEventPacketList = new ArrayList<ValidEventPacket>();
 												for(int i = 0; i < CloneFamilyVector.size(); i++){
 													Clone iclone = CloneFamilyVector.get(i);
 													if(iclone != null){
@@ -586,7 +568,7 @@ public class CopyPasteChangeEpisodeRecognizer implements EpisodeRecognizer {
 														int startline = 0;
 														int endline = 0;
 														if(user != null && project != null && timestamp != null && docuname != null){
-															if (!iclone.isDeleted() & iclone.isValid() & iclone != clone){
+															if (!iclone.isDeleted() && iclone.isValid() && iclone != clone){
 																file = iclone.getCloneFilename();
 																startline = iclone.getCloneCodeStartline()+1;
 																String startLine = Integer.toString(startline);
@@ -611,7 +593,7 @@ public class CopyPasteChangeEpisodeRecognizer implements EpisodeRecognizer {
 			    	default:
 			    		break;
 				} // switch
-		 	} catch (Exception e) {
+		 	} catch (NodeException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
@@ -627,7 +609,6 @@ public class CopyPasteChangeEpisodeRecognizer implements EpisodeRecognizer {
     private class StringDifferMeasurement {
   	  private String firstString = null;
   	  private String secondString = null;
-  	  private static final double STRING_DIFFER_MEASUREMENT = STRING_MEASURE;
   
   	  public StringDifferMeasurement(String first, String second){
   	  	this.firstString = first;

@@ -2,8 +2,6 @@ package org.electrocodeogram.module.intermediate.implementation.location.change;
 
 import org.electrocodeogram.event.CommonData;
 import org.electrocodeogram.event.MicroActivity;
-import org.electrocodeogram.misc.xml.ECGParser;
-import org.electrocodeogram.misc.xml.NodeException;
 import org.electrocodeogram.module.intermediate.implementation.location.state.Location;
 import org.w3c.dom.CDATASection;
 import org.w3c.dom.Document;

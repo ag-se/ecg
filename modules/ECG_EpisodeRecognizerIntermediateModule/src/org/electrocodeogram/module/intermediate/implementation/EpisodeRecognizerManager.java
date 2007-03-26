@@ -81,20 +81,6 @@ public class EpisodeRecognizerManager {
         Collection<ValidEventPacket> events = null;
 		Collection<ValidEventPacket> recognizerEvents = null;
 		
-		if (freeRecognizer == null && recognizerClass != null) {
-			try {
-				freeRecognizer = (EpisodeRecognizer) recognizerClass.newInstance();
-			} catch (InstantiationException e) {
-                logger.log(Level.SEVERE, "Couldn't create Recognizer instance of kind " 
-                        + recognizerClass.getName());
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-                logger.log(Level.SEVERE, "Couldn't access Recognizer instance of kind " 
-                        + recognizerClass.getName());
-				e.printStackTrace();
-			}
-		}			
-
 		for (ListIterator<EpisodeRecognizer> i = recognizers.listIterator(); i.hasNext(); ) {
 	    
 			EpisodeRecognizer recognizer = i.next();
@@ -117,8 +103,23 @@ public class EpisodeRecognizerManager {
             }
 		}
         
+        if (freeRecognizer == null && recognizerClass != null) {
+            try {
+                freeRecognizer = (EpisodeRecognizer) recognizerClass.newInstance();
+                if (freeRecognizer == null)
+                    return events;
+            } catch (InstantiationException e) {
+                logger.log(Level.SEVERE, "Couldn't create Recognizer instance of kind " 
+                        + recognizerClass.getName());
+                return events;
+            } catch (IllegalAccessException e) {
+                logger.log(Level.SEVERE, "Couldn't access Recognizer instance of kind " 
+                        + recognizerClass.getName());
+                return events;
+            }
+        }
+        
 		// Do it for the free recognizer
-        // TODO Why do I precess this first?
 		recognizerEvents = freeRecognizer.analyse(packet, this.module.getMinDuration());
 
         // Look for existing recognizer with equal state. If, forget the free
