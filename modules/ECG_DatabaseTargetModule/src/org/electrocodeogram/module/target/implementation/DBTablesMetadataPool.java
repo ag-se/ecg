@@ -1,5 +1,6 @@
 package org.electrocodeogram.module.target.implementation;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Vector;
 import java.util.logging.Logger;
@@ -34,11 +35,11 @@ public class DBTablesMetadataPool {
     /**
      * get the Metadata from all Tables in the database
      */
-    private static void getMetadataForAllTables(DBCommunicator dbCommunicator) {
+    private static void getMetadataForAllTables(DBCommunicator dbCommunicator) throws SQLException {
         Vector v = dbCommunicator.getTableNames();
         for (int i = 0; i < v.size(); i++) {
             String tableName = (String) v.get(i);
-            Instance().addMetadataVector(tableName,
+            getInstance().addMetadataVector(tableName,
                     dbCommunicator.getMetadataInColumnOrder(tableName));
         }
     }
@@ -49,7 +50,7 @@ public class DBTablesMetadataPool {
      * 
      * @return the unique instance of the class DBTablesMetadataPool
      */
-    public static DBTablesMetadataPool Instance() {
+    public static DBTablesMetadataPool getInstance() {
         if (poolInstance == null)
             poolInstance = new DBTablesMetadataPool();
         return poolInstance;
@@ -65,7 +66,7 @@ public class DBTablesMetadataPool {
      * @return the Vector containing the Metadata for the giben tablename
      */
     public Vector getMetadataVector(String tableName,
-            DBCommunicator dbCommunicator) {
+            DBCommunicator dbCommunicator) throws SQLException {
         if (metaInformationVectors.isEmpty())
             getMetadataForAllTables(dbCommunicator);
         if (poolInstance.metaInformationVectors.get(tableName) == null) {
@@ -88,6 +89,7 @@ public class DBTablesMetadataPool {
     public void addMetadataVector(String tableName, Vector v) {
         if (poolInstance == null) {
             logger.severe("No Instance of DBTablesMetadataPool available");
+            return;
         }
         poolInstance.metaInformationVectors.put(tableName, v);
     }
@@ -96,7 +98,7 @@ public class DBTablesMetadataPool {
      * 
      * @return the Vector with the Metadata Information for all Tables
      */
-    public HashMap getMetaInformationVectors(DBCommunicator dbCommunicator) {
+    public HashMap getMetaInformationVectors(DBCommunicator dbCommunicator) throws SQLException {
         if (this.metaInformationVectors.isEmpty())
             getMetadataForAllTables(dbCommunicator);
         return this.metaInformationVectors;

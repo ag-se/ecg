@@ -1,5 +1,6 @@
 package org.electrocodeogram.module.target.implementation;
 
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.Vector;
@@ -50,7 +51,7 @@ public class CreateSQL {
      * @return the string which represents the insert Statement for the database
      */
     public static String createCommonDataInsertStmt(
-            ValidEventPacketProxy eventProxy, DBCommunicator dbCommunicator) {
+            ValidEventPacketProxy eventProxy, DBCommunicator dbCommunicator) throws SQLException {
 
         // the logger entering the method
         logger.entering(CreateSQL.class.getName(),
@@ -78,7 +79,7 @@ public class CreateSQL {
          */
 
         // the columns of the common data table in the database
-        Vector commonColumns = DBTablesMetadataPool.Instance()
+        Vector commonColumns = DBTablesMetadataPool.getInstance()
                 .getMetadataVector("commondata", dbCommunicator);
 
         insertCommonDataString = "INSERT INTO commondata VALUES (";
@@ -173,7 +174,7 @@ public class CreateSQL {
      */
     public static Vector createMSDTInsertStmts(
             final ValidEventPacketProxy eventProxy, final int linkId,
-            final DBCommunicator dbCommunicator) {
+            final DBCommunicator dbCommunicator) throws SQLException {
 
         // the logger entering the method
         logger.entering(CreateSQL.class.getName(), "createMSDTInsertStmt",
@@ -190,7 +191,7 @@ public class CreateSQL {
          * holding the Information of this msdt Type in the Database
          */
 
-        Vector tableNamesInDatabase = TableInformation.Instance()
+        Vector tableNamesInDatabase = TableInformation.getInstance()
                 .getTableNamesForMSDT(eventProxy.getMsdt());
         if(tableNamesInDatabase.size()<= 0){
             logger.warning("No Table Information found for msdt Type "+eventProxy.getMsdt());
@@ -206,7 +207,7 @@ public class CreateSQL {
             /**
              * get the column names and their datatypes from the database
              */
-            Vector currentTableColumns = DBTablesMetadataPool.Instance()
+            Vector currentTableColumns = DBTablesMetadataPool.getInstance()
                     .getMetadataVector(currentTable, dbCommunicator);
 
             String insertDataString = "INSERT INTO " + currentTable;

@@ -1,5 +1,6 @@
 package org.electrocodeogram.module.target.implementation;
 
+import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -223,7 +224,6 @@ public class DatabaseTargetModule extends TargetModule {
      * @see org.electrocodeogram.module.Module#initialize()
      */
     public final void initialize() {
-        int i = 1;
         // not implemented
     }
 
@@ -238,7 +238,11 @@ public class DatabaseTargetModule extends TargetModule {
         this.dbCommunicator = new DBCommunicator(username, password,
                 jdbcConnection, jdbcDriver);
 
-        syncWithDatabase();
+        try {
+            syncWithDatabase();
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "An SQL Execption occured: " + e.getLocalizedMessage());
+        }
 
         logger.exiting(this.getClass().getName(), "startWriter");
 
@@ -263,7 +267,7 @@ public class DatabaseTargetModule extends TargetModule {
     /**
      * Sychronize the xml schemes with the database tables
      */
-    private void syncWithDatabase() {
+    private void syncWithDatabase() throws SQLException {
         dbCommunicator.getInformationAndSyncTables();
     }
 

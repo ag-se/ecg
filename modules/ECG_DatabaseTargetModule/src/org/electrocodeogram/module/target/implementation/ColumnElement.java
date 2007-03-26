@@ -1,9 +1,5 @@
 package org.electrocodeogram.module.target.implementation;
 
-import java.util.logging.Logger;
-
-import org.electrocodeogram.logging.LogHelper;
-
 /**
  * @author jule
  * @version 1.0 This class represents a Column in a Database table which holds
@@ -38,12 +34,6 @@ public class ColumnElement {
      * Denotes that no attributes of two ColumnElement instances are equal.
      */
     public static final int NOT_EQUAL = 0;
-
-    /**
-     * This is the logger.
-     */
-    private static Logger logger = LogHelper.createLogger(ColumnElement.class
-            .getName());
 
     /**
      * The Constructor for a ColumnElement, where the sqlDT and the xmlDT are

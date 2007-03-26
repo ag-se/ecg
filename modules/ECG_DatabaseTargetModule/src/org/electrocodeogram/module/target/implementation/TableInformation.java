@@ -39,7 +39,7 @@ public class TableInformation {
      * 
      * @return the Singleton instance
      */
-    public static TableInformation Instance() {
+    public static TableInformation getInstance() {
         if (uniqueInstance == null) {
             uniqueInstance = new TableInformation();
         }

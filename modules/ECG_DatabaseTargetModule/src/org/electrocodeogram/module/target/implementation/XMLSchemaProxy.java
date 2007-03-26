@@ -6,6 +6,7 @@ package org.electrocodeogram.module.target.implementation;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -324,7 +325,7 @@ public class XMLSchemaProxy {
         mapElementsToDB(microActivity, microActivityTable, "");
         // Information about the tables which are linked to store a msdt with
         // the given schema
-        TableInformation inf = TableInformation.Instance();
+        TableInformation inf = TableInformation.getInstance();
         inf.addTableInformation(this.schemaName, tables);
         return this.tables;
     }
@@ -403,6 +404,9 @@ public class XMLSchemaProxy {
          * recursively for determining the global elements of this complex type
          * and so on until all atomic elements of the schema are found
          */
+        if (properties == null)
+            return;
+        
         for (int i = 0; i < properties.length; i++) {
 
             ColumnElement tableColumn = null;
@@ -684,8 +688,8 @@ public class XMLSchemaProxy {
      * check for all tables which represent complex type elements in a schema
      * whether the tables in the database are correct
      */
-    public void synchronizeSchemaToDatabase() {
-        Vector<Table> schemaTables = new Vector<Table>();
+    public void synchronizeSchemaToDatabase() throws SQLException {
+        Vector<Table> schemaTables;
         // getAll the Tables (complexType Elements) from the schema
         schemaTables = getSchemaProperties();
         for (Iterator iter = schemaTables.iterator(); iter.hasNext();) {
@@ -694,7 +698,7 @@ public class XMLSchemaProxy {
         }
     }
 
-    public void synchronizeCommonSchemaToDatabase() {
+    public void synchronizeCommonSchemaToDatabase() throws SQLException {
         Table commonTable = getCommonProperties();
         synchronizeTable(commonTable);
     }
@@ -706,7 +710,7 @@ public class XMLSchemaProxy {
      * @param schemaTable
      *            the table information for a complex type element
      */
-    private void synchronizeTable(Table schemaTable) {
+    private void synchronizeTable(Table schemaTable) throws SQLException {
         logger.info("tablename: " + schemaTable.getTableName());
         if (!(dbCommunicator.tableExists(schemaTable.getTableName()))) {
             logger.info("Table " + schemaTable.getTableName()
@@ -714,7 +718,7 @@ public class XMLSchemaProxy {
             dbCommunicator.executeStmt(CreateSQL.createTableStmt(schemaTable));
             return;
         }
-        Vector schemaColumns = new Vector();
+        Vector schemaColumns;
         schemaColumns = schemaTable.getElements();
         SqlDatatypes sqlTypes = new SqlDatatypes();
         sqlTypes.setSqlTypes4Elements(schemaColumns);

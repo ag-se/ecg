@@ -104,20 +104,14 @@ public class DBCommunicator {
                 Class.forName(db_driver).newInstance();
             }
             catch (InstantiationException e) {
-                logger.severe("database driver could not be instantiated");
-                e.printStackTrace();
-                return null;
+                throw new SQLException("database driver could not be instantiated");
             }
             catch (IllegalAccessException e) {
-                logger.severe("could not connect the Database in cause of an "
+                throw new SQLException("could not connect the Database in cause of an "
                         + "illegal access");
-                e.printStackTrace();
-                return null;
             }
             catch (ClassNotFoundException e) {
-                logger.severe("database driver class not found");
-                e.printStackTrace();
-                return null;
+                throw new SQLException("database driver class not found");
             }
             logger.info("want to connect the Database with URL " + db_URL
                     + " and User " + db_user);
@@ -187,47 +181,28 @@ public class DBCommunicator {
      *         occured, suppose for example the table with the given name does
      *         not exist in the database
      */
-    private ResultSetMetaData getMetadata(final String table) {
+    private ResultSetMetaData getMetadata(final String table) throws SQLException {
         // the logger logs entering this method
         logger.entering("org.electrocodeogram.module.target.implementation."
                 + "DBCommunicator", "getMetadata()");
         if (table.length() <= 0) {
             throw new IllegalArgumentException("empty table name is not valid");
         }
-        Connection c = null;
         /**
          * get DB connection
          * 
          * @see org.electrocodeogram.module.target.implementation.
          *      DBCommunicator#getDBConnection() getDBConnection
          */
-        try {
-            c = getDBConnection();
-        }
-        catch (SQLException sqlE) {
-            logger.severe("database connection error while trying "
-                    + "to get metadata-information");
-            sqlE.printStackTrace();
-        }
+        Connection c = getDBConnection();
         // the Statement which has to execute the Query
-        Statement stmt = null;
+        Statement stmt = (Statement) c.createStatement();
+        // get the ResultSet from the executed Query
+        ResultSet rs = (ResultSet) stmt.executeQuery("SELECT * FROM "
+                + table);
+        // get the Metadata of the table from the ResultSet
         // the ResultSet which has to hold the Metadata of the given table
-        ResultSetMetaData rsmd = null;
-        try {
-            // create Statement Object
-            stmt = (Statement) c.createStatement();
-            // get the ResultSet from the executed Query
-            ResultSet rs = (ResultSet) stmt.executeQuery("SELECT * FROM "
-                    + table);
-            // get the Metadata of the table from the ResultSet
-            rsmd = (ResultSetMetaData) rs.getMetaData();
-        }
-        catch (SQLException e) {
-            logger.severe("An SQL Exception occured while getting the Metadata"
-                    + "for the table " + table);
-            e.printStackTrace();
-            return null;
-        }
+        ResultSetMetaData rsmd = (ResultSetMetaData) rs.getMetaData();
         // the logger logs the leaving of the method
         logger.exiting("org.electrocodeogram.module.target.implementation."
                 + "DBCommunicator", "closeDBConnection()", rsmd);
@@ -246,42 +221,24 @@ public class DBCommunicator {
      * @return true if the Statement could be executed or false if not or if a
      *         SQLException occured
      */
-    public boolean executeStmt(String sqlString) {
+    public void executeStmt(String sqlString) throws SQLException {
         // the logger logs entering this method
         logger.entering("org.electrocodeogram.module.target.implementation."
                 + "DBCommunicator", "insertStatement(...)");
-        Connection conn = null;
         /**
          * get DB connection
          * 
          * @see org.electrocodeogram.module.target.implementation.
          *      DBCommunicator#getDBConnection() getDBConnection
          */
-        try {
-            conn = getDBConnection();
-        }
-        catch (SQLException e1) {
-            logger
-                    .warning("Could not execute the statement in cause of an SQL exception");
-            e1.printStackTrace();
-        }
+        Connection conn = getDBConnection();
         // Statement which executes the SQL statement
-        Statement stmt = null;
-        try {
-            stmt = (Statement) conn.createStatement();
-            stmt.execute(sqlString);
-        }
-        catch (SQLException e) {
-            logger.info("The statement could not be executed on the Database");
-            e.printStackTrace();
-            return false;
-        }
+        Statement stmt = (Statement) conn.createStatement();
+        stmt.execute(sqlString);
         // the logger logs the leaving the method
-        logger
-                .exiting("org.electrocodeogram.module.target."
+        logger.exiting("org.electrocodeogram.module.target."
                         + "implementation.DBCommunicator",
                         "insertStatement(...)", true);
-        return true;
     }
 
     /**
@@ -297,51 +254,31 @@ public class DBCommunicator {
      *       query the returned ResultSet rs contains this data
      * @post the ResultSet rs is null if an exception occured
      */
-    public ResultSet executeQuery(String sqlString) {
+    public ResultSet executeQuery(String sqlString) throws SQLException {
         // the logger logs entering this method
         logger.entering("org.electrocodeogram.module.target.implementation."
                 + "DBCommunicator", "queryDB(...)");
-        Connection conn = null;
         /**
          * get DB connection
          * 
          * @see org.electrocodeogram.module.target.implementation.
          *      DBCommunicator#getDBConnection() getDBConnection
          */
-        try {
-            conn = getDBConnection();
-        }
-        catch (SQLException e1) {
-            logger
-                    .severe("not able to execute the Query because an SQL Exception occured while connection the database");
-            e1.printStackTrace();
-        }
-        /**
+        Connection conn = getDBConnection();
+       /**
          * get Statement from connection
          * 
          * @see com.mysql.jdbc.Statement
          */
-        Statement stmt = null;
+        Statement stmt = (Statement) conn.createStatement();
         /**
          * the ResultSet which has to hold the data which is returned as a
          * result from the query
          * 
          * @see com.mysql.jdbc.ResultSet
          */
-        ResultSet rs = null;
-        try {
-            stmt = (Statement) conn.createStatement();
-            rs = (ResultSet) stmt.executeQuery(sqlString);
-        }
-        catch (SQLException e) {
-            logger.info("The statement could not be executed on the Database: " + sqlString);
-            System.out.println("Statement: " + sqlString);
-            e.printStackTrace();
-            return null;
-        }
-        logger
-                .exiting(
-                        "org.electrocodeogram.module.target.implementation.DBCommunicator",
+        ResultSet rs = (ResultSet) stmt.executeQuery(sqlString);
+        logger.exiting("org.electrocodeogram.module.target.implementation.DBCommunicator",
                         "queryDB(...)", rs);
         // return the resultSet containing the data
         return rs;
@@ -388,10 +325,9 @@ public class DBCommunicator {
                     .warning("Put the Event in the buffer because was not able to get database connection for inserting the Event");
             return false;
         }
-        Statement stmt = null;
         try {
             conn.setAutoCommit(false);
-            stmt = (Statement) conn.createStatement();
+            Statement stmt = (Statement) conn.createStatement();
             String s = CreateSQL.createCommonDataInsertStmt(proxy, this);
             //System.out.println(s);
             stmt.execute(s, Statement.RETURN_GENERATED_KEYS);
@@ -452,7 +388,7 @@ public class DBCommunicator {
      * @return the Vector containing the Metadata as Elements
      * 
      */
-    public Vector getMetadataInColumnOrder(String table) {
+    public Vector getMetadataInColumnOrder(String table) throws SQLException {
         logger.entering("org.electrocodeogramm.module.target.implementation."
                 + "DBCommunicator", "getMetadataInColumnOrder(...)");
         // Vector to hold the Metadata in column order
@@ -491,7 +427,7 @@ public class DBCommunicator {
      *       vector
      * @return a Vector containing the names of all tables in the db
      */
-    public Vector getTableNames() {
+    public Vector getTableNames() throws SQLException {
         // the logger logs entering this method
         logger.entering("org.electrocodeogramm.module.target.implementation."
                 + "DBCommunicator", "getTableNames()");
@@ -501,38 +437,22 @@ public class DBCommunicator {
          * @see org.electrocodeogram.module.target.implementation.
          *      DBCommunicator#getDBConnection() getDBConnection
          */
-        Connection c = null;
-        try {
-            c = getDBConnection();
-        }
-        catch (SQLException e1) {
-            logger
-                    .info("An SQL Exception occured, could not get the Tablenames");
-            e1.printStackTrace();
-        }
-        Statement stmt;
+        Connection c = getDBConnection();
         // the RsultSet which holds the returned tablenames
         ResultSet tableNames = null;
         // the Vector in which the tablenames from the ResultSet are written
         Vector<String> v = new Vector<String>();
-        try {
-            stmt = (Statement) c.createStatement();
-            // select the right database from which to retrieve the tablenames
-            stmt.execute("USE ecgtest;"); // TODO
-            // get Metadata from the selected database
-            DatabaseMetaData dbmd = (DatabaseMetaData) c.getMetaData();
-            String[] names = { "TABLE" };
-            // extract the Tablenames from the Metadata
-            tableNames = (ResultSet) dbmd.getTables(null, null, "%", names);
-            // write tablenames from ResultSet in the Vector
-            while (tableNames.next()) {
-                v.add(tableNames.getString("TABLE_NAME"));
-            }
-        }
-        catch (SQLException e) {
-            logger
-                    .warning("While getting the tablenames a SQLException occured");
-            e.printStackTrace();
+        Statement stmt = (Statement) c.createStatement();
+        // select the right database from which to retrieve the tablenames
+        stmt.execute("USE ecgtest;"); // TODO
+        // get Metadata from the selected database
+        DatabaseMetaData dbmd = (DatabaseMetaData) c.getMetaData();
+        String[] names = { "TABLE" };
+        // extract the Tablenames from the Metadata
+        tableNames = (ResultSet) dbmd.getTables(null, null, "%", names);
+        // write tablenames from ResultSet in the Vector
+        while (tableNames.next()) {
+            v.add(tableNames.getString("TABLE_NAME"));
         }
         logger.exiting("org.electrocodeogramm.module.target.implementation."
                 + "DBCommunicator", "getTableNames", v);
@@ -545,23 +465,9 @@ public class DBCommunicator {
      * @param tableName
      * @return true if the given table with the given table name exists
      */
-    public boolean tableExists(String tableName) {
-        Connection c = null;
-        try {
-            c = getDBConnection();
-        }
-        catch (SQLException e2) {
-            logger.info("Could not test whethertable exists");
-            e2.printStackTrace();
-        }
-        Statement stmt = null;
-        try {
-            stmt = (Statement) c.createStatement();
-        }
-        catch (SQLException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        }
+    public boolean tableExists(String tableName) throws SQLException {
+        Connection c = getDBConnection();
+        Statement stmt = (Statement) c.createStatement();
         try {
             stmt.execute("DESCRIBE " + tableName + ";");
             return true;
@@ -571,7 +477,7 @@ public class DBCommunicator {
         }
     }
 
-    public void getInformationAndSyncTables() {
+    public void getInformationAndSyncTables() throws SQLException {
         MicroSensorDataType[] msdts = ModuleSystem.getInstance()
                 .getMicroSensorDataTypes();
         /**
