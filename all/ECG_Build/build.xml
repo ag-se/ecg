@@ -18,6 +18,8 @@
 		<dirset dir="../ECG_Installer/src" />
 		<dirset dir="../ECG_FileSystemSourceModule/src" />
 		<dirset dir="../ECG_FileSystemTargetModule/src" />
+		<dirset dir="../ECG_DatabaseTargetModule/src" />
+		<dirset dir="../ECG_DatabaseSourceModule/src" />
 		<dirset dir="../ECG_HackyStatTargetModule/src" />
 		<dirset dir="../ECG_HackyStatSourceModule/src" />
 		<dirset dir="../ECG_ManualAnnotatorSourceModule/src" />
@@ -26,6 +28,7 @@
 		<dirset dir="../ECG_MSDTFilterIntermediateModule/src" />
 		<dirset dir="../ECG_CodeChangeDifferIntermediateModule/src" />
 		<dirset dir="../ECG_CodeLocationTrackerIntermediateModule/src" />
+		<dirset dir="../ECG_CodeLocationAnalysisIntermediateModule/src" />
 		<dirset dir="../ECG_SocketSourceModule/src" />
 		<dirset dir="../ECG_StatisticsTargetModule/src" />
 	</path>
@@ -82,15 +85,18 @@
 
 		<echo message="######## CLEANING MODULES" />
 
-		<ant dir="../ECG_FileSystemTargetModule" target="cleanall" />
 		<ant dir="../ECG_SocketSourceModule" target="cleanall" />
 		<ant dir="../ECG_HackyStatTargetModule" target="cleanall" />
 		<ant dir="../ECG_HackyStatSourceModule" target="cleanall" />
 		<ant dir="../ECG_FileSystemSourceModule" target="cleanall" />
+		<ant dir="../ECG_FileSystemTargetModule" target="cleanall" />
+		<ant dir="../ECG_DatabaseTargetModule" target="cleanall" />
+		<ant dir="../ECG_DatabaseSourceModule" target="cleanall" />
 		<ant dir="../ECG_MSDTFilterIntermediateModule" target="cleanall" />
 		<ant dir="../ECG_StatisticsTargetModule" target="cleanall" />
 		<ant dir="../ECG_CodeChangeDifferIntermediateModule" target="cleanall" />
 		<ant dir="../ECG_CodeLocationTrackerIntermediateModule" target="cleanall" />
+		<ant dir="../ECG_CodeLocationAnalysisIntermediateModule" target="cleanall" />
 		<ant dir="../ECG_ManualAnnotatorSourceModule" target="cleanall" />
 		<ant dir="../ECG_EpisodeRecognizerIntermediateModule" target="cleanall" />
 		<ant dir="../ECG_CSVFileTargetModule" target="cleanall" />
@@ -158,14 +164,17 @@
 		<echo message="######## BUILDING MODULES" />
 
 	 	<ant dir="../ECG_SocketSourceModule" target="deploy" />
-		<ant dir="../ECG_FileSystemTargetModule" target="deploy" />
 		<ant dir="../ECG_HackyStatTargetModule" target="deploy" />
 		<ant dir="../ECG_HackyStatSourceModule" target="deploy" />
 		<ant dir="../ECG_FileSystemSourceModule" target="deploy" />
+		<ant dir="../ECG_FileSystemTargetModule" target="deploy" />
+		<ant dir="../ECG_DatabaseTargetModule" target="deploy" />
+		<ant dir="../ECG_DatabaseSourceModule" target="deploy" />
 		<ant dir="../ECG_MSDTFilterIntermediateModule" target="deploy" />
 		<ant dir="../ECG_StatisticsTargetModule" target="deploy" />
 		<ant dir="../ECG_CodeChangeDifferIntermediateModule" target="deploy" />
 		<ant dir="../ECG_CodeLocationTrackerIntermediateModule" target="deploy" />
+		<ant dir="../ECG_CodeLocationAnalysisIntermediateModule" target="deploy" />
 		<ant dir="../ECG_ManualAnnotatorSourceModule" target="deploy" />
 		<ant dir="../ECG_EpisodeRecognizerIntermediateModule" target="deploy" />
 		<ant dir="../ECG_CSVFileTargetModule" target="deploy" />
@@ -260,7 +269,7 @@
 			<fileset dir="." includes="*.zip"/>
 		</delete>
 
-		<zip destfile="ElectroCodeoGram_v1.1.4.zip" 
+		<zip destfile="ElectroCodeoGram_v1.1.6.zip" 
 		 	 basedir="dist" filesonly="false" update="false"/>
 
 	</target>

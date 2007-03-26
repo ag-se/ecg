@@ -41,7 +41,6 @@ Changes for 1.1.4:
 ** Added "Passer" property which is the reverse to "Blocker" and should not be used in parallel to Blocker
 * New EpisodeRecognizer for msdt.runactive.xsd computed from msdt.run - run/debug- and -terminated event pairs (rev958,rev960,rev963)
 * New EpisodeRecognizer for msdt.antactive.xsd computed from msdt.ant - run/debug- and -terminated event pairs (rev958,rev960,rev963)
-* msdt.exactcodechanges.xsd support in EclipseSensor for the Replayer which will be released in 1.1.5 (rev965, rev966)
 * CodeLineDiffer: 
 ** Bugfixes and small changes, especially correct deletion interpretation and handling of double code status events (rev969, rev977, rev981, rev987)
 ** Introduction of msdt.linediffbase.xsd for first representation of a text file (rev997, rev998)
