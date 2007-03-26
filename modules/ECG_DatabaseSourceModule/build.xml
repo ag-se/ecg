@@ -42,12 +42,12 @@
 		
 		<!-- include local jdbc driver -->
 		<fileset dir="${jdbc.driver.dir}">
-			<include name="*.jar"/>
+			<include name="**/*.jar"/>
 		</fileset>
 		
 		<!-- include apache xmlbeans library -->
 		<fileset dir="${xmlbeans.dir}">
-			<include name="*.jar"/>
+			<include name="**/*.jar"/>
 		</fileset>
 		
 		<fileset dir="${support.dir}/dist/lib">
