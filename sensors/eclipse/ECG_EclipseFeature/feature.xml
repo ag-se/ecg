@@ -2,8 +2,9 @@
 <feature
       id="org.electrocodeogram.sensor.eclipse"
       label="ElectroCodeoGram EclipseSensor with ECG Lab"
-      version="1.1.1"
-      provider-name="FU Berlin">
+      version="1.1.6"
+      provider-name="FU Berlin"
+      plugin="org.electrocodeogram.sensor.eclipse">
    <install-handler library="installer.jar" handler="org.electrocodeogram.installer.Installer"/>
 
    <description url="http://projects.mi.fu-berlin.de/w/bin/view/SE/ElectroCodeoGram">
@@ -23,9 +24,7 @@ on its own.
 
    <license>
       ElectroCodeoGram Software User Agreement
-
 9th May 2006
-
 ElectroCodeoGram (ECG) is licensed under the GNU General Public
 License (GPL). See http://www.gnu.org/licenses/gpl.html.
 Applicable Licenses: The ElectroCodeoGram sensor plugin for Eclipse
@@ -79,7 +78,7 @@ PRIOR TO USE OF THIS CONTENT.
          id="org.electrocodeogram.sensor.eclipse"
          download-size="0"
          install-size="0"
-         version="1.1.1"/>
+         version="1.1.6"/>
 
    <data
          id="../sensor.properties"
