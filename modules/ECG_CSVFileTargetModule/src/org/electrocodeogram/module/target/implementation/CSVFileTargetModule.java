@@ -7,7 +7,6 @@
 
 package org.electrocodeogram.module.target.implementation;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -52,32 +51,6 @@ public class CSVFileTargetModule extends TargetModule {
     private PrintWriter writer;
 
     /**
-     * This is the default output filename prefix.
-     */
-    private static final String DEFAULT_FILENAME_PREFIX = "ecgout";
-
-    /**
-     * This is the default output filename suffix.
-     */
-    private static final String DEFAULT_FILENAME_SUFFIX = ".csv";
-
-    /**
-     * This is the default output directory under the user's home
-     * directory.
-     */
-    private static final String LOG_SUBDIR = "ecg_log";
-
-    /**
-     * A reference to the user's home directory path.
-     */
-    private String homeDir;
-
-    /**
-     * A reference to the log directory.
-     */
-    private File logDir;
-
-    /**
      * The delimiter to seperate the columns, defaults to TAB.
      */
     private String delimiter = "\t";
@@ -106,7 +79,7 @@ public class CSVFileTargetModule extends TargetModule {
     /**
      * Generally useful DateFormat
      */
-    public static DateFormat dateFormat = DateFormat.getDateTimeInstance(
+    public static final DateFormat dateFormat = DateFormat.getDateTimeInstance(
             DateFormat.MEDIUM, DateFormat.MEDIUM);
     	
     /**
