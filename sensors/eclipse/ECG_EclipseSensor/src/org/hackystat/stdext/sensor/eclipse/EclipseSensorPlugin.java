@@ -149,11 +149,6 @@ public class EclipseSensorPlugin extends AbstractUIPlugin implements IStartup {
      *         <em>ECG EclipseSensor</em> plugin
      */
     public static EclipseSensorPlugin getInstance() {
-        logger.entering(EclipseSensorPlugin.class.getName(), "getInstance");
-
-        logger.exiting(EclipseSensorPlugin.class.getName(), "getInstance",
-            plugin);
-
         return plugin;
     }
 
@@ -162,11 +157,6 @@ public class EclipseSensorPlugin extends AbstractUIPlugin implements IStartup {
      * @return The current <em>Eclipse Workspace</em>
      */
     public static IWorkspace getWorkspace() {
-        logger.entering(EclipseSensorPlugin.class.getName(), "getWorkspace");
-
-        logger.exiting(EclipseSensorPlugin.class.getName(), "getWorkspace",
-            ResourcesPlugin.getWorkspace());
-
         return ResourcesPlugin.getWorkspace();
     }
 

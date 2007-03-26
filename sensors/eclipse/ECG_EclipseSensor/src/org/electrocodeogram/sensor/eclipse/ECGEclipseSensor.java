@@ -70,7 +70,7 @@ public final class ECGEclipseSensor {
 	/**
      * This is to log program states.
      */
-    static public Logger logger = LogHelper
+    static public final Logger logger = LogHelper
         .createLogger(ECGEclipseSensor.class.getName());
 
     /**

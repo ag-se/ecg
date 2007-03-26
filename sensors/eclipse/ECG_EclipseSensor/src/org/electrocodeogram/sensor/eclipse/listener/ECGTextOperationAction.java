@@ -1,10 +1,6 @@
 package org.electrocodeogram.sensor.eclipse.listener;
 
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.eclipse.jface.text.Assert;
 import org.eclipse.jface.text.ITextOperationTarget;

@@ -1,8 +1,6 @@
 package org.electrocodeogram.sensor.eclipse.listener;
 
 import org.eclipse.ui.texteditor.IElementStateListener;
-import org.electrocodeogram.logging.LogHelper.ECGLevel;
-import org.electrocodeogram.sensor.eclipse.ECGEclipseSensor;
 
 /**
  * TODO Not Used 

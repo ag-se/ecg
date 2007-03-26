@@ -30,7 +30,7 @@ public class ECGPreferenceInitializer extends AbstractPreferenceInitializer {
                 shellProps.getECGServerType());
         wsProperties.setDefault(
                 ECGPreferenceConstants.P_SERVER_ADDRESS, 
-                shellProps.getECGServerAddressAsString().toString());
+                shellProps.getECGServerAddressAsString());
         wsProperties.setDefault(
                 ECGPreferenceConstants.P_SERVER_PORT, 
                 shellProps.getECGServerPort());

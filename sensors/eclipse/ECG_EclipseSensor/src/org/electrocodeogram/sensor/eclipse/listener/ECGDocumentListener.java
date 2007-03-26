@@ -8,7 +8,6 @@ import org.eclipse.jface.text.IDocumentListener;
 import org.electrocodeogram.sensor.eclipse.ECGEclipseSensor; 
 
 import java.util.TimerTask;
-import java.util.logging.Level;
 
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.ui.IEditorPart;
