@@ -1,5 +1,6 @@
 package org.electrocodeogram.module.source.implementation;
 
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.logging.Logger;
@@ -83,7 +84,7 @@ public class CreateEventFromDB {
      *            the DBCommunicator to communicate with the database
      */
     public static WellFormedEventPacket createEvent(final String eventID,
-            final DBCommunicator dbCom) {
+            final DBCommunicator dbCom) throws SQLException {
         Event event = DBQueries.getEventByID(eventID, dbCom);
         return createEventPacket(event, dbCom);
     }

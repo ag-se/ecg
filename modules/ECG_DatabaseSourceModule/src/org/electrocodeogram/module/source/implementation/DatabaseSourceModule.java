@@ -122,7 +122,11 @@ public class DatabaseSourceModule extends SourceModule implements UIModule {
     public void preStart() throws SourceModuleException {
         this.dbCommunicator = new DBCommunicator(username, password,
                 jdbcConnection, jdbcDriver);
-        dbCommunicator.getInformationAndSyncTables(); 
+        try {
+            dbCommunicator.getInformationAndSyncTables();
+        } catch (SQLException e) {
+            throw new SourceModuleException(e.getLocalizedMessage(), this.getName());
+        } 
         readerThread = new DatabaseReaderThread(this, this.dbCommunicator);
     }
 
@@ -158,11 +162,18 @@ public class DatabaseSourceModule extends SourceModule implements UIModule {
                 logger.exiting(this.getClass().getName(), "propertyChanged");
                 // ToDo
             }
-            System.out.println("vor set Property");
             this.SQLQuery = moduleProperty.getValue();
             CachedRowSet commonData;
-            commonData = DBQueries.executeUserQuery(this.SQLQuery,
-                    dbCommunicator);
+            try {
+                commonData = DBQueries.executeUserQuery(this.SQLQuery,
+                        dbCommunicator);
+            } catch (SQLException e) {
+                throw new ModulePropertyException(e.getLocalizedMessage(),
+                        this.getName(),
+                        this.getId(),
+                        "SQL Query",
+                        this.SQLQuery);
+            }
             Collection eventIDs = null;
             try {
                 /**
@@ -171,9 +182,11 @@ public class DatabaseSourceModule extends SourceModule implements UIModule {
                 eventIDs = commonData.toCollection("linkid");
             }
             catch (SQLException e) {
-                logger.severe("was not able to fetch the linkid values "
-                        + "for the events");
-                e.printStackTrace();
+                throw new ModulePropertyException(e.getLocalizedMessage(),
+                        this.getName(),
+                        this.getId(),
+                        "SQL Query",
+                        this.SQLQuery);
             }
             /**
              * create the ValidEventPacket for each given linkid value

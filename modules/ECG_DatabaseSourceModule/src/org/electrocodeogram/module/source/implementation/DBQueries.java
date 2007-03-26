@@ -27,7 +27,7 @@ public class DBQueries {
      *            the primary key of the event in the commondata table
      * @return the event data turned into an Event object
      */
-    public static Event getEventByID(final String id, final DBCommunicator dbCom) {
+    public static Event getEventByID(final String id, final DBCommunicator dbCom) throws SQLException {
         // get the commondata record from the event with the given primary key
         String query = SqlQueryStrings.getDataByID(id, "commondata");
         CachedRowSet commonData = returnCachedResult(query, dbCom);
@@ -48,7 +48,7 @@ public class DBQueries {
      *         satisfy the given attribute values
      */
     public static CachedRowSet getEventsWithUsernameAndDate(String username,
-            String date, DBCommunicator dbCom) {
+            String date, DBCommunicator dbCom) throws SQLException {
         return returnCachedResult(SqlQueryStrings.queryWithUsernameAndDate(
                 username, date), dbCom);
     }
@@ -59,7 +59,7 @@ public class DBQueries {
      *         two runs events and a Vector containing HashMaps which hold the
      *         events between the two run Events
      */
-    public static CachedRowSet getRunsWithTimediff(DBCommunicator dbCom) {
+    public static CachedRowSet getRunsWithTimediff(DBCommunicator dbCom) throws SQLException {
         // the resultSet contains the four columns run1, run1_TS (timestamp of
         // run1), run2 and runs2_TS (timestamp of run2)
         // each row in the result set represents two run events
@@ -79,7 +79,7 @@ public class DBQueries {
      *         events between the two given timestamps
      */
     public static CachedRowSet getEventsBetweenTimestamps(String run1_TS,
-            String run2_TS, DBCommunicator dbCom) {
+            String run2_TS, DBCommunicator dbCom) throws SQLException {
         return returnCachedResult(SqlQueryStrings.queryEventsBetweenTimestamps(
                 run1_TS, run2_TS), dbCom);
     }
@@ -98,7 +98,7 @@ public class DBQueries {
      *         value of the second given event
      */
     public static CachedRowSet getEventsBetweenTwoEvents(String firstID,
-            String secondID, DBCommunicator dbCom) {
+            String secondID, DBCommunicator dbCom) throws SQLException {
         return returnCachedResult(SqlQueryStrings.queryEventsBetweenTwoEvents(
                 firstID, secondID), dbCom);
     }
@@ -115,7 +115,7 @@ public class DBQueries {
      * @return a CachedRowSet containing the result of the Query
      */
     private static CachedRowSet returnCachedResult(final String query,
-            final DBCommunicator dbCom) {
+            final DBCommunicator dbCom) throws SQLException {
         ResultSet currentEventSet = dbCom.executeQuery(query);
         CachedRowSet currentCommonData = null;
         try {
@@ -156,7 +156,7 @@ public class DBQueries {
             }
             msdt = event.getMSDT();
             eventID = "" + event.getPrimaryKey();
-            Vector tableNames = TableInformation.Instance()
+            Vector tableNames = TableInformation.getInstance()
                     .getTableNamesForMSDT(msdt);
             if (tableNames == null) {
                 logger.severe("tableNames == NULL");
@@ -199,7 +199,7 @@ public class DBQueries {
      * @return a CachesRowSet containing the result of the query
      */
     public static CachedRowSet executeUserQuery(final String query,
-            final DBCommunicator dbCom) {
+            final DBCommunicator dbCom) throws SQLException {
         ResultSet rs = dbCom.executeQuery(query);
         CachedRowSet data = null;
         try {
@@ -232,7 +232,7 @@ public class DBQueries {
             rsmd = rowset.getMetaData();
             for (int i = 1; i <= rsmd.getColumnCount(); i++) {
                 EventDataEntry currentEntry = new EventDataEntry(rsmd
-                        .getColumnName(i).toString());
+                        .getColumnName(i));
                 currentEntry.fillValues((Collection<String>) rowset
                         .toCollection(i));
                 event.addEntry(currentEntry);

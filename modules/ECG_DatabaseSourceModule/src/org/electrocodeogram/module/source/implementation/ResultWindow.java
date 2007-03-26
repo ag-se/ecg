@@ -157,8 +157,15 @@ public class ResultWindow extends JFrame {
                         .toString();
                 String run2_TS = resultTable.getValueAt(selectedRow, 3)
                         .toString();
-                CachedRowSet eventsBetween = DBQueries
-                        .getEventsBetweenTimestamps(run1_TS, run2_TS, dbCom);
+                CachedRowSet eventsBetween;
+                try {
+                    eventsBetween = DBQueries
+                            .getEventsBetweenTimestamps(run1_TS, run2_TS, dbCom);
+                } catch (SQLException e2) {
+                    // TODO Auto-generated catch block
+                    e2.printStackTrace();
+                    return;
+                }
                 final JTable newtable = new JTable();
                 // It may take a while to get the results, so give the user some
                 // immediate feedback that their query was accepted.
@@ -195,12 +202,13 @@ public class ResultWindow extends JFrame {
         panel.setLayout(new FlowLayout());
         TableColumn column = null;
         try {
-            column = resultTable.getColumn("linkid");
+            column = resultTable.getColumn("linkID");
         }
         catch (IllegalArgumentException e) {
             JOptionPane
                     .showMessageDialog(ResultWindow.this,
                             "To create an EventPacket there must be a row 'linkid' in your ResultSet");
+            return;
         }
         int idIndex = column.getModelIndex();
         // for each selected Event...
@@ -210,7 +218,14 @@ public class ResultWindow extends JFrame {
             String eventID = resultTable.getValueAt(selectedRow, idIndex)
                     .toString();
             // get the event data from the database
-            Event eventMap = DBQueries.getEventByID(eventID, dbCom);
+            Event eventMap;
+            try {
+                eventMap = DBQueries.getEventByID(eventID, dbCom);
+            } catch (SQLException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                return;
+            }
             eventMap.printEventToConsole();
             String eventData = eventMap.eventDataToString();
             JTextArea ta = new JTextArea(eventData, 20, 30);
@@ -225,12 +240,13 @@ public class ResultWindow extends JFrame {
         int[] selectedRowNumbers = resultTable.getSelectedRows();
         TableColumn column = null;
         try {
-            column = resultTable.getColumn("linkid");
+            column = resultTable.getColumn("linkID");
         }
         catch (IllegalArgumentException e) {
             JOptionPane
                     .showMessageDialog(ResultWindow.this,
                             "To create an EventPacket there must be a row 'linkid' in your ResultSet");
+            return;
         }
         int idIndex = column.getModelIndex();
         // for each selected Event...

@@ -13,6 +13,11 @@ import javax.swing.JScrollPane;
  */
 public class ShowEventDetails extends JFrame {
     
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 3831446218751164246L;
+    
     JScrollPane scrollPane;
     
     public ShowEventDetails(JPanel detailPanel){

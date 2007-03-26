@@ -1,5 +1,6 @@
 package org.electrocodeogram.module.source.implementation;
 
+import java.sql.SQLException;
 import java.util.logging.Logger;
 import org.electrocodeogram.event.WellFormedEventPacket;
 import org.electrocodeogram.logging.LogHelper;
@@ -90,8 +91,12 @@ public class DatabaseReaderThread extends EventReader {
                 // get the ID of each event
                 eventID = IDs[j].toString();
                 // create the EventPacket from the Event with the given ID
-                eventPacket = CreateEventFromDB.createEvent(eventID,
-                        dbCommunicator);
+                try {
+                    eventPacket = CreateEventFromDB.createEvent(eventID,
+                            dbCommunicator);
+                } catch (SQLException e) {
+                    throw new EventReaderException(e.getLocalizedMessage()) ;
+                }
                 logger.info("created Event with id " + eventID);
                 j++;
                 return eventPacket;

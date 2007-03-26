@@ -74,7 +74,7 @@ public class EventDataEntry {
      * @return the value for the element
      */
     public final String getElementValue() {
-        return values.getFirst().toString();
+        return values.getFirst();
     }
 
     /**

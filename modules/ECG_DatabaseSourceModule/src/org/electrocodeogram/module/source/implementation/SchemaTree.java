@@ -124,7 +124,7 @@ public class SchemaTree {
             }
             String elementName = subNodes[i].getName().toString();
             logger.info("Element Name: " + elementName);
-            LinkedList columnValues = new LinkedList();
+            LinkedList columnValues;
             if (event.containsElement(elementName)) {
                 columnValues = event.getEntryValues(elementName);
                 if (columnValues.size() >= 1) {

@@ -2,13 +2,9 @@ package org.electrocodeogram.module.source.implementation;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.ScrollPane;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -20,11 +16,9 @@ import javax.sql.rowset.CachedRowSet;
 import javax.swing.ComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -352,8 +346,15 @@ public class QueriesWindow extends JPanel {
                  * get the ResultSet containing the comomndata part of the
                  * events which satisfy the query
                  */
-                CachedRowSet e1 = DBQueries.getEventsWithUsernameAndDate(
-                        username, date, dbCommunicator);
+                CachedRowSet e1;
+                try {
+                    e1 = DBQueries.getEventsWithUsernameAndDate(
+                            username, date, dbCommunicator);
+                } catch (SQLException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                    return;
+                }
                 /**
                  * display the result as a table in a new Window
                  */
@@ -376,18 +377,39 @@ public class QueriesWindow extends JPanel {
                     JOptionPane.showMessageDialog(QueriesWindow.this,
                             "please enter the linkid of the second event");
                 }
-                CachedRowSet e2 = DBQueries.getEventsBetweenTwoEvents(firstID,
-                        secondID, dbCommunicator);
+                CachedRowSet e2;
+                try {
+                    e2 = DBQueries.getEventsBetweenTwoEvents(firstID,
+                            secondID, dbCommunicator);
+                } catch (SQLException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                    return;
+                }
                 displayQueryResults(e2, 0);
                 break;
             case 3:
-                CachedRowSet e3 = DBQueries.getRunsWithTimediff(dbCommunicator);
+                CachedRowSet e3;
+                try {
+                    e3 = DBQueries.getRunsWithTimediff(dbCommunicator);
+                } catch (SQLException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                    return;
+                }
                 displayQueryResults(e3, 1);
                 break;
             case 4:
                 String userStmt = queryField.getText();
-                CachedRowSet userRS = DBQueries.executeUserQuery(userStmt,
-                        dbCommunicator);
+                CachedRowSet userRS;
+                try {
+                    userRS = DBQueries.executeUserQuery(userStmt,
+                            dbCommunicator);
+                } catch (SQLException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                    return;
+                }
                 displayQueryResults(userRS, 0);
                 break;
             default:
