@@ -1,9 +1,0 @@
-Manifest-Version: 1.0
-Bundle-ManifestVersion: 2
-Bundle-Name: ECG_EclipseFeature
-Bundle-SymbolicName: ECG_EclipseFeature
-Bundle-Version: 1.1.1
-Bundle-ClassPath: lib/org.eclipse.core.boot_3.1.0.jar,
- lib/org.eclipse.core.runtime_3.1.0.jar,
- lib/org.eclipse.update.core_3.1.0.jar
-Bundle-Localization: plugin
