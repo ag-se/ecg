@@ -132,7 +132,7 @@ public class ValidEventPacketProxy {
                     .getDocument());
         }
         catch (NodeException e) {
-            logger.warning("There is no such Node '" + elementName
+            logger.info("There is no such Node '" + elementName
                     + "' in the event: \n" + this.event);
             return null;
         }

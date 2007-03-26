@@ -334,7 +334,7 @@ public class DBCommunicator {
             rs = (ResultSet) stmt.executeQuery(sqlString);
         }
         catch (SQLException e) {
-            logger.info("The statement could not be executed on the Database");
+            logger.info("The statement could not be executed on the Database: " + sqlString);
             System.out.println("Statement: " + sqlString);
             e.printStackTrace();
             return null;
@@ -393,7 +393,7 @@ public class DBCommunicator {
             conn.setAutoCommit(false);
             stmt = (Statement) conn.createStatement();
             String s = CreateSQL.createCommonDataInsertStmt(proxy, this);
-            System.out.println(s);
+            //System.out.println(s);
             stmt.execute(s, Statement.RETURN_GENERATED_KEYS);
             ResultSet idKey = (ResultSet) stmt.getGeneratedKeys();
             int idRow = 0;
