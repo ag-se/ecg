@@ -269,7 +269,7 @@
 			<fileset dir="." includes="*.zip"/>
 		</delete>
 
-		<zip destfile="ElectroCodeoGram_v1.1.6.zip" 
+		<zip destfile="ElectroCodeoGram_v1.2.0.zip" 
 		 	 basedir="dist" filesonly="false" update="false"/>
 
 	</target>

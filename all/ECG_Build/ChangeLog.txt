@@ -1,5 +1,5 @@
-ElectroCodeoGram 1.1.4
-(c) Freie Universität Berlin, Frank Schlesinger, 2006
+ElectroCodeoGram 1.2
+(c) Freie Universität Berlin, Frank Schlesinger, 2007
 
 CHANGE LOG
 ==========
@@ -47,3 +47,20 @@ Changes for 1.1.4:
 * CodeLocationTracker: 
 ** Bugfixes
 ** Sends msdt.codelocation events (rev988, rev993)
+
+Note that there have been some intermediate releases 1.1.5 and 1.1.6.
+
+Changes for 1.2.0:
+* Right before a paste and right after a paste codechange events are sent immediately (rev1031)
+* Extended Recognizer Framework to allow for emitting more than one episode per event event from a single live recognizer. (rev1036)
+* Evtl. user name bug beseitigt (rev1044)
+* Enhanced Manual Annotator: Allows Events as well as Episodes, Project name and Remark to be sent as msdt.manualevent and msdt.manualepisode (rev1046)
+* Test event now confirms to msdt.test.xsd and msdt.testrun.xsd (rev1053)
+* Release version of DatabaseSource/TargetModules (rev1013, rev1023, rev1033, rev1034, rev1060 and others)
+* Bug/omission fixes (rev1054, rev1056, rev1057)
+* ATL 1.0.0: (rev1064, rev1065)
+* ApplicationActivity episode recognizer (rev1072)
+* CSVWriter 1.2: # can be used to concatenate values in a row (rev1073)
+* Added Copy/Cut/Paste-Tracker from Sofoklis' master thesis (rev1105)
+* Added initial version of BettermentRecognizer, currently does only report run/change distances to console. (rev1106)
+* Many minor code changes due to compiler warnings and FindBugs messages
