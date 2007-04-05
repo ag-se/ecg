@@ -2,7 +2,7 @@
 <feature
       id="org.electrocodeogram.sensor.eclipse"
       label="ElectroCodeoGram EclipseSensor with ECG Lab"
-      version="1.1.6"
+      version="1.2.0"
       provider-name="FU Berlin"
       plugin="org.electrocodeogram.sensor.eclipse">
    <install-handler library="installer.jar" handler="org.electrocodeogram.installer.Installer"/>
@@ -78,7 +78,7 @@ PRIOR TO USE OF THIS CONTENT.
          id="org.electrocodeogram.sensor.eclipse"
          download-size="0"
          install-size="0"
-         version="1.1.6"/>
+         version="1.2.0"/>
 
    <data
          id="../sensor.properties"
