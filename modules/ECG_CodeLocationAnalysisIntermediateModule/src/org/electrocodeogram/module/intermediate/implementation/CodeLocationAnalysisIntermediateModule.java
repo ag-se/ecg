@@ -1,5 +1,6 @@
 package org.electrocodeogram.module.intermediate.implementation;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -8,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.Vector;
 import java.util.logging.Logger;
 
 import org.electrocodeogram.event.IllegalEventParameterException;
@@ -100,21 +102,35 @@ public class CodeLocationAnalysisIntermediateModule extends IntermediateModule {
             // Convert code locations to exact code change events
     		
             Document doc = eventPacket.getDocument();
-            String data = "";
+            String data1 = "";
+            String data2 = "";
             // parse codelocation
             try {
-                String id = ECGParser.getSingleNodeValue("id", doc);
+                // String id = ECGParser.getSingleNodeValue("id", doc);
                 String projectName = ECGParser.getSingleNodeValue("projectname", doc);
                 String userName = ECGParser.getSingleNodeValue("username", doc);
                 String type = ECGParser.getSingleNodeValue("type", doc);
-                String locId = ECGParser.getNodeValue(doc.getElementsByTagName("id").item(1));
-                // int relId = Integer.parseInt(ECGParser.getSingleNodeValue("related", doc));
+                String locId = ECGParser.getSingleNodeValue("locid", doc);
+                String relIds = ECGParser.getSingleNodeValue("related", doc);
+                String relParts[] = relIds.split(";");
+                String fId = relParts[0];
+                String pId = relParts[1];
+                String nId = relParts[2];
+                String rId = relParts[3];
                 String locString = ECGParser.getSingleNodeValue("location", doc);
                 String locParts[] = locString.split(";");
+                String file = locParts[0].substring(locParts[0].lastIndexOf("/")+1);
+                int startline = Integer.parseInt(locParts[1]);
+                // int length = Integer.parseInt(locParts[2]);
                 String contents = ECGParser.getSingleNodeValue("contents", doc);
                 if (contents == null)
                     contents = "";
-                String file = locParts[0].substring(locParts[0].lastIndexOf("/")+1);
+                else
+                    contents = addLineNumbers(contents, startline);
+                contents = "----(Prev:" + pId + ")----\n" + 
+                            contents + 
+                            "----(Next:" + nId + ")----" + 
+                            "\n(Parent:" + fId + ")(Related:" + rId + ")";
                 String locIdFull = locId + " in " + file;
                 
                 count(projects, projectName);
@@ -150,6 +166,72 @@ public class CodeLocationAnalysisIntermediateModule extends IntermediateModule {
             		if (l.alive)
             			l.end = eventPacket.getTimeStamp();
 
+                // write exactcodechange with file as path
+                data1 = "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+                        + userName
+                        + "</username><projectname>"
+                        + projectName
+                        + "</projectname></commonData><exactCodeChange>"+"<path>"
+                        + file+"</path>"
+                        + "<change><typeOfChange>" + type + "</typeOfChange>"
+                        + "<elementName>"+ String.format("%1$05d", Integer.parseInt(locId)) +"</elementName>"
+                        + "<identifier><![CDATA[" + locIdFull + "]]></identifier>"
+                        + "<codeOrIdentifier><![CDATA["+ contents + "]]>"
+                        + "</codeOrIdentifier></change>"
+                        + "</exactCodeChange></microActivity>";
+
+                // write exactcodechange with time stamp as path
+                data2 = "<?xml version=\"1.0\"?><microActivity><commonData><username>"
+                        + userName
+                        + "</username><projectname>"
+                        + projectName
+                        + "</projectname></commonData><exactCodeChange>"+"<path>"
+                        + new SimpleDateFormat("dd.MM.yy, HH:mm:ss").format(eventPacket.getTimeStamp())+"</path>"
+                        + "<change><typeOfChange>" + type + "</typeOfChange>"
+                        + "<elementName>"+ String.format("%1$05d", Integer.parseInt(locId)) +"</elementName>"
+                        + "<identifier><![CDATA[" + locId + " at " + eventPacket.getTimeStamp() + "]]></identifier>"
+                        + "<codeOrIdentifier><![CDATA["+ contents + "]]>"
+                        + "</codeOrIdentifier></change>"
+                        + "</exactCodeChange></microActivity>";
+            } catch (NodeException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+            try {
+                String[] args1 = {WellFormedEventPacket.HACKYSTAT_ADD_COMMAND, 
+                        "msdt.exactcodechange.xsd", 
+                        data1};
+                events.add(new ValidEventPacket(eventPacket.getTimeStamp(),
+                    WellFormedEventPacket.HACKYSTAT_ACTIVITY_STRING, Arrays.asList(args1)));
+                String[] args2 = {WellFormedEventPacket.HACKYSTAT_ADD_COMMAND, 
+                        "msdt.exactcodechange.xsd", 
+                        data2};
+                events.add(new ValidEventPacket(eventPacket.getTimeStamp(),
+                    WellFormedEventPacket.HACKYSTAT_ACTIVITY_STRING, Arrays.asList(args2)));
+            } catch (IllegalEventParameterException e) {
+                logger.log(ECGLevel.SEVERE, "Wrong event parameters in CodeLocationTrackerIntermediateModule.");
+            }
+                        
+        }
+
+        else if (eventPacket.getMicroSensorDataType().getName().equals("msdt.codechange.xsd") ||
+                 eventPacket.getMicroSensorDataType().getName().equals("msdt.codestatus.xsd")) {
+            
+            Document doc = eventPacket.getDocument();
+            String data = "";
+            // parse codelocation
+            try {
+                // String id = ECGParser.getSingleNodeValue("id", doc);
+                String projectName = ECGParser.getSingleNodeValue("projectname", doc);
+                String userName = ECGParser.getSingleNodeValue("username", doc);
+                String file = ECGParser.getSingleNodeValue("documentname", doc);
+                String contents = ECGParser.getSingleNodeValue("document", doc);
+                if (contents == null)
+                    contents = "";
+                else
+                    contents = addLineNumbers(contents,0);
+
                 // write exactcodechange
                 data = "<?xml version=\"1.0\"?><microActivity><commonData><username>"
                         + userName
@@ -157,9 +239,9 @@ public class CodeLocationAnalysisIntermediateModule extends IntermediateModule {
                         + projectName
                         + "</projectname></commonData><exactCodeChange>"+"<path>"
                         + file+"</path>"
-                        + "<change><typeOfChange>" + type + "</typeOfChange>"
-                        + "<elementName>"+ locId +"</elementName>"
-                        + "<identifier><![CDATA[" + locIdFull + "]]></identifier>"
+                        + "<change><typeOfChange>CHANGED</typeOfChange>"
+                        + "<elementName>complete</elementName>"
+                        + "<identifier><![CDATA[" + file + " complete" + "]]></identifier>"
                         + "<codeOrIdentifier><![CDATA["+ contents + "]]>"
                         + "</codeOrIdentifier></change>"
                         + "</exactCodeChange></microActivity>";
@@ -177,11 +259,9 @@ public class CodeLocationAnalysisIntermediateModule extends IntermediateModule {
             } catch (IllegalEventParameterException e) {
                 logger.log(ECGLevel.SEVERE, "Wrong event parameters in CodeLocationTrackerIntermediateModule.");
             }
-            
-            
-        }
 
-        // TODO just for debugging
+        }
+            // TODO just for debugging
         else if (eventPacket.getMicroSensorDataType().getName().equals("msdt.system.xsd")) {
             try {
                 if (ECGParser.getSingleNodeValue("type", eventPacket.getDocument()).equals("termination")) {
@@ -203,6 +283,46 @@ public class CodeLocationAnalysisIntermediateModule extends IntermediateModule {
         return events;
         
 	}
+
+    private String addLineNumbers(String contents, int start) {
+        String res = "";
+        for (String l : getLines(contents)) {
+            res += (start++) + "\t" + l + "\n";
+        }
+        return res;
+    }
+
+    /**
+     * Splits a file contents into an array of lines
+     * 
+     * @param contents A text file contents
+     * @return The single lines (seperated by \n) in code
+     */
+    private Vector<String> getLines(String contents) {
+        Vector<String> res=new Vector<String>();
+        if (contents == null) {
+            return res;
+        }
+        StringBuffer buffer=new StringBuffer();
+        int size=contents.length();
+        for (int index=0;index<size;index++) {
+           char current=contents.charAt(index);
+           if (current==0x0D) {
+              if (index+1<size && contents.charAt(index+1)==0x0A)
+                  index++;
+              res.add(buffer.toString());
+              buffer.setLength(0);
+           } else if (current==0x0A) {
+              if (index+1<size && contents.charAt(index+1)==0x0D)
+                  index++;
+              res.add(buffer.toString());
+              buffer.setLength(0);
+           } else buffer.append(current);
+        }
+        if (buffer.length()>0)
+           res.add(buffer.toString());
+        return res;
+    }
 
     private void print(String heading, Map<String, Integer> map, Map<String, Loc> ref) {
         System.out.println(map.size() + " " + heading);
