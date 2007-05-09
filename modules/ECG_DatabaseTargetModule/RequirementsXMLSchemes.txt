@@ -1,5 +1,5 @@
 Requirements for schemes to be mapped automatically:
-* the microActivity Element has to be the root Element in a scheme.
+* the microActivity Element has to be the root Element in a scheme.
 * the  microActivity has two dircect child elements:  commonData ant the eventspecific element, whose child-elements are the attributes of the event 
 *the microActivity element does not contain any simple type direct child elements 
 * the datatype of a simple type element must be specified either by 
