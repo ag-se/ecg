@@ -1,0 +1,88 @@
+<?xml version="1.0"?>
+<modulesetup>
+	<module id="4" active="true">
+		<name>
+		File Writer
+		</name>
+		<fromClassId>
+		org.electrocodeogram.module.target.implementation.FileSystemTargetModule
+		</fromClassId>
+		<connectedTo>
+		</connectedTo>
+		<properties>
+			<property>
+				<name>Output File</name>
+				<value>out_database_events.log</value>
+				<type>java.io.File</type>
+			</property>
+			<property>
+				<name>Append Data</name>
+				<value>false</value>
+				<type>java.lang.Boolean</type>
+			</property>
+			<property>
+				<name>Stamp File Name</name>
+				<value>false</value>
+				<type>java.lang.Boolean</type>
+			</property>
+			<property>
+				<name>Split Files</name>
+				<value>false</value>
+				<type>java.lang.Boolean</type>
+			</property>
+			<property>
+				<name>File Size</name>
+				<value>1000000</value>
+				<type>java.lang.Integer</type>
+			</property>
+		</properties>
+	</module>
+	<module id="3" active="true">
+		<name>
+		Database Reader
+		</name>
+		<fromClassId>
+		org.electrocodeogram.module.source.implementation.DatabaseSourceModule
+		</fromClassId>
+		<connectedTo>
+		<id>
+		4
+		</id>
+		</connectedTo>
+		<properties>
+			<property>
+			<name>
+			JDBC Connection
+			</name>
+			<value>
+			jdbc:mysql://localhost:3306/ecgtest
+			</value>
+			<type>
+			java.lang.String
+			</type>
+			</property>
+			<property>
+			<name>
+			Username
+			</name>
+			<value>
+			ecg
+			</value>
+			<type>
+			java.lang.String
+			</type>
+			</property>
+			<property>
+			<name>
+			Password
+			</name>
+			<value>
+			ecg
+			</value>
+			<type>
+			java.lang.String
+			</type>
+			</property>
+		</properties>
+	</module>
+</modulesetup>
