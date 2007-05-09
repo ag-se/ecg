@@ -26,11 +26,18 @@
 	
 	<property name="targetModule.dir" value="../ECG_DatabaseTargetModule"/>
 
-	<!-- include local jdbc driver -->
-	<property name="jdbc.driver.dir" value="C:/Program Files/Java/mysql-connector-java-5.0.3/"/>
+	<!-- include local jdbc driver 
+	!! You must change the path and version number here
+	!! Obtain JDBC driver from http://dev.mysql.com/downloads/connector/j/
+	-->
+	<property name="jdbc.driver.dir" value="mysql-connector-java-5.0.3/"/>
 
-	<!-- include apache xmlbeans library -->
-	<property name="xmlbeans.dir" value="C:/Program Files/Java/xmlbeans-2.2.0/"/>
+	<!-- include apache xmlbeans library 
+	!! You must change the path and version number here
+	!! Obtain XMLBeans from http://xmlbeans.apache.org/sourceAndBinaries/
+	-->
+	<property name="xmlbeans.dir" value="xmlbeans-2.2.0/"/>
+
 
     <!-- Classpath setting -->
 	<path id="classpath">
