@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.3"?>
+<plugin>
+   <extension-point id="providers" name="Provider Registry Extension Point" schema="schema/providers.exsd"/>
+   <extension-point id="cloneDataElements" name="Custom Clone Data Objects for ICloneFactoryProvider" schema="schema/cloneDataElements.exsd"/>
+   <extension-point id="providerRegistry" name="Provider Registry Implementation Extension Point" schema="schema/providerRegistry.exsd"/>
+   <extension-point id="eventHubRegistry" name="Event Hub Implementation Extension Point" schema="schema/eventHubRegistry.exsd"/>
+   <extension-point id="eventHubListeners" name="Event Listeners Extension Point" schema="schema/eventHubListeners.exsd"/>
+   <extension-point id="configurationRegistry" name="Configuration Registry Implementation Extension Point" schema="schema/configurationRegistry.exsd"/>
+
+   <extension
+         point="org.electrocodeogram.cpc.core.providers">
+      <provider
+            class="org.electrocodeogram.cpc.core.provider.CloneFactoryProvider"
+            name="CPC Core - Default Clone Factory Provider"
+            priority="0"
+            type="org.electrocodeogram.cpc.core.api.provider.data.ICloneFactoryProvider">
+      </provider>
+      <provider
+            class="org.electrocodeogram.cpc.core.registry.DefaultMappingRegistry"
+            name="CPC Core - Default Mapping Registry"
+            priority="0"
+            type="org.electrocodeogram.cpc.core.api.provider.xml.IMappingRegistry">
+      </provider>
+   </extension>
+   
+   <extension
+         point="org.electrocodeogram.cpc.core.providerRegistry">
+      <providerRegistry
+            class="org.electrocodeogram.cpc.core.registry.DefaultProviderRegistry"
+            name="Default Provider Registry"
+            priority="0">
+      </providerRegistry>
+   </extension>
+   
+   <extension
+         point="org.electrocodeogram.cpc.core.eventHubRegistry">
+      <eventHubRegistry
+            class="org.electrocodeogram.cpc.core.registry.DefaultEventHubRegistry"
+            name="Default Event Hub Registry"
+            priority="0">
+      </eventHubRegistry>
+   </extension>
+   <extension
+         point="org.electrocodeogram.cpc.core.configurationRegistry">
+      <configurationRegistry
+            class="org.electrocodeogram.cpc.core.registry.DefaultConfigurationRegistry"
+            name="Default Configuration Registry"
+            priority="0">
+      </configurationRegistry>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="org.electrocodeogram.cpc.core.preferences.CPCPreferencePage"
+            id="org.electrocodeogram.cpc.core.preferences.cpc"
+            name="%cpccore.preferences.cpc.category.name">
+      </page>
+      <page
+            category="org.electrocodeogram.cpc.core.preferences.cpc"
+            class="org.electrocodeogram.cpc.core.preferences.CPCCorePreferencePage"
+            id="org.electrocodeogram.cpc.core.preferences.cpccore"
+            name="%cpccore.preferences.cpccore.category.name">
+      </page>
+   </extension>
+
+</plugin>

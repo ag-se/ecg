@@ -1,0 +1,179 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="org.electrocodeogram.cpc.core">
+<annotation>
+      <appInfo>
+         <meta.schema plugin="org.electrocodeogram.cpc.core" id="eventHubListeners" name="Event Listeners Extension Point"/>
+      </appInfo>
+      <documentation>
+         [Enter description of this extension point.]
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <complexType>
+         <sequence>
+            <element ref="listener" minOccurs="1" maxOccurs="unbounded"/>
+         </sequence>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appInfo>
+                  <meta.attribute translatable="true"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="listener">
+      <annotation>
+         <documentation>
+            Specifies a cpc event listener.
+         </documentation>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="eventType" minOccurs="1" maxOccurs="unbounded"/>
+         </sequence>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The class which should be used as listener callback.
+The class must implement org.electrocodeogram.cpc.core.api.hub.registry.IEventHubListener.
+
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="java" basedOn=":org.electrocodeogram.cpc.core.api.hub.registry.IEventHubListener"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  A human readable name of this listener. Mainly for debugging purposes.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="eventType">
+      <annotation>
+         <documentation>
+            Specifies an event this listener is insterested in.
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The event type or super type for which this listener wishes to receive notifications.
+Must be org.electrocodeogram.cpc.core.api.hub.event.CPCEvent or one of its subclasses.
+
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="java" basedOn="org.electrocodeogram.cpc.core.api.hub.event.CPCEvent:"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+         <attribute name="synchronous" type="boolean" use="default" value="false">
+            <annotation>
+               <documentation>
+                  Specifies whether the listener wants to be notified synchronously or asynchronously about events of this type. Synchronous listeners should try to minimise the amount of processing done during event handling as they might be blocking the main UI thread.
+Other considerations are also important. Please refer to the IEventHubListener documentation.
+
+The default value is false.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="priority" type="string" use="default" value="0">
+            <annotation>
+               <documentation>
+                  The priority of this listener. If multiple listeners are registered for one event type they will be notified in descending order of their priority. If multiple listeners have the same priority the order of execution is not specified.
+Priorities are signed byte values.
+Negative priorities are allowed.
+
+The default priority is 0.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="threadsafe" type="boolean" use="default" value="false">
+            <annotation>
+               <documentation>
+                  Specifies whether this listener is thread safe.
+
+NOTE: ALL synchronous listeners MUST be thread safe. Thread safety is only optional for _asynchronous_ listeners.
+
+An Event Hub Registry implementation will not send multiple asynchronous events to the same listener concurrently, if this value is false or undefined. If this value is set to true it is up to the Event Hub Registry implementation to decide whether to use a single or multiple event dispatching threads for this listener.
+
+The default value is false.
+
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="since"/>
+      </appInfo>
+      <documentation>
+         [Enter the first release in which this extension point appears.]
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="examples"/>
+      </appInfo>
+      <documentation>
+         [Enter extension point usage example here.]
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="apiInfo"/>
+      </appInfo>
+      <documentation>
+         [Enter API information here.]
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="implementation"/>
+      </appInfo>
+      <documentation>
+         [Enter information about supplied implementation of this extension point.]
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="copyright"/>
+      </appInfo>
+      <documentation>
+         
+      </documentation>
+   </annotation>
+
+</schema>

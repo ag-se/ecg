@@ -1,0 +1,159 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="org.electrocodeogram.cpc.core">
+<annotation>
+      <appInfo>
+         <meta.schema plugin="org.electrocodeogram.cpc.core" id="providers" name="Provider Registry Extension Point"/>
+      </appInfo>
+      <documentation>
+         Allows plugins which contribute CPC subsystem implementations to register their providers with the central CPC provider registry.
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <complexType>
+         <sequence minOccurs="1" maxOccurs="unbounded">
+            <element ref="provider"/>
+         </sequence>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appInfo>
+                  <meta.attribute translatable="true"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="provider">
+      <annotation>
+         <documentation>
+            Allows registration of a provider implementation with the central provider registry.
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="name" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Human readable name of the provider. This will be displayed in configuration dialogs and debug messages.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="priority" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The priority of this provider implementation. This can be used to enforce the use of one specific provider even if multiple providers of the same type are registered.&lt;br&gt;
+This is a byte value (negative values are possible).&lt;br&gt;
+&lt;br&gt;
+Priorities:
+&lt;ul&gt;
+ &lt;li&gt;0 is the default priority for original CPC modules.&lt;/li&gt;
+ &lt;li&gt;Byte.MAX_VALUE is the highest priority&lt;/li&gt;
+ &lt;li&gt;Byte.MIN_VALUE is the lowest priority&lt;/li&gt;
+ &lt;li&gt;Providers are generally used in order of decreasing priority. For provider types
+  which require only one implementation (i.e. local storage/&lt;em&gt;IStoreProvider&lt;/em&gt;)
+  only the one provider with the highest priority will be used and all other
+  providers will have no effect.&lt;/li&gt;
+ &lt;li&gt;To maintain extensibility all provider authors are strongly encouraged to always leave some
+  priorities above and below their providers priority. I.e. if you want to override the
+  default &lt;em&gt;IStoreProvider&lt;/em&gt; don&apos;t set your priority to 1 but use 50 instead.&lt;/li&gt;
+ &lt;li&gt;For certain provider types all registered providers  may be taken into account or all
+  providers may be asked if they&apos;re applicable in a given context, in decreasing order according
+  to priotity.&lt;/li&gt;
+&lt;/ul&gt;
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="type" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The interface which the provider provides. I.e. &quot;org.electrocodeogram.cpc.core.api.store.IStoreProvider&quot;
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="java" basedOn="org.electrocodeogram.cpc.core.api.provider.IProvider:"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The facade class of the provider implementation. Needs to implement org.electrocodeogram.cpc.core.api.provider.IProvider.
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="java" basedOn="org.electrocodeogram.cpc.core.api.provider.IProvider"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+         <attribute name="singleton" type="boolean" use="default" value="true">
+            <annotation>
+               <documentation>
+                  Specifies whether this provider should be treated as a Singleton. Meaning that all calls to the lookupProvider() method of the provider registry should always return the same instance of this provider. The default is true.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="since"/>
+      </appInfo>
+      <documentation>
+         1.0.0 - 26.07.2007
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="examples"/>
+      </appInfo>
+      <documentation>
+         
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="apiInfo"/>
+      </appInfo>
+      <documentation>
+         
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="implementation"/>
+      </appInfo>
+      <documentation>
+         
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="copyright"/>
+      </appInfo>
+      <documentation>
+         
+      </documentation>
+   </annotation>
+
+</schema>
