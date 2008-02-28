@@ -1,0 +1,18 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: CPC Similarity
+Bundle-SymbolicName: org.electrocodeogram.cpc.similarity;singleton:=true
+Bundle-Version: 1.0.2.qualifier
+Bundle-Localization: plugin
+Bundle-Activator: org.electrocodeogram.cpc.similarity.CPCSimilarityPlugin
+Require-Bundle: org.electrocodeogram.eclipse.core,
+ org.electrocodeogram.cpc.core,
+ org.electrocodeogram.cpc.imports,
+ org.eclipse.core.runtime,
+ org.eclipse.core.resources,
+ org.eclipse.ui
+Eclipse-LazyStart: true
+Bundle-Vendor: FU Berlin
+Bundle-ClassPath: cpc.similarity.jar,
+ lib/antlr-runtime-3.0.1.jar
+Export-Package: org.electrocodeogram.cpc.similarity

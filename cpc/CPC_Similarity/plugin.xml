@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.3"?>
+<plugin>
+   <extension-point id="similarityStategies" name="Similarity Strategies Extension Point" schema="schema/similarityStategies.exsd"/>
+   <extension
+         point="org.electrocodeogram.cpc.core.providers">
+      <provider
+            class="org.electrocodeogram.cpc.similarity.provider.SimilarityProvider"
+            name="Default Similarity Provider"
+            priority="0"
+            singleton="true"
+            type="org.electrocodeogram.cpc.core.api.provider.similarity.ISimilarityProvider">
+      </provider>
+   </extension>
+   <extension
+         point="org.electrocodeogram.cpc.similarity.similarityStategies">
+      <strategy
+            class="org.electrocodeogram.cpc.similarity.strategy.JavaCodeNormalisingStrategy"
+            name="Java Code Normalising Strategy"
+            priority="100">
+      </strategy>
+      <strategy
+            class="org.electrocodeogram.cpc.similarity.strategy.GenericCodeNormalisingStrategy"
+            name="Generic Code Normalising Strategy"
+            priority="60">
+      </strategy>
+      <strategy
+            class="org.electrocodeogram.cpc.similarity.strategy.LevenshteinDistanceStrategy"
+            name="Levenshtein Distance Strategy (edit distance)"
+            priority="0">
+      </strategy>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="org.electrocodeogram.cpc.similarity.preferences.CPCPreferenceInitializer">
+      </initializer>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="org.electrocodeogram.cpc.core.preferences.cpc"
+            class="org.electrocodeogram.cpc.similarity.preferences.CPCSimilarityPreferencePage"
+            id="org.electrocodeogram.cpc.similarity.preferences.cpcsimilarity"
+            name="%cpcsimilarity.preferences.cpcsimilarity.category.name">
+      </page>
+      <page
+            category="org.electrocodeogram.cpc.core.preferences.cpc/org.electrocodeogram.cpc.similarity.preferences.cpcsimilarity"
+            class="org.electrocodeogram.cpc.similarity.preferences.CPCSimilarityStrategiesPreferencePage"
+            id="org.electrocodeogram.cpc.similarity.preferences.similaritystrategies"
+            name="%cpcsimilarity.preferences.strategies.category.name">
+      </page>
+      <page
+            category="org.electrocodeogram.cpc.core.preferences.cpc/org.electrocodeogram.cpc.similarity.preferences.cpcsimilarity/org.electrocodeogram.cpc.similarity.preferences.similaritystrategies"
+            class="org.electrocodeogram.cpc.similarity.preferences.CPCJavaCodeNormalisingStrategyPreferencePage"
+            id="org.electrocodeogram.cpc.similarity.preferences.similaritystrategies.javacodenormalising"
+            name="%cpcsimilarity.preferences.strategies.javacodenormalising.category.name">
+      </page>
+   </extension>
+</plugin>
