@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.3"?>
+<plugin>
+   <extension
+         point="org.electrocodeogram.cpc.core.providers">
+      <provider
+            class="org.electrocodeogram.cpc.reconciler.provider.ExternalModificationReconcilerProvider"
+            name="CPC Reconciler - Default Reconciler"
+            priority="0"
+            type="org.electrocodeogram.cpc.core.api.provider.reconciler.IReconcilerProvider">
+      </provider>
+      <provider
+            class="org.electrocodeogram.cpc.reconciler.provider.DefaultDiffProvider"
+            name="CPC Reconciler - Default Diff Provider"
+            priority="0"
+            singleton="true"
+            type="org.electrocodeogram.cpc.core.api.provider.reconciler.IDiffProvider">
+      </provider>
+   </extension>
+   <extension
+         point="org.electrocodeogram.cpc.core.eventHubListeners">
+      <listener
+            class="org.electrocodeogram.cpc.reconciler.listener.EclipseFileAccessEventListener"
+            name="EclipseFileAccessEventListener">
+         <eventType
+               class="org.electrocodeogram.cpc.core.api.hub.event.EclipseFileAccessEvent"
+               priority="110"
+               synchronous="true">
+         </eventType>
+      </listener>
+   </extension>
+</plugin>

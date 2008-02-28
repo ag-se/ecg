@@ -1,0 +1,21 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: CPC Reconciler
+Bundle-SymbolicName: org.electrocodeogram.cpc.reconciler;singleton:=true
+Bundle-Version: 1.0.2.qualifier
+Bundle-Activator: org.electrocodeogram.cpc.reconciler.CPCReconcilerPlugin
+Require-Bundle: org.electrocodeogram.eclipse.core,
+ org.electrocodeogram.cpc.core,
+ org.eclipse.core.runtime,
+ org.eclipse.core.resources,
+ org.eclipse.core.filesystem,
+ org.eclipse.ui,
+ org.eclipse.jface.text
+Eclipse-LazyStart: true
+Bundle-Vendor: FU Berlin
+Bundle-ClassPath: cpc.reconciler.jar,
+ lib/java-diff-1.0.5.jar
+Export-Package: org.electrocodeogram.cpc.reconciler,
+ org.electrocodeogram.cpc.reconciler.api.strategy,
+ org.electrocodeogram.cpc.reconciler.provider;x-friends:="org.electrocodeogram.cpc.test",
+ org.electrocodeogram.cpc.reconciler.utils.diff;x-friends:="org.electrocodeogram.cpc.test"
