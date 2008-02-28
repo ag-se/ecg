@@ -1,0 +1,21 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: ECG Eclipse Core
+Bundle-SymbolicName: org.electrocodeogram.eclipse.core; singleton:=true
+Bundle-Version: 1.0.2.qualifier
+Bundle-Vendor: FU Berlin
+Bundle-Activator: org.electrocodeogram.eclipse.core.ECGEclipseCorePlugin
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.jface,
+ org.eclipse.ui.workbench,
+ org.junit4
+Eclipse-LazyStart: true
+Bundle-ClassPath: ecg.core.jar,
+ lib/log4j-1.2.14.jar,
+ lib/jcl104-over-slf4j-1.4.3.jar,
+ lib/slf4j-api-1.4.3.jar
+Export-Package: .,
+ org.apache.commons.logging,
+ org.apache.commons.logging.impl,
+ org.electrocodeogram.eclipse.core,
+ org.electrocodeogram.eclipse.core.logging

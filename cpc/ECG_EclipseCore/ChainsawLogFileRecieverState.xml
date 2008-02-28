@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE log4j:configuration PUBLIC "-//log4j/log4j Configuration//EN" "log4j.dtd"> 
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/" debug="true">
+
+   <plugin name="logFileReceiver" class="org.apache.log4j.varia.LogFilePatternReceiver">
+     <param name="fileURL" value="file:///c:/dev/logs/serverLog.log" />
+     <param name="timestampFormat" value="yyyy-MM-d HH:mm:ss,SSS"/> 
+     <param name="logFormat" value="TIMESTAMP LEVEL [THREAD] CLASS (FILE:LINE) - MESSAGE"/> 
+     <param name="name" value="Reciever-name-in-Chainsaw" />
+     <param name="tailing" value="true" /> 
+   </plugin>
+
+   <root>
+      <level value="debug"/>
+   </root>
+</log4j:configuration>
