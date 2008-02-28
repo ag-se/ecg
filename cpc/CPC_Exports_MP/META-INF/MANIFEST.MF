@@ -1,0 +1,19 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: CPC Exports MP
+Bundle-SymbolicName: org.electrocodeogram.cpc.exports.mp;singleton:=true
+Bundle-Version: 1.0.2.qualifier
+Bundle-Activator: org.electrocodeogram.cpc.exports.mp.CPCExportsMPPlugin
+Require-Bundle: org.electrocodeogram.eclipse.core,
+ org.electrocodeogram.cpc.core,
+ org.electrocodeogram.cpc.importexport,
+ org.electrocodeogram.cpc.exports,
+ org.eclipse.core.runtime,
+ org.eclipse.core.resources,
+ org.eclipse.ui,
+ org.eclipse.ui.ide
+Eclipse-LazyStart: true
+Bundle-Vendor: FU Berlin
+Bundle-ClassPath: cpc.exports.mp.jar
+Export-Package: org.electrocodeogram.cpc.exports.mp,
+ org.electrocodeogram.cpc.exports.mp.exports;x-friends:="org.electrocodeogram.cpc.test"

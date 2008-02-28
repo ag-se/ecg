@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.3"?>
+<plugin>
+   <extension
+         point="org.electrocodeogram.cpc.exports.exportToolAdapters">
+      <exportToolAdapter
+            class="org.electrocodeogram.cpc.exports.mp.exports.MPExportToolAdapter"
+            name="CPC Exports MP - Mapping Provider File Export Adapter">
+         <option
+               defaultValue="0"
+               key="exportEmptyCloneFiles"
+               name="also include files without clones (1=yes/0=no)"
+               >
+         </option>
+         <option
+               defaultValue="0"
+               key="exportSourceFiles"
+               name="include source in export (1=yes/0=no)"
+               >
+         </option>
+         <optionPage
+               class="org.electrocodeogram.cpc.exports.mp.wizards.ExportDestinationOptionWizardPage"
+               name="Export Destination Selection">
+         </optionPage>
+      </exportToolAdapter>
+   </extension>
+</plugin>
