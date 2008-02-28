@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.3"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.viewActions">
+      <viewContribution
+            id="org.electrocodeogram.cpc.optimiser.actions.simplecloneviewcontrib"
+            targetID="org.electrocodeogram.cpc.ui.views.simplecloneview">
+         <action
+               class="org.electrocodeogram.cpc.optimiser.actions.PurgeCloneDiffHistoryAction"
+               id="org.electrocodeogram.cpc.optimiser.actions.purgeclonediffhistory"
+               label="%cpcui.action.purgeclonediffhistory.name"
+               menubarPath="additions">
+         </action>
+      </viewContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            id="org.electrocodeogram.cpc.optimiser.actions.iclonecontextcontrib"
+            objectClass="org.electrocodeogram.cpc.core.api.data.IClone">
+         <action
+               class="org.electrocodeogram.cpc.optimiser.actions.PurgeCloneDiffHistoryAction"
+               id="org.electrocodeogram.cpc.optimiser.actions.context.purgeclonediffhistory"
+               label="%cpcui.action.purgeclonediffhistory.name"
+               menubarPath="additions">
+         </action>
+      </objectContribution>
+   </extension>
+     
+      <extension
+         point="org.eclipse.ui.popupMenus">
+         <objectContribution
+       	   id="org.electrocodeogram.cpc.ui.CPCResourceContextMenu"
+           objectClass="org.eclipse.core.resources.IResource" adaptable="true">
+         <menu
+               label="%cpcui.contextmenu.name"
+               path="additions"
+               id="org.electrocodeogram.cpc.ui.CPCContextMenu">
+            <separator
+                  name="content">
+            </separator>
+            <separator
+                  name="additions">
+            </separator>
+         </menu>		
+         <action
+               label="%cpcui.action.orphandetection.name"
+               class="org.electrocodeogram.cpc.optimiser.actions.OrphanDetectionActionDelegate"
+               menubarPath="org.electrocodeogram.cpc.ui.CPCContextMenu/content"
+               enablesFor="+"
+               id="org.electrocodeogram.cpc.optimiser.actions.OrphanDetectionActionDelegate">
+			<enablement>
+				<objectClass name="org.eclipse.core.resources.IProject"/>
+			</enablement>
+         </action>
+      </objectContribution>
+   </extension>
+
+</plugin>
