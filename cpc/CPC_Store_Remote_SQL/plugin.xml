@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.3"?>
+<plugin>
+   <extension
+         point="org.electrocodeogram.cpc.core.eventHubListeners">
+      <listener
+            class="org.electrocodeogram.cpc.store.remote.sql.listener.EclipseTeamEventListener"
+            name="CPC Store Remote SQL - Eclipse Team Event Listener">
+         <eventType
+               class="org.electrocodeogram.cpc.core.api.hub.event.EclipseTeamEvent"
+               priority="50"
+               synchronous="true">
+         </eventType>
+      </listener>
+   </extension>
+   <extension
+         point="org.electrocodeogram.cpc.core.providers">
+      <provider
+            class="org.electrocodeogram.cpc.store.remote.sql.provider.SQLCPCRepositoryProvider"
+            name="CPC Store Remote SQL - CPC Repository Provider"
+            priority="0"
+            singleton="true"
+            type="org.electrocodeogram.cpc.core.api.provider.cpcrepository.ICPCRepositoryProvider">
+      </provider>
+   </extension>
+</plugin>

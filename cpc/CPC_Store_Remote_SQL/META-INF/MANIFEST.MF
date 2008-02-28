@@ -1,0 +1,19 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: CPC Store Remote SQL
+Bundle-SymbolicName: org.electrocodeogram.cpc.store.remote.sql;singleton:=true
+Bundle-Version: 1.0.2.qualifier
+Bundle-Activator: org.electrocodeogram.cpc.store.remote.sql.CPCStoreRemoteSQLPlugin
+Require-Bundle: org.eclipse.core.runtime,
+ org.electrocodeogram.cpc.core,
+ org.electrocodeogram.cpc.store.remote,
+ org.electrocodeogram.eclipse.core,
+ org.eclipse.ui,
+ org.eclipse.core.resources,
+ org.eclipse.core.filesystem,
+ org.eclipse.team.core
+Eclipse-LazyStart: true
+Bundle-Vendor: FU Berlin
+Bundle-ClassPath: cpc.store.remote.sql.jar,
+ lib/postgresql-8.2-507.jdbc4.jar
+Export-Package: org.electrocodeogram.cpc.store.remote.sql
