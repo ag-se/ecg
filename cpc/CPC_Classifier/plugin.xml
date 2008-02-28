@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.3"?>
+<plugin>
+   <extension-point id="classificationStategies" name="Classification Strategies Extension Point" schema="schema/classificationStategies.exsd"/>
+   <extension
+         point="org.electrocodeogram.cpc.core.providers">
+      <provider
+            class="org.electrocodeogram.cpc.classifier.provider.ClassificationProvider"
+            name="CPC Classifier - Default Classification Provider"
+            priority="0"
+            singleton="true"
+            type="org.electrocodeogram.cpc.core.api.provider.classification.IClassificationProvider">
+      </provider>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="org.electrocodeogram.cpc.core.preferences.cpc"
+            class="org.electrocodeogram.cpc.classifier.preferences.CPCClassifierPreferencePage"
+            id="org.electrocodeogram.cpc.classifier.preferences.cpcclassifier"
+            name="%cpcclassifier.preferences.cpcclassifier.category.name">
+      </page>
+      <page
+            category="org.electrocodeogram.cpc.core.preferences.cpc/org.electrocodeogram.cpc.classifier.preferences.cpcclassifier/org.electrocodeogram.cpc.classifier.preferences.classificationstrategies"
+            class="org.electrocodeogram.cpc.classifier.preferences.CPCMinLengthClassifierPreferencePage"
+            id="org.electrocodeogram.cpc.classifier.preferences.minlengthstrategy"
+            name="%cpcclassifier.preferences.strategies.minlengthstrategy.category.name">
+      </page>
+      <page
+            category="org.electrocodeogram.cpc.core.preferences.cpc/org.electrocodeogram.cpc.classifier.preferences.cpcclassifier"
+            class="org.electrocodeogram.cpc.classifier.preferences.CPCClassificationStrategiesPreferencePage"
+            id="org.electrocodeogram.cpc.classifier.preferences.classificationstrategies"
+            name="%cpcclassifier.preferences.strategies.category.name">
+      </page>
+   </extension>
+   <extension
+         point="org.electrocodeogram.cpc.classifier.classificationStategies">
+      <strategy
+            class="org.electrocodeogram.cpc.classifier.strategy.MinLengthStrategy"
+            name="Minimal Length Strategy (discards small clones)"
+            priority="100">
+      </strategy>
+      <strategy
+            class="org.electrocodeogram.cpc.classifier.strategy.CopyOriginClassificationStrategy"
+            name="Copy Origin Classification Strategy (copies classifications from origin)"
+            priority="80">
+      </strategy>
+      <strategy
+            class="org.electrocodeogram.cpc.classifier.strategy.JDTASTStrategy"
+            name="JDT AST Strategy (uses the JDT source pasing to classify a clone&apos;s content)"
+            priority="50">
+      </strategy>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="org.electrocodeogram.cpc.classifier.preferences.CPCPreferenceInitializer">
+      </initializer>
+   </extension>
+</plugin>

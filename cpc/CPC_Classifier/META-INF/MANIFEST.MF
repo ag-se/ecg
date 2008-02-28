@@ -1,0 +1,18 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: CPC Classifier
+Bundle-SymbolicName: org.electrocodeogram.cpc.classifier;singleton:=true
+Bundle-Version: 1.0.2.qualifier
+Bundle-Localization: plugin
+Bundle-Activator: org.electrocodeogram.cpc.classifier.CPCClassifierPlugin
+Require-Bundle: org.electrocodeogram.eclipse.core,
+ org.electrocodeogram.cpc.core,
+ org.eclipse.core.runtime,
+ org.eclipse.core.resources,
+ org.eclipse.ui,
+ org.eclipse.jface.text,
+ org.eclipse.jdt.core
+Eclipse-LazyStart: true
+Bundle-Vendor: FU Berlin
+Bundle-ClassPath: cpc.classifier.jar
+Export-Package: org.electrocodeogram.cpc.classifier
