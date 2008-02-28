@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.3"?>
+<plugin>
+   <extension
+         point="org.electrocodeogram.cpc.core.eventHubListeners">
+      <listener
+            class="org.electrocodeogram.cpc.store.remote.lmi.listener.ClonePersistenceListener"
+            name="ClonePersistenceListener">
+         <eventType
+               class="org.electrocodeogram.cpc.core.api.hub.event.ClonePersistenceEvent"
+               synchronous="true">
+         </eventType>
+      </listener>
+      <listener
+            class="org.electrocodeogram.cpc.store.remote.lmi.listener.EclipseTeamEventListener"
+            name="TeamEventListener">
+         <eventType
+               class="org.electrocodeogram.cpc.core.api.hub.event.EclipseTeamEvent"
+               synchronous="true">
+         </eventType>
+      </listener>
+      <listener
+            class="org.electrocodeogram.cpc.store.remote.lmi.listener.EclipseFileChangeListener"
+            name="EclipseFileChangeListener">
+         <eventType
+               class="org.electrocodeogram.cpc.core.api.hub.event.EclipseFileChangeEvent"
+               synchronous="true">
+         </eventType>
+      </listener>
+   </extension>
+   
+   <!-- hide .cpc folder and *.cpc files by default -->
+   <extension
+         point="org.eclipse.ui.ide.resourceFilters">
+      <filter
+            selected="true"
+            pattern="*.cpc">
+      </filter>
+   </extension>
+   
+	<!-- make sure the team providers know that our data files are plain text files -->
+	<extension point="org.eclipse.team.core.fileTypes">
+		<fileTypes extension="cpc" type="text"/>
+	</extension>
+   
+   <extension
+         id="modelProvider"
+         name="CPC Model Provider"
+         point="org.eclipse.core.resources.modelProviders">
+      <modelProvider
+            class="org.electrocodeogram.cpc.store.remote.lmi.model.CPCModelProvider"/>
+      <extends-model id="org.eclipse.core.resources.modelProvider"/>
+      <extends-model id="org.eclipse.jdt.ui.modelProvider"/>
+      <enablement>
+         <test property="org.eclipse.core.resources.projectNature" 
+               value="org.eclipse.jdt.core.javanature" />
+       </enablement>
+   </extension>
+
+	<!-- special merge handling for cpc data files ("*.cpc") -->
+	<extension point="org.eclipse.team.core.storageMergers">
+		<storageMerger id="org.electrocodeogram.cpc.store.remote.lmi.model.CPCStorageMerger"
+			class="org.electrocodeogram.cpc.store.remote.lmi.model.CPCStorageMerger"
+			extensions="cpc"/>
+	</extension>
+   
+   <extension
+         point="org.eclipse.core.runtime.adapters">
+      <factory
+            class="org.electrocodeogram.cpc.store.remote.lmi.model.CPCAdapterFactory"
+            adaptableType="org.electrocodeogram.cpc.store.remote.lmi.model.CPCModelProvider">
+            <adapter type="org.eclipse.team.core.mapping.IResourceMappingMerger"/>
+      </factory>      
+   </extension>
+
+<!--
+      <extension
+            point="org.eclipse.ui.navigator.navigatorContent">
+         <navigatorContent
+               contentProvider="org.electrocodeogram.cpc.store.remote.lmi.model.ui.CPCModelSyncContentProvider"
+               id="org.electrocodeogram.cpc.store.remote.lmi.model.cpcsynccontentprovider"
+               labelProvider="org.electrocodeogram.cpc.store.remote.lmi.model.ui.CPCModelSyncLabelProvider"
+               name="CPC Model"
+               priority="high">
+            <actionProvider class="org.electrocodeogram.cpc.store.remote.lmi.model.ui.CPCModelSyncActionProvider"/>
+            <override
+                  policy="InvokeAlwaysRegardlessOfSuppressedExt"
+                  suppressedExtensionId="org.eclipse.team.ui.resourceContent"/>
+            <triggerPoints>
+               <or>
+                  <instanceof value="org.eclipse.team.core.mapping.ISynchronizationScope"/>
+                  <instanceof value="org.eclipse.team.core.mapping.ISynchronizationContext"/>
+                  <instanceof value="org.electrocodeogram.cpc.store.remote.lmi.model.CPCModelProvider"/>
+                  <instanceof value="org.eclipse.core.resources.IResource"/>
+               </or>
+            </triggerPoints>
+            <possibleChildren>
+               <or>
+                  <instanceof value="org.electrocodeogram.cpc.store.remote.lmi.model.CPCModelProvider"/>
+                  <instanceof value="org.eclipse.core.resources.IResource"/>
+               </or>
+            </possibleChildren>
+         </navigatorContent>
+         <actionProvider
+               class="org.eclipse.team.examples.model.ui.mapping.ThirdPartyActionProvider"
+               id="org.eclipse.team.examples.model.ThirdPartyActionProvider">
+            <enablement>
+               <adapt type="org.eclipse.core.resources.mapping.ResourceMapping"/>
+            </enablement>
+         </actionProvider>
+      </extension>
+         -->
+
+
+<!--
+	<extension
+		point="org.eclipse.core.runtime.adapters">
+		<factory
+			adaptableType="org.electrocodeogram.cpc.core.model.CPCModelProvider"
+			class="org.electrocodeogram.cpc.core.model.CPCAdapterFactory">
+			<adapter type="org.eclipse.team.core.mapping.IResourceMappingMerger"/>
+			<adapter type="org.eclipse.team.ui.mapping.ISynchronizationCompareAdapter"/>
+		</factory>
+	</extension>
+	-->
+<!--
+   <extension
+         id="modelProvider"
+         name="CPC Model Provider"
+         point="org.eclipse.core.resources.modelProviders">
+      <modelProvider
+            class="org.electrocodeogram.cpc.core.model.CPCModelProvider"/>
+      <extends-model id="org.eclipse.core.resources.modelProvider"/>
+      <enablement>
+         <test property="org.eclipse.core.resources.projectNature" 
+               value="org.eclipse.jdt.core.javanature" />
+       </enablement>
+   </extension>
+   
+	<extension
+		point="org.eclipse.core.runtime.adapters">
+		<factory
+			class="org.electrocodeogram.cpc.core.model.CPCAdapterFactory"
+			adaptableType="org.electrocodeogram.cpc.core.model.CPCResourceMapping">
+			<adapter type="org.eclipse.core.resources.mapping.ResourceMapping"/>
+		</factory>
+		<factory
+			class="org.electrocodeogram.cpc.core.model.CPCAdapterFactory"
+			adaptableType="org.electrocodeogram.cpc.core.model.CPCModelProvider">
+            <adapter type="org.eclipse.team.core.mapping.IResourceMappingMerger"/>
+            <adapter type="org.eclipse.team.ui.mapping.ISynchronizationCompareAdapter"/>
+		</factory>
+	</extension>
+-->
+	<!-- so far unused -->
+	<!--
+	<extension
+      point="org.eclipse.core.resources.natures"
+      id="cpcnature"
+      name="CPC Nature">
+      <runtime>
+         <run class="org.electrocodeogram.cpc.core.model.CPCNature">
+         </run>
+      </runtime>
+      <requires-nature id="org.eclipse.jdt.core.javanature"/>
+   </extension>
+   -->
+
+<!--
+	<extension point="org.eclipse.core.resources.moveDeleteHook" id="MoveDeleteHook">
+		<moveDeleteHook class="org.electrocodeogram.cpc.core.hooks.MoveDeleteManager"/>
+	</extension>
+	-->
+
+</plugin>
