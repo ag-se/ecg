@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.3"?>
+<plugin>
+   <extension
+         point="org.electrocodeogram.cpc.imports.importToolAdapters">
+      <importToolAdapter
+            class="org.electrocodeogram.cpc.imports.sdd.imports.SDDImportToolAdapter"
+            name="CPC Imports SDD - SDD Eclipse Plugin Adapter">
+         <option
+               defaultValue="15"
+               key="minChainSize"
+               name="minimal chain size"
+               >
+         </option>
+         <option
+               defaultValue="2"
+               key="nNeighborLength"
+               name="nNeighborLength"
+               >
+         </option>
+      </importToolAdapter>
+   </extension>
+</plugin>
