@@ -1,0 +1,22 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: CPC Track
+Bundle-SymbolicName: org.electrocodeogram.cpc.track;singleton:=true
+Bundle-Version: 1.0.2.qualifier
+Bundle-Activator: org.electrocodeogram.cpc.track.CPCTrackPlugin
+Require-Bundle: org.electrocodeogram.eclipse.core,
+ org.electrocodeogram.cpc.core,
+ org.eclipse.core.runtime,
+ org.eclipse.core.resources,
+ org.eclipse.ui,
+ org.eclipse.ui.editors,
+ org.eclipse.jface.text,
+ org.junit4,
+ org.eclipse.ltk.core.refactoring,
+ org.eclipse.jdt.core
+Eclipse-LazyStart: true
+Bundle-Vendor: FU Berlin
+Bundle-ClassPath: cpc.track.jar
+Export-Package: org.electrocodeogram.cpc.track,
+ org.electrocodeogram.cpc.track.repository,
+ org.electrocodeogram.cpc.track.utils

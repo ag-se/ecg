@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+
+   <extension
+         point="org.electrocodeogram.cpc.core.providers">
+      <provider
+            class="org.electrocodeogram.cpc.track.provider.DefaultPositionUpdateStrategyProvider"
+            name="Default PositionUpdateStrategyProvider"
+            priority="0"
+            singleton="true"
+            type="org.electrocodeogram.cpc.core.api.provider.track.IPositionUpdateStrategyProvider">
+      </provider>
+      <provider
+            class="org.electrocodeogram.cpc.track.provider.DefaultFuzzyPositionToCloneMatchingProvider"
+            name="Default DefaultFuzzyPositionToCloneMatchingProvider"
+            priority="0"
+            singleton="true"
+            type="org.electrocodeogram.cpc.core.api.provider.track.IFuzzyPositionToCloneMatchingProvider">
+      </provider>
+   </extension>
+   <extension
+         point="org.electrocodeogram.cpc.core.eventHubListeners">
+      <listener
+            class="org.electrocodeogram.cpc.track.listener.FileAccessListener"
+            name="FileAccessListener">
+         <eventType
+               class="org.electrocodeogram.cpc.core.api.hub.event.EclipseFileAccessEvent"
+               priority="100"
+               synchronous="true">
+         </eventType>
+      </listener>
+      <listener
+            class="org.electrocodeogram.cpc.track.listener.CutCopyPasteListener"
+            name="CutCopyPasteListener">
+         <eventType
+               class="org.electrocodeogram.cpc.core.api.hub.event.EclipseCutCopyPasteEvent"
+               priority="50"
+               synchronous="true">
+         </eventType>
+         <eventType
+               class="org.electrocodeogram.cpc.core.api.hub.event.CloneModificationEvent"
+               priority="50"
+               synchronous="true">
+         </eventType>
+      </listener>
+      <listener
+            class="org.electrocodeogram.cpc.track.listener.PersistenceListener"
+            name="PersistenceListener">
+         <eventType
+               class="org.electrocodeogram.cpc.core.api.hub.event.EclipseResourcePersistenceEvent"
+               priority="50"
+               synchronous="true">
+         </eventType>
+      </listener>
+      <listener
+            class="org.electrocodeogram.cpc.track.listener.EclipseFileChangeListener"
+            name="EclipseFileChangeListener">
+         <eventType
+               class="org.electrocodeogram.cpc.core.api.hub.event.EclipseFileChangeEvent"
+               priority="50"
+               synchronous="true">
+         </eventType>
+      </listener>
+   </extension>
+
+   <extension
+         point="org.eclipse.ltk.core.refactoring.renameParticipants">
+		<renameParticipant id="org.electrocodeogram.cpc.track.participant.renameParticipant" name="CPCRenameParticipant"
+			class="org.electrocodeogram.cpc.track.participant.CPCRenameParticipant">
+			<enablement>
+				<with variable="affectedNatures">
+					<iterate operator="or">
+						<equals value="org.eclipse.jdt.core.javanature"/>
+					</iterate>
+				</with>
+				<with variable="element">
+					<instanceof value="org.eclipse.jdt.core.ICompilationUnit"/>
+				</with>
+				-->
+			</enablement>
+		</renameParticipant>
+   </extension>
+
+   <extension
+         point="org.eclipse.ltk.core.refactoring.moveParticipants">
+		<moveParticipant id="org.electrocodeogram.cpc.track.participant.moveParticipant" name="CPCMoveParticipant"
+			class="org.electrocodeogram.cpc.track.participant.CPCMoveParticipant">
+			<enablement>
+				<with variable="affectedNatures">
+					<iterate operator="or">
+						<equals value="org.eclipse.jdt.core.javanature"/>
+					</iterate>
+				</with>
+				<with variable="element">
+					<instanceof value="org.eclipse.jdt.core.ICompilationUnit"/>
+				</with>
+				-->
+			</enablement>
+		</moveParticipant>
+   </extension>
+</plugin>
