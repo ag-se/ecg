@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: CPC Merge
+Bundle-SymbolicName: org.electrocodeogram.cpc.merge;singleton:=true
+Bundle-Version: 1.0.2.qualifier
+Bundle-Activator: org.electrocodeogram.cpc.merge.CPCMergePlugin
+Require-Bundle: org.electrocodeogram.eclipse.core,
+ org.electrocodeogram.cpc.core,
+ org.electrocodeogram.cpc.imports,
+ org.eclipse.core.runtime,
+ org.eclipse.core.resources,
+ org.eclipse.ui
+Eclipse-LazyStart: true
+Bundle-Vendor: FU Berlin
+Bundle-ClassPath: cpc.merge.jar
+Export-Package: org.electrocodeogram.cpc.merge

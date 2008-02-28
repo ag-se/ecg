@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.3"?>
+<plugin>
+   <extension
+         point="org.electrocodeogram.cpc.core.providers">
+      <provider
+            class="org.electrocodeogram.cpc.merge.provider.MergeProvider"
+            name="Default CPC Merge Provider"
+            priority="0"
+            singleton="true"
+            type="org.electrocodeogram.cpc.core.api.provider.merge.IMergeProvider">
+      </provider>
+   </extension>
+</plugin>
