@@ -1,0 +1,15 @@
+<project name="CPCUpdateSite" default="clean" basedir=".">
+	
+  <!-- TODO: find a way to trigger the update site building via ant -->
+	
+  <target name="clean"
+        description="clean up" >
+  	<!-- delete old data -->
+    <delete dir="features"/>
+    <delete dir="plugins"/>
+  	
+  	<!-- recreate directories -->
+  	<mkdir dir="features"/>
+  	<mkdir dir="plugins"/>
+  </target>
+</project>

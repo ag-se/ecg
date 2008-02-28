@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <description url="http://cpc.anetwork.de/update">
+      CPC Clone Tracking Eclipse Plugin.
+   </description>
+   <feature url="features/org.electrocodeogram.cpc.core_1.0.0.200711071847.jar" id="org.electrocodeogram.cpc.core" version="1.0.0.200711071847">
+      <category name="CPC"/>
+   </feature>
+   <feature url="features/org.electrocodeogram.cpc.notification_1.0.0.200711071847.jar" id="org.electrocodeogram.cpc.notification" version="1.0.0.200711071847">
+      <category name="CPC"/>
+   </feature>
+   <feature url="features/org.electrocodeogram.cpc.ui_1.0.0.200711071847.jar" id="org.electrocodeogram.cpc.ui" version="1.0.0.200711071847">
+      <category name="CPC"/>
+   </feature>
+   <feature url="features/org.electrocodeogram.cpc.imports.sdd_1.0.0.200711071847.jar" id="org.electrocodeogram.cpc.imports.sdd" version="1.0.0.200711071847">
+      <category name="CPC_Ext"/>
+   </feature>
+   <feature url="features/org.eclipse.soc.sdd_1.0.0.jar" id="org.eclipse.soc.sdd" version="1.0.0">
+      <category name="Misc"/>
+   </feature>
+   <feature url="features/org.electrocodeogram.cpc.extras_1.0.0.qualifier.jar" id="org.electrocodeogram.cpc.extras" version="1.0.0.qualifier">
+      <category name="CPC"/>
+   </feature>
+   <category-def name="CPC" label="CPC Clone Tracking CORE">
+      <description>
+         The core CPC feature which provides basic clone tracking and the underlying framework for CPC Extensions.
+      </description>
+   </category-def>
+   <category-def name="CPC_Ext" label="CPC Clone Tracking Extensions">
+      <description>
+         Additional CPC modules which add extra functionality. These modules are optional.
+      </description>
+   </category-def>
+   <category-def name="Misc" label="3rd Party Extensions">
+      <description>
+         3rd Party Extensions which are hosted here for convenience reasons.
+      </description>
+   </category-def>
+</site>
