@@ -1,0 +1,21 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: CPC Sensor
+Bundle-SymbolicName: org.electrocodeogram.cpc.sensor;singleton:=true
+Bundle-Version: 1.0.2.qualifier
+Bundle-Activator: org.electrocodeogram.cpc.sensor.CPCSensorPlugin
+Require-Bundle: org.electrocodeogram.eclipse.core,
+ org.electrocodeogram.cpc.core,
+ org.eclipse.core.runtime,
+ org.eclipse.core.resources,
+ org.eclipse.ui,
+ org.eclipse.core.filebuffers,
+ org.eclipse.jface.text,
+ org.eclipse.ui.workbench.texteditor,
+ org.eclipse.ui.editors,
+ org.eclipse.ui.ide
+Eclipse-LazyStart: true
+Bundle-Vendor: FU Berlin
+Bundle-ClassPath: cpc.sensor.jar
+Export-Package: org.electrocodeogram.cpc.sensor,
+ org.electrocodeogram.cpc.sensor.listener;x-friends:="org.electrocodeogram.cpc.test"

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension-point id="deactivate" name="Deactivation Extension Point" schema="schema/deactivate.exsd"/>
+   <extension
+         point="org.eclipse.ui.startup">
+   </extension>
+   <!--
+   <extension
+         id="org.electrocodeogram.cpc.sensor.documentSetupParticipant"
+         name="CPC Sensor DocumentSetupParticipant"
+         point="org.eclipse.core.filebuffers.documentSetup">
+      <participant
+            class="org.electrocodeogram.cpc.sensor.listener.CPCDocumentSetupParticipant"
+            extensions="java">
+      </participant>
+   </extension>
+   -->
+</plugin>
