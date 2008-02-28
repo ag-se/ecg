@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.3"?>
+<plugin>
+   <extension
+         point="org.electrocodeogram.cpc.core.eventHubListeners">
+      <listener
+            class="org.electrocodeogram.cpc.notification.ui.listener.CloneNotificationListener"
+            name="CloneNotificationListener">
+         <eventType
+               class="org.electrocodeogram.cpc.core.api.hub.event.CloneNotificationEvent">
+         </eventType>
+      </listener>
+      <listener
+            class="org.electrocodeogram.cpc.notification.ui.listener.CloneModificationListener"
+            name="CloneModificationListener">
+         <eventType
+               class="org.electrocodeogram.cpc.core.api.hub.event.CloneModificationEvent">
+         </eventType>
+      </listener>
+      <listener
+            class="org.electrocodeogram.cpc.notification.ui.listener.FileAccessListener"
+            name="FileAccessListener">
+         <eventType
+               class="org.electrocodeogram.cpc.core.api.hub.event.EclipseFileAccessEvent">
+         </eventType>
+      </listener>
+   </extension>
+	
+	<extension id="org.electrocodeogram.cpc.notification.ui.notificationmarker" point="org.eclipse.core.resources.markers"
+   		name="CPC Notification Marker">
+		<persistent value="false"/>
+		<super type="org.eclipse.core.resources.problemmarker"/>
+		<super type="org.eclipse.core.resources.textmarker"/>
+		<attribute name="cpc_clone_uuid"/>
+  <attribute
+        name="cpc_type">
+  </attribute>
+	</extension>
+ <extension
+	point="org.eclipse.ui.ide.markerResolution">
+	<markerResolutionGenerator
+		markerType="org.electrocodeogram.cpc.notification.ui.notificationmarker"
+		class="org.electrocodeogram.cpc.notification.ui.marker.NotificationMarkerResolutionGenerator">
+	</markerResolutionGenerator>
+</extension>
+</plugin>
