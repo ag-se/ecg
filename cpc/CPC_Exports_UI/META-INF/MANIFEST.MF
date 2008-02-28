@@ -1,0 +1,17 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: CPC Exports UI
+Bundle-SymbolicName: org.electrocodeogram.cpc.exports.ui;singleton:=true
+Bundle-Version: 1.0.2.qualifier
+Bundle-Activator: org.electrocodeogram.cpc.exports.ui.CPCExportsUIPlugin
+Require-Bundle: org.electrocodeogram.eclipse.core,
+ org.electrocodeogram.cpc.core,
+ org.electrocodeogram.cpc.importexport,
+ org.electrocodeogram.cpc.exports,
+ org.eclipse.core.runtime,
+ org.eclipse.core.resources,
+ org.eclipse.ui
+Eclipse-LazyStart: true
+Bundle-Vendor: FU Berlin
+Bundle-ClassPath: cpc.exports.ui.jar
+Export-Package: org.electrocodeogram.cpc.exports.ui

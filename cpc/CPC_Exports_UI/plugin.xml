@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.3"?>
+<plugin>
+      <extension
+         point="org.eclipse.ui.popupMenus">
+         <objectContribution
+       	   id="org.electrocodeogram.cpc.ui.CPCResourceContextMenu"
+           objectClass="org.eclipse.core.resources.IResource" adaptable="true">
+         <menu
+               label="CPC"
+               path="additions"
+               id="org.electrocodeogram.cpc.ui.CPCContextMenu">
+            <separator
+                  name="content">
+            </separator>
+            <separator
+                  name="additions">
+            </separator>
+         </menu>		
+         <action
+               label="Export Static Clone Data"
+               class="org.electrocodeogram.cpc.exports.ui.actions.ExportClonesAction"
+               menubarPath="org.electrocodeogram.cpc.ui.CPCContextMenu/content"
+               enablesFor="+"
+               id="org.electrocodeogram.cpc.exports.ui.actions.ExportClonesAction">
+		<enablement>
+			<objectClass name="org.eclipse.core.resources.IProject"/>
+		</enablement>
+         </action>
+      </objectContribution>
+   </extension>
+   
+</plugin>
