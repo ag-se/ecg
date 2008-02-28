@@ -1,0 +1,18 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: CPC Sensor Team RP
+Bundle-SymbolicName: org.electrocodeogram.cpc.sensor.team.rp;singleton:=true
+Bundle-Version: 1.0.2.qualifier
+Bundle-Activator: org.electrocodeogram.cpc.sensor.team.rp.CPCSensorTeamRPPlugin
+Require-Bundle: org.electrocodeogram.eclipse.core,
+ org.electrocodeogram.cpc.core,
+ org.eclipse.core.runtime,
+ org.eclipse.core.resources,
+ org.eclipse.team.core,
+ org.eclipse.team.ui,
+ org.eclipse.ui
+Eclipse-LazyStart: true
+Bundle-Vendor: FU Berlin
+Bundle-ClassPath: cpc.sensor.team.rp.jar
+Export-Package: org.electrocodeogram.cpc.sensor.team.rp,
+ org.electrocodeogram.cpc.sensor.team.rp.listener;x-friends:="org.electrocodeogram.cpc.test"
