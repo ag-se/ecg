@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.3"?>
+<plugin>
+   <extension-point id="notificationEvaluationStategies" name="Notification Evaluation Provider Strategy Extension Point" schema="schema/notificationEvaluationStategies.exsd"/>
+   <extension
+         point="org.electrocodeogram.cpc.core.providers">
+      <provider
+            class="org.electrocodeogram.cpc.notification.provider.NotificationEvaluationProvider"
+            name="Default INotificationEvaluationProvider Implementation"
+            priority="0"
+            singleton="true"
+            type="org.electrocodeogram.cpc.core.api.provider.notification.INotificationEvaluationProvider">
+      </provider>
+      <provider
+            class="org.electrocodeogram.cpc.notification.provider.NotificationDelayProvider"
+            name="Default INotificationDelayProvider Implementation"
+            priority="0"
+            singleton="true"
+            type="org.electrocodeogram.cpc.core.api.provider.notification.INotificationDelayProvider">
+      </provider>
+   </extension>
+   <extension
+         point="org.electrocodeogram.cpc.core.eventHubListeners">
+      <listener
+            class="org.electrocodeogram.cpc.notification.listener.CloneModificationListener"
+            name="CloneModificationListener">
+         <eventType
+               class="org.electrocodeogram.cpc.core.api.hub.event.CloneModificationEvent">
+         </eventType>
+      </listener>
+      <listener
+            class="org.electrocodeogram.cpc.notification.listener.CloneNotificationListener"
+            name="CloneNotificationListener">
+         <eventType
+               class="org.electrocodeogram.cpc.core.api.hub.event.CloneNotificationEvent">
+         </eventType>
+      </listener>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="org.electrocodeogram.cpc.core.preferences.cpc"
+            class="org.electrocodeogram.cpc.notification.preferences.CPCNotificationPreferencePage"
+            id="org.electrocodeogram.cpc.notification.preferences.cpcnotification"
+            name="%cpcnotification.preferences.cpcnotification.category.name">
+      </page>
+      <page
+            category="org.electrocodeogram.cpc.core.preferences.cpc/org.electrocodeogram.cpc.notification.preferences.cpcnotification/org.electrocodeogram.cpc.notification.preferences.notificationevaluationstrategies"
+            class="org.electrocodeogram.cpc.notification.preferences.CPCMinAgeStrategyPreferencePage"
+            id="org.electrocodeogram.cpc.notification.preferences.minagestrategy"
+            name="%cpcnotification.preferences.strategies.minagestrategy.category.name">
+      </page>
+      <page
+            category="org.electrocodeogram.cpc.core.preferences.cpc/org.electrocodeogram.cpc.notification.preferences.cpcnotification"
+            class="org.electrocodeogram.cpc.notification.preferences.CPCNotificationDelayPreferencePage"
+            id="org.electrocodeogram.cpc.notification.preferences.notificationdelayprovider"
+            name="%cpcnotification.preferences.notificationdelayprovider.category.name">
+      </page>
+      <page
+            category="org.electrocodeogram.cpc.core.preferences.cpc/org.electrocodeogram.cpc.notification.preferences.cpcnotification"
+            class="org.electrocodeogram.cpc.notification.preferences.CPCNotificationEvaluationStrategiesPreferencePage"
+            id="org.electrocodeogram.cpc.notification.preferences.notificationevaluationstrategies"
+            name="%cpcnotification.preferences.strategies.category.name">
+      </page>
+   </extension>
+   <extension
+         point="org.electrocodeogram.cpc.notification.notificationEvaluationStategies">
+      <strategy
+            class="org.electrocodeogram.cpc.notification.strategy.SimpleCategoryStrategy"
+            name="Simple Category Strategy (ignores template clones)"
+            priority="100">
+      </strategy>
+      <strategy
+            class="org.electrocodeogram.cpc.notification.strategy.WhitespaceOnlyChangeStrategy"
+            name="Whitespace Only Change Strategy (ignores whitespace changes)"
+            priority="90">
+      </strategy>
+      <strategy
+            class="org.electrocodeogram.cpc.notification.strategy.SelfSimilarityStrategy"
+            name="Self Similarity Strategy (ignores insignificant changes)"
+            priority="80">
+      </strategy>
+      <strategy
+            class="org.electrocodeogram.cpc.notification.strategy.FullSimilarityStrategy"
+            name="Full Similarity Strategy (checks synchronisation state of clones)"
+            priority="70">
+      </strategy>
+      <strategy
+            class="org.electrocodeogram.cpc.notification.strategy.MinAgeStrategy"
+            name="Minimum Age Strategy (prevents warnings for young clones)"
+            priority="60">
+      </strategy>
+      <strategy
+            class="org.electrocodeogram.cpc.notification.strategy.SameClassStrategy"
+            name="Same Class Strategy (prevents warnings for clones within one class)"
+            priority="50">
+      </strategy>
+      <strategy
+            class="org.electrocodeogram.cpc.notification.strategy.DefaultResultStrategy"
+            name="Default Result Strategy (fallback strategy, creates notifications for all changes)"
+            priority="-100">
+      </strategy>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="org.electrocodeogram.cpc.notification.preferences.CPCPreferenceInitializer">
+      </initializer>
+   </extension>
+</plugin>
