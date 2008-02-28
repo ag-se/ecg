@@ -1,0 +1,20 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: CPC Store Local XML
+Bundle-SymbolicName: org.electrocodeogram.cpc.store.local.xml;singleton:=true
+Bundle-Version: 1.0.2.qualifier
+Bundle-Activator: org.electrocodeogram.cpc.store.local.xml.CPCStoreLocalXMLPlugin
+Require-Bundle: org.eclipse.core.runtime,
+ org.electrocodeogram.cpc.core,
+ org.electrocodeogram.eclipse.core,
+ org.eclipse.ui,
+ org.electrocodeogram.cpc.track,
+ org.eclipse.core.resources,
+ org.eclipse.core.filesystem,
+ org.electrocodeogram.cpc.store
+Eclipse-LazyStart: true
+Bundle-Vendor: FU Berlin
+Bundle-ClassPath: cpc.store.local.xml.jar,
+ lib/jdom.jar
+Export-Package: org.electrocodeogram.cpc.store.local.xml,
+ org.electrocodeogram.cpc.store.local.xml.provider

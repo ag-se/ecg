@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension
+         point="org.electrocodeogram.cpc.core.providers">
+      <provider
+            class="org.electrocodeogram.cpc.store.local.xml.provider.XMLStoreProvider"
+            name="CPC Store Local XML - XML Local Store Provider"
+            priority="-50"
+            type="org.electrocodeogram.cpc.core.api.provider.store.IStoreProvider">
+      </provider>
+      <provider
+            class="org.electrocodeogram.cpc.store.local.xml.provider.XMLMappingProvider"
+            name="CPC Store Local XML - XML Mapping Provider"
+            priority="0"
+            singleton="true"
+            type="org.electrocodeogram.cpc.core.api.provider.xml.IMappingProvider">
+      </provider>
+   </extension>
+</plugin>
