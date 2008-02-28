@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.3"?>
+<plugin>
+   <extension-point id="importToolAdapters" name="Import Tool Adapters Extension Point" schema="schema/importToolAdapters.exsd"/>
+   <extension-point id="importFilterStrategies" name="Import Filter Strategies Extension Point" schema="schema/importFilterStrategies.exsd"/>
+</plugin>
