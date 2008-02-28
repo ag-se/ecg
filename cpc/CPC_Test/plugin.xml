@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension
+         point="org.electrocodeogram.cpc.core.cloneDataElements">
+      <cloneObjectExtension
+            class="org.electrocodeogram.cpc.test.data.SomeStatefulCloneObjectExtension"
+            name="StoreTest Stateful Sample Extension"
+            parentType="org.electrocodeogram.cpc.core.api.data.IClone"
+            priority="0"
+            type="org.electrocodeogram.cpc.test.data.ISomeStatefulCloneObjectExtension">
+      </cloneObjectExtension>
+      <cloneObjectExtension
+            class="org.electrocodeogram.cpc.test.data.SomeMultiStatefulCloneObjectExtension"
+            name="StoreTest Multi Stateful Sample Extension"
+            parentType="org.electrocodeogram.cpc.core.api.data.IClone"
+            priority="0"
+            type="org.electrocodeogram.cpc.test.data.ISomeMultiStatefulCloneObjectExtension">
+      </cloneObjectExtension>
+   </extension>
+</plugin>
