@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.3"?>
+<plugin>
+   <extension
+         point="org.electrocodeogram.cpc.core.providers">
+      <provider
+            class="org.electrocodeogram.cpc.store.local.sql.provider.SQLStoreProvider"
+            name="CPC Store Local SQL - SQL/JDBC Local Store Provider with HSQL integration"
+            priority="0"
+            type="org.electrocodeogram.cpc.core.api.provider.store.IStoreProvider">
+      </provider>
+   </extension>
+   <extension
+         point="org.electrocodeogram.cpc.core.cloneDataElements">
+      <cloneObjectSupport
+            class="org.electrocodeogram.cpc.store.local.sql.data.CloneFileContent"
+            name="Store Local SQL CloneFileContent Data Element"
+            priority="0"
+            type="org.electrocodeogram.cpc.store.local.sql.data.ICloneFileContent">
+      </cloneObjectSupport>
+   </extension>
+</plugin>
