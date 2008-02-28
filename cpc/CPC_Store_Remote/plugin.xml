@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.3"?>
+<plugin>
+   <extension
+         point="org.electrocodeogram.cpc.core.eventHubListeners">
+      <listener
+            class="org.electrocodeogram.cpc.store.remote.listener.TeamEventListener"
+            name="TeamEventListener">
+         <eventType
+               class="org.electrocodeogram.cpc.core.api.hub.event.EclipseTeamEvent"
+               synchronous="true">
+         </eventType>
+      </listener>
+   </extension>
+</plugin>
