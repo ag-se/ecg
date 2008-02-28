@@ -1,0 +1,21 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: CPC Store
+Bundle-SymbolicName: org.electrocodeogram.cpc.store;singleton:=true
+Bundle-Version: 1.0.2.qualifier
+Bundle-Activator: org.electrocodeogram.cpc.store.CPCStorePlugin
+Require-Bundle: org.eclipse.core.runtime,
+ org.electrocodeogram.cpc.core,
+ org.electrocodeogram.eclipse.core,
+ org.eclipse.ui,
+ org.electrocodeogram.cpc.track,
+ org.eclipse.core.resources,
+ org.eclipse.core.filesystem
+Eclipse-LazyStart: true
+Bundle-Vendor: FU Berlin
+Bundle-ClassPath: cpc.store.jar
+Export-Package: org.electrocodeogram.cpc.store,
+ org.electrocodeogram.cpc.store.data,
+ org.electrocodeogram.cpc.store.data.extension,
+ org.electrocodeogram.cpc.store.provider,
+ org.electrocodeogram.cpc.store.utils

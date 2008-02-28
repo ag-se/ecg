@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.3"?>
+<plugin>
+   <extension
+         point="org.electrocodeogram.cpc.core.cloneDataElements">
+      <cloneObject
+            class="org.electrocodeogram.cpc.store.data.Clone"
+            name="Default IClone Implementation"
+            priority="0"
+            type="org.electrocodeogram.cpc.core.api.data.IClone">
+      </cloneObject>
+      <cloneObject
+            class="org.electrocodeogram.cpc.store.data.CloneFile"
+            name="Default ICloneFile Implementation"
+            priority="0"
+            type="org.electrocodeogram.cpc.core.api.data.ICloneFile">
+      </cloneObject>
+      <cloneObject
+            class="org.electrocodeogram.cpc.store.data.CloneGroup"
+            name="Default ICloneGroup Implementation"
+            priority="0"
+            type="org.electrocodeogram.cpc.core.api.data.ICloneGroup">
+      </cloneObject>
+      <!--
+      <cloneObjectSupport
+            class="org.electrocodeogram.cpc.store.data.ClonePosition"
+            name="Default IClonePosition Implementation"
+            priority="0"
+            type="org.electrocodeogram.cpc.core.api.data.IClonePosition">
+      </cloneObjectSupport>
+      -->
+      <cloneObjectExtension
+            class="org.electrocodeogram.cpc.store.data.extension.CloneNonWsPositionExtension"
+            name="Default ICloneNonWsPositionExtension Implementation"
+            parentType="org.electrocodeogram.cpc.core.api.data.IClone"
+            priority="0"
+            type="org.electrocodeogram.cpc.core.api.data.extension.ICloneNonWsPositionExtension">
+      </cloneObjectExtension>
+      <cloneObjectExtension
+            class="org.electrocodeogram.cpc.store.data.extension.CloneModificationHistoryExtension"
+            name="Default ICloneModificationHistoryExtension Implementation"
+            parentType="org.electrocodeogram.cpc.core.api.data.IClone"
+            priority="0"
+            type="org.electrocodeogram.cpc.core.api.data.extension.ICloneModificationHistoryExtension">
+      </cloneObjectExtension>
+   </extension>
+
+</plugin>
