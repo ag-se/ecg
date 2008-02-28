@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.3"?>
+<plugin>
+      <extension
+         point="org.eclipse.ui.popupMenus">
+         <objectContribution
+       	   id="org.electrocodeogram.cpc.ui.CPCResourceContextMenu"
+           objectClass="org.eclipse.core.resources.IResource" adaptable="true">
+         <menu
+               label="%cpcui.contextmenu.name"
+               path="additions"
+               id="org.electrocodeogram.cpc.ui.CPCContextMenu">
+            <separator
+                  name="content">
+            </separator>
+            <separator
+                  name="additions">
+            </separator>
+         </menu>		
+         <action
+               label="%cpcui.action.checkintegrity.name"
+               class="org.electrocodeogram.cpc.debug.actions.IntegrityCheckActionDelegate"
+               menubarPath="org.electrocodeogram.cpc.ui.CPCContextMenu/content"
+               enablesFor="+"
+               id="org.electrocodeogram.cpc.debug.actions.IntegrityCheckActionDelegate">
+         </action>
+         <action
+               label="%cpcui.action.reclassifyclones.name"
+               class="org.electrocodeogram.cpc.debug.actions.ReclassifyClonesActionDelegate"
+               menubarPath="org.electrocodeogram.cpc.ui.CPCContextMenu/content"
+               enablesFor="+"
+               id="org.electrocodeogram.cpc.debug.actions.ReclassifyClonesActionDelegate">
+         </action>
+         
+      </objectContribution>
+   </extension>
+
+</plugin>
