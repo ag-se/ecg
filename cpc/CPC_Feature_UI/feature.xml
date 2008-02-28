@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="org.electrocodeogram.cpc.ui"
+      label="CPC UI Feature"
+      version="1.0.2.qualifier"
+      provider-name="FU Berlin">
+
+   <description url="http://cpc.anetwork.de">
+      CPC Clone Tracking for the Eclipse IDE - Basic UI Modules
+   </description>
+
+   <copyright url="http://cpc.anetwork.de/copyright.html">
+      (C) 2007-2008 by Valentin Weckerle, all rights reserved.
+The software may be used according to GPL v2.
+   </copyright>
+
+   <license url="http://cpc.anetwork.de/license.html">
+      GPL v2
+   </license>
+
+   <url>
+      <update label="CPC Update Site" url="http://cpc.anetwork.de/update"/>
+   </url>
+
+   <requires>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.core.resources"/>
+      <import plugin="org.electrocodeogram.cpc.core"/>
+      <import plugin="org.electrocodeogram.eclipse.core"/>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.ui.views"/>
+      <import plugin="org.eclipse.ui.editors"/>
+      <import plugin="org.eclipse.ui.workbench.texteditor"/>
+      <import plugin="org.eclipse.ui.ide"/>
+      <import plugin="org.eclipse.jdt.ui"/>
+      <import plugin="org.eclipse.jdt.core"/>
+      <import plugin="org.eclipse.jface.text"/>
+      <import plugin="org.electrocodeogram.cpc.importexport"/>
+      <import plugin="org.electrocodeogram.cpc.exports"/>
+      <import plugin="org.electrocodeogram.cpc.imports"/>
+   </requires>
+
+   <plugin
+         id="org.electrocodeogram.cpc.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.electrocodeogram.cpc.exports.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.electrocodeogram.cpc.imports.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>
