@@ -1,0 +1,25 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: CPC UI
+Bundle-SymbolicName: org.electrocodeogram.cpc.ui;singleton:=true
+Bundle-Version: 1.0.2.qualifier
+Bundle-Activator: org.electrocodeogram.cpc.ui.CPCUiPlugin
+Bundle-Localization: plugin
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.core.resources,
+ org.electrocodeogram.cpc.core,
+ org.electrocodeogram.eclipse.core,
+ org.eclipse.ui,
+ org.eclipse.ui.views,
+ org.eclipse.ui.editors,
+ org.eclipse.ui.workbench.texteditor,
+ org.eclipse.ui.ide,
+ org.eclipse.jdt.ui,
+ org.eclipse.jdt.core,
+ org.eclipse.jface.text
+Eclipse-LazyStart: true
+Bundle-Vendor: FU Berlin
+Bundle-ClassPath: cpc.ui.jar
+Export-Package: org.electrocodeogram.cpc.ui,
+ org.electrocodeogram.cpc.ui.api,
+ org.electrocodeogram.cpc.ui.views

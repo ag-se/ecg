@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.3"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            id="org.electrocodeogram.cpc.ui.category.cpc"
+            name="%cpcui.category.name">
+      </category>
+      <view
+            category="org.electrocodeogram.cpc.ui.category.cpc"
+            class="org.electrocodeogram.cpc.ui.views.SimpleCloneView"
+            icon="icons/sample.gif"
+            id="org.electrocodeogram.cpc.ui.views.simplecloneview"
+            name="%cpcui.view.simple.name">
+      </view>
+   </extension>
+
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            id="org.electrocodeogram.cpc.ui.category.cpc"
+            name="%cpcui.category.name">
+      </category>
+      <view
+            category="org.electrocodeogram.cpc.ui.category.cpc"
+            class="org.electrocodeogram.cpc.ui.views.TreeCloneView"
+            icon="icons/sample.gif"
+            id="org.electrocodeogram.cpc.ui.views.treecloneview"
+            name="%cpcui.view.tree.name">
+      </view>
+   </extension>
+
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            id="org.electrocodeogram.cpc.ui.category.cpc"
+            name="%cpcui.category.name">
+      </category>
+      <view
+            category="org.electrocodeogram.cpc.ui.category.cpc"
+            class="org.electrocodeogram.cpc.ui.views.codereplay.ReplayView"
+            icon="icons/sample.gif"
+            id="org.electrocodeogram.cpc.ui.views.replayview"
+            name="%cpcui.view.replay.name">
+      </view>
+   </extension>
+
+      <extension
+         point="org.eclipse.ui.popupMenus">
+         <objectContribution
+       	   id="org.electrocodeogram.cpc.ui.CPCResourceContextMenu"
+           objectClass="org.eclipse.core.resources.IResource" adaptable="true">
+         <menu
+               label="%cpcui.contextmenu.name"
+               path="additions"
+               id="org.electrocodeogram.cpc.ui.CPCContextMenu">
+            <separator
+                  name="content">
+            </separator>
+            <separator
+                  name="additions">
+            </separator>
+         </menu>		
+         <action
+               label="%cpcui.action.purge.name"
+               class="org.electrocodeogram.cpc.ui.actions.PurgeCloneDataActionDelegate"
+               menubarPath="org.electrocodeogram.cpc.ui.CPCContextMenu/content"
+               enablesFor="+"
+               id="org.electrocodeogram.cpc.ui.actions.PurgeCloneDataActionDelegate">
+         </action>
+      </objectContribution>
+   </extension>
+
+	<extension point="org.eclipse.ui.workbench.texteditor.rulerColumns">
+		<column id="org.electrocodeogram.cpc.ui.rulers.cpcclones" name="CPC Clones Ruler"
+			class="org.electrocodeogram.cpc.ui.ruler.CPCContributedRulerColumn"
+			enabled="true" global="true" includeInMenu="true">
+				<placement gravity="0.7">
+					<after id="org.eclipse.ui.editors.columns.annotations"/>
+				</placement>
+				<targetClass class="org.eclipse.ui.texteditor.AbstractDecoratedTextEditor">
+				</targetClass>
+		</column>
+	</extension>
+ <extension
+       point="org.electrocodeogram.cpc.core.eventHubListeners">
+    <listener
+          class="org.electrocodeogram.cpc.ui.listener.CloneEventListener"
+          name="CloneEventListener">
+       <eventType
+             class="org.electrocodeogram.cpc.core.api.hub.event.CloneModificationEvent">
+       </eventType>
+    </listener>
+    <listener
+          class="org.electrocodeogram.cpc.ui.listener.EditorPartListener"
+          name="EditorPartListener">
+       <eventType
+             class="org.electrocodeogram.cpc.core.api.hub.event.EclipseEditorPartEvent">
+       </eventType>
+    </listener>
+ </extension>
+
+   <extension
+         point="org.eclipse.core.runtime.adapters">
+      <factory
+            class="org.electrocodeogram.cpc.ui.data.CloneObjectPropertySourceAdapterFactory"
+            adaptableType="org.electrocodeogram.cpc.core.api.data.IClone">
+            <adapter type="org.eclipse.ui.views.properties.IPropertySource"/>
+      </factory>      
+   </extension>
+
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="org.electrocodeogram.cpc.core.preferences.cpc"
+            class="org.electrocodeogram.cpc.ui.preferences.CPCUIPreferencePage"
+            id="org.electrocodeogram.cpc.ui.preferences.cpcui"
+            name="%cpcui.preferences.cpcui.category.name">
+      </page>
+      <page
+            category="org.electrocodeogram.cpc.core.preferences.cpc/org.electrocodeogram.cpc.ui.preferences.cpcui"
+            class="org.electrocodeogram.cpc.ui.preferences.CPCUIRulerPreferencePage"
+            id="org.electrocodeogram.cpc.ui.preferences.cpcruler"
+            name="%cpcui.preferences.cpcruler.category.name">
+      </page>
+   </extension>
+
+</plugin>
